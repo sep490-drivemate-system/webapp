@@ -3,15 +3,13 @@ import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { FcGoogle } from "react-icons/fc";
-import { FaFacebook, FaMap } from "react-icons/fa";
+import { FaFacebook } from "react-icons/fa";
+import Link from "next/link"
 
 export function LoginForm({
   className,
@@ -20,87 +18,75 @@ export function LoginForm({
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="bg-white/50 backdrop-blur-sm border-none">
-        <CardHeader className="flex flex-col gap-2 justify-center items-center">
-          <CardTitle className="text-2xl font-bold">Login to your account</CardTitle>
-          <CardDescription className="text-sm text-gray-500">
-            Enter your email below to login to your account
-          </CardDescription>
+    <div className={cn("flex flex-col", className)} {...props}>
+      <Card className="bg-white/50 backdrop-blur-md border-none shadow-lg rounded-2xl p-6">
+        <CardHeader className="flex flex-col gap-2 justify-center items-center pb-2">
+          <Link href="/">
+            <h1 className="text-3xl font-bold mb-1 mt-2">Drive Mate</h1>
+          </Link>
+
+          <h2 className="text-2xl font-bold mb-2">Sign in to your account</h2>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <form>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-3">
-                <Input
-                  id="email"
-                  type="email"
-                  onChange={(e) => setEmail(e.target.value)}
-                  value={email}
-                  placeholder="m@example.com"
-                  required
-                />
-              </div>
-              <div className="grid gap-3">
-                <div className="flex justify-between text-sm text-black/35 mb-4">
-                  <label>
-                    <input type="checkbox" className="mr-1" />
-                    Lưu mật khẩu
+            <div className="flex flex-col gap-4">
+              <Input
+                id="email"
+                type="email"
+                onChange={(e) => setEmail(e.target.value)}
+                value={email}
+                placeholder="Email"
+                required
+                className="rounded-lg bg-white/90 border border-gray-300 px-4 py-3 text-base shadow-sm focus:ring-2 focus:ring-blue-200"
+              />
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between text-sm text-gray-700">
+                  <label className="flex items-center gap-1">
+                    <input type="checkbox" className="rounded mr-1" />
+                    Remember me
                   </label>
-                  <a href="#" className="underline">
-                    Quên mật khẩu?
-                  </a>
+                  <a href="#" className="text-blue-900/70 hover:underline font-medium">Forgot password?</a>
                 </div>
                 <Input
                   id="password"
                   type="password"
                   onChange={(e) => setPassword(e.target.value)}
                   value={password}
-                  placeholder="********"
+                  placeholder="Password"
                   required
+                  className="rounded-lg bg-white/90 border border-gray-300 px-4 py-3 text-base shadow-sm focus:ring-2 focus:ring-blue-200"
                 />
+                <div className="flex items-center my-2">
+                  <div className="flex-1 h-px bg-gray-300" />
+                  <span className="mx-3 text-gray-500 text-sm font-medium">Or Sign in with</span>
+                  <div className="flex-1 h-px bg-gray-300" />
+                </div>
               </div>
-              <div className="text-black/35 text-sm font-medium">Đăng nhập với</div>
-              <div className="flex justify-center items-center gap-2 ">
+              <div className="flex justify-center items-center gap-4">
                 <Button
                   variant="outline"
                   type="button"
-                  //  onClick={() => handleGoogleLogin()}
-                  className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-full shadow hover:shadow-md transition"
+                  className="flex items-center gap-2 bg-white text-black px-6 py-2 rounded-full shadow hover:shadow-md transition border border-gray-300"
                 >
                   <FcGoogle className="text-xl" />
-                  <span className="text-sm font-medium">Google</span>
+                  <span className="text-base font-medium">Google</span>
                 </Button>
                 <Button
                   variant="outline"
                   type="button"
-                  //  onClick={() => handleGoogleLogin()}
-                  className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-full shadow hover:shadow-md transition"
+                  className="flex items-center gap-2 bg-white text-black px-6 py-2 rounded-full shadow hover:shadow-md transition border border-gray-300"
                 >
-                  <FaFacebook className="text-xl" />
-                  <span className="text-sm font-medium">Facebook</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  type="button"
-                  //  onClick={() => handleGoogleLogin()}
-                  className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-full shadow hover:shadow-md transition"
-                >
-                  <FaMap className="text-xl" />
-                  <span className="text-sm font-medium">ZaLo</span>
+                  <FaFacebook className="text-xl text-[#1877f3]" />
+                  <span className="text-base font-medium">Facebook</span>
                 </Button>
               </div>
-              <div className="flex flex-col gap-3">
-                <Button type="submit" className="w-full">
-                  Login
-                </Button>
-              </div>
+              <Button type="submit" className="w-full mt-2 bg-[#0074c2] hover:bg-[#00598a] text-white text-base rounded-lg py-3 shadow">
+                Sign In
+              </Button>
             </div>
-            <div className="mt-4 text-center text-sm">
+            <div className="mt-6 text-center text-base">
               Don&apos;t have an account?{" "}
-              <a href="#" className="underline underline-offset-4">
-                Sign up
-              </a>
+              <Link href="/signup" className="underline font-medium text-blue-900/80">Sign up</Link>
             </div>
           </form>
         </CardContent>

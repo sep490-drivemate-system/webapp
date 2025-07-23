@@ -1,226 +1,171 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { User, Menu, X } from "lucide-react";
-import logo from "@/../public/bg-auth.jpg";
-import ProfilePicture from "@/../public/bg-auth.jpg";
+import { useState, useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { User } from "lucide-react";
 
-const Header = () => {
-  const pathname = usePathname();
-  const router = useRouter();
+const MAIN_MENU = [
+  { path: "/", label: "Home" },
+  { path: "/services", label: "Services" },
+  { path: "/driving-centor", label: "Driving Centor" },
+  { path: "/mentor", label: "Mentor" },
+  { path: "/blog", label: "Blog" },
+  { path: "/news", label: "News" },
+  { path: "/handbook", label: "Handbook" },
+];
 
-  const [showAuthOptions, setShowAuthOptions] = useState(false);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
-  const isAuthenticated = !!token;
-
-  const handleLogout = () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("user_role");
-    }
-    setShowProfileMenu(false);
-    router.push("/auth");
-  };
-
-  const mainMenuItems = [
-    { path: "/", label: "Home" },
-    { path: "/about", label: "About" },
-    { path: "/services", label: "Service" },
-    { path: "/suppliers", label: "Center" },
-    { path: "/mentors", label: "Mentor" },
-    { path: "/blogs", label: "Blog" },
-  ];
-
-  const isActive = (path: string) => {
-    if (path === "/") return pathname === "/";
-    return pathname?.startsWith(path);
-  };
-
+function Logo() {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md border-b border-white/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <Image src={logo} alt="logo" className="h-8 w-auto" />
-            <span className="text-xl font-bold text-white">EvenTop</span>
-          </Link>
+    <Link href="/" className="flex font-bold items-center">
+      <span className="flex items-center justify-center size-7 lg:size-8 mr-2 bg-gradient-to-tr from-primary via-primary/70 to-primary rounded-lg border border-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sun-dim size-5 lg:size-6 text-white"><circle cx="12" cy="12" r="4"></circle><path d="M12 4h.01"></path><path d="M20 12h.01"></path><path d="M12 20h.01"></path><path d="M4 12h.01"></path><path d="M17.657 6.343h.01"></path><path d="M17.657 17.657h.01"></path><path d="M6.343 17.657h.01"></path><path d="M6.343 6.343h.01"></path></svg>
+      </span>
+      <h5 className="text-lg lg:text-xl">Cosmic</h5>
+    </Link>
+  );
+}
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-4">
-            {mainMenuItems.map((item) => (
+function NavMenu({ menu, activePath }: { menu: { path: string; label: string }[]; activePath: string }) {
+  return (
+    <nav aria-label="Main" className="group/navigation-menu relative max-w-max flex-1 items-center justify-center mx-auto hidden lg:block">
+      <div style={{ position: "relative" }}>
+        <ul className="group flex flex-1 list-none items-center justify-center gap-1 space-x-0" dir="ltr">
+          {menu.map((item) => (
+            <li key={item.path} className="relative">
               <Link
-                key={item.path}
                 href={item.path}
-                className={`text-white px-4 py-2 rounded-md hover:bg-white/10 ${
-                  isActive(item.path) ? "font-semibold" : ""
-                }`}
+                className={`group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors ${activePath === item.path
+                  ? "bg-[#00598a] text-white dark:bg-[#004b6a]"
+                  : "hover:bg-[#006fa8] hover:text-white dark:hover:bg-[#005a7a]"
+                  }`}
               >
                 {item.label}
               </Link>
-            ))}
-          </nav>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </nav>
+  );
+}
 
-          {/* Right Side Actions */}
-          <div className="hidden md:flex items-center space-x-4">
-            {!isAuthenticated ? (
-              <div className="relative">
-                <button
-                  onClick={() => setShowAuthOptions((prev) => !prev)}
-                  className="flex items-center text-white hover:text-gray-300"
-                >
-                  <User className="h-6 w-6" />
-                  <span>Tài khoản</span>
-                </button>
-                {showAuthOptions && (
-                  <div className="absolute top-full right-0 mt-2 w-40 bg-white rounded-lg shadow-lg py-2">
-                    <Link
-                      href="/auth?type=login"
-                      className="block px-2 py-1 text-gray-800 hover:bg-gray-100"
-                    >
-                      Đăng nhập
-                    </Link>
-                    <Link
-                      href="/auth?type=register"
-                      className="block px-2 py-1 text-gray-800 hover:bg-gray-100"
-                    >
-                      Đăng ký
-                    </Link>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <>
-                <div className="relative">
-                  <button
-                    onClick={() => setShowProfileMenu(!showProfileMenu)}
-                    className="focus:outline-none"
-                  >
-                    <Image
-                      src={ProfilePicture}
-                      alt="Profile"
-                      className="h-8 w-8 rounded-full border-2 border-white"
-                    />
-                  </button>
-                  {showProfileMenu && (
-                    <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2">
-                      <Link
-                        href="/profile"
-                        className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-                      >
-                        Thông tin cá nhân
-                      </Link>
-                      <Link
-                        href="/history"
-                        className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-                      >
-                        Lịch sử
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
-                      >
-                        Đăng xuất
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
+function ThemeToggle({ isDark, onToggle }: { isDark: boolean; onToggle: () => void }) {
+  return (
+    <button onClick={onToggle} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-9">
+      <div className="flex items-center gap-2 dark:hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-moon"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
+        <span className="block lg:hidden">Dark</span>
+      </div>
+      <div className="dark:flex items-center gap-2 hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sun"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
+        <span className="block lg:hidden">Light</span>
+      </div>
+      <span className="sr-only">Change theme</span>
+    </button>
+  );
+}
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-              className="text-white hover:text-gray-300 focus:outline-none"
-            >
-              {isMobileMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
+function UserDropdown() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [open]);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        className="h-10 rounded-md flex items-center justify-center"
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="true"
+        aria-expanded={open}
+      >
+        <User className="w-6 h-6" />
+      </button>
+      {open && (
+        <div className="absolute right-0 mt-2 w-23 bg-white rounded-lg shadow-lg py-2 z-50">
+          <Link
+            href="/signin"
+            className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+            onClick={() => setOpen(false)}
+          >
+            Sign in
+          </Link>
+          <Link
+            href="/signup"
+            className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+            onClick={() => setOpen(false)}
+          >
+            Sign up
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MobileMenu({ menu, activePath, open, onClose }: { menu: { path: string; label: string }[]; activePath: string; open: boolean; onClose: () => void }) {
+  if (!open) return null;
+  return (
+    <div className="lg:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md">
+      <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
+        {menu.map((item) => (
+          <Link
+            key={item.path}
+            href={item.path}
+            className={`block px-6 py-3 rounded-md text-lg font-medium ${activePath === item.path ? "bg-accent text-accent-foreground" : "text-white hover:bg-accent hover:text-accent-foreground"}`}
+            onClick={onClose}
+          >
+            {item.label}
+          </Link>
+        ))}
+        <div className="w-full flex flex-col gap-2 mt-4">
+          <Link href="/signin" className="block px-6 py-3 rounded-md text-lg font-medium text-white hover:bg-accent hover:text-accent-foreground" onClick={onClose}>Sign in</Link>
+          <Link href="/signup" className="block px-6 py-3 rounded-md text-lg font-medium text-white hover:bg-accent hover:text-accent-foreground" onClick={onClose}>Sign up</Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function Header() {
+  const [isDark, setIsDark] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+
+  return (
+    <header className="fixed z-40 p-5 w-full">
+      <div className="container">
+        <div className="bg-background/70 flex items-center justify-between rounded-2xl border p-3 backdrop-blur-sm">
+          <Logo />
+          <div className="flex items-center lg:hidden">
+            <button onClick={() => setMobileOpen((v) => !v)} aria-label="Open menu">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-menu cursor-pointer lg:hidden" type="button"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
             </button>
+          </div>
+          <NavMenu menu={MAIN_MENU} activePath={pathname} />
+          <div className="hidden items-center lg:flex gap-2">
+            <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} />
+            <UserDropdown />
           </div>
         </div>
       </div>
-
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-black/95">
-          <div className="px-2 pt-2 pb-3 space-y-1">
-            {mainMenuItems.map((item) => (
-              <Link
-                key={item.path}
-                href={item.path}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  isActive(item.path)
-                    ? "text-white bg-gray-900"
-                    : "text-gray-300 hover:text-white hover:bg-gray-700"
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
-            {!isAuthenticated ? (
-              <>
-                <Link
-                  href="/auth?type=login"
-                  className="block px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700"
-                >
-                  Đăng nhập
-                </Link>
-                <Link
-                  href="/auth?type=register"
-                  className="block px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700"
-                >
-                  Đăng ký
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/planning"
-                  className="block px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700"
-                >
-                  Lịch trình
-                </Link>
-                <Link
-                  href="/cart"
-                  className="block px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700"
-                >
-                  Giỏ hàng
-                </Link>
-                <Link
-                  href="/profile"
-                  className="block px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700"
-                >
-                  Thông tin cá nhân
-                </Link>
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="w-full text-left px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700"
-                >
-                  Đăng xuất
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      <MobileMenu menu={MAIN_MENU} activePath={pathname} open={mobileOpen} onClose={() => setMobileOpen(false)} />
     </header>
   );
-};
-
-export default Header;
+}

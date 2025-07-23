@@ -1,115 +1,46 @@
-"use client"; // nếu dùng App Router
+"use client";
 
 import Link from "next/link";
 
-const Footer = () => {
-  return (
-    <footer className="text-gray-600 body-font">
-      <div className="container px-5 py-24 mx-auto flex md:items-center lg:items-start md:flex-row md:flex-nowrap flex-wrap flex-col">
-        <div className="w-64 flex-shrink-0 md:mx-0 mx-auto text-center md:text-left">
-          <Link
-            href="/"
-            className="flex title-font font-medium items-center md:justify-start justify-center text-gray-900"
-          >
-            <div className="w-10 h-10 text-white p-2 bg-indigo-500 rounded-full flex items-center justify-center">
-              {/* Icon SVG Logo */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                className="w-6 h-6"
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-              </svg>
-            </div>
-            <span className="ml-3 text-xl">Tailblocks</span>
-          </Link>
-          <p className="mt-2 text-sm text-gray-500">
-            Air plant banjo lyft occupy retro adaptogen indego
-          </p>
-        </div>
+const links = {
+  Contact: ["Github", "Twitter", "Instagram"],
+  Platforms: ["iOS", "Android", "Web"],
+  Help: ["Contact Us", "FAQ", "Feedback"],
+  Socials: ["Twitch", "Discord", "Dribbble"],
+};
 
-        {/* Footer Links */}
-        <div className="flex-grow flex flex-wrap md:pl-20 -mb-10 md:mt-0 mt-10 md:text-left text-center">
-          {[1, 2, 3, 4].map((col) => (
-            <div key={col} className="lg:w-1/4 md:w-1/2 w-full px-4">
-              <h2 className="title-font font-medium text-gray-900 tracking-widest text-sm mb-3">
-                CATEGORIES
-              </h2>
-              <nav className="list-none mb-10">
-                {["First Link", "Second Link", "Third Link", "Fourth Link"].map(
-                  (item, index) => (
-                    <li key={index}>
-                      <a href="#" className="text-gray-600 hover:text-gray-800">
-                        {item}
-                      </a>
-                    </li>
-                  )
-                )}
-              </nav>
+export default function Footer() {
+  return (
+    <footer id="footer" className="container space-y-4 p-5">
+      <div className="bg-muted rounded-2xl border p-10">
+        <div className="grid grid-cols-2 gap-x-12 gap-y-8 md:grid-cols-4 xl:grid-cols-6">
+          {/* Brand */}
+          <div className="col-span-full space-y-4 xl:col-span-2">
+            <Link href="/" className="flex font-bold items-center">
+              <span className="flex items-center justify-center size-7 lg:size-8 mr-2 bg-gradient-to-tr from-primary via-primary/70 to-primary rounded-lg border border-secondary">
+                {/* Sun icon SVG */}
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sun-dim size-5 lg:size-6 text-white"><circle cx="12" cy="12" r="4"></circle><path d="M12 4h.01"></path><path d="M20 12h.01"></path><path d="M12 20h.01"></path><path d="M4 12h.01"></path><path d="M17.657 6.343h.01"></path><path d="M17.657 17.657h.01"></path><path d="M6.343 17.657h.01"></path><path d="M6.343 6.343h.01"></path></svg>
+              </span>
+              <h5 className="text-lg lg:text-xl">Cosmic</h5>
+            </Link>
+            <p className="text-muted-foreground">
+              Meet our AI-powered SaaS solution to lighten your workload, increase efficiency and make more accurate decisions.
+            </p>
+          </div>
+
+          {/* Links */}
+          {Object.entries(links).map(([section, items]) => (
+            <div key={section} className="flex flex-col gap-2">
+              <h3 className="mb-2 text-lg font-bold">{section}</h3>
+              {items.map((item) => (
+                <div key={item}>
+                  <a className="opacity-60 hover:opacity-100" href="#">{item}</a>
+                </div>
+              ))}
             </div>
           ))}
         </div>
       </div>
-
-      {/* Bottom Bar */}
-      <div className="bg-gray-100">
-        <div className="container mx-auto py-4 px-5 flex flex-wrap flex-col sm:flex-row">
-          <p className="text-gray-500 text-sm text-center sm:text-left">
-            © 2020 Tailblocks —
-            <a
-              href="https://twitter.com/knyttneve"
-              rel="noopener noreferrer"
-              className="text-gray-600 ml-1"
-              target="_blank"
-            >
-              @knyttneve
-            </a>
-          </p>
-          <span className="inline-flex sm:ml-auto sm:mt-0 mt-2 justify-center sm:justify-start">
-            {/* Social Icons */}
-            {[
-              // Facebook
-              // <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />,
-              // Twitter
-              // <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" />,
-              // Instagram
-              <>
-                <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-                <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zm1.5-4.87h.01" />
-              </>,
-              // LinkedIn
-              <>
-                <path
-                  stroke="none"
-                  d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"
-                />
-                <circle cx="4" cy="4" r="2" stroke="none" />
-              </>,
-            ].map((iconPath, index) => (
-              <a key={index} href="#" className="ml-3 text-gray-500">
-                <svg
-                  fill="currentColor"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  className="w-5 h-5"
-                  viewBox="0 0 24 24"
-                >
-                  {iconPath}
-                </svg>
-              </a>
-            ))}
-          </span>
-        </div>
-      </div>
     </footer>
   );
-};
-
-export default Footer;
+}
