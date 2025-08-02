@@ -65,7 +65,7 @@ export function LoginForm({
                   <p className="text-red-500 text-sm">{errors.email.message}</p>
                 )}
               </div>
-              
+
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between text-sm text-gray-700">
                   <label className="flex items-center gap-1">
