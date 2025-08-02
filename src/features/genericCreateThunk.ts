@@ -1,4 +1,4 @@
-import axiosInstance from "@/lib/api/axiosInstance";
+import axiosInstance from "@/lib/axios/axiosInstance";
 import { HttpMethod } from "@/types/constants/httpMethod";
 import { GenericResponse } from "@/types/generic/genericResponse";
 import { ThunkOptions } from "@/types/generic/thunkOptions";

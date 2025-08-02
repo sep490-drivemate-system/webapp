@@ -6,30 +6,32 @@ import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import Link from "next/link";
+import { signupSchema, SignupSchema } from "@/schemas/auth/signup.schema";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [formData, setFormData] = useState({
-    userName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+  const [isLoading, setIsLoading] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignupSchema>({
+    resolver: yupResolver(signupSchema),
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle registration logic here
-    console.log("Registration data:", formData);
+  const onSubmit = async (data: SignupSchema) => {
+    setIsLoading(true);
+    try {
+      // Handle registration logic here
+      console.log("Registration data:", data);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -47,61 +49,61 @@ export function RegisterForm({
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-6">
               {/* Personal Information */}
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Input
-                  id="firstName"
-                  name="firstName"
+                  id="userName"
                   type="text"
-                  onChange={handleInputChange}
-                  value={formData.userName}
+                  {...register("userName")}
                   placeholder="User Name"
-                  required
                   className="bg-white/60 text-black border border-gray-300 rounded-lg px-4 py-2"
                 />
+                {errors.userName && (
+                  <p className="text-red-500 text-sm">{errors.userName.message}</p>
+                )}
               </div>
 
               {/* Contact Information */}
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Input
                   id="email"
-                  name="email"
                   type="email"
-                  onChange={handleInputChange}
-                  value={formData.email}
+                  {...register("email")}
                   placeholder="Email"
-                  required
                   className="bg-white/60 text-black border border-gray-300 rounded-lg px-4 py-2"
                 />
+                {errors.email && (
+                  <p className="text-red-500 text-sm">{errors.email.message}</p>
+                )}
               </div>
 
               {/* Password */}
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Input
                   id="password"
-                  name="password"
                   type="password"
-                  onChange={handleInputChange}
-                  value={formData.password}
+                  {...register("password")}
                   placeholder="Password"
-                  required
                   className="bg-white/60 text-black border border-gray-300 rounded-lg px-4 py-2"
                 />
+                {errors.password && (
+                  <p className="text-red-500 text-sm">{errors.password.message}</p>
+                )}
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Input
                   id="confirmPassword"
-                  name="confirmPassword"
                   type="password"
-                  onChange={handleInputChange}
-                  value={formData.confirmPassword}
+                  {...register("confirmPassword")}
                   placeholder="Confirm password"
-                  required
                   className="bg-white/60 text-black border border-gray-300 rounded-lg px-4 py-2"
                 />
+                {errors.confirmPassword && (
+                  <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 <div className="flex-grow border-t border-gray-300"></div>
@@ -134,8 +136,20 @@ export function RegisterForm({
 
               {/* Submit Button */}
               <div className="flex flex-col gap-3">
-                <Button type="submit" className="w-full" variant="blue">
-                  Sign Up
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  variant="blue"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Signing up...
+                    </div>
+                  ) : (
+                    "Sign Up"
+                  )}
                 </Button>
               </div>
             </div>

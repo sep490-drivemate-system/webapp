@@ -1,12 +1,11 @@
 export default function Home() {
   return (
     <>
-      <div className="relative w-full h-screen isolate px-6 lg:px-8 bg-white">
+      <div className="relative w-full h-screen isolate px-6 lg:px-8">
         <div
           aria-hidden="true"
           className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
         >
-          <div className="relative left-1/2 aspect-[1155/678] w-[72.1875rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-blue-300 to-blue-500 opacity-30"></div>
         </div>
 
         {/* Content */}

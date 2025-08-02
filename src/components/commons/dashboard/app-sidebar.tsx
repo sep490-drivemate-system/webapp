@@ -42,27 +42,27 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/dashboard",
       icon: IconDashboard,
     },
     {
       title: "Lifecycle",
-      url: "#",
+      url: "/dashboard/lifecycle",
       icon: IconListDetails,
     },
     {
       title: "Analytics",
-      url: "#",
+      url: "/analytics",
       icon: IconChartBar,
     },
     {
       title: "Projects",
-      url: "#",
+      url: "/dashboard/projects",
       icon: IconFolder,
     },
     {
       title: "Team",
-      url: "#",
+      url: "/dashboard/team",
       icon: IconUsers,
     },
   ],
@@ -71,45 +71,45 @@ const data = {
       title: "Capture",
       icon: IconCamera,
       isActive: true,
-      url: "#",
+      url: "/dashboard/capture",
       items: [
         {
           title: "Active Proposals",
-          url: "#",
+          url: "/dashboard/capture/active",
         },
         {
           title: "Archived",
-          url: "#",
+          url: "/dashboard/capture/archived",
         },
       ],
     },
     {
       title: "Proposal",
       icon: IconFileDescription,
-      url: "#",
+      url: "/dashboard/proposal",
       items: [
         {
           title: "Active Proposals",
-          url: "#",
+          url: "/dashboard/proposal/active",
         },
         {
           title: "Archived",
-          url: "#",
+          url: "/dashboard/proposal/archived",
         },
       ],
     },
     {
       title: "Prompts",
       icon: IconFileAi,
-      url: "#",
+      url: "/dashboard/prompts",
       items: [
         {
           title: "Active Proposals",
-          url: "#",
+          url: "/dashboard/prompts/active",
         },
         {
           title: "Archived",
-          url: "#",
+          url: "/dashboard/prompts/archived",
         },
       ],
     },
@@ -117,34 +117,34 @@ const data = {
   navSecondary: [
     {
       title: "Settings",
-      url: "#",
+      url: "/dashboard/settings",
       icon: IconSettings,
     },
     {
       title: "Get Help",
-      url: "#",
+      url: "/dashboard/help",
       icon: IconHelp,
     },
     {
       title: "Search",
-      url: "#",
+      url: "/dashboard/search",
       icon: IconSearch,
     },
   ],
   documents: [
     {
       name: "Data Library",
-      url: "#",
+      url: "/dashboard/documents/data-library",
       icon: IconDatabase,
     },
     {
       name: "Reports",
-      url: "#",
+      url: "/dashboard/documents/reports",
       icon: IconReport,
     },
     {
       name: "Word Assistant",
-      url: "#",
+      url: "/dashboard/documents/word-assistant",
       icon: IconFileWord,
     },
   ],
@@ -162,7 +162,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <a href="#">
                 <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+                <span className="text-base font-semibold">DriveMate</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
