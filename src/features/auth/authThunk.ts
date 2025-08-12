@@ -13,12 +13,16 @@ export const signIn = createThunk<ISignInResponse, ISignInRequest>(
     onSuccess: (res) => {
       const accessToken = res.data?.accessToken;
       const refreshToken = res.data?.refreshToken;
-      handleTokenStorage(accessToken!, refreshToken!);
+      if (accessToken && refreshToken) {
+        handleTokenStorage(accessToken, refreshToken);
+      }
     },
   }
 );
 
-export const signUp = createThunk<boolean, ISignInRequest>(
+import type { ISignUpRequest } from "@/types/auth/signup.type";
+
+export const signUp = createThunk<boolean, ISignUpRequest>(
   HttpMethod.POST,
   `signup`,
   `${AUTH_PATH}/signup`

@@ -149,7 +149,7 @@ export default function Header() {
   return (
     <header className="fixed z-40 p-3 sm:p-4 lg:p-5 w-full">
       <div className="container mx-auto sm:px-6 lg:px-8">
-        <div className="bg-background/60 flex items-center justify-between rounded-2xl border p-2 sm:p-3 backdrop-blur-sm shadow-sm">
+        <div className="bg-background/40 flex items-center justify-between rounded-2xl border p-2 sm:p-3 backdrop-blur-sm shadow-sm">
           <Logo />
           <div className="flex items-center gap-2 lg:hidden">
             <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} />

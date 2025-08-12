@@ -1,13 +1,19 @@
+"use client";
 import { ReactNode } from "react";
 import { AppSidebar } from "@/components/commons/dashboard/app-sidebar";
 import { SiteHeader } from "@/components/commons/dashboard/site-header";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { useRequireAuth } from "@/hooks/auth/useRequireAuth";
+import { UserRole } from "@/types/auth/user-role.enum";
 
 interface DashboardLayoutProps {
   children: ReactNode;
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
+  // Bảo vệ layout dashboard cho Admin/Manager
+  useRequireAuth("/signin", [UserRole.Admin, UserRole.Manager], "/forbidden");
+
   return (
     <SidebarProvider
       style={

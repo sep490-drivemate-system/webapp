@@ -1,26 +1,24 @@
-import { useAppDispatch, useAppSelector } from "@/lib/redux/useAppDispatch";
-import { signIn, signUp } from "@/features/auth/authThunk";
+import { useAppSelector } from "@/lib/redux/useAppDispatch";
+import { signUp } from "@/features/auth/authThunk";
 import { useRouter } from "next/navigation";
-import { getUserRole } from "@/lib/jwt/jwt.utils";
-import { UserRole } from "@/types/auth/user-role.enum";
-import type { SigninSchema } from "@/schemas/auth/signin.schema";
 import { SignupSchema } from "@/schemas/auth/signup.schema";
+import { useThunkAction } from "@/lib/redux/useThunkAction";
 
 export const useSignUp = () => {
-    const dispatch = useAppDispatch();
+    const { runSafe: runSignUp, loading } = useThunkAction(signUp);
     const router = useRouter();
     const auth = useAppSelector((state) => state.auth);
 
     const handleSignUp = async (data: SignupSchema) => {
-        const result = await dispatch(signUp(data));
-
-        if (signUp.fulfilled.match(result)) {
+        const res = await runSignUp(data);
+        if (res.ok) {
             router.push("/");
         }
     };
 
     return {
         ...auth,
+        isLoading: auth.isLoading || loading,
         handleSignUp,
     };
 };

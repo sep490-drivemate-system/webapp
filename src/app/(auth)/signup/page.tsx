@@ -1,5 +1,4 @@
 "use client"
-import { LoginForm } from "@/components/ui/login-form"
 import bgLogin from "@/../public/bg-auth.jpg"
 import { RegisterForm } from "@/components/ui/register-form"
 

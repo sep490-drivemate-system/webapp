@@ -9,6 +9,7 @@ import Link from "next/link";
 import { signupSchema, SignupSchema } from "@/schemas/auth/signup.schema";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useSignUp } from "@/hooks/auth/useSignUp";
 
 export function RegisterForm({
   className,
@@ -24,11 +25,12 @@ export function RegisterForm({
     resolver: yupResolver(signupSchema),
   });
 
+  const { handleSignUp } = useSignUp();
+
   const onSubmit = async (data: SignupSchema) => {
     setIsLoading(true);
     try {
-      // Handle registration logic here
-      console.log("Registration data:", data);
+      await handleSignUp(data);
     } finally {
       setIsLoading(false);
     }
@@ -136,10 +138,9 @@ export function RegisterForm({
 
               {/* Submit Button */}
               <div className="flex flex-col gap-3">
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  variant="blue"
+                <Button
+                  type="submit"
+                  className="w-full"
                   disabled={isLoading}
                 >
                   {isLoading ? (

@@ -1,3 +1,4 @@
+"use client";
 import { AppSidebar } from "@/components/commons/dashboard/app-sidebar"
 import { ChartAreaInteractive } from "@/components/commons/dashboard/chart-area-interactive"
 import { DataTable } from "@/components/commons/dashboard/data-table"
@@ -7,10 +8,13 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar"
+import { useRequireAuth } from "@/hooks/auth/useRequireAuth"
+import { UserRole } from "@/types/auth/user-role.enum"
 
 import data from "./data.json"
 
 export default function Page() {
+  useRequireAuth([UserRole.Admin])
   return (
     <SidebarProvider
       style={

@@ -1,6 +1,7 @@
 export enum UserRole {
+  Demo = 0,
   Admin = 1,
-  Trainee = 2,
-  Manager = 3,
-  Mentor = 5,
+  Inspector = 2,
+  NoviceDriver = 3,
+  Instructor = 4
 }
