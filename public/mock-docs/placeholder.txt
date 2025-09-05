@@ -1,0 +1,16 @@
+# Mock Document Images Placeholder
+
+This directory contains placeholder images for the instructor management system.
+
+For a complete implementation, you would need to add actual document images:
+
+- b2-front-1.jpg to b2-front-5.jpg (B2 License front images)
+- b2-back-1.jpg to b2-back-5.jpg (B2 License back images)
+- cccd-front-1.jpg to cccd-front-5.jpg (CCCD front images)
+- cccd-back-1.jpg to cccd-back-5.jpg (CCCD back images)
+- prof-cert-1.jpg to prof-cert-5.jpg (Professional Certificate images)
+- health-cert-1.jpg to health-cert-5.jpg (Health Certificate images)
+- vehicle-papers-1.jpg to vehicle-papers-5.jpg (Vehicle Papers images)
+- vehicle-insurance-1.jpg to vehicle-insurance-5.jpg (Vehicle Insurance images)
+
+For now, the system will show broken image placeholders until actual images are added.

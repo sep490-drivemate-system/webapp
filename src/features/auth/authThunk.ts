@@ -27,3 +27,26 @@ export const signUp = createThunk<boolean, ISignUpRequest>(
   `signup`,
   `${AUTH_PATH}/signup`
 );
+import type { InstructorSignupResponse, InstructorSignupRequest } from "@/types/auth/signup-instructor.types";
+
+export const signUpInstructor = createThunk<InstructorSignupResponse, InstructorSignupRequest>(
+  HttpMethod.POST,
+  `signup-instructor`,
+  `${AUTH_PATH}/instructor/signup`,
+  {
+    config: (payload) => {
+      const form = new FormData();
+      form.append("email", payload.email);
+      form.append("b2LicenseFront", payload.b2LicenseFront);
+      form.append("b2LicenseBack", payload.b2LicenseBack);
+      form.append("cccdFront", payload.cccdFront);
+      form.append("cccdBack", payload.cccdBack);
+      form.append("professionalCertificate", payload.professionalCertificate);
+      form.append("healthCertificate", payload.healthCertificate);
+      form.append("vehiclePapers", payload.vehiclePapers);
+      form.append("vehicleInsurance", payload.vehicleInsurance);  
+
+      return { data: form } as any;
+    },
+  }
+);

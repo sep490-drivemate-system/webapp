@@ -18,7 +18,8 @@ import {
   IconSettings,
   IconUsers,
 } from "@tabler/icons-react";
-
+import { IconUserCog } from "@tabler/icons-react";
+import { IconUsersGroup } from "@tabler/icons-react";
 import { NavDocuments } from "@/components/commons/dashboard/nav-documents";
 import { NavMain } from "@/components/commons/dashboard/nav-main";
 import { NavSecondary } from "@/components/commons/dashboard/nav-secondary";
@@ -41,9 +42,14 @@ const data = {
   },
   navMain: [
     {
-      title: "Dashboard",
-      url: "/dashboard",
+      title: "Tổng quan",
+      url: "/dashboards",
       icon: IconDashboard,
+    },
+    {
+      title: "Quản lý người dùng",
+      url: "/management-user",
+      icon: IconUserCog,
     },
     {
       title: "Lifecycle",
@@ -114,28 +120,28 @@ const data = {
       ],
     },
   ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "/dashboard/settings",
-      icon: IconSettings,
-    },
-    {
-      title: "Get Help",
-      url: "/dashboard/help",
-      icon: IconHelp,
-    },
-    {
-      title: "Search",
-      url: "/dashboard/search",
-      icon: IconSearch,
-    },
-  ],
+  // navSecondary: [
+  //   {
+  //     title: "Settings",
+  //     url: "/dashboard/settings",
+  //     icon: IconSettings,
+  //   },
+  //   {
+  //     title: "Get Help",
+  //     url: "/dashboard/help",
+  //     icon: IconHelp,
+  //   },
+  //   {
+  //     title: "Search",
+  //     url: "/dashboard/search",
+  //     icon: IconSearch,
+  //   },
+  // ],
   documents: [
     {
-      name: "Data Library",
-      url: "/dashboard/documents/data-library",
-      icon: IconDatabase,
+      name: "Quản lý người hướng dẫn",
+      url: "/management-instructor",
+      icon: IconUsersGroup,
     },
     {
       name: "Reports",
@@ -171,7 +177,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

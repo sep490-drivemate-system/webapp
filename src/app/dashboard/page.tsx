@@ -14,7 +14,7 @@ import { UserRole } from "@/types/auth/user-role.enum"
 import data from "./data.json"
 
 export default function Page() {
-  useRequireAuth([UserRole.Admin])
+  //useRequireAuth([UserRole.Admin])
   return (
     <SidebarProvider
       style={
