@@ -2,6 +2,7 @@ import { ISignInRequest, ISignInResponse } from "@/types/auth/signin.type";
 import { createThunk } from "../genericCreateThunk";
 import { HttpMethod } from "@/types/constants/httpMethod";
 import { handleTokenStorage } from "@/lib/jwt/jwt.utils";
+import type { ISignUpRequest, ISignUpResponse } from "@/types/auth/signup.type";
 
 export const AUTH_PATH = "auth";
 
@@ -20,13 +21,20 @@ export const signIn = createThunk<ISignInResponse, ISignInRequest>(
   }
 );
 
-import type { ISignUpRequest } from "@/types/auth/signup.type";
 
-export const signUp = createThunk<boolean, ISignUpRequest>(
+
+export const signUp = createThunk<ISignUpResponse, ISignUpRequest>(
   HttpMethod.POST,
   `signup`,
   `${AUTH_PATH}/signup`
 );
+
+export const sendEmailCode = createThunk<string, { email: string }>(
+  HttpMethod.POST,
+  `verify-email`,
+  `${AUTH_PATH}/verify-email`,
+);
+
 import type { InstructorSignupResponse, InstructorSignupRequest } from "@/types/auth/signup-instructor.types";
 
 export const signUpInstructor = createThunk<InstructorSignupResponse, InstructorSignupRequest>(
@@ -44,7 +52,7 @@ export const signUpInstructor = createThunk<InstructorSignupResponse, Instructor
       form.append("professionalCertificate", payload.professionalCertificate);
       form.append("healthCertificate", payload.healthCertificate);
       form.append("vehiclePapers", payload.vehiclePapers);
-      form.append("vehicleInsurance", payload.vehicleInsurance);  
+      form.append("vehicleInsurance", payload.vehicleInsurance);
 
       return { data: form } as any;
     },

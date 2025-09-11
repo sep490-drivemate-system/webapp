@@ -19,7 +19,11 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 import { IconUserCog } from "@tabler/icons-react";
+import { IconPackage } from "@tabler/icons-react";
+import { IconArticle } from "@tabler/icons-react";
+import { IconBook } from "@tabler/icons-react";
 import { IconUsersGroup } from "@tabler/icons-react";
+import { IconCar } from "@tabler/icons-react";
 import { NavDocuments } from "@/components/commons/dashboard/nav-documents";
 import { NavMain } from "@/components/commons/dashboard/nav-main";
 import { NavSecondary } from "@/components/commons/dashboard/nav-secondary";
@@ -33,6 +37,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import Link from "next/link";
+
 
 const data = {
   user: {
@@ -52,19 +58,24 @@ const data = {
       icon: IconUserCog,
     },
     {
-      title: "Lifecycle",
-      url: "/dashboard/lifecycle",
-      icon: IconListDetails,
+      title: "Quản lý gói thuê",
+      url: "/management-package",
+      icon: IconPackage,
+    },
+    {
+      title: "Quản lý tài liệu",
+      url: "/management-document",
+      icon: IconArticle,
+    },
+    {
+      title: "Quản lý xe",
+      url: "/management-car",
+      icon: IconCar,
     },
     {
       title: "Analytics",
       url: "/analytics",
       icon: IconChartBar,
-    },
-    {
-      title: "Projects",
-      url: "/dashboard/projects",
-      icon: IconFolder,
     },
     {
       title: "Team",
@@ -144,6 +155,11 @@ const data = {
       icon: IconUsersGroup,
     },
     {
+      name: "Quản lý bài viết",
+      url: "/management-article",
+      icon: IconBook,
+    },
+    {
       name: "Reports",
       url: "/dashboard/documents/reports",
       icon: IconReport,
@@ -166,10 +182,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
+              <Link href="#">
                 <IconInnerShadowTop className="!size-5" />
                 <span className="text-base font-semibold">DriveMate</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

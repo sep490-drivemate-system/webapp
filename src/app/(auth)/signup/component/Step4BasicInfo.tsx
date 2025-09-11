@@ -1,66 +1,15 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { ArrowLeft } from "lucide-react"
-import { useState } from "react"
+import { ArrowLeft, ArrowRight } from "lucide-react"
+import { Step4BasicInfoProps } from "@/types/auth/signup.type"
+import { useSignUp } from "@/hooks/auth/useSignUp"
+import { setConfirmPasswordChange, setPasswordChange, setUserNameChange } from "@/features/auth/authSlice"
+import { Spinner } from "@/components/ui/shadcn-io/spinner"
 
-interface Step4BasicInfoProps {
-    onNext: (data: BasicInfoData) => void
-    onBack: () => void
-    loading?: boolean
-}
 
-export interface BasicInfoData {
-    username: string
-    password: string
-    confirmPassword: string
-}
+export function Step4BasicInfo({ onBack }: Step4BasicInfoProps) {
+    const { errorMessage, isLoading, signupData, dispatch, handleBasicInfoSubmit } = useSignUp()
 
-export function Step4BasicInfo({ onNext, onBack, loading = false }: Step4BasicInfoProps) {
-    const [formData, setFormData] = useState<BasicInfoData>({
-        username: '',
-        password: '',
-        confirmPassword: ''
-    })
-    const [errors, setErrors] = useState<Partial<BasicInfoData>>({})
-
-    const handleChange = (field: keyof BasicInfoData, value: string) => {
-        setFormData(prev => ({ ...prev, [field]: value }))
-        // Clear error when user starts typing
-        if (errors[field]) {
-            setErrors(prev => ({ ...prev, [field]: '' }))
-        }
-    }
-
-    const validateForm = (): boolean => {
-        const newErrors: Partial<BasicInfoData> = {}
-
-        if (!formData.username.trim()) {
-            newErrors.username = 'Vui lòng nhập họ tên'
-        }
-
-        if (!formData.password) {
-            newErrors.password = 'Vui lòng nhập mật khẩu'
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Mật khẩu phải có ít nhất 6 ký tự'
-        }
-
-        if (!formData.confirmPassword) {
-            newErrors.confirmPassword = 'Vui lòng xác nhận mật khẩu'
-        } else if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = 'Mật khẩu xác nhận không khớp'
-        }
-
-        setErrors(newErrors)
-        return Object.keys(newErrors).length === 0
-    }
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        if (validateForm()) {
-            onNext(formData)
-        }
-    }
 
     return (
         <div className="flex flex-col gap-6">
@@ -69,20 +18,20 @@ export function Step4BasicInfo({ onNext, onBack, loading = false }: Step4BasicIn
                 <p className="text-gray-300">Hoàn thiện thông tin để tạo tài khoản</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <form onSubmit={(e) => { e.preventDefault(); handleBasicInfoSubmit(signupData.basicInfo.signUpRequest) }} className="flex flex-col gap-4">
                 <div className="grid gap-3">
                     <div>
                         <Input
                             id="fullName"
                             type="text"
                             placeholder="Tên người dùng"
-                            value={formData.username}
-                            onChange={(e) => handleChange('username', e.target.value)}
+                            value={signupData.basicInfo.signUpRequest.userName}
+                            onChange={(e) => dispatch(setUserNameChange(e.target.value))}
                             className="text-white placeholder:text-gray-400 bg-white/10 border-white/20"
                             required
                         />
-                        {errors.username && (
-                            <p className="text-red-400 text-sm mt-1">{errors.username}</p>
+                        {errorMessage && (
+                            <p className="text-red-400 text-sm mt-1">{errorMessage}</p>
                         )}
                     </div>
                 </div>
@@ -93,13 +42,13 @@ export function Step4BasicInfo({ onNext, onBack, loading = false }: Step4BasicIn
                             id="password"
                             type="password"
                             placeholder="Mật khẩu"
-                            value={formData.password}
-                            onChange={(e) => handleChange('password', e.target.value)}
+                            value={signupData.basicInfo.signUpRequest.password}
+                            onChange={(e) => dispatch(setPasswordChange(e.target.value))}
                             className="text-white placeholder:text-gray-400 bg-white/10 border-white/20"
                             required
                         />
-                        {errors.password && (
-                            <p className="text-red-400 text-sm mt-1">{errors.password}</p>
+                        {errorMessage && (
+                            <p className="text-red-400 text-sm mt-1">{errorMessage}</p>
                         )}
                     </div>
                 </div>
@@ -110,13 +59,13 @@ export function Step4BasicInfo({ onNext, onBack, loading = false }: Step4BasicIn
                             id="confirmPassword"
                             type="password"
                             placeholder="Nhập lại mật khẩu"
-                            value={formData.confirmPassword}
-                            onChange={(e) => handleChange('confirmPassword', e.target.value)}
+                            value={signupData.basicInfo.confirmPassword || ''}
+                            onChange={(e) => dispatch(setConfirmPasswordChange(e.target.value))}
                             className="text-white placeholder:text-gray-400 bg-white/10 border-white/20"
                             required
                         />
-                        {errors.confirmPassword && (
-                            <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>
+                        {errorMessage && (
+                            <p className="text-red-400 text-sm mt-1">{errorMessage}</p>
                         )}
                     </div>
                 </div>
@@ -134,11 +83,22 @@ export function Step4BasicInfo({ onNext, onBack, loading = false }: Step4BasicIn
 
                     <Button
                         type="submit"
-                        disabled={loading}
+                        disabled={isLoading}
                         className="flex-1 bg-[#0074c2] hover:bg-[#00598a]"
                     >
-                        {loading ? "Đang tạo tài khoản..." : "Hoàn thành đăng ký"}
+                        {isLoading ? (
+                            <>
+                                <Spinner className="h-4 w-4 animate-spin" />
+                                <span>Đang xử lý...</span>
+                            </>
+                        ) : (
+                            <>
+                                <span>Hoàn thành đăng ký</span>
+                                <ArrowRight className="h-4 w-4" />
+                            </>
+                        )}
                     </Button>
+
                 </div>
             </form>
         </div>

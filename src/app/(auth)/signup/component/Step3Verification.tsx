@@ -1,87 +1,68 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ArrowLeft, RefreshCw } from "lucide-react"
+import { Step3VerificationProps } from "@/types/auth/signup.type"
+import { ArrowLeft, ArrowRight, RefreshCw } from "lucide-react"
 import { useState, useEffect } from "react"
-
-interface Step3VerificationProps {
-    method: 'email' | 'phone' | 'instructor'
-    contact: string
-    onNext: () => void
-    onBack: () => void
-    onResend: () => void
-    loading?: boolean
-}
+import { useSignUp } from "@/hooks/auth/useSignUp"
+import { useSliceSelector } from "@/hooks/commonHooks"
+import { setInputCode } from "@/features/auth/authSlice"
+import { Spinner } from "@/components/ui/shadcn-io/spinner"
 
 export function Step3Verification({
-    method,
-    contact,
     onNext,
     onBack,
-    onResend,
-    loading = false
 }: Step3VerificationProps) {
-    const [code, setCode] = useState('')
-    const [resendCooldown, setResendCooldown] = useState(0)
+    const {
+        isLoading,
+        dispatch,
+        errorMessage,
+        inputCode,
+        signupData,
+        resendCooldown,
+        setResendCooldown,
+        handleVerificationResend,
+        getMaskedContact,
+        handleSubmit
+    } = useSignUp()
 
     useEffect(() => {
         if (resendCooldown > 0) {
             const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000)
             return () => clearTimeout(timer)
         }
-    }, [resendCooldown])
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        if (code.length === 6) {
-            onNext()
-        }
-    }
-
-    const handleResend = () => {
-        if (resendCooldown === 0) {
-            onResend()
-            setResendCooldown(60) // 60 seconds cooldown
-        }
-    }
-
-    const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value.replace(/\D/g, '').slice(0, 6)
-        setCode(value)
-    }
-
-    const maskedContact = method === 'email'
-        ? contact.replace(/(.{2}).*(@.*)/, '$1***$2')
-        : contact.replace(/(\d{3})\d{4}(\d{3})/, '$1****$2')
-
+    }, [resendCooldown, setResendCooldown])
     return (
         <div className="flex flex-col gap-6">
             <div className="flex flex-col items-center text-center">
-                <h1 className="text-2xl font-bold text-white mb-2">Xác thực {method === 'email' ? 'Email' : 'Số điện thoại'}</h1>
+                <h1 className="text-2xl font-bold text-white mb-2">Xác thực {signupData.method === 'email' ? 'Email' : 'Số điện thoại'}</h1>
                 <p className="text-gray-300">
                     Chúng tôi đã gửi mã 6 chữ số đến <br />
-                    <span className="font-semibold text-white">{maskedContact}</span>
+                    <span className="font-semibold text-white">{getMaskedContact()}</span>
                 </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <form onSubmit={(e) => handleSubmit(e, onNext)} className="flex flex-col gap-4">
                 <div className="grid gap-3">
                     <Input
                         type="text"
                         placeholder="Nhập mã 6 chữ số"
-                        value={code}
-                        onChange={handleCodeChange}
-                        className="text-center text-2xl tracking-widest text-white placeholder:text-gray-400 bg-white/10 border-white/20"
+                        value={inputCode}
+                        onChange={(e) => dispatch(setInputCode(e.target.value))}
+                        className={`text-center text-2xl tracking-widest text-white placeholder:text-gray-400 bg-white/10 border-white/20 ${errorMessage ? "border-red-500 focus:border-red-500" : ""}`}
                         maxLength={6}
                         required
                         autoFocus
                     />
+                    {errorMessage && (
+                        <p className="text-red-400 text-sm mt-1">{errorMessage}</p>
+                    )}
                 </div>
 
                 <div className="text-center">
                     <Button
                         type="button"
                         variant="link"
-                        onClick={handleResend}
+                        onClick={handleVerificationResend}
                         disabled={resendCooldown > 0}
                         className="text-gray-300 hover:text-white p-0 h-auto"
                     >
@@ -109,10 +90,20 @@ export function Step3Verification({
 
                     <Button
                         type="submit"
-                        disabled={code.length !== 6 || loading}
+                        disabled={inputCode.length !== 6 || isLoading}
                         className="flex-1 bg-[#0074c2] hover:bg-[#00598a]"
                     >
-                        {loading ? "Đang xác thực..." : "Xác thực"}
+                        {isLoading ? (
+                            <>
+                                <Spinner className="h-4 w-4 animate-spin" />
+                                <span>Đang xác thực...</span>
+                            </>
+                        ) : (
+                            <>
+                                <span>Xác thực</span>
+                                <ArrowRight className="h-4 w-4" />
+                            </>
+                        )}
                     </Button>
                 </div>
             </form>

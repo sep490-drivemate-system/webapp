@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Eye, CheckCircle, XCircle, Clock, User, Mail, Phone, Calendar, Upload, AlertTriangle, RefreshCw } from "lucide-react";
-import Image from "next/image";
+import { Eye, CheckCircle, XCircle, Clock, User, Users, UserCheck, UserX, Search, X, FileText, AlertTriangle, RefreshCw, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { InstructorApplication } from "@/types/instructor-management.types";
 import mockData from "@/data/mock-instructors.json";
 
@@ -15,14 +17,48 @@ export default function ManagementInstructorPage() {
     const [selectedInstructor, setSelectedInstructor] = useState<InstructorApplication | null>(null);
     const [applications, setApplications] = useState<InstructorApplication[]>(mockData.instructors as InstructorApplication[]);
     const [reapplyDocument, setReapplyDocument] = useState<{ instructorId: string, docType: string } | null>(null);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+
+    // Filter applications based on search term
+    const filteredApplications = applications.filter(instructor =>
+        instructor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        instructor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        instructor.phone.includes(searchTerm)
+    );
+
+    // Pagination calculations
+    const totalPages = Math.ceil(filteredApplications.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedApplications = filteredApplications.slice(startIndex, endIndex);
+
+    // Reset to first page when search changes
+    React.useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm]);
+
+    const goToFirstPage = () => setCurrentPage(1);
+    const goToLastPage = () => setCurrentPage(totalPages);
+    const goToPreviousPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
+    const goToNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
+    const canGoPrevious = currentPage > 1;
+    const canGoNext = currentPage < totalPages;
+
+    // Calculate stats
+    const stats = {
+        total: applications.length,
+        pending: applications.filter(app => app.status === 'pending').length,
+        approved: applications.filter(app => app.status === 'approved').length,
+        rejected: applications.filter(app => app.status === 'rejected').length,
+    };
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('vi-VN', {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
         });
     };
 
@@ -78,35 +114,66 @@ export default function ManagementInstructorPage() {
     };
 
     return (
-        <div className="container mx-auto py-6 space-y-6">
+        <div className="flex flex-1 flex-col space-y-6">
+            {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Quản lý người hướng dẫn</h1>
-                    <p className="text-gray-600 mt-2">Duyệt và quản lý đơn đăng ký trở thành người hướng dẫn</p>
-                </div>
-                <div className="flex gap-2">
-                    <Badge variant="outline" className="text-sm">
-                        Tổng: {applications.length} đơn
-                    </Badge>
-                    <Badge variant="secondary" className="text-sm">
-                        Chờ duyệt: {applications.filter(app => app.status === 'pending').length}
-                    </Badge>
+                    <h1 className="text-3xl font-bold tracking-tight">Quản lý người hướng dẫn</h1>
+                    <p className="text-muted-foreground">
+                        Duyệt và quản lý đơn đăng ký trở thành người hướng dẫn
+                    </p>
                 </div>
             </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <User className="w-5 h-5" />
-                        Danh sách đơn đăng ký
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
+            {/* Stats Cards */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Tổng đơn đăng ký</CardTitle>
+                        <FileText className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{stats.total}</div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Chờ duyệt</CardTitle>
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Đã duyệt</CardTitle>
+                        <UserCheck className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Từ chối</CardTitle>
+                        <UserX className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Search and Table */}
+            <Card className="py-0">
+                <CardContent className="p-0">
                     <div className="overflow-x-auto">
                         <Table>
-                            <TableHeader>
+                            <TableHeader className="bg-muted sticky top-0 z-10">
                                 <TableRow>
-                                    <TableHead>Thông tin cá nhân</TableHead>
+                                    <TableHead className="text-center">STT</TableHead>
+                                    <TableHead>Họ và tên</TableHead>
                                     <TableHead>Liên hệ</TableHead>
                                     <TableHead>Ngày nộp</TableHead>
                                     <TableHead>Trạng thái</TableHead>
@@ -114,26 +181,25 @@ export default function ManagementInstructorPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {applications.map((instructor, index) => {
+                                {paginatedApplications.map((instructor, index) => {
                                     const docStatus = checkDocumentStatus(instructor.documents);
+                                    const globalIndex = startIndex + index;
                                     return (
                                         <TableRow key={instructor.id}>
+                                            <TableCell className="text-center font-medium">
+                                                {globalIndex + 1}
+                                            </TableCell>
                                             <TableCell>
-                                                <div className="space-y-1">
-                                                    <div className="font-semibold">{instructor.name}</div>
-                                                </div>
+                                                <div className="font-medium">{instructor.name}</div>
                                             </TableCell>
                                             <TableCell>
                                                 <div className="space-y-1">
-                                                    <div className="flex items-center gap-2 text-sm">
-                                                        <Mail className="w-4 h-4 text-gray-400" />
-                                                        {instructor.email}
-                                                    </div>
+                                                    <div className="text-sm">{instructor.email}</div>
+                                                    <div className="text-sm text-muted-foreground">{instructor.phone}</div>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <div className="flex items-center gap-2 text-sm">
-                                                    <Calendar className="w-4 h-4 text-gray-400" />
+                                                <div className="text-sm">
                                                     {formatDate(instructor.submittedAt)}
                                                 </div>
                                             </TableCell>
@@ -141,16 +207,16 @@ export default function ManagementInstructorPage() {
                                                 {getStatusBadge(instructor.status)}
                                             </TableCell>
                                             <TableCell>
-                                                <div className="flex gap-2 justify-center">
+                                                <div className="flex gap-1 justify-center">
                                                     <Dialog>
                                                         <DialogTrigger asChild>
                                                             <Button
                                                                 variant="outline"
                                                                 size="sm"
                                                                 onClick={() => setSelectedInstructor(instructor)}
+                                                                className="h-8 w-8 p-0"
                                                             >
-                                                                <Eye className="w-4 h-4 mr-1" />
-                                                                Xem
+                                                                <Eye className="h-4 w-4" />
                                                             </Button>
                                                         </DialogTrigger>
                                                         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
@@ -290,22 +356,21 @@ export default function ManagementInstructorPage() {
                                                     {instructor.status === 'pending' && (
                                                         <>
                                                             <Button
-                                                                variant="default"
+                                                                variant="outline"
                                                                 size="sm"
                                                                 onClick={() => handleApprove(instructor.id)}
-                                                                className="bg-green-600 hover:bg-green-700"
+                                                                className="h-8 w-8 p-0"
                                                                 disabled={!docStatus.allVerified}
                                                             >
-                                                                <CheckCircle className="w-4 h-4 mr-1" />
-                                                                Duyệt
+                                                                <UserCheck className="h-4 w-4" />
                                                             </Button>
                                                             <Button
-                                                                variant="destructive"
+                                                                variant="outline"
                                                                 size="sm"
                                                                 onClick={() => handleReject(instructor.id)}
+                                                                className="h-8 w-8 p-0"
                                                             >
-                                                                <XCircle className="w-4 h-4 mr-1" />
-                                                                Từ chối
+                                                                <UserX className="h-4 w-4" />
                                                             </Button>
                                                         </>
                                                     )}
@@ -316,6 +381,80 @@ export default function ManagementInstructorPage() {
                                 })}
                             </TableBody>
                         </Table>
+                    </div>
+
+                    {/* Pagination Controls */}
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-4 border-t">
+                        <div className="text-muted-foreground hidden flex-1 text-xs sm:text-sm lg:flex">
+                            Hiển thị {paginatedApplications.length} trong{" "}
+                            {filteredApplications.length} kết quả.
+                        </div>
+                        <div className="flex w-full items-center justify-center sm:justify-end gap-4 sm:gap-8 lg:w-fit">
+                            <div className="hidden items-center gap-2 lg:flex">
+                                <Label htmlFor="rows-per-page" className="text-sm font-medium">
+                                    Số hàng mỗi trang
+                                </Label>
+                                <Select
+                                    value={`${itemsPerPage}`}
+                                    onValueChange={(value) => {
+                                        setItemsPerPage(Number(value));
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    <SelectTrigger className="w-20" id="rows-per-page">
+                                        <SelectValue placeholder={itemsPerPage} />
+                                    </SelectTrigger>
+                                    <SelectContent side="top">
+                                        {[5, 10, 20, 30, 50].map((pageSize) => (
+                                            <SelectItem key={pageSize} value={`${pageSize}`}>
+                                                {pageSize}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="flex w-fit items-center justify-center text-xs sm:text-sm font-medium">
+                                Trang {currentPage} trong {totalPages}
+                            </div>
+                            <div className="flex items-center gap-1 sm:gap-2">
+                                <Button
+                                    variant="outline"
+                                    className="hidden h-7 w-7 sm:h-8 sm:w-8 p-0 lg:flex"
+                                    onClick={goToFirstPage}
+                                    disabled={!canGoPrevious}
+                                >
+                                    <span className="sr-only">Go to first page</span>
+                                    <ChevronsLeft className="size-3 sm:size-4" />
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="size-7 sm:size-8"
+                                    onClick={goToPreviousPage}
+                                    disabled={!canGoPrevious}
+                                >
+                                    <span className="sr-only">Go to previous page</span>
+                                    <ChevronLeft className="size-3 sm:size-4" />
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="size-7 sm:size-8"
+                                    onClick={goToNextPage}
+                                    disabled={!canGoNext}
+                                >
+                                    <span className="sr-only">Go to next page</span>
+                                    <ChevronRight className="size-3 sm:size-4" />
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="hidden size-7 sm:size-8 lg:flex"
+                                    onClick={goToLastPage}
+                                    disabled={!canGoNext}
+                                >
+                                    <span className="sr-only">Go to last page</span>
+                                    <ChevronsRight className="size-3 sm:size-4" />
+                                </Button>
+                            </div>
+                        </div>
                     </div>
                 </CardContent>
             </Card>
@@ -343,7 +482,7 @@ export default function ManagementInstructorPage() {
                                 <div>
                                     <label className="block text-sm font-medium mb-2">Chụp ảnh mặt trước</label>
                                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                                        <Upload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
+                                        <AlertTriangle className="w-8 h-8 mx-auto text-gray-400 mb-2" />
                                         <p className="text-sm text-gray-600">Nhấp để chọn ảnh hoặc kéo thả vào đây</p>
                                         <input type="file" accept="image/*" className="hidden" />
                                     </div>
@@ -353,7 +492,7 @@ export default function ManagementInstructorPage() {
                                     <div>
                                         <label className="block text-sm font-medium mb-2">Chụp ảnh mặt sau</label>
                                         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                                            <Upload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
+                                            <AlertTriangle className="w-8 h-8 mx-auto text-gray-400 mb-2" />
                                             <p className="text-sm text-gray-600">Nhấp để chọn ảnh hoặc kéo thả vào đây</p>
                                             <input type="file" accept="image/*" className="hidden" />
                                         </div>
@@ -369,7 +508,6 @@ export default function ManagementInstructorPage() {
                                     console.log('Reapplying document:', reapplyDocument);
                                     setReapplyDocument(null);
                                 }}>
-                                    <Upload className="w-4 h-4 mr-2" />
                                     Nộp lại
                                 </Button>
                             </div>

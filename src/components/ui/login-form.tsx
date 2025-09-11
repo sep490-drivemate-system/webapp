@@ -72,11 +72,12 @@ export function LoginForm({
               </div>
 
               <div className="text-center text-sm text-gray-300">
-                Bạn không có tài khoản?{" "}
-                <a href="/signup" className="underline underline-offset-4 text-white hover:text-gray-300">
+                Bạn chưa có tài khoản?{" "}
+                <Link href="/signup" className="underline underline-offset-4 text-white hover:text-gray-300">
                   Đăng ký
-                </a>
+                </Link>
               </div>
+             
             </div>
           </form>
           <div className="bg-muted relative hidden md:block">

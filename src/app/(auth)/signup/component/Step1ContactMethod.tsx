@@ -1,9 +1,6 @@
 import { Button } from "@/components/ui/button"
-import { Mail, Phone, UserCheck } from "lucide-react"
-
-interface Step1ContactMethodProps {
-    onSelect: (method: 'email' | 'phone' | 'instructor') => void
-}
+import { SignupMethod, Step1ContactMethodProps } from "@/types/auth/signup.type"
+import { Mail, Phone } from "lucide-react"
 
 export function Step1ContactMethod({ onSelect }: Step1ContactMethodProps) {
     return (
@@ -14,7 +11,7 @@ export function Step1ContactMethod({ onSelect }: Step1ContactMethodProps) {
 
             <div className="grid gap-4">
                 <Button
-                    onClick={() => onSelect('email')}
+                    onClick={() => onSelect(SignupMethod.EMAIL)}
                     variant="outline"
                     className="w-full h-16 flex items-center justify-center gap-3 text-lg bg-white/10 border-white/20 hover:bg-white/20 text-white"
                 >
@@ -23,21 +20,12 @@ export function Step1ContactMethod({ onSelect }: Step1ContactMethodProps) {
                 </Button>
                 <div className="text-center text-gray-400">Hoặc</div>
                 <Button
-                    onClick={() => onSelect('phone')}
+                    onClick={() => onSelect(SignupMethod.PHONE)}
                     variant="outline"
                     className="w-full h-16 flex items-center justify-center gap-3 text-lg bg-white/10 border-white/20 hover:bg-white/20 text-white"
                 >
                     <Phone className="h-6 w-6" />
                     <span>Số điện thoại</span>
-                </Button>
-                <div className="text-center text-gray-400">Hoặc</div>
-                <Button
-                    onClick={() => onSelect('instructor')}
-                    variant="outline"
-                    className="w-full h-16 flex items-center justify-center gap-3 text-lg bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-400/30 hover:from-purple-500/30 hover:to-pink-500/30 text-white"
-                >
-                    <UserCheck className="h-6 w-6" />
-                    <span>Đăng ký trở thành người hướng dẫn</span>
                 </Button>
             </div>
         </div>

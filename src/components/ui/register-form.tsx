@@ -1,88 +1,36 @@
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { FcGoogle } from "react-icons/fc";
 import Link from "next/link"
 import Image from "next/image"
 import bgLogin from "@/../public/bg-login.jpg"
-import { useState } from "react"
 import { Step1ContactMethod } from "@/app/(auth)/signup/component/Step1ContactMethod"
 import { Step2ContactInput } from "@/app/(auth)/signup/component/Step2ContactInput"
 import { Step3Verification } from "@/app/(auth)/signup/component/Step3Verification"
-import { Step4BasicInfo, BasicInfoData } from "@/app/(auth)/signup/component/Step4BasicInfo"
-
-type SignupStep = 1 | 2 | 3 | 4
-
-interface SignupData {
-  method: 'email' | 'phone' | 'instructor'
-  contact: string
-  verificationCode: string
-  basicInfo: BasicInfoData
-}
+import { Step4BasicInfo } from "@/app/(auth)/signup/component/Step4BasicInfo"
+import { useSignUp } from "@/hooks/auth/useSignUp"
+import { useSliceSelector } from "@/hooks/commonHooks"
+import { AuthState } from "@/features/auth/authSlice"
+import { setSignupContact } from "@/features/auth/authSlice"
+import { useAppDispatch } from "@/lib/redux/useAppDispatch"
 
 export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [currentStep, setCurrentStep] = useState<SignupStep>(1)
-  const [signupData, setSignupData] = useState<SignupData>({
-    method: 'email',
-    contact: '',
-    verificationCode: '',
-    basicInfo: {
-      username: '',
-      password: '',
-      confirmPassword: ''
-    }
-  })
-  const [loading, setLoading] = useState(false)
+  const dispatch = useAppDispatch()
+  const {
+    currentStep,
+    signupData,
+    handleMethodSelect,
+    handleContactSubmit,
+    handleVerificationSubmit,
+    handleResendCode,
+    handleBasicInfoSubmit,
+    handleBack,
+  } = useSignUp()
 
-  const handleMethodSelect = (method: 'email' | 'phone' | 'instructor') => {
-    if (method === 'instructor') {
-      // Redirect to instructor signup page
-      window.location.href = '/signup-instructor'
-      return
-    }
-    setSignupData(prev => ({ ...prev, method }))
-    setCurrentStep(2)
-  }
-
-  const handleContactSubmit = (contact: string) => {
-    setSignupData(prev => ({ ...prev, contact }))
-    setCurrentStep(3)
-    // Here you would typically send verification code
-    console.log(`Sending verification code to ${contact}`)
-  }
-
-  const handleVerificationSubmit = () => {
-    setCurrentStep(4)
-    // Here you would typically verify the code
-    console.log('Verifying code...')
-  }
-
-  const handleResendCode = () => {
-    // Here you would resend the verification code
-    console.log('Resending verification code...')
-  }
-
-  const handleBasicInfoSubmit = (basicInfo: BasicInfoData) => {
-    setLoading(true)
-    // Here you would complete the signup process
-    console.log('Completing signup with data:', { ...signupData, basicInfo })
-
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false)
-      // Redirect to success page or login
-      console.log('Signup completed successfully!')
-    }, 2000)
-  }
-
-  const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep((prev) => (prev - 1) as SignupStep)
-    }
+  const updateSignupData = (data: { contact: string }) => {
+    dispatch(setSignupContact(data.contact))
   }
 
   const renderStep = () => {
@@ -95,26 +43,18 @@ export function RegisterForm({
           <Step2ContactInput
             method={signupData.method}
             value={signupData.contact}
-            onChange={(value) => setSignupData(prev => ({ ...prev, contact: value }))}
+            onChange={(value) => updateSignupData({ contact: value })}
             onNext={() => handleContactSubmit(signupData.contact)}
             onBack={handleBack}
-            loading={loading}
           />
         )
 
       case 3:
-        return signupData.method === 'instructor' ? (
-          <div className="text-center text-white">
-            <p>Redirecting to instructor registration...</p>
-          </div>
-        ) : (
+        return (
           <Step3Verification
-            method={signupData.method as 'email' | 'phone'}
-            contact={signupData.contact}
             onNext={handleVerificationSubmit}
             onBack={handleBack}
             onResend={handleResendCode}
-            loading={loading}
           />
         )
 
@@ -123,7 +63,6 @@ export function RegisterForm({
           <Step4BasicInfo
             onNext={handleBasicInfoSubmit}
             onBack={handleBack}
-            loading={loading}
           />
         )
 
@@ -169,9 +108,14 @@ export function RegisterForm({
               {/* Footer link */}
               <div className="text-center text-sm text-gray-300">
                 Bạn đã có tài khoản?{" "}
-                <a href="/signin" className="underline underline-offset-4 text-white hover:text-gray-300">
+                <Link href="/signin" className="underline underline-offset-4 text-white hover:text-gray-300">
                   Đăng nhập
-                </a>
+                </Link>
+                <br />
+                Đăng ký trở thành người hướng dẫn?{" "}
+                <Link href="/signup-instructor" className="underline underline-offset-4 text-white hover:text-gray-300">
+                  Đăng ký
+                </Link>
               </div>
             </div>
           </div>

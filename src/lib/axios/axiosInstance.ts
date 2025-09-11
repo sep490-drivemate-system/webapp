@@ -7,7 +7,7 @@ import {
   isAccessTokenExpired,
 } from "@/lib/jwt/jwt.utils";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL;
+const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const axiosInstance = axios.create({
   baseURL,
