@@ -1,3 +1,5 @@
+"use client"
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -6,16 +8,24 @@ import { FcGoogle } from "react-icons/fc";
 import Link from "next/link"
 import Image from "next/image"
 import bgLogin from "@/../public/bg-login.jpg"
+import { useSignIn } from "@/hooks/auth/useSignIn"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const { handleSignIn, isLoading, signInData, updateEmailOrPhone, updatePassword } = useSignIn()
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    await handleSignIn()
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0 bg-white/10 backdrop-blur-md border-none shadow-lg rounded-2xl">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form className="p-6 md:p-8" onSubmit={onSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <Link href="/" className="flex items-center justify-center gap-3">
@@ -37,13 +47,22 @@ export function LoginForm({
                 <Input
                   id="email"
                   className="text-white placeholder:text-gray-400"
-                  type="email"
+                  type="text"
                   placeholder="Email hoặc số điện thoại"
+                  value={signInData.emailOrPhone}
+                  onChange={(e) => updateEmailOrPhone(e.target.value)}
                   required
                 />
               </div>
               <div className="grid gap-3">
-                <Input id="password" type="password" placeholder="Mật khẩu" required />
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Mật khẩu"
+                  value={signInData.password}
+                  onChange={(e) => updatePassword(e.target.value)}
+                  required
+                />
                 <div className="flex items-center text-white">
                   <a
                     href="#"
@@ -53,8 +72,17 @@ export function LoginForm({
                   </a>
                 </div>
               </div>
-              <Button type="submit" className="w-full bg-[#0074c2] hover:bg-[#00598a]">
-                Đăng nhập
+              {/* {error && (
+                <div className="text-red-400 text-sm text-center bg-red-100/10 p-2 rounded">
+                  {error}
+                </div>
+              )} */}
+              <Button
+                type="submit"
+                className="w-full bg-[#0074c2] hover:bg-[#00598a]"
+                disabled={isLoading}
+              >
+                {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
               </Button>
               <div className="flex items-center text-sm text-muted-foreground">
                 <span className="flex-grow border-t border-border"></span>
@@ -77,7 +105,7 @@ export function LoginForm({
                   Đăng ký
                 </Link>
               </div>
-             
+
             </div>
           </form>
           <div className="bg-muted relative hidden md:block">

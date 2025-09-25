@@ -1,8 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { sendEmailCode, signIn, signUp } from "./authThunk";
+import { sendEmailCode, signIn, signUp, signOut } from "./authThunk";
 import { getUserRole, isAccessTokenExpired, clearTokens } from "@/lib/jwt/jwt.utils";
 import { BaseState } from "@/types/generic/baseState";
 import { SignupMethod, SignupStep, ISignUpRequest } from "@/types/auth/signup.type";
+import { ISignInRequest } from "@/types/auth/signin.type";
 
 interface SignupData {
     method: SignupMethod;
@@ -12,9 +13,9 @@ interface SignupData {
         confirmPassword: string;
     };
 }
-
 export interface AuthState extends BaseState {
     // Authentication state
+    signInData: ISignInRequest
     isAuthenticated: boolean;
     role: number | null;
 
@@ -39,6 +40,10 @@ const initialState: AuthState = {
     isSuccess: false,
 
     // Authentication state
+    signInData: {
+        password: '',
+        emailOrPhone: '',
+    },
     isAuthenticated: isClient ? (!!getUserRole() && !tokenExpired) : false,
     role: isClient && !tokenExpired ? (getUserRole() ?? null) : null,
 
@@ -53,6 +58,7 @@ const initialState: AuthState = {
             signUpRequest: {
                 userName: '',
                 password: '',
+                emailOrPhone: '',
             },
             confirmPassword: ''
         }
@@ -63,12 +69,16 @@ const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        signOut(state) {
+        signOutLocal(state) {
             state.isAuthenticated = false;
             state.role = null;
             state.isLoading = false;
             state.isSuccess = false;
             state.errorMessage = null;
+            state.signInData = {
+                emailOrPhone: '',
+                password: ''
+            };
             if (typeof window !== "undefined") {
                 localStorage.removeItem("access_token");
                 localStorage.removeItem("refresh_token");
@@ -82,6 +92,7 @@ const authSlice = createSlice({
         },
         setSignupContact(state, action) {
             state.signupData.contact = action.payload;
+            state.signupData.basicInfo.signUpRequest.emailOrPhone = action.payload;
         },
         setSignupVerificationCode(state, action) {
             state.verificationCode = action.payload;
@@ -105,7 +116,19 @@ const authSlice = createSlice({
             state.signupData = {
                 method: SignupMethod.EMAIL,
                 contact: '',
-                basicInfo: { signUpRequest: { userName: '', password: '' }, confirmPassword: '' }
+                basicInfo: { signUpRequest: { userName: '', password: '', emailOrPhone: '' }, confirmPassword: '' }
+            };
+        },
+        setSignInEmailOrPhone(state, action) {
+            state.signInData.emailOrPhone = action.payload;
+        },
+        setSignInPassword(state, action) {
+            state.signInData.password = action.payload;
+        },
+        resetSignInData(state) {
+            state.signInData = {
+                emailOrPhone: '',
+                password: ''
             };
         },
     },
@@ -140,7 +163,7 @@ const authSlice = createSlice({
                 state.signupData = {
                     method: SignupMethod.EMAIL,
                     contact: '',
-                    basicInfo: { signUpRequest: { userName: '', password: '' }, confirmPassword: '' }
+                    basicInfo: { signUpRequest: { userName: '', password: '', emailOrPhone: '' }, confirmPassword: '' }
                 };
             })
             .addCase(signUp.rejected, (state, action) => {
@@ -150,7 +173,7 @@ const authSlice = createSlice({
             .addCase(sendEmailCode.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                state.verificationCode = action.payload.data || '';
+                state.verificationCode = action.payload.value || '';
             })
             .addCase(sendEmailCode.rejected, (state) => {
                 state.isLoading = false;
@@ -159,12 +182,30 @@ const authSlice = createSlice({
             .addCase(sendEmailCode.pending, (state) => {
                 state.isLoading = true;
                 // state.errorMessage = action.error?.message || "Đăng nhập thất bại";
+            })
+            .addCase(signOut.pending, (state) => {
+                state.isLoading = true;
+                state.errorMessage = null;
+            })
+            .addCase(signOut.fulfilled, (state) => {
+                state.isAuthenticated = false;
+                state.role = null;
+                state.isLoading = false;
+                state.isSuccess = true;
+                state.signInData = {
+                    emailOrPhone: '',
+                    password: ''
+                };
+            })
+            .addCase(signOut.rejected, (state, action) => {
+                state.isLoading = false;
+                state.errorMessage = action.error?.message || "Đăng xuất thất bại";
             });
     },
 });
 
 export const {
-    signOut,
+    signOutLocal,
     setCurrentStep,
     setSignupMethod,
     setSignupContact,
@@ -173,6 +214,9 @@ export const {
     setUserNameChange,
     setPasswordChange,
     setConfirmPasswordChange,
-    resetSignupFlow
+    resetSignupFlow,
+    setSignInEmailOrPhone,
+    setSignInPassword,
+    resetSignInData
 } = authSlice.actions;
 export default authSlice.reducer;

@@ -9,8 +9,9 @@ import Image from "next/image";
 
 const MAIN_MENU = [
   { path: "/", label: "Trang chủ" },
-  { path: "/services", label: "Xe tập" },
+  { path: "/cars", label: "Xe tập" },
   { path: "/instructors", label: "Người hướng dẫn" },
+  { path: "/bookings", label: "Lịch sử đặt" },
   { path: "/blog", label: "Bài viết" },
   { path: "/news", label: "Tin tức" },
   { path: "/handbook", label: "Cẩm nang" },
@@ -105,7 +106,15 @@ function UserDropdown() {
         <User className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-30 bg-white rounded-lg shadow-lg py-2 z-50 border">
+        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border">
+          <Link
+            href="/bookings"
+            className="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
+            onClick={() => setOpen(false)}
+          >
+            Lịch sử đặt
+          </Link>
+          <div className="border-t my-1"></div>
           <Link
             href="/signin"
             className="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"

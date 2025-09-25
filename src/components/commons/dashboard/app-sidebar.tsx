@@ -38,6 +38,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { getUserRole } from "@/lib/jwt/jwt.utils";
+import { UserRole } from "@/types/auth/user-role.enum";
 
 
 const data = {
@@ -173,6 +175,39 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [userRole, setUserRole] = React.useState<UserRole | null>(null);
+
+  React.useEffect(() => {
+    // Get user role from JWT token
+    const role = getUserRole();
+    setUserRole(role);
+  }, []);
+
+  // Filter navigation items based on user role
+  const getFilteredNavItems = () => {
+    if (userRole === UserRole.Admin) {
+      // Admin has access to all navigation items
+      return {
+        navMain: data.navMain,
+        documents: data.documents
+      };
+    } else if (userRole === UserRole.Inspector) {
+      // Inspector only has access to NavDocuments
+      return {
+        navMain: [], // No access to main navigation
+        documents: data.documents
+      };
+    } else {
+      // Other roles or no role - no access
+      return {
+        navMain: [],
+        documents: []
+      };
+    }
+  };
+
+  const filteredNav = getFilteredNavItems();
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -191,8 +226,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
+        {/* Show NavMain only for Admin */}
+        {filteredNav.navMain.length > 0 && (
+          <NavMain items={filteredNav.navMain} />
+        )}
+
+        {/* Show NavDocuments for Admin and Inspector */}
+        {filteredNav.documents.length > 0 && (
+          <NavDocuments items={filteredNav.documents} />
+        )}
+
         {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
