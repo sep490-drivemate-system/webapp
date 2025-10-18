@@ -2,9 +2,11 @@
 import { useState } from "react";
 import { useThunkAction } from "@/lib/redux/useThunkAction";
 import { uploadFileWithMeta, createProfile } from "@/features/upload/uploadThunks";
+import { test } from "@/features/auth/authThunk";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { TestDto } from "@/types/test";
 
 export default function UploadDemoPage() {
     const [file, setFile] = useState<File | null>(null);
@@ -12,8 +14,15 @@ export default function UploadDemoPage() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
 
+    // Test demo states
+    const [cccdmtFile, setCccdmtFile] = useState<File | null>(null);
+    const [cccdmsFile, setCccdmsFile] = useState<File | null>(null);
+    const [cccdmt, setCccdmt] = useState("");
+    const [cccdms, setCccdms] = useState("");
+
     const { runSafe: runUpload, loading: uploading } = useThunkAction(uploadFileWithMeta);
     const { runSafe: runCreateProfile, loading: creating } = useThunkAction(createProfile);
+    const { runSafe: runTest, loading: testing } = useThunkAction(test);
 
     const handleUpload = async () => {
         if (!file) return alert("Vui lòng chọn file");
@@ -46,9 +55,43 @@ export default function UploadDemoPage() {
         }
     };
 
+    const handleTestDemo = async () => {
+        if (!cccdmtFile || !cccdmsFile) {
+            alert("Vui lòng chọn cả 2 file CCCD");
+            return;
+        }
+
+        if (!cccdmt || !cccdms) {
+            alert("Vui lòng nhập số CCCD");
+            return;
+        }
+
+        const testData: TestDto = {
+            testccdmat: {
+                cccdmt: parseInt(cccdmt),
+                formFilecccd: cccdmtFile
+            },
+            testccdmas: {
+                cccdms: parseInt(cccdms),
+                formFilecccdms: cccdmsFile
+            }
+        };
+
+        const res = await runTest(testData);
+        if (res.ok) {
+            alert("Test thành công! (xem console)");
+            // eslint-disable-next-line no-console
+            console.log("Test response:", res.data);
+        } else {
+            // eslint-disable-next-line no-console
+            console.error(res.error);
+            alert("Test thất bại");
+        }
+    };
+
     return (
         <div className="container mx-auto p-4">
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-3 gap-6">
                 <Card>
                     <CardHeader>
                         <CardTitle>Upload ảnh (multipart/form-data)</CardTitle>
@@ -71,6 +114,45 @@ export default function UploadDemoPage() {
                         <Input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
                         <Button onClick={handleCreateProfile} disabled={creating}>
                             {creating ? "Đang tạo..." : "Tạo profile"}
+                        </Button>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Test Demo (TestDto)</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div>
+                            <label className="text-sm font-medium">CCCD Mặt trước:</label>
+                            <Input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => setCccdmtFile(e.target.files?.[0] ?? null)}
+                            />
+                        </div>
+                        <Input
+                            placeholder="Số CCCD mặt trước"
+                            value={cccdmt}
+                            onChange={(e) => setCccdmt(e.target.value)}
+                            type="number"
+                        />
+                        <div>
+                            <label className="text-sm font-medium">CCCD Mặt sau:</label>
+                            <Input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => setCccdmsFile(e.target.files?.[0] ?? null)}
+                            />
+                        </div>
+                        <Input
+                            placeholder="Số CCCD mặt sau"
+                            value={cccdms}
+                            onChange={(e) => setCccdms(e.target.value)}
+                            type="number"
+                        />
+                        <Button onClick={handleTestDemo} disabled={testing}>
+                            {testing ? "Đang test..." : "Test Demo"}
                         </Button>
                     </CardContent>
                 </Card>

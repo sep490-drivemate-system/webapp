@@ -32,11 +32,17 @@ async function refreshAccessToken(): Promise<string> {
   refreshPromise = (async () => {
     const url = `${baseURL?.replace(/\/$/, "") || ""}/auth/refresh`;
     try {
-      const res = await axios.post(url, { refreshToken }, {
-        headers: { "Content-Type": "application/json" },
-      });
-      const newAccess: string | undefined = res.data?.data?.accessToken ?? res.data?.accessToken;
-      const newRefresh: string | undefined = res.data?.data?.refreshToken ?? res.data?.refreshToken ?? refreshToken;
+      const res = await axios.post(
+        url,
+        { refreshToken },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      const newAccess: string | undefined =
+        res.data?.data?.accessToken ?? res.data?.accessToken;
+      const newRefresh: string | undefined =
+        res.data?.data?.refreshToken ?? res.data?.refreshToken ?? refreshToken;
       if (!newAccess) throw new Error("Invalid refresh response");
       handleTokenStorage(newAccess, newRefresh || refreshToken);
       return newAccess;
@@ -75,7 +81,8 @@ axiosInstance.interceptors.request.use(
       const maybeNewToken = await ensureValidAccessToken();
       const finalToken = maybeNewToken || getAccessToken();
       if (finalToken) {
-        (config.headers = config.headers ?? {}).Authorization = `Bearer ${finalToken}`;
+        (config.headers =
+          config.headers ?? {}).Authorization = `Bearer ${finalToken}`;
       }
     } catch {
       // noop; let request proceed without token
@@ -84,7 +91,8 @@ axiosInstance.interceptors.request.use(
     // Auto-handle Content-Type
     const method = (config.method || "").toLowerCase();
     const hasBody = ["post", "put", "patch"].includes(method);
-    const isFormData = typeof FormData !== "undefined" && config.data instanceof FormData;
+    const isFormData =
+      typeof FormData !== "undefined" && config.data instanceof FormData;
     const headers = (config.headers = config.headers ?? {});
 
     if (isFormData) {

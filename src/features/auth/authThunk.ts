@@ -51,6 +51,7 @@ export const sendEmailCode = createThunk<string, { email: string }>(
 );
 
 import type { InstructorSignupResponse, InstructorSignupRequest } from "@/types/auth/signup-instructor.types";
+import type { TestDto } from "@/types/test";
 
 export const signUpInstructor = createThunk<InstructorSignupResponse, InstructorSignupRequest>(
   HttpMethod.POST,
@@ -73,3 +74,23 @@ export const signUpInstructor = createThunk<InstructorSignupResponse, Instructor
     },
   }
 );
+
+
+export const test = createThunk<any, TestDto>(
+  HttpMethod.POST,
+  `test`,
+  `api/auth/test-form`,
+  {
+    config: (payload) => {
+      const form = new FormData();
+      // Use dot notation for nested objects to match ASP.NET Core model binding
+      form.append("testccdmat.cccdmt", payload.testccdmat.cccdmt.toString());
+      form.append("testccdmat.formFilecccd", payload.testccdmat.formFilecccd);
+      form.append("testccdmas.cccdms", payload.testccdmas.cccdms.toString());
+      form.append("testccdmas.formFilecccdms", payload.testccdmas.formFilecccdms);
+
+      return { data: form } as any;
+    },
+  }
+);
+
