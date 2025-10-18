@@ -1,170 +1,126 @@
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { FcGoogle } from "react-icons/fc";
-import { FaFacebook } from "react-icons/fa";
-import Link from "next/link";
-import { signupSchema, SignupSchema } from "@/schemas/auth/signup.schema";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useSignUp } from "@/hooks/auth/useSignUp";
+import { cn } from "@/lib/utils"
+import { Card, CardContent } from "@/components/ui/card"
+import Link from "next/link"
+import Image from "next/image"
+import bgLogin from "@/../public/bg-login.jpg"
+import { Step1ContactMethod } from "@/app/(auth)/signup/component/Step1ContactMethod"
+import { Step2ContactInput } from "@/app/(auth)/signup/component/Step2ContactInput"
+import { Step3Verification } from "@/app/(auth)/signup/component/Step3Verification"
+import { Step4BasicInfo } from "@/app/(auth)/signup/component/Step4BasicInfo"
+import { useSignUp } from "@/hooks/auth/useSignUp"
+import { useSliceSelector } from "@/hooks/commonHooks"
+import { AuthState } from "@/features/auth/authSlice"
+import { setSignupContact } from "@/features/auth/authSlice"
+import { useAppDispatch } from "@/lib/redux/useAppDispatch"
 
 export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [isLoading, setIsLoading] = useState(false);
-
+  const dispatch = useAppDispatch()
   const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<SignupSchema>({
-    resolver: yupResolver(signupSchema),
-  });
+    currentStep,
+    signupData,
+    handleMethodSelect,
+    handleContactSubmit,
+    handleVerificationSubmit,
+    handleResendCode,
+    handleBasicInfoSubmit,
+    handleBack,
+  } = useSignUp()
 
-  const { handleSignUp } = useSignUp();
+  const updateSignupData = (data: { contact: string }) => {
+    dispatch(setSignupContact(data.contact))
+  }
 
-  const onSubmit = async (data: SignupSchema) => {
-    setIsLoading(true);
-    try {
-      await handleSignUp(data);
-    } finally {
-      setIsLoading(false);
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return <Step1ContactMethod onSelect={handleMethodSelect} />
+
+      case 2:
+        return (
+          <Step2ContactInput
+            method={signupData.method}
+            value={signupData.contact}
+            onChange={(value) => updateSignupData({ contact: value })}
+            onNext={() => handleContactSubmit(signupData.contact)}
+            onBack={handleBack}
+          />
+        )
+
+      case 3:
+        return (
+          <Step3Verification
+            onNext={handleVerificationSubmit}
+            onBack={handleBack}
+            onResend={handleResendCode}
+          />
+        )
+
+      case 4:
+        return (
+          <Step4BasicInfo
+            onNext={handleBasicInfoSubmit}
+            onBack={handleBack}
+          />
+        )
+
+      default:
+        return <Step1ContactMethod onSelect={handleMethodSelect} />
     }
-  };
+  }
 
   return (
-    <div
-      className={cn("flex flex-col gap-6 border-none", className)}
-      {...props}
-    >
-      <Card className="bg-white/50 backdrop-blur-sm border-none">
-        <CardHeader className="flex flex-col gap-2 justify-center items-center">
-          <CardTitle className="text-3xl font-bold">
-            <Link href="/">Drive Mate</Link>
-          </CardTitle>
-          <CardTitle className="text-2xl font-bold">
-            Sign up to your account
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <form onSubmit={handleSubmit(onSubmit)}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
+      <Card className="overflow-hidden p-0 bg-white/10 backdrop-blur-md border-none shadow-lg rounded-2xl">
+        <CardContent className="grid p-0 md:grid-cols-2">
+          <div className="bg-muted relative hidden md:block">
+            <Image
+              src={bgLogin}
+              alt="Image"
+              fill
+              priority
+              className="object-cover dark:brightness-[0.2] dark:grayscale"
+            />
+          </div>
+          <div className="p-6 md:p-8">
             <div className="flex flex-col gap-6">
-              {/* Personal Information */}
-              <div className="space-y-1">
-                <Input
-                  id="userName"
-                  type="text"
-                  {...register("userName")}
-                  placeholder="User Name"
-                  className="bg-white/60 text-black border border-gray-300 rounded-lg px-4 py-2"
-                />
-                {errors.userName && (
-                  <p className="text-red-500 text-sm">{errors.userName.message}</p>
-                )}
+              {/* Header with logo */}
+              <div className="flex flex-col items-center text-center">
+                <Link href="/" className="flex items-center justify-center gap-3">
+                  <Image
+                    src="/logo.png"
+                    alt="Logo"
+                    width={48}
+                    height={48}
+                    priority
+                    className="h-12 w-12 object-contain"
+                  />
+                  <h1 className="text-xl font-bold m-0 text-white">DriveMate</h1>
+                </Link>
               </div>
 
-              {/* Contact Information */}
-              <div className="space-y-1">
-                <Input
-                  id="email"
-                  type="email"
-                  {...register("email")}
-                  placeholder="Email"
-                  className="bg-white/60 text-black border border-gray-300 rounded-lg px-4 py-2"
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-sm">{errors.email.message}</p>
-                )}
-              </div>
 
-              {/* Password */}
-              <div className="space-y-1">
-                <Input
-                  id="password"
-                  type="password"
-                  {...register("password")}
-                  placeholder="Password"
-                  className="bg-white/60 text-black border border-gray-300 rounded-lg px-4 py-2"
-                />
-                {errors.password && (
-                  <p className="text-red-500 text-sm">{errors.password.message}</p>
-                )}
-              </div>
+              {/* Step content */}
+              {renderStep()}
 
-              <div className="space-y-1">
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  {...register("confirmPassword")}
-                  placeholder="Confirm password"
-                  className="bg-white/60 text-black border border-gray-300 rounded-lg px-4 py-2"
-                />
-                {errors.confirmPassword && (
-                  <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex-grow border-t border-gray-300"></div>
-                <div className="text-black/35 text-sm font-medium px-2">
-                  Or Sign in with
-                </div>
-                <div className="flex-grow border-t border-gray-300"></div>
-              </div>
-              {/* Social Login Options */}
-              <div className="text-center">
-                <div className="flex justify-center items-center gap-2">
-                  <Button
-                    variant="outline"
-                    type="button"
-                    className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-full shadow hover:shadow-md transition"
-                  >
-                    <FcGoogle className="text-xl" />
-                    <span className="text-sm font-medium">Google</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    type="button"
-                    className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-full shadow hover:shadow-md transition"
-                  >
-                    <FaFacebook className="text-xl text-[#1877F2]" />
-                    <span className="text-sm font-medium">Facebook</span>
-                  </Button>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <div className="flex flex-col gap-3">
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Signing up...
-                    </div>
-                  ) : (
-                    "Sign Up"
-                  )}
-                </Button>
+              {/* Footer link */}
+              <div className="text-center text-sm text-gray-300">
+                Bạn đã có tài khoản?{" "}
+                <Link href="/signin" className="underline underline-offset-4 text-white hover:text-gray-300">
+                  Đăng nhập
+                </Link>
+                <br />
+                Đăng ký trở thành người hướng dẫn?{" "}
+                <Link href="/signup-instructor" className="underline underline-offset-4 text-white hover:text-gray-300">
+                  Đăng ký
+                </Link>
               </div>
             </div>
-
-            {/* Login Link */}
-            <div className="mt-6 text-center text-base">
-              Already have an account?{" "}
-              <Link href="/signin" className="underline font-medium text-blue-900/80">
-                Sign in
-              </Link>
-            </div>
-          </form>
+          </div>
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

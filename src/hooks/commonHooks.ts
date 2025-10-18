@@ -1,7 +1,9 @@
 "use client";
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import axiosInstance from "@/lib/axios/axiosInstance";
-import type { AxiosRequestConfig } from "axios";
+import { FormSchema, validateField, validateForm } from "@/schemas/schema";
+import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/lib/redux/store";
+import { useAppSelector } from "@/lib/redux/useAppDispatch";
 
 // useLocalStorage
 type SetValue<T> = Dispatch<SetStateAction<T>>;
@@ -94,39 +96,45 @@ export function useAsync<T>(fn: () => Promise<T>, deps: unknown[] = []) {
     return { ...state, reload: run } as const;
 }
 
-// useApi
-// export function useApi<TResponse, TBody = unknown>(
-//     config: AxiosRequestConfig<TBody>,
-//     deps: unknown[] = []
-// ) {
-//     const [data, setData] = useState<TResponse | null>(null);
-//     const [loading, setLoading] = useState<boolean>(true);
-//     const [error, setError] = useState<unknown>(null);
+// useValidation hook
+export function useValidation() {
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
-//     useEffect(() => {
-//         let mounted = true;
-//         setLoading(true);
-//         axiosInstance
-//             .request<TResponse, any, TBody>(config)
-//             .then((res) => {
-//                 if (!mounted) return;
-//                 setData(res.data);
-//             })
-//             .catch((err) => {
-//                 if (!mounted) return;
-//                 setError(err);
-//             })
-//             .finally(() => {
-//                 if (!mounted) return;
-//                 setLoading(false);
-//             });
-//         return () => {
-//             mounted = false;
-//         };
-//     }, deps);
+    // validate 1 field
+    const validateInput = useCallback(
+        async <T extends keyof FormSchema>(field: T, value: FormSchema[T]) => {
+            const result = await validateField(field, value);
+            if (!result.isValid) {
+                setErrors((prev) => ({ ...prev, [field]: result.error || "" }));
+                return false;
+            }
+            setErrors((prev) => {
+                const { [field]: _, ...rest } = prev;
+                return rest;
+            });
+            return true;
+        },
+        []
+    );
 
-//     return { data, loading, error } as const;
-// }
+    // validate toàn form
+    const validateAll = useCallback(async (values: FormSchema) => {
+        const result = await validateForm(values);
+        setErrors(result.errors);
+        return result.isValid;
+    }, []);
+
+    // clear error
+    const clearError = useCallback((field?: keyof FormSchema) => {
+        setErrors((prev) => {
+            if (!field) return {};
+            const { [field]: _, ...rest } = prev;
+            return rest;
+        });
+    }, []);
+
+    return { errors, validateInput, validateAll, clearError } as const;
+}
 
 // usePagination
 export function usePagination<T>(items: T[], pageSize = 10, initialPage = 1) {
@@ -151,4 +159,7 @@ export function usePagination<T>(items: T[], pageSize = 10, initialPage = 1) {
     return { page, pageSize, total, totalPages, currentItems, setPage, next, prev, reset } as const;
 }
 
-
+// selector for specific slice
+export function useSliceSelector<Slice, T>(selector: (state: Slice) => T, sliceSelector: (state: RootState) => Slice): T {
+    return useSelector((state: RootState) => selector(sliceSelector(state)));
+}

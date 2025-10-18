@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-
+  import Image from "next/image";
 const links = {
   Contact: ["Github", "Twitter", "Instagram"],
   Platforms: ["iOS", "Android", "Web"],
@@ -16,13 +16,19 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6 sm:gap-8 lg:gap-12">
           {/* Brand */}
           <div className="col-span-full space-y-4 xl:col-span-2">
-            <Link href="/" className="flex font-bold items-center">
-              <span className="flex items-center justify-center size-6 sm:size-7 lg:size-8 mr-2 bg-gradient-to-tr from-primary via-primary/70 to-primary rounded-lg border border-secondary">
-                {/* Sun icon SVG */}
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sun-dim size-4 sm:size-5 lg:size-6 text-white"><circle cx="12" cy="12" r="4"></circle><path d="M12 4h.01"></path><path d="M20 12h.01"></path><path d="M12 20h.01"></path><path d="M4 12h.01"></path><path d="M17.657 6.343h.01"></path><path d="M17.657 17.657h.01"></path><path d="M6.343 17.657h.01"></path><path d="M6.343 6.343h.01"></path></svg>
-              </span>
-              <h5 className="text-base sm:text-lg lg:text-xl">DriveMate</h5>
-            </Link>
+            <div className="flex flex-col  text-center">
+              <Link href="/" className="flex items-center gap-3">
+                <Image
+                  src="/logo.png"
+                  alt="Logo"
+                  width={48}
+                  height={48}
+                  priority
+                  className="h-12 w-12 object-contain"
+                />
+                <h1 className="text-xl font-bold m-0 text-black">DriveMate</h1>
+              </Link>
+            </div>
             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
               Meet our AI-powered SaaS solution to lighten your workload, increase efficiency and make more accurate decisions.
             </p>

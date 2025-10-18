@@ -5,23 +5,33 @@ import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { User } from "lucide-react";
+import Image from "next/image";
 
 const MAIN_MENU = [
-  { path: "/", label: "Home" },
-  { path: "/services", label: "Services" },
-  { path: "/mentor", label: "Mentor" },
-  { path: "/blog", label: "Blog" },
-  { path: "/news", label: "News" },
+  { path: "/", label: "Trang chủ" },
+  { path: "/cars", label: "Xe tập" },
+  { path: "/instructors", label: "Người hướng dẫn" },
+  { path: "/bookings", label: "Lịch sử đặt" },
+  { path: "/blog", label: "Bài viết" },
+  { path: "/news", label: "Tin tức" },
+  { path: "/handbook", label: "Cẩm nang" },
 ];
 
 function Logo() {
   return (
-    <Link href="/" className="flex font-bold items-center">
-      <span className="flex items-center justify-center size-6 sm:size-7 lg:size-8 mr-2 bg-gradient-to-tr from-primary via-primary/70 to-primary rounded-lg border border-secondary">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sun-dim size-4 sm:size-5 lg:size-6 text-white"><circle cx="12" cy="12" r="4"></circle><path d="M12 4h.01"></path><path d="M20 12h.01"></path><path d="M12 20h.01"></path><path d="M4 12h.01"></path><path d="M17.657 6.343h.01"></path><path d="M17.657 17.657h.01"></path><path d="M6.343 17.657h.01"></path><path d="M6.343 6.343h.01"></path></svg>
-      </span>
-      <h5 className="text-base sm:text-lg lg:text-xl">DriveMate</h5>
-    </Link>
+    <div className="flex flex-col items-center text-center">
+      <Link href="/" className="flex items-center justify-center gap-3">
+        <Image
+          src="/logo.png"
+          alt="Logo"
+          width={48}
+          height={48}
+          priority
+          className="h-12 w-12 object-contain"
+        />
+        <h1 className="text-xl font-bold m-0 text-black">DriveMate</h1>
+      </Link>
+    </div>
   );
 }
 
@@ -98,18 +108,26 @@ function UserDropdown() {
       {open && (
         <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border">
           <Link
+            href="/bookings"
+            className="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
+            onClick={() => setOpen(false)}
+          >
+            Lịch sử đặt
+          </Link>
+          <div className="border-t my-1"></div>
+          <Link
             href="/signin"
             className="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
             onClick={() => setOpen(false)}
           >
-            Sign in
+            Đăng nhập
           </Link>
           <Link
             href="/signup"
             className="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
             onClick={() => setOpen(false)}
           >
-            Sign up
+            Đăng ký
           </Link>
         </div>
       )}

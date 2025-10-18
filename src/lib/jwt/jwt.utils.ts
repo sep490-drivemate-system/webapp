@@ -49,8 +49,40 @@ export const isAccessTokenExpired = (): boolean => {
 
 export const getUserRole = (): UserRole | null => {
   const payload = decodeAccessToken();
+  if (!payload?.Role) return null;
+  
+  // Debug: Log payload to console (remove in production)
+  console.log("JWT Payload:", payload);
+  console.log("Role from payload:", payload.Role);
+  
+  // Map string role names to enum values
+  switch (payload.Role.toLowerCase()) {
+    case "demo":
+      return UserRole.Demo;
+    case "admin":
+      return UserRole.Admin;
+    case "inspector":
+      return UserRole.Inspector;
+    case "novicedriver":
+      return UserRole.NoviceDriver;
+    case "instructor":
+      return UserRole.Instructor;
+    default:
+      console.log("Unknown role:", payload.Role);
+      return null;
+  }
+};
+
+// Helper function to get user info from JWT
+export const getUserInfo = () => {
+  const payload = decodeAccessToken();
   if (!payload) return null;
-  const roleValue = typeof payload.role === "string" ? Number(payload.role) : payload.role;
-  if (Number.isNaN(roleValue)) return null;
-  return roleValue as UserRole;
+  
+  return {
+    userName: payload.UserName,
+    email: payload.Email,
+    role: getUserRole(),
+    id: payload.Id,
+    createdAt: payload.CreatedAt
+  };
 };

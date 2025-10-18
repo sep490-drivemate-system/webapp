@@ -12,7 +12,7 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   // Bảo vệ layout dashboard cho Admin/Manager
-  useRequireAuth("/signin", [UserRole.Admin, UserRole.Manager], "/forbidden");
+  // useRequireAuth("/signin", [UserRole.Admin, UserRole.Manager], "/forbidden");
 
   return (
     <SidebarProvider
