@@ -23,177 +23,127 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Pencil, Trash2, Search, X, FileText, Shield } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, X, FileText, Shield, Settings, Eye } from "lucide-react";
 import { useRequireAuth } from "@/hooks/auth/useRequireAuth";
 import { UserRole } from "@/types/auth/user-role.enum";
+import { Policy, PolicySection, PolicyValue } from "@/types/policy";
+import { mockPolicies } from "@/data/mock-policies";
 
-// Types
-interface Policy {
-    id: string;
-    title: string;
-    description: string;
-    content: string;
-    category: "Privacy" | "Terms" | "Refund" | "Safety" | "General";
-    status: "Active" | "Draft" | "Archived";
-    version: string;
-    effectiveDate: string;
-    createdAt: string;
-    updatedAt: string;
-}
+// Component để hiển thị policy như trong hình
+const PolicyDisplay = ({ policy }: { policy: Policy }) => {
+    return (
+        <div className="bg-white p-6 rounded-lg border">
+            <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">{policy.title}</h2>
+            
+            {policy.sections.map((section, index) => (
+                <div key={section.id} className="mb-6">
+                    <h3 className="text-lg font-semibold text-blue-600 mb-3">{section.title}</h3>
+                    
+                    {/* Hiển thị các values có thể điều chỉnh */}
+                    {section.values.length > 0 && (
+                        <div className="mb-4">
+                            {section.values.map((value) => (
+                                <div key={value.id} className="mb-2">
+                                    <span className="font-medium">• {value.label}: </span>
+                                    <span className="font-bold text-green-600">{value.value}{value.unit}</span>
+                                    {value.description && (
+                                        <span className="text-gray-600 ml-2">({value.description})</span>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    
+                    {/* Hiển thị các rules */}
+                    <ul className="list-disc ml-6 space-y-1">
+                        {section.rules.map((rule, ruleIndex) => (
+                            <li key={ruleIndex} className="text-gray-700">{rule}</li>
+                        ))}
+                    </ul>
+                </div>
+            ))}
+        </div>
+    );
+};
 
-// Mock data
-const initialPolicies: Policy[] = [
-    {
-        id: "1",
-        title: "Chính sách bảo mật thông tin",
-        description: "Quy định về việc thu thập, sử dụng và bảo vệ thông tin cá nhân của người dùng",
-        content: "Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn...",
-        category: "Privacy",
-        status: "Active",
-        version: "1.2",
-        effectiveDate: "2024-01-01",
-        createdAt: "2024-01-01",
-        updatedAt: "2024-03-15",
-    },
-    {
-        id: "2", 
-        title: "Điều khoản sử dụng dịch vụ",
-        description: "Các điều khoản và điều kiện khi sử dụng dịch vụ của DriveMate",
-        content: "Khi sử dụng dịch vụ của chúng tôi, bạn đồng ý với các điều khoản sau...",
-        category: "Terms",
-        status: "Active",
-        version: "2.1",
-        effectiveDate: "2024-02-01",
-        createdAt: "2024-01-15",
-        updatedAt: "2024-04-01",
-    },
-    {
-        id: "3",
-        title: "Chính sách hoàn tiền",
-        description: "Quy định về việc hoàn tiền cho các dịch vụ đã đặt",
-        content: "Chính sách hoàn tiền áp dụng trong các trường hợp sau...",
-        category: "Refund",
-        status: "Active", 
-        version: "1.0",
-        effectiveDate: "2024-01-01",
-        createdAt: "2024-01-01",
-        updatedAt: "2024-01-01",
-    },
-    {
-        id: "4",
-        title: "Quy định an toàn lái xe",
-        description: "Các quy tắc và hướng dẫn đảm bảo an toàn trong quá trình học lái xe",
-        content: "Để đảm bảo an toàn cho học viên và giảng viên...",
-        category: "Safety",
-        status: "Draft",
-        version: "1.0",
-        effectiveDate: "2024-06-01",
-        createdAt: "2024-04-15",
-        updatedAt: "2024-04-20",
-    },
-];
+// Component để chỉnh sửa giá trị
+const ValueEditor = ({ 
+    value, 
+    onUpdate 
+}: { 
+    value: PolicyValue; 
+    onUpdate: (updatedValue: PolicyValue) => void;
+}) => {
+    const [editValue, setEditValue] = useState(value.value);
+    
+    const handleSave = () => {
+        onUpdate({ ...value, value: editValue });
+    };
+    
+    return (
+        <div className="flex items-center gap-2 p-2 border rounded">
+            <span className="font-medium min-w-0 flex-1">{value.label}:</span>
+            <Input
+                type="number"
+                value={editValue}
+                onChange={(e) => setEditValue(Number(e.target.value))}
+                className="w-20"
+            />
+            <span className="text-sm text-gray-600">{value.unit}</span>
+            <Button size="sm" onClick={handleSave}>
+                Lưu
+            </Button>
+        </div>
+    );
+};
 
 export default function ManagementPolicyPage() {
     // useRequireAuth([UserRole.Admin, UserRole.Manager]);
 
-    const [policies, setPolicies] = useState<Policy[]>(initialPolicies);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [categoryFilter, setCategoryFilter] = useState<string>("all");
-    const [statusFilter, setStatusFilter] = useState<string>("all");
-    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+    const [policies, setPolicies] = useState<Policy[]>(mockPolicies);
+    const [selectedPolicy, setSelectedPolicy] = useState<Policy | null>(null);
+    const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-    const [editingPolicy, setEditingPolicy] = useState<Policy | null>(null);
-    const [formData, setFormData] = useState({
-        title: "",
-        description: "",
-        content: "",
-        category: "General" as Policy["category"],
-        status: "Draft" as Policy["status"],
-        version: "1.0",
-        effectiveDate: "",
-    });
+    const [editingSection, setEditingSection] = useState<PolicySection | null>(null);
 
-    // Filter policies
-    const filteredPolicies = policies.filter((policy) => {
-        const matchesSearch = policy.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            policy.description.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = categoryFilter === "all" || policy.category === categoryFilter;
-        const matchesStatus = statusFilter === "all" || policy.status === statusFilter;
-        return matchesSearch && matchesCategory && matchesStatus;
-    });
-
-    const resetForm = () => {
-        setFormData({
-            title: "",
-            description: "",
-            content: "",
-            category: "General",
-            status: "Draft",
-            version: "1.0",
-            effectiveDate: "",
-        });
+    const handleViewPolicy = (policy: Policy) => {
+        setSelectedPolicy(policy);
+        setIsViewDialogOpen(true);
     };
 
-    const handleCreate = () => {
-        const newPolicy: Policy = {
-            id: Date.now().toString(),
-            ...formData,
-            createdAt: new Date().toISOString().split("T")[0],
-            updatedAt: new Date().toISOString().split("T")[0],
-        };
-        setPolicies([...policies, newPolicy]);
-        setIsCreateDialogOpen(false);
-        resetForm();
-    };
-
-    const handleEdit = (policy: Policy) => {
-        setEditingPolicy(policy);
-        setFormData({
-            title: policy.title,
-            description: policy.description,
-            content: policy.content,
-            category: policy.category,
-            status: policy.status,
-            version: policy.version,
-            effectiveDate: policy.effectiveDate,
-        });
+    const handleEditPolicy = (policy: Policy) => {
+        setSelectedPolicy(policy);
         setIsEditDialogOpen(true);
     };
 
-    const handleUpdate = () => {
-        if (!editingPolicy) return;
-        setPolicies(policies.map((policy) =>
-            policy.id === editingPolicy.id 
-                ? { ...policy, ...formData, updatedAt: new Date().toISOString().split("T")[0] }
-                : policy
-        ));
-        setIsEditDialogOpen(false);
-        setEditingPolicy(null);
-        resetForm();
+    const handleUpdateValue = (policyId: string, sectionId: string, updatedValue: PolicyValue) => {
+        setPolicies(policies.map(policy => {
+            if (policy.id === policyId) {
+                return {
+                    ...policy,
+                    sections: policy.sections.map(section => {
+                        if (section.id === sectionId) {
+                            return {
+                                ...section,
+                                values: section.values.map(value => 
+                                    value.id === updatedValue.id ? updatedValue : value
+                                )
+                            };
+                        }
+                        return section;
+                    }),
+                    updatedAt: new Date()
+                };
+            }
+            return policy;
+        }));
     };
 
-    const handleDelete = (policyId: string) => {
-        setPolicies(policies.filter((policy) => policy.id !== policyId));
-    };
-
-    const getCategoryLabel = (category: Policy["category"]) => {
-        const labels = {
-            Privacy: "Bảo mật",
-            Terms: "Điều khoản",
-            Refund: "Hoàn tiền", 
-            Safety: "An toàn",
-            General: "Chung"
-        };
-        return labels[category];
-    };
-
-    const getStatusLabel = (status: Policy["status"]) => {
-        const labels = {
-            Active: "Đang áp dụng",
-            Draft: "Bản nháp",
-            Archived: "Lưu trữ"
-        };
-        return labels[status];
+    const formatDate = (date: Date | string) => {
+        if (typeof date === 'string') {
+            return new Date(date).toLocaleDateString('vi-VN');
+        }
+        return date.toLocaleDateString('vi-VN');
     };
 
     return (
@@ -203,7 +153,7 @@ export default function ManagementPolicyPage() {
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Quản lý Chính sách</h1>
                     <p className="text-muted-foreground">
-                        Quản lý các chính sách và điều khoản của hệ thống
+                        Quản lý các chính sách và điều khoản với các tham số có thể điều chỉnh
                     </p>
                 </div>
             </div>
@@ -226,393 +176,160 @@ export default function ManagementPolicyPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {policies.filter((p) => p.status === "Active").length}
+                            {policies.filter((p) => p.isActive).length}
                         </div>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Bản nháp</CardTitle>
+                        <CardTitle className="text-sm font-medium">Tổng tham số</CardTitle>
+                        <Settings className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {policies.filter((p) => p.status === "Draft").length}
+                            {policies.reduce((total, policy) => 
+                                total + policy.sections.reduce((sectionTotal, section) => 
+                                    sectionTotal + section.values.length, 0), 0)}
                         </div>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Lưu trữ</CardTitle>
+                        <CardTitle className="text-sm font-medium">Phiên bản mới nhất</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {policies.filter((p) => p.status === "Archived").length}
+                            {Math.max(...policies.map(p => parseFloat(p.version)))}
                         </div>
                     </CardContent>
                 </Card>
             </div>
 
-            {/* Policy Management */}
-            <Card>
-                <CardContent>
-                    <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-                        {/* Search and Filters */}
-                        <div className="flex flex-1 items-center space-x-2">
-                            <div className="relative flex-1 max-w-sm">
-                                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                                <Input
-                                    placeholder="Tìm kiếm chính sách..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-9"
-                                />
-                            </div>
-                            {searchTerm && (
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setSearchTerm("")}
-                                    className="h-9 px-2 shrink-0"
-                                >
-                                    <X className="h-4 w-4" />
-                                </Button>
-                            )}
-                            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                                <SelectTrigger className="w-[150px]">
-                                    <SelectValue placeholder="Danh mục" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Tất cả</SelectItem>
-                                    <SelectItem value="Privacy">Bảo mật</SelectItem>
-                                    <SelectItem value="Terms">Điều khoản</SelectItem>
-                                    <SelectItem value="Refund">Hoàn tiền</SelectItem>
-                                    <SelectItem value="Safety">An toàn</SelectItem>
-                                    <SelectItem value="General">Chung</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Select value={statusFilter} onValueChange={setStatusFilter}>
-                                <SelectTrigger className="w-[150px]">
-                                    <SelectValue placeholder="Trạng thái" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Tất cả</SelectItem>
-                                    <SelectItem value="Active">Đang áp dụng</SelectItem>
-                                    <SelectItem value="Draft">Bản nháp</SelectItem>
-                                    <SelectItem value="Archived">Lưu trữ</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {/* Add Policy Button */}
-                        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-                            <DialogTrigger asChild>
-                                <Button>
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    Thêm chính sách
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
-                                <DialogHeader>
-                                    <DialogTitle>Thêm chính sách mới</DialogTitle>
-                                    <DialogDescription>
-                                        Tạo chính sách hoặc điều khoản mới cho hệ thống.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="grid gap-4 py-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="title">Tiêu đề</Label>
-                                        <Input
-                                            id="title"
-                                            value={formData.title}
-                                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                            placeholder="Nhập tiêu đề chính sách"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="description">Mô tả</Label>
-                                        <Textarea
-                                            id="description"
-                                            value={formData.description}
-                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                            placeholder="Nhập mô tả ngắn gọn"
-                                            rows={3}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="content">Nội dung</Label>
-                                        <Textarea
-                                            id="content"
-                                            value={formData.content}
-                                            onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                                            placeholder="Nhập nội dung chi tiết của chính sách"
-                                            rows={6}
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="category">Danh mục</Label>
-                                            <Select
-                                                value={formData.category}
-                                                onValueChange={(value: Policy["category"]) =>
-                                                    setFormData({ ...formData, category: value })
-                                                }
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Chọn danh mục" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Privacy">Bảo mật</SelectItem>
-                                                    <SelectItem value="Terms">Điều khoản</SelectItem>
-                                                    <SelectItem value="Refund">Hoàn tiền</SelectItem>
-                                                    <SelectItem value="Safety">An toàn</SelectItem>
-                                                    <SelectItem value="General">Chung</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="status">Trạng thái</Label>
-                                            <Select
-                                                value={formData.status}
-                                                onValueChange={(value: Policy["status"]) =>
-                                                    setFormData({ ...formData, status: value })
-                                                }
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Chọn trạng thái" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Draft">Bản nháp</SelectItem>
-                                                    <SelectItem value="Active">Đang áp dụng</SelectItem>
-                                                    <SelectItem value="Archived">Lưu trữ</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="version">Phiên bản</Label>
-                                            <Input
-                                                id="version"
-                                                value={formData.version}
-                                                onChange={(e) => setFormData({ ...formData, version: e.target.value })}
-                                                placeholder="1.0"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="effectiveDate">Ngày có hiệu lực</Label>
-                                            <Input
-                                                id="effectiveDate"
-                                                type="date"
-                                                value={formData.effectiveDate}
-                                                onChange={(e) => setFormData({ ...formData, effectiveDate: e.target.value })}
-                                            />
-                                        </div>
+            {/* Policies List */}
+            <div className="grid gap-4">
+                {policies.map((policy) => (
+                    <Card key={policy.id}>
+                        <CardHeader>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <CardTitle className="text-xl">{policy.title}</CardTitle>
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                        {policy.description}
+                                    </p>
+                                    <div className="flex items-center gap-2 mt-2">
+                                        <Badge variant={policy.isActive ? "default" : "secondary"}>
+                                            {policy.isActive ? "Đang áp dụng" : "Không hoạt động"}
+                                        </Badge>
+                                        <span className="text-sm text-muted-foreground">
+                                            Phiên bản {policy.version}
+                                        </span>
+                                        <span className="text-sm text-muted-foreground">
+                                            Cập nhật: {formatDate(policy.updatedAt)}
+                                        </span>
                                     </div>
                                 </div>
-                                <DialogFooter>
-                                    <Button type="submit" onClick={handleCreate}>
-                                        Tạo chính sách
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handleViewPolicy(policy)}
+                                    >
+                                        <Eye className="h-4 w-4 mr-2" />
+                                        Xem
                                     </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-                    </div>
-                </CardContent>
-                
-                {/* Policies Table */}
-                <CardContent className="p-0">
-                    <div className="rounded-md border">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="border-b bg-muted/50">
-                                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-                                        Tiêu đề
-                                    </th>
-                                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-                                        Danh mục
-                                    </th>
-                                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-                                        Trạng thái
-                                    </th>
-                                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-                                        Phiên bản
-                                    </th>
-                                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-                                        Ngày cập nhật
-                                    </th>
-                                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-                                        Thao tác
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredPolicies.map((policy) => (
-                                    <tr key={policy.id} className="border-b transition-colors hover:bg-muted/50">
-                                        <td className="p-4 align-middle">
-                                            <div>
-                                                <div className="font-medium">{policy.title}</div>
-                                                <div className="text-sm text-muted-foreground truncate max-w-xs">
-                                                    {policy.description}
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="p-4 align-middle">
-                                            <Badge variant="outline">
-                                                {getCategoryLabel(policy.category)}
-                                            </Badge>
-                                        </td>
-                                        <td className="p-4 align-middle">
-                                            <Badge 
-                                                variant={
-                                                    policy.status === "Active" ? "default" : 
-                                                    policy.status === "Draft" ? "secondary" : "outline"
-                                                }
-                                            >
-                                                {getStatusLabel(policy.status)}
-                                            </Badge>
-                                        </td>
-                                        <td className="p-4 align-middle">{policy.version}</td>
-                                        <td className="p-4 align-middle">{policy.updatedAt}</td>
-                                        <td className="p-4 align-middle">
-                                            <div className="flex items-center gap-2">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => handleEdit(policy)}
-                                                >
-                                                    <Pencil className="h-4 w-4" />
-                                                </Button>
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => {
-                                                        if (window.confirm(`Bạn có chắc chắn muốn xóa chính sách "${policy.title}"?`)) {
-                                                            handleDelete(policy.id);
-                                                        }
-                                                    }}
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        {filteredPolicies.length === 0 && (
-                            <div className="text-center py-8">
-                                <p className="text-muted-foreground">Không tìm thấy chính sách nào</p>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handleEditPolicy(policy)}
+                                    >
+                                        <Settings className="h-4 w-4 mr-2" />
+                                        Chỉnh sửa
+                                    </Button>
+                                </div>
                             </div>
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
-            
-            {/* Edit Policy Dialog */}
-            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid gap-4">
+                                {policy.sections.map((section) => (
+                                    <div key={section.id} className="border rounded-lg p-4">
+                                        <h4 className="font-semibold mb-2">{section.title}</h4>
+                                        {section.values.length > 0 && (
+                                            <div className="grid gap-2 mb-3">
+                                                {section.values.map((value) => (
+                                                    <div key={value.id} className="flex items-center justify-between text-sm">
+                                                        <span>{value.label}:</span>
+                                                        <span className="font-medium text-blue-600">
+                                                            {value.value}{value.unit}
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        <p className="text-sm text-muted-foreground">
+                                            {section.rules.length} quy tắc được định nghĩa
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+
+            {/* View Policy Dialog */}
+            <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+                <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Chỉnh sửa chính sách</DialogTitle>
+                        <DialogTitle>Xem chính sách</DialogTitle>
                         <DialogDescription>
-                            Cập nhật thông tin chính sách.
+                            Hiển thị chi tiết chính sách như người dùng sẽ thấy
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="edit-title">Tiêu đề</Label>
-                            <Input
-                                id="edit-title"
-                                value={formData.title}
-                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                placeholder="Nhập tiêu đề chính sách"
-                            />
+                    {selectedPolicy && (
+                        <PolicyDisplay policy={selectedPolicy} />
+                    )}
+                </DialogContent>
+            </Dialog>
+
+            {/* Edit Policy Dialog */}
+            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Chỉnh sửa tham số chính sách</DialogTitle>
+                        <DialogDescription>
+                            Điều chỉnh các con số và tham số trong chính sách
+                        </DialogDescription>
+                    </DialogHeader>
+                    {selectedPolicy && (
+                        <div className="space-y-6">
+                            {selectedPolicy.sections.map((section) => (
+                                <div key={section.id} className="border rounded-lg p-4">
+                                    <h4 className="font-semibold mb-4">{section.title}</h4>
+                                    <div className="space-y-3">
+                                        {section.values.map((value) => (
+                                            <ValueEditor
+                                                key={value.id}
+                                                value={value}
+                                                onUpdate={(updatedValue) => 
+                                                    handleUpdateValue(selectedPolicy.id, section.id, updatedValue)
+                                                }
+                                            />
+                                        ))}
+                                    </div>
+                                    {section.rules.length > 0 && (
+                                        <div className="mt-4">
+                                            <h5 className="font-medium mb-2">Quy tắc:</h5>
+                                            <ul className="text-sm text-muted-foreground space-y-1">
+                                                {section.rules.map((rule, index) => (
+                                                    <li key={index}>• {rule}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="edit-description">Mô tả</Label>
-                            <Textarea
-                                id="edit-description"
-                                value={formData.description}
-                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                placeholder="Nhập mô tả ngắn gọn"
-                                rows={3}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="edit-content">Nội dung</Label>
-                            <Textarea
-                                id="edit-content"
-                                value={formData.content}
-                                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                                placeholder="Nhập nội dung chi tiết của chính sách"
-                                rows={6}
-                            />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="edit-category">Danh mục</Label>
-                                <Select
-                                    value={formData.category}
-                                    onValueChange={(value: Policy["category"]) =>
-                                        setFormData({ ...formData, category: value })
-                                    }
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Privacy">Bảo mật</SelectItem>
-                                        <SelectItem value="Terms">Điều khoản</SelectItem>
-                                        <SelectItem value="Refund">Hoàn tiền</SelectItem>
-                                        <SelectItem value="Safety">An toàn</SelectItem>
-                                        <SelectItem value="General">Chung</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="edit-status">Trạng thái</Label>
-                                <Select
-                                    value={formData.status}
-                                    onValueChange={(value: Policy["status"]) =>
-                                        setFormData({ ...formData, status: value })
-                                    }
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Draft">Bản nháp</SelectItem>
-                                        <SelectItem value="Active">Đang áp dụng</SelectItem>
-                                        <SelectItem value="Archived">Lưu trữ</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="edit-version">Phiên bản</Label>
-                                <Input
-                                    id="edit-version"
-                                    value={formData.version}
-                                    onChange={(e) => setFormData({ ...formData, version: e.target.value })}
-                                    placeholder="1.0"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="edit-effectiveDate">Ngày có hiệu lực</Label>
-                                <Input
-                                    id="edit-effectiveDate"
-                                    type="date"
-                                    value={formData.effectiveDate}
-                                    onChange={(e) => setFormData({ ...formData, effectiveDate: e.target.value })}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button type="submit" onClick={handleUpdate}>
-                            Cập nhật
-                        </Button>
-                    </DialogFooter>
+                    )}
                 </DialogContent>
             </Dialog>
         </div>

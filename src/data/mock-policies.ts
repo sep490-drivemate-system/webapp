@@ -1,0 +1,105 @@
+import { Policy } from "@/types/policy";
+
+export const mockPolicies: Policy[] = [
+  {
+    id: "policy-001",
+    title: "Điều Khoản",
+    description: "Điều khoản và chính sách sử dụng dịch vụ",
+    sections: [
+      {
+        id: "section-001",
+        title: "1. Quyền của người lái mới",
+        description: "Các quyền lợi và chính sách hủy của người lái mới",
+        values: [
+          {
+            id: "value-001",
+            label: "Hoàn tiền trong 48h",
+            value: 100,
+            unit: "%",
+            description: "Có thể hủy theo chính sách hoàn tiền"
+          },
+          {
+            id: "value-002", 
+            label: "Hoàn tiền từ 24-48h",
+            value: 50,
+            unit: "%",
+            description: "Hoàn 50% số tiền"
+          },
+          {
+            id: "value-003",
+            label: "Thời gian hủy tối thiểu",
+            value: 24,
+            unit: "giờ",
+            description: "Dưới 24h: không hoàn trả"
+          }
+        ],
+        rules: [
+          "Có thể hủy theo chính sách hoàn tiền:",
+          "48h: hoàn 100% số tiền",
+          "24-48h: hoàn 50% số tiền", 
+          "Dưới 24h: không hoàn trả",
+          "Có thể đổi lịch theo chính sách:",
+          "Dưới 24h: không cho phép đổi lịch"
+        ]
+      },
+      {
+        id: "section-002",
+        title: "2. Nghĩa vụ của người lái mới",
+        description: "Các nghĩa vụ và trách nhiệm của học viên",
+        values: [
+          {
+            id: "value-004",
+            label: "Tuổi tối thiểu",
+            value: 18,
+            unit: "tuổi",
+            description: "Có bằng lái hợp lệ (từ hạng B1 trở lên)"
+          },
+          {
+            id: "value-005",
+            label: "Thời gian chờ tối đa",
+            value: 15,
+            unit: "phút",
+            description: "Thời gian chờ giáo viên tối đa"
+          }
+        ],
+        rules: [
+          "Có bằng lái hợp lệ (từ hạng B1 trở lên) và chịu trách nhiệm pháp lý trong suốt buổi học.",
+          "Cung cấp thông tin cá nhân, giấy tờ, phương tiện (nếu dùng xe riêng) đúng và chính xác.",
+          "Có mặt đúng giờ, chủ động liên hệ với Người hướng dẫn khi trễ.",
+          "Tuân thủ luật giao thông và hướng dẫn của Người hướng dẫn.",
+          "Không dùng buổi học cho mục đích khác (vận chuyển hàng, chở khách...).",
+          "Nếu dùng xe cá nhân, phải đảm bảo xe đạt chuẩn lưu thông và có bảo hiểm hợp lệ."
+        ]
+      },
+      {
+        id: "section-003", 
+        title: "3. Giới hạn trách nhiệm",
+        description: "Các giới hạn về trách nhiệm và bồi thường",
+        values: [
+          {
+            id: "value-006",
+            label: "Mức bồi thường tối đa",
+            value: 10000000,
+            unit: "VNĐ",
+            description: "Mức bồi thường tối đa cho tai nạn"
+          },
+          {
+            id: "value-007",
+            label: "Thời gian xử lý khiếu nại",
+            value: 7,
+            unit: "ngày",
+            description: "Thời gian xử lý khiếu nại tối đa"
+          }
+        ],
+        rules: [
+          "DriveMate không chịu trách nhiệm về tai nạn, hư hại xe hoặc thương tích phát sinh trong buổi học.",
+          "Thời gian hiện thị trên bản đồ chỉ mang tính tham khảo, có thể khác thực tế."
+        ]
+      }
+    ],
+    isActive: true,
+    createdAt: new Date("2024-01-01T00:00:00.000Z"),
+    updatedAt: new Date("2024-10-24T00:00:00.000Z"),
+    version: "1.0"
+  }
+];
