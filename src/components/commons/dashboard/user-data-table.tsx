@@ -28,6 +28,8 @@ import {
 import * as yup from "yup"
 
 import { Badge } from "@/components/ui/badge"
+import { IUserManagement } from "@/types/user/manage-user.type"
+import { UserRole } from "@/types/auth/user-role.enum"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
@@ -46,17 +48,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-export const userSchema = yup.object({
-  id: yup.string().required(),
-  name: yup.string().required(),
-  email: yup.string().email().required(),
-  phone: yup.string().required(),
-  role: yup.string().oneOf(["Admin", "Manager", "Student", "Instructor"]).required(),
-  status: yup.string().oneOf(["Active", "Inactive", "Suspended"]).required(),
-  createdAt: yup.string().required(),
-})
-
-export type User = yup.InferType<typeof userSchema>
+// Using IUserManagement interface from types
+export type User = IUserManagement
 
 interface UserDataTableProps {
   data: User[]
@@ -89,15 +82,15 @@ const getStatusVariant = (status: User["status"]) => {
 }
 
 // Get role badge variant
-const getRoleVariant = (role: User["role"]) => {
+const getRoleVariant = (role: UserRole) => {
   switch (role) {
-    case "Admin":
+    case UserRole.Admin:
       return "destructive"
-    case "Manager":
+    case UserRole.Inspector:
       return "default"
-    case "Instructor":
+    case UserRole.Instructor:
       return "secondary"
-    case "Student":
+    case UserRole.NoviceDriver:
       return "outline"
     default:
       return "outline"
@@ -183,10 +176,10 @@ export function UserDataTable({ data: initialData, onEdit, onDelete, onAdd }: Us
       enableHiding: false,
     },
     {
-      accessorKey: "name",
+      accessorKey: "userName",
       header: "Họ tên",
       cell: ({ row }) => (
-        <div className="font-medium">{row.original.name}</div>
+        <div className="font-medium">{row.original.userName}</div>
       ),
       enableHiding: false,
     },
@@ -209,7 +202,7 @@ export function UserDataTable({ data: initialData, onEdit, onDelete, onAdd }: Us
       header: "Vai trò",
       cell: ({ row }) => (
         <Badge variant={getRoleVariant(row.original.role)}>
-          {row.original.role}
+          {UserRole[row.original.role]}
         </Badge>
       ),
     },
@@ -226,7 +219,7 @@ export function UserDataTable({ data: initialData, onEdit, onDelete, onAdd }: Us
       accessorKey: "createdAt",
       header: "Ngày tạo",
       cell: ({ row }) => (
-        <div>{row.original.createdAt}</div>
+        <div>{row.original.createdAt.toLocaleDateString('vi-VN')}</div>
       ),
     },
     {

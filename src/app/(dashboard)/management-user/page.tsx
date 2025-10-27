@@ -36,166 +36,165 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Plus, Pencil, Trash2, Search, Filter, X } from "lucide-react";
 import { useRequireAuth } from "@/hooks/auth/useRequireAuth";
 import { UserRole } from "@/types/auth/user-role.enum";
-import { UserDataTable, type User } from "@/components/commons/dashboard/user-data-table";
+import { IUserManagement } from "@/types/user/manage-user.type";
+import { UserDataTable } from "@/components/commons/dashboard/user-data-table";
 
-// Using User type from UserDataTable component
-
-// Mock data
-const initialUsers: User[] = [
+// Mock data using IUserManagement interface
+const initialUsers: IUserManagement[] = [
     {
         id: "1",
-        name: "Nguyễn Văn An",
+        userName: "Nguyễn Văn An",
         email: "nguyenvanan@example.com",
         phone: "0901234567",
-        role: "Admin",
+        role: UserRole.Admin,
         status: "Active",
-        createdAt: "2024-01-15",
+        createdAt: new Date("2024-01-15"),
     },
     {
         id: "2",
-        name: "Trần Thị Bình",
+        userName: "Trần Thị Bình",
         email: "tranthibinh@example.com",
         phone: "0912345678",
-        role: "Manager",
+        role: UserRole.Inspector,
         status: "Active",
-        createdAt: "2024-02-20",
+        createdAt: new Date("2024-02-20"),
     },
     {
         id: "3",
-        name: "Lê Văn Cường",
+        userName: "Lê Văn Cường",
         email: "levancuong@example.com",
         phone: "0923456789",
-        role: "Instructor",
+        role: UserRole.Instructor,
         status: "Active",
-        createdAt: "2024-03-10",
+        createdAt: new Date("2024-03-10"),
     },
     {
         id: "4",
-        name: "Phạm Thị Dung",
+        userName: "Phạm Thị Dung",
         email: "phamthidung@example.com",
         phone: "0934567890",
-        role: "Student",
+        role: UserRole.NoviceDriver,
         status: "Inactive",
-        createdAt: "2024-03-25",
+        createdAt: new Date("2024-03-25"),
     },
     {
         id: "5",
-        name: "Hoàng Minh Đức",
+        userName: "Hoàng Minh Đức",
         email: "hoangminhduc@example.com",
         phone: "0945678901",
-        role: "Instructor",
+        role: UserRole.Instructor,
         status: "Active",
-        createdAt: "2024-04-05",
+        createdAt: new Date("2024-04-05"),
     },
     {
         id: "6",
-        name: "Vũ Thị Hoa",
+        userName: "Vũ Thị Hoa",
         email: "vuthihoa@example.com",
         phone: "0956789012",
-        role: "Student",
+        role: UserRole.NoviceDriver,
         status: "Active",
-        createdAt: "2024-04-12",
+        createdAt: new Date("2024-04-12"),
     },
     {
         id: "7",
-        name: "Đỗ Văn Hùng",
+        userName: "Đỗ Văn Hùng",
         email: "dovanhung@example.com",
         phone: "0967890123",
-        role: "Manager",
+        role: UserRole.Inspector,
         status: "Active",
-        createdAt: "2024-04-18",
+        createdAt: new Date("2024-04-18"),
     },
     {
         id: "8",
-        name: "Bùi Thị Lan",
+        userName: "Bùi Thị Lan",
         email: "buithilan@example.com",
         phone: "0978901234",
-        role: "Student",
+        role: UserRole.NoviceDriver,
         status: "Suspended",
-        createdAt: "2024-04-22",
+        createdAt: new Date("2024-04-22"),
     },
     {
         id: "9",
-        name: "Ngô Văn Minh",
+        userName: "Ngô Văn Minh",
         email: "ngovanminh@example.com",
         phone: "0989012345",
-        role: "Instructor",
+        role: UserRole.Instructor,
         status: "Active",
-        createdAt: "2024-05-01",
+        createdAt: new Date("2024-05-01"),
     },
     {
         id: "10",
-        name: "Lý Thị Nga",
+        userName: "Lý Thị Nga",
         email: "lythinga@example.com",
         phone: "0990123456",
-        role: "Student",
+        role: UserRole.NoviceDriver,
         status: "Active",
-        createdAt: "2024-05-08",
+        createdAt: new Date("2024-05-08"),
     },
     {
         id: "11",
-        name: "Trương Văn Phúc",
+        userName: "Trương Văn Phúc",
         email: "truongvanphuc@example.com",
         phone: "0901234568",
-        role: "Student",
+        role: UserRole.NoviceDriver,
         status: "Inactive",
-        createdAt: "2024-05-15",
+        createdAt: new Date("2024-05-15"),
     },
     {
         id: "12",
-        name: "Đinh Thị Quỳnh",
+        userName: "Đinh Thị Quỳnh",
         email: "dinhthiquynh@example.com",
         phone: "0912345679",
-        role: "Instructor",
+        role: UserRole.Instructor,
         status: "Active",
-        createdAt: "2024-05-20",
+        createdAt: new Date("2024-05-20"),
     },
     {
         id: "13",
-        name: "Phan Văn Sơn",
+        userName: "Phan Văn Sơn",
         email: "phanvanson@example.com",
         phone: "0923456780",
-        role: "Student",
+        role: UserRole.NoviceDriver,
         status: "Active",
-        createdAt: "2024-05-25",
+        createdAt: new Date("2024-05-25"),
     },
     {
         id: "14",
-        name: "Mai Thị Tâm",
+        userName: "Mai Thị Tâm",
         email: "maithitam@example.com",
         phone: "0934567891",
-        role: "Manager",
+        role: UserRole.Inspector,
         status: "Active",
-        createdAt: "2024-06-01",
+        createdAt: new Date("2024-06-01"),
     },
 ];
 
 export default function ManagementUserPage() {
     // useRequireAuth([UserRole.Admin, UserRole.Manager]);
 
-    const [users, setUsers] = useState<User[]>(initialUsers);
+    const [users, setUsers] = useState<IUserManagement[]>(initialUsers);
     const [searchTerm, setSearchTerm] = useState("");
     const [roleFilter, setRoleFilter] = useState<string>("all");
     const [statusFilter, setStatusFilter] = useState<string>("all");
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-    const [editingUser, setEditingUser] = useState<User | null>(null);
+    const [editingUser, setEditingUser] = useState<IUserManagement | null>(null);
     const [formData, setFormData] = useState({
-        name: "",
+        userName: "",
         email: "",
         phone: "",
-        role: "Student" as User["role"],
-        status: "Active" as User["status"],
+        role: UserRole.NoviceDriver as UserRole,
+        status: "Active" as string,
     });
 
     // Filter users based on search term and filters
     const filteredUsers = users.filter((user) => {
         const matchesSearch =
-            user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.phone.includes(searchTerm);
 
-        const matchesRole = roleFilter === "all" || user.role === roleFilter;
+        const matchesRole = roleFilter === "all" || UserRole[user.role] === roleFilter;
         const matchesStatus = statusFilter === "all" || user.status === statusFilter;
 
         return matchesSearch && matchesRole && matchesStatus;
@@ -214,20 +213,20 @@ export default function ManagementUserPage() {
     // Reset form
     const resetForm = () => {
         setFormData({
-            name: "",
+            userName: "",
             email: "",
             phone: "",
-            role: "Student",
+            role: UserRole.NoviceDriver,
             status: "Active",
         });
     };
 
     // Handle create user
     const handleCreateUser = () => {
-        const newUser: User = {
+        const newUser: IUserManagement = {
             id: Date.now().toString(),
             ...formData,
-            createdAt: new Date().toISOString().split("T")[0],
+            createdAt: new Date(),
         };
         setUsers([...users, newUser]);
         setIsCreateDialogOpen(false);
@@ -235,10 +234,10 @@ export default function ManagementUserPage() {
     };
 
     // Handle edit user
-    const handleEditUser = (user: User) => {
+    const handleEditUser = (user: IUserManagement) => {
         setEditingUser(user);
         setFormData({
-            name: user.name,
+            userName: user.userName,
             email: user.email,
             phone: user.phone,
             role: user.role,
@@ -275,9 +274,7 @@ export default function ManagementUserPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Quản lý người dùng</h1>
-                    <p className="text-muted-foreground">
-                        Quản lý thông tin người dùng trong hệ thống
-                    </p>
+                    
                 </div>
             </div>
 
@@ -293,7 +290,7 @@ export default function ManagementUserPage() {
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Đang hoạt động</CardTitle>
+                        <CardTitle className="text-sm font-medium">Người kiểm duyệt</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
@@ -303,27 +300,25 @@ export default function ManagementUserPage() {
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Giảng viên</CardTitle>
+                        <CardTitle className="text-sm font-medium">Người hướng dẫn</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {users.filter((u) => u.role === "Instructor").length}
+                            {users.filter((u) => u.role === UserRole.Instructor).length}
                         </div>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Học viên</CardTitle>
+                        <CardTitle className="text-sm font-medium">Lái mới</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {users.filter((u) => u.role === "Student").length}
+                            {users.filter((u) => u.role === UserRole.NoviceDriver).length}
                         </div>
                     </CardContent>
                 </Card>
             </div>
-
-            {/* Search and Add User */}
 
 
             {/* Users Table */}
@@ -373,13 +368,13 @@ export default function ManagementUserPage() {
                                     </DialogHeader>
                                     <div className="grid gap-4 py-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="name">
+                                            <Label htmlFor="userName">
                                                 Họ tên
                                             </Label>
                                             <Input
-                                                id="name"
-                                                value={formData.name}
-                                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                                id="userName"
+                                                value={formData.userName}
+                                                onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
                                                 placeholder="Nhập họ tên"
                                             />
                                         </div>
@@ -411,9 +406,9 @@ export default function ManagementUserPage() {
                                                 Vai trò
                                             </Label>
                                             <Select
-                                                value={formData.role}
-                                                onValueChange={(value: User["role"]) =>
-                                                    setFormData({ ...formData, role: value })
+                                                value={UserRole[formData.role]}
+                                                onValueChange={(value: string) =>
+                                                    setFormData({ ...formData, role: UserRole[value as keyof typeof UserRole] })
                                                 }
                                             >
                                                 <SelectTrigger>
@@ -421,9 +416,9 @@ export default function ManagementUserPage() {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="Admin">Admin</SelectItem>
-                                                    <SelectItem value="Manager">Manager</SelectItem>
+                                                    <SelectItem value="Inspector">Inspector</SelectItem>
                                                     <SelectItem value="Instructor">Instructor</SelectItem>
-                                                    <SelectItem value="Student">Student</SelectItem>
+                                                    <SelectItem value="NoviceDriver">Novice Driver</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -433,7 +428,7 @@ export default function ManagementUserPage() {
                                             </Label>
                                             <Select
                                                 value={formData.status}
-                                                onValueChange={(value: User["status"]) =>
+                                                onValueChange={(value: string) =>
                                                     setFormData({ ...formData, status: value })
                                                 }
                                             >
@@ -487,7 +482,7 @@ export default function ManagementUserPage() {
                         onEdit={handleEditUser}
                         onDelete={(userId) => {
                             const user = users.find(u => u.id === userId);
-                            if (user && window.confirm(`Bạn có chắc chắn muốn xóa người dùng "${user.name}"? Hành động này không thể hoàn tác.`)) {
+                            if (user && window.confirm(`Bạn có chắc chắn muốn xóa người dùng "${user.userName}"? Hành động này không thể hoàn tác.`)) {
                                 handleDeleteUser(userId);
                             }
                         }}
@@ -506,13 +501,13 @@ export default function ManagementUserPage() {
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="space-y-2">
-                            <Label htmlFor="edit-name">
+                            <Label htmlFor="edit-userName">
                                 Họ tên
                             </Label>
                             <Input
-                                id="edit-name"
-                                value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                id="edit-userName"
+                                value={formData.userName}
+                                onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
                                 placeholder="Nhập họ tên"
                             />
                         </div>
@@ -544,9 +539,9 @@ export default function ManagementUserPage() {
                                 Vai trò
                             </Label>
                             <Select
-                                value={formData.role}
-                                onValueChange={(value: User["role"]) =>
-                                    setFormData({ ...formData, role: value })
+                                value={UserRole[formData.role]}
+                                onValueChange={(value: string) =>
+                                    setFormData({ ...formData, role: UserRole[value as keyof typeof UserRole] })
                                 }
                             >
                                 <SelectTrigger>
@@ -554,9 +549,9 @@ export default function ManagementUserPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="Admin">Admin</SelectItem>
-                                    <SelectItem value="Manager">Manager</SelectItem>
+                                    <SelectItem value="Inspector">Inspector</SelectItem>
                                     <SelectItem value="Instructor">Instructor</SelectItem>
-                                    <SelectItem value="Student">Student</SelectItem>
+                                    <SelectItem value="NoviceDriver">Novice Driver</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -566,7 +561,7 @@ export default function ManagementUserPage() {
                             </Label>
                             <Select
                                 value={formData.status}
-                                onValueChange={(value: User["status"]) =>
+                                onValueChange={(value: string) =>
                                     setFormData({ ...formData, status: value })
                                 }
                             >
