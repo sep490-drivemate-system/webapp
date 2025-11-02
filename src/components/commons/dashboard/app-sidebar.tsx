@@ -198,10 +198,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         documents: data.documents
       };
     } else {
-      // Other roles or no role - no access
+      // For development or when no role is set, show all items
+      // In production, you might want to redirect to login instead
       return {
-        navMain: [],
-        documents: []
+        navMain: data.navMain,
+        documents: data.documents
       };
     }
   };
@@ -227,15 +228,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         {/* Show NavMain only for Admin */}
-        {filteredNav.navMain.length > 0 && (
-          <NavMain items={filteredNav.navMain} />
-        )}
-
+        {/* {filteredNav.navMain.length > 0 && (
+         
+        )} */}
+        <NavMain items={filteredNav.navMain} />
         {/* Show NavDocuments for Admin and Inspector */}
-        {filteredNav.documents.length > 0 && (
-          <NavDocuments items={filteredNav.documents} />
-        )}
-
+        {/* {filteredNav.documents.length > 0 && (
+        
+        )} */}
+        <NavDocuments items={filteredNav.documents} />
         {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
