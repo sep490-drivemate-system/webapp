@@ -1,0 +1,247 @@
+{
+    "sessions": [
+        {
+            "id": "ses_001",
+            "packageId": "pkg_001",
+            "instructorId": "1",
+            "instructorName": "Nguyễn Văn An",
+            "instructorAvatar": "https://i.pravatar.cc/150?img=1",
+            "instructorPhone": "0901234567",
+            "date": "2024-11-05",
+            "startTime": "08:00",
+            "endTime": "12:00",
+            "duration": 4,
+            "status": "completed",
+            "pickupLocation": "123 Nguyễn Huệ, Quận 1, TP.HCM",
+            "pickupCoordinates": {
+                "lat": 10.7731,
+                "lng": 106.7010
+            },
+            "vehicle": {
+                "type": "Toyota Vios 2023",
+                "plate": "30A-12345",
+                "color": "Trắng"
+            },
+            "route": {
+                "distance": 45.5,
+                "skills": [
+                    "Đường đô thị",
+                    "Quốc lộ"
+                ],
+                "waypoints": [
+                    "123 Nguyễn Huệ, Q1",
+                    "Đường Võ Văn Kiệt",
+                    "Cao tốc Trung Lương",
+                    "123 Nguyễn Huệ, Q1"
+                ]
+            },
+            "instructorNotes": "Học viên cần chú ý quan sát gương chiếu hậu khi chuyển làn. Kỹ năng lái xe đã khá tốt, cần luyện thêm ở tốc độ cao.",
+            "rating": 5,
+            "feedback": "Thầy dạy rất tận tâm và kiên nhẫn. Tôi đã học được rất nhiều!",
+            "actualPrice": 800000,
+            "createdAt": "2024-11-01T10:00:00",
+            "completedAt": "2024-11-05T12:15:00"
+        },
+        {
+            "id": "ses_002",
+            "packageId": "pkg_001",
+            "instructorId": "1",
+            "instructorName": "Nguyễn Văn An",
+            "instructorAvatar": "https://i.pravatar.cc/150?img=1",
+            "instructorPhone": "0901234567",
+            "date": "2024-11-08",
+            "startTime": "14:00",
+            "endTime": "18:00",
+            "duration": 4,
+            "status": "completed",
+            "pickupLocation": "456 Lê Lai, Quận 1, TP.HCM",
+            "pickupCoordinates": {
+                "lat": 10.7695,
+                "lng": 106.6950
+            },
+            "vehicle": {
+                "type": "Toyota Vios 2023",
+                "plate": "30A-12345",
+                "color": "Trắng"
+            },
+            "route": {
+                "distance": 52.3,
+                "skills": [
+                    "Quốc lộ",
+                    "Đường khu dân cư"
+                ],
+                "waypoints": [
+                    "456 Lê Lai, Q1",
+                    "Quốc lộ 1A",
+                    "Đường Nguyễn Văn Linh",
+                    "456 Lê Lai, Q1"
+                ]
+            },
+            "instructorNotes": "Kỹ năng xử lý tình huống đã tốt hơn nhiều. Cần tập luyện thêm về đỗ xe song song.",
+            "rating": 5,
+            "feedback": "Buổi học rất bổ ích. Thầy chỉ cho tôi nhiều mẹo hay!",
+            "actualPrice": 800000,
+            "createdAt": "2024-11-04T09:00:00",
+            "completedAt": "2024-11-08T18:20:00"
+        },
+        {
+            "id": "ses_003",
+            "packageId": "pkg_001",
+            "instructorId": "1",
+            "instructorName": "Nguyễn Văn An",
+            "instructorAvatar": "https://i.pravatar.cc/150?img=1",
+            "instructorPhone": "0901234567",
+            "date": "2024-11-12",
+            "startTime": "08:00",
+            "endTime": "12:00",
+            "duration": 4,
+            "status": "completed",
+            "pickupLocation": "789 Trần Hưng Đạo, Quận 5, TP.HCM",
+            "pickupCoordinates": {
+                "lat": 10.7556,
+                "lng": 106.6779
+            },
+            "vehicle": {
+                "type": "Toyota Vios 2023",
+                "plate": "30A-12345",
+                "color": "Trắng"
+            },
+            "route": {
+                "distance": 48.7,
+                "skills": [
+                    "Đường đô thị",
+                    "Đường khu dân cư"
+                ],
+                "waypoints": [
+                    "789 Trần Hưng Đạo, Q5",
+                    "Đường Nguyễn Tri Phương",
+                    "Khu Tân Bình",
+                    "789 Trần Hưng Đạo, Q5"
+                ]
+            },
+            "instructorNotes": "Học viên đã rất tự tin khi lái xe trong thành phố. Khuyến khích tiếp tục luyện tập.",
+            "rating": 5,
+            "feedback": "Tuyệt vời! Giờ tôi đã tự tin lái xe hơn rất nhiều.",
+            "actualPrice": 800000,
+            "createdAt": "2024-11-08T11:00:00",
+            "completedAt": "2024-11-12T12:10:00"
+        },
+        {
+            "id": "ses_004",
+            "packageId": "pkg_001",
+            "instructorId": "1",
+            "instructorName": "Nguyễn Văn An",
+            "instructorAvatar": "https://i.pravatar.cc/150?img=1",
+            "instructorPhone": "0901234567",
+            "date": "2024-11-15",
+            "startTime": "08:00",
+            "endTime": "12:00",
+            "duration": 4,
+            "status": "pending",
+            "pickupLocation": "123 Nguyễn Huệ, Quận 1, TP.HCM",
+            "pickupCoordinates": {
+                "lat": 10.7731,
+                "lng": 106.7010
+            },
+            "vehicle": {
+                "type": "Toyota Vios 2023",
+                "plate": "30A-12345",
+                "color": "Trắng"
+            },
+            "route": {
+                "distance": 0,
+                "skills": [
+                    "Đường đô thị",
+                    "Quốc lộ"
+                ],
+                "waypoints": []
+            },
+            "instructorNotes": null,
+            "rating": null,
+            "feedback": null,
+            "actualPrice": null,
+            "createdAt": "2024-11-10T15:30:00",
+            "completedAt": null
+        },
+        {
+            "id": "ses_005",
+            "packageId": "pkg_001",
+            "instructorId": "1",
+            "instructorName": "Nguyễn Văn An",
+            "instructorAvatar": "https://i.pravatar.cc/150?img=1",
+            "instructorPhone": "0901234567",
+            "date": "2024-11-18",
+            "startTime": "14:00",
+            "endTime": "18:00",
+            "duration": 4,
+            "status": "pending",
+            "pickupLocation": "456 Lê Lai, Quận 1, TP.HCM",
+            "pickupCoordinates": {
+                "lat": 10.7695,
+                "lng": 106.6950
+            },
+            "vehicle": {
+                "type": "Toyota Vios 2023",
+                "plate": "30A-12345",
+                "color": "Trắng"
+            },
+            "route": {
+                "distance": 0,
+                "skills": [
+                    "Quốc lộ",
+                    "Đường cao tốc"
+                ],
+                "waypoints": []
+            },
+            "instructorNotes": null,
+            "rating": null,
+            "feedback": null,
+            "actualPrice": null,
+            "createdAt": "2024-11-11T09:00:00",
+            "completedAt": null
+        },
+        {
+            "id": "ses_006",
+            "packageId": "pkg_001",
+            "instructorId": "1",
+            "instructorName": "Nguyễn Văn An",
+            "instructorAvatar": "https://i.pravatar.cc/150?img=1",
+            "instructorPhone": "0901234567",
+            "date": "2024-11-20",
+            "startTime": "08:00",
+            "endTime": "12:00",
+            "duration": 4,
+            "status": "confirmed",
+            "pickupLocation": "789 Trần Hưng Đạo, Quận 5, TP.HCM",
+            "pickupCoordinates": {
+                "lat": 10.7556,
+                "lng": 106.6779
+            },
+            "vehicle": {
+                "type": "Toyota Vios 2023",
+                "plate": "30A-12345",
+                "color": "Trắng"
+            },
+            "route": {
+                "distance": 55,
+                "skills": [
+                    "Đường đô thị",
+                    "Đường trường"
+                ],
+                "waypoints": [
+                    "789 Trần Hưng Đạo, Q5",
+                    "Cao tốc Trung Lương",
+                    "Bến Lức",
+                    "789 Trần Hưng Đạo, Q5"
+                ],
+                "mapUrl": "https://maps.google.com/..."
+            },
+            "instructorNotes": null,
+            "rating": null,
+            "feedback": null,
+            "actualPrice": null,
+            "createdAt": "2024-11-12T16:00:00",
+            "completedAt": null
+        }
+    ]
+}

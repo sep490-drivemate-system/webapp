@@ -1,0 +1,110 @@
+{
+    "packages": [
+        {
+            "id": "pkg_001",
+            "instructorId": "1",
+            "instructorName": "Nguyễn Văn An",
+            "instructorAvatar": "https://i.pravatar.cc/150?img=1",
+            "packageName": "Gói luyện tập cơ bản",
+            "totalHours": 40,
+            "usedHours": 12,
+            "pendingHours": 8,
+            "remainingHours": 20,
+            "pricePerHour": 200000,
+            "totalPrice": 8000000,
+            "hasVehicle": true,
+            "vehicleType": "Toyota Vios 2023",
+            "vehiclePlate": "30A-12345",
+            "skills": [
+                "Đường đô thị",
+                "Quốc lộ",
+                "Đường khu dân cư"
+            ],
+            "status": "active",
+            "purchaseDate": "2024-10-15T08:30:00",
+            "expiryDate": "2024-12-15T23:59:59",
+            "sessions": [
+                {
+                    "sessionId": "ses_001",
+                    "date": "2024-11-05",
+                    "duration": 4,
+                    "status": "completed"
+                },
+                {
+                    "sessionId": "ses_002",
+                    "date": "2024-11-08",
+                    "duration": 4,
+                    "status": "completed"
+                },
+                {
+                    "sessionId": "ses_003",
+                    "date": "2024-11-12",
+                    "duration": 4,
+                    "status": "completed"
+                },
+                {
+                    "sessionId": "ses_004",
+                    "date": "2024-11-15",
+                    "duration": 4,
+                    "status": "pending"
+                },
+                {
+                    "sessionId": "ses_005",
+                    "date": "2024-11-18",
+                    "duration": 4,
+                    "status": "pending"
+                }
+            ]
+        },
+        {
+            "id": "pkg_002",
+            "instructorId": "3",
+            "instructorName": "Trần Thị Mai",
+            "instructorAvatar": "https://i.pravatar.cc/150?img=3",
+            "packageName": "Gói luyện cao tốc",
+            "totalHours": 20,
+            "usedHours": 20,
+            "pendingHours": 0,
+            "remainingHours": 0,
+            "pricePerHour": 250000,
+            "totalPrice": 5000000,
+            "hasVehicle": true,
+            "vehicleType": "Honda City 2022",
+            "vehiclePlate": "51F-67890",
+            "skills": [
+                "Đường cao tốc",
+                "Quốc lộ",
+                "Đường trường"
+            ],
+            "status": "completed",
+            "purchaseDate": "2024-09-01T10:00:00",
+            "expiryDate": "2024-10-31T23:59:59",
+            "sessions": []
+        },
+        {
+            "id": "pkg_003",
+            "instructorId": "5",
+            "instructorName": "Phạm Minh Tuấn",
+            "instructorAvatar": "https://i.pravatar.cc/150?img=5",
+            "packageName": "Gói luyện đường đèo",
+            "totalHours": 15,
+            "usedHours": 0,
+            "pendingHours": 0,
+            "remainingHours": 15,
+            "pricePerHour": 300000,
+            "totalPrice": 4500000,
+            "hasVehicle": false,
+            "vehicleType": null,
+            "vehiclePlate": null,
+            "skills": [
+                "Đường đèo",
+                "Đường núi",
+                "Cua gấp"
+            ],
+            "status": "active",
+            "purchaseDate": "2024-11-01T14:20:00",
+            "expiryDate": "2024-12-31T23:59:59",
+            "sessions": []
+        }
+    ]
+}
