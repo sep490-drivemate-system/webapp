@@ -3,18 +3,16 @@
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { User } from "lucide-react";
 import Image from "next/image";
 
 const MAIN_MENU = [
   { path: "/", label: "Trang chủ" },
-  { path: "/cars", label: "Xe tập" },
+  { path: "/packages", label: "Gói dịch vụ" },
   { path: "/instructors", label: "Người hướng dẫn" },
+  { path: "/cars", label: "Xe tập" },
   { path: "/bookings", label: "Lịch sử đặt" },
   { path: "/blog", label: "Bài viết" },
-  { path: "/news", label: "Tin tức" },
-  { path: "/handbook", label: "Cẩm nang" },
 ];
 
 function Logo() {
