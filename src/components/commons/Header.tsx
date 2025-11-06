@@ -6,13 +6,13 @@ import { usePathname } from "next/navigation";
 import { User } from "lucide-react";
 import Image from "next/image";
 
+
 const MAIN_MENU = [
   { path: "/", label: "Trang chủ" },
   { path: "/packages", label: "Gói dịch vụ" },
   { path: "/instructors", label: "Người hướng dẫn" },
   { path: "/cars", label: "Xe tập" },
-  { path: "/bookings", label: "Lịch sử đặt" },
-  { path: "/blog", label: "Bài viết" },
+  { path: "/blogs", label: "Bài viết" },
 ];
 
 function Logo() {
@@ -22,12 +22,11 @@ function Logo() {
         <Image
           src="/logo.png"
           alt="Logo"
-          width={48}
-          height={48}
+          width={64}
+          height={64}
           priority
-          className="h-12 w-12 object-contain"
+          className="h-16 w-16 object-contain"
         />
-        <h1 className="text-xl font-bold m-0 text-black">DriveMate</h1>
       </Link>
     </div>
   );
@@ -57,22 +56,6 @@ function NavMenu({ menu, activePath }: { menu: { path: string; label: string }[]
   );
 }
 
-function ThemeToggle({ isDark, onToggle }: { isDark: boolean; onToggle: () => void }) {
-  return (
-    <button onClick={onToggle} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-8 sm:size-9">
-      <div className="flex items-center gap-2 dark:hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-moon size-4 sm:size-5"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
-        <span className="block lg:hidden text-xs sm:text-sm">Dark</span>
-      </div>
-      <div className="dark:flex items-center gap-2 hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sun size-4 sm:size-5"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
-        <span className="block lg:hidden text-xs sm:text-sm">Light</span>
-      </div>
-      <span className="sr-only">Change theme</span>
-    </button>
-  );
-}
-
 function UserDropdown() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -96,12 +79,12 @@ function UserDropdown() {
   return (
     <div className="relative" ref={ref}>
       <button
-        className="h-8 sm:h-10 rounded-md flex items-center justify-center"
+        className="h-8 sm:h-10 rounded-md flex items-center justify-center hover:bg-gray-100 transition-colors"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="true"
         aria-expanded={open}
       >
-        <User className="w-5 h-5 sm:w-6 sm:h-6" />
+        <User className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 hover:text-blue-600 transition-colors" />
       </button>
       {open && (
         <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border">
@@ -168,7 +151,6 @@ export default function Header() {
         <div className="bg-background/40 flex items-center justify-between rounded-2xl border p-2 sm:p-3 backdrop-blur-sm shadow-sm">
           <Logo />
           <div className="flex items-center gap-2 lg:hidden">
-            <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} />
             <button
               onClick={() => setMobileOpen((v) => !v)}
               aria-label="Open menu"
@@ -179,7 +161,6 @@ export default function Header() {
           </div>
           <NavMenu menu={MAIN_MENU} activePath={pathname} />
           <div className="hidden items-center lg:flex gap-2">
-            <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} />
             <UserDropdown />
           </div>
         </div>

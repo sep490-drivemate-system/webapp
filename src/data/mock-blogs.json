@@ -1,0 +1,165 @@
+{
+  "blogs": [
+    {
+      "id": "blog_001",
+      "title": "10 Mẹo Lái Xe An Toàn Cho Người Mới Bắt Đầu",
+      "excerpt": "Khám phá những mẹo lái xe cơ bản và quan trọng nhất để bạn tự tin hơn khi cầm vô lăng. Từ cách điều chỉnh ghế đến kỹ thuật đỗ xe song song...",
+      "content": "Nội dung đầy đủ của bài viết...",
+      "author": {
+        "name": "Nguyễn Văn An",
+        "avatar": "https://i.pravatar.cc/150?img=1",
+        "role": "Giáo viên lái xe chuyên nghiệp"
+      },
+      "category": "Kỹ năng lái xe",
+      "tags": ["Lái xe an toàn", "Người mới", "Mẹo vặt"],
+      "image": "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800",
+      "publishedAt": "2024-11-15T10:00:00",
+      "readTime": 5,
+      "views": 1250,
+      "likes": 89,
+      "featured": true
+    },
+    {
+      "id": "blog_002",
+      "title": "Hướng Dẫn Chi Tiết Thi Bằng Lái Xe B2",
+      "excerpt": "Tất cả những gì bạn cần biết về kỳ thi bằng lái xe B2: quy trình, lệ phí, thời gian, và các mẹo để vượt qua kỳ thi một cách dễ dàng...",
+      "content": "Nội dung đầy đủ của bài viết...",
+      "author": {
+        "name": "Trần Thị Mai",
+        "avatar": "https://i.pravatar.cc/150?img=3",
+        "role": "Giám khảo thi bằng lái"
+      },
+      "category": "Thi bằng lái",
+      "tags": ["Bằng B2", "Thi bằng lái", "Hướng dẫn"],
+      "image": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800",
+      "publishedAt": "2024-11-12T14:30:00",
+      "readTime": 8,
+      "views": 2100,
+      "likes": 156,
+      "featured": true
+    },
+    {
+      "id": "blog_003",
+      "title": "Kỹ Thuật Lái Xe Trên Đường Cao Tốc",
+      "excerpt": "Lái xe trên đường cao tốc đòi hỏi kỹ năng đặc biệt. Học cách giữ làn, vượt xe an toàn, và xử lý các tình huống khẩn cấp...",
+      "content": "Nội dung đầy đủ của bài viết...",
+      "author": {
+        "name": "Phạm Minh Tuấn",
+        "avatar": "https://i.pravatar.cc/150?img=5",
+        "role": "Giáo viên lái xe cao tốc"
+      },
+      "category": "Kỹ năng lái xe",
+      "tags": ["Cao tốc", "Kỹ thuật", "An toàn"],
+      "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
+      "publishedAt": "2024-11-10T09:15:00",
+      "readTime": 6,
+      "views": 980,
+      "likes": 72,
+      "featured": false
+    },
+    {
+      "id": "blog_004",
+      "title": "Cách Xử Lý Khi Xe Bị Hỏng Giữa Đường",
+      "excerpt": "Những bước cần làm khi xe của bạn gặp sự cố giữa đường: từ việc dừng xe an toàn đến gọi cứu hộ và bảo vệ bản thân...",
+      "content": "Nội dung đầy đủ của bài viết...",
+      "author": {
+        "name": "Lê Văn Cường",
+        "avatar": "https://i.pravatar.cc/150?img=7",
+        "role": "Chuyên gia bảo dưỡng xe"
+      },
+      "category": "Bảo dưỡng xe",
+      "tags": ["Sửa chữa", "Sự cố", "An toàn"],
+      "image": "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800",
+      "publishedAt": "2024-11-08T16:45:00",
+      "readTime": 4,
+      "views": 750,
+      "likes": 45,
+      "featured": false
+    },
+    {
+      "id": "blog_005",
+      "title": "Luật Giao Thông Mới Năm 2024 - Những Điều Cần Biết",
+      "excerpt": "Tổng hợp các thay đổi về luật giao thông đường bộ năm 2024 mà mọi tài xế cần nắm rõ để tránh vi phạm...",
+      "content": "Nội dung đầy đủ của bài viết...",
+      "author": {
+        "name": "Hoàng Thị Lan",
+        "avatar": "https://i.pravatar.cc/150?img=9",
+        "role": "Luật sư giao thông"
+      },
+      "category": "Luật giao thông",
+      "tags": ["Luật mới", "2024", "Quy định"],
+      "image": "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800",
+      "publishedAt": "2024-11-05T11:20:00",
+      "readTime": 7,
+      "views": 1890,
+      "likes": 134,
+      "featured": false
+    },
+    {
+      "id": "blog_006",
+      "title": "Chọn Xe Tập Lái Phù Hợp Cho Người Mới",
+      "excerpt": "Hướng dẫn chọn xe tập lái: từ loại xe, kích thước, đến các tính năng an toàn cần có. Giúp bạn tìm được chiếc xe phù hợp nhất...",
+      "content": "Nội dung đầy đủ của bài viết...",
+      "author": {
+        "name": "Vũ Minh Đức",
+        "avatar": "https://i.pravatar.cc/150?img=11",
+        "role": "Chuyên gia tư vấn xe"
+      },
+      "category": "Tư vấn xe",
+      "tags": ["Xe tập lái", "Mua xe", "Tư vấn"],
+      "image": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800",
+      "publishedAt": "2024-11-03T13:10:00",
+      "readTime": 6,
+      "views": 1120,
+      "likes": 67,
+      "featured": false
+    },
+    {
+      "id": "blog_007",
+      "title": "Kỹ Thuật Đỗ Xe Song Song - Hướng Dẫn Từng Bước",
+      "excerpt": "Đỗ xe song song là một trong những kỹ năng khó nhất. Học cách thực hiện từng bước một cách chính xác và an toàn...",
+      "content": "Nội dung đầy đủ của bài viết...",
+      "author": {
+        "name": "Nguyễn Văn An",
+        "avatar": "https://i.pravatar.cc/150?img=1",
+        "role": "Giáo viên lái xe chuyên nghiệp"
+      },
+      "category": "Kỹ năng lái xe",
+      "tags": ["Đỗ xe", "Kỹ thuật", "Hướng dẫn"],
+      "image": "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800",
+      "publishedAt": "2024-11-01T08:30:00",
+      "readTime": 5,
+      "views": 890,
+      "likes": 58,
+      "featured": false
+    },
+    {
+      "id": "blog_008",
+      "title": "Bảo Dưỡng Xe Định Kỳ - Lịch Trình và Chi Phí",
+      "excerpt": "Tìm hiểu về lịch trình bảo dưỡng xe định kỳ, các hạng mục cần kiểm tra, và cách ước tính chi phí để giữ xe luôn trong tình trạng tốt...",
+      "content": "Nội dung đầy đủ của bài viết...",
+      "author": {
+        "name": "Lê Văn Cường",
+        "avatar": "https://i.pravatar.cc/150?img=7",
+        "role": "Chuyên gia bảo dưỡng xe"
+      },
+      "category": "Bảo dưỡng xe",
+      "tags": ["Bảo dưỡng", "Chi phí", "Lịch trình"],
+      "image": "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800",
+      "publishedAt": "2024-10-28T15:00:00",
+      "readTime": 6,
+      "views": 1050,
+      "likes": 78,
+      "featured": false
+    }
+  ],
+  "categories": [
+    "Tất cả",
+    "Kỹ năng lái xe",
+    "Thi bằng lái",
+    "Luật giao thông",
+    "Bảo dưỡng xe",
+    "Tư vấn xe"
+  ]
+}
+

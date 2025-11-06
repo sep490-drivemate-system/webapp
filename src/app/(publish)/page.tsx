@@ -87,19 +87,6 @@ export default function HomePage() {
                 DriveMate kết nối bạn với những giáo viên lái xe có kinh nghiệm nhất.
                 Học lái xe hiệu quả, an toàn với lịch trình linh hoạt theo nhu cầu của bạn.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700" asChild>
-                  <Link href="/packages">
-                    Xem gói dịch vụ
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button variant="outline" size="lg" asChild>
-                  <Link href="/instructors">
-                    Tìm người hướng dẫn
-                  </Link>
-                </Button>
-              </div>
             </div>
 
             {/* Image */}
@@ -121,7 +108,6 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Gói dịch vụ nổi bật</h2>
-              <p className="text-gray-600">Chọn gói phù hợp với nhu cầu của bạn</p>
             </div>
             <Button variant="ghost" asChild className="hidden sm:flex">
               <Link href="/packages">
@@ -135,14 +121,7 @@ export default function HomePage() {
             {featuredPackages.map((pkg) => (
               <Card key={pkg.id} className="hover:shadow-lg transition-shadow flex flex-col">
                 <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge variant={pkg.popular ? "default" : "secondary"} className="text-xs">
-                      {pkg.popular ? "Phổ biến" : "Gói học"}
-                    </Badge>
-                    <Package className="h-4 w-4 text-gray-400" />
-                  </div>
                   <h3 className="font-bold text-lg">{pkg.name}</h3>
-                  <p className="text-sm text-gray-600">{pkg.description}</p>
                 </CardHeader>
                 <CardContent className="flex-1 space-y-3">
                   <div className="flex items-center gap-2">
@@ -171,7 +150,6 @@ export default function HomePage() {
                   </div>
                   <div className="pt-2 border-t">
                     <p className="text-2xl font-bold text-blue-600">{formatPrice(pkg.price)}</p>
-                    <p className="text-xs text-gray-600">{formatPrice(pkg.pricePerHour)}/giờ</p>
                   </div>
                 </CardContent>
                 <CardFooter className="pt-0">
@@ -200,7 +178,6 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Người hướng dẫn nổi bật</h2>
-              <p className="text-gray-600">Đội ngũ giáo viên giàu kinh nghiệm</p>
             </div>
             <Button variant="ghost" asChild className="hidden sm:flex">
               <Link href="/instructors">
@@ -231,14 +208,6 @@ export default function HomePage() {
                         <span className="text-sm text-gray-500">({instructor.reviewCount})</span>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 line-clamp-2">{instructor.bio}</p>
-                    <div className="flex items-center gap-1 text-sm text-gray-600">
-                      <MapPin className="h-4 w-4" />
-                      <span>{instructor.area}</span>
-                    </div>
-                    <div className="text-lg font-bold text-blue-600">
-                      {formatPrice(instructor.pricePerHour)}/giờ
-                    </div>
                     <Button className="w-full" size="sm" asChild>
                       <Link href={`/instructors/${instructor.id}`}>Xem chi tiết</Link>
                     </Button>
@@ -265,7 +234,6 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Xe tập nổi bật</h2>
-              <p className="text-gray-600">Đa dạng phương tiện cho bạn lựa chọn</p>
             </div>
             <Button variant="ghost" asChild className="hidden sm:flex">
               <Link href="/cars">
@@ -291,7 +259,6 @@ export default function HomePage() {
                 <CardContent className="p-4 space-y-3">
                   <div>
                     <h3 className="font-bold text-lg mb-1">{car.name}</h3>
-                    <p className="text-sm text-gray-600 line-clamp-2">{car.description}</p>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-1">
@@ -309,13 +276,9 @@ export default function HomePage() {
                     <Badge variant="outline" className="text-xs">{car.fuel}</Badge>
                     <Badge variant="outline" className="text-xs">{car.seats} chỗ</Badge>
                   </div>
-                  <div className="pt-2 border-t">
-                    <p className="text-xl font-bold text-blue-600">{formatPrice(car.pricePerHour)}/giờ</p>
-                    <p className="text-xs text-gray-600">{formatPrice(car.pricePerDay)}/ngày</p>
-                  </div>
                 </CardContent>
                 <CardFooter className="p-4 pt-0">
-                  <Button className="w-full" size="sm" asChild>
+                  <Button className="w-full text-white" size="sm" asChild>
                     <Link href={`/cars/${car.id}`}>Xem chi tiết</Link>
                   </Button>
                 </CardFooter>

@@ -42,7 +42,7 @@ export default function CarsPage() {
     priceRange: [0, 300000],
     rating: 0
   });
-  
+
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("rating");
 
@@ -114,12 +114,10 @@ export default function CarsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
+    <div className="pt-24 pb-12 lg:pt-32 lg:pb-16 bg-gradient-to-br from-blue-50 via-white to-blue-50">
+      <div className="container mx-auto px-4">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Danh sách xe tập lái</h1>
-          <p className="text-gray-600">Tìm kiếm và thuê xe tập lái phù hợp với nhu cầu của bạn</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -138,7 +136,7 @@ export default function CarsPage() {
                   {/* Seats Filter */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Số chỗ ngồi</label>
-                    <Select value={filters.seats} onValueChange={(value) => setFilters({...filters, seats: value})}>
+                    <Select value={filters.seats} onValueChange={(value) => setFilters({ ...filters, seats: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn số chỗ" />
                       </SelectTrigger>
@@ -154,7 +152,7 @@ export default function CarsPage() {
                   {/* Brand Filter */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Hãng xe</label>
-                    <Select value={filters.brand} onValueChange={(value) => setFilters({...filters, brand: value})}>
+                    <Select value={filters.brand} onValueChange={(value) => setFilters({ ...filters, brand: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn hãng xe" />
                       </SelectTrigger>
@@ -170,7 +168,7 @@ export default function CarsPage() {
                   {/* Transmission Filter */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Loại xe</label>
-                    <Select value={filters.transmission} onValueChange={(value) => setFilters({...filters, transmission: value})}>
+                    <Select value={filters.transmission} onValueChange={(value) => setFilters({ ...filters, transmission: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn loại xe" />
                       </SelectTrigger>
@@ -186,7 +184,7 @@ export default function CarsPage() {
                   {/* Fuel Filter */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Nhiên liệu</label>
-                    <Select value={filters.fuel} onValueChange={(value) => setFilters({...filters, fuel: value})}>
+                    <Select value={filters.fuel} onValueChange={(value) => setFilters({ ...filters, fuel: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn nhiên liệu" />
                       </SelectTrigger>
@@ -202,7 +200,7 @@ export default function CarsPage() {
                   {/* Area Filter */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Khu vực</label>
-                    <Select value={filters.area} onValueChange={(value) => setFilters({...filters, area: value})}>
+                    <Select value={filters.area} onValueChange={(value) => setFilters({ ...filters, area: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn khu vực" />
                       </SelectTrigger>
@@ -222,7 +220,7 @@ export default function CarsPage() {
                     </label>
                     <Slider
                       value={filters.priceRange}
-                      onValueChange={(value) => setFilters({...filters, priceRange: value})}
+                      onValueChange={(value) => setFilters({ ...filters, priceRange: value })}
                       max={300000}
                       min={0}
                       step={10000}
@@ -233,7 +231,7 @@ export default function CarsPage() {
                   {/* Rating Filter */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Đánh giá tối thiểu</label>
-                    <Select value={filters.rating.toString()} onValueChange={(value) => setFilters({...filters, rating: parseFloat(value)})}>
+                    <Select value={filters.rating.toString()} onValueChange={(value) => setFilters({ ...filters, rating: parseFloat(value) })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn đánh giá" />
                       </SelectTrigger>
@@ -252,23 +250,6 @@ export default function CarsPage() {
 
           {/* Cars Grid */}
           <div className="lg:col-span-3">
-            {/* Sort and Results Info */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-              <p className="text-gray-600">
-                Hiển thị {startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, filteredCars.length)} trong {filteredCars.length} xe
-              </p>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Sắp xếp theo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="rating">Đánh giá cao nhất</SelectItem>
-                  <SelectItem value="price-low">Giá thấp đến cao</SelectItem>
-                  <SelectItem value="price-high">Giá cao đến thấp</SelectItem>
-                  <SelectItem value="reviews">Nhiều đánh giá nhất</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
 
             {/* Cars Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -284,11 +265,11 @@ export default function CarsPage() {
                       {car.status === 'available' ? 'Có sẵn' : 'Không có sẵn'}
                     </Badge>
                   </div>
-                  
+
                   <CardContent className="p-4">
                     <h3 className="font-semibold text-lg mb-2">{car.name}</h3>
                     <p className="text-gray-600 text-sm mb-3 line-clamp-2">{car.description}</p>
-                    
+
                     <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4 text-gray-500" />
@@ -340,8 +321,8 @@ export default function CarsPage() {
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious 
-                      href="#" 
+                    <PaginationPrevious
+                      href="#"
                       onClick={(e) => {
                         e.preventDefault();
                         if (currentPage > 1) setCurrentPage(currentPage - 1);
@@ -349,7 +330,7 @@ export default function CarsPage() {
                       className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                     />
                   </PaginationItem>
-                  
+
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                     <PaginationItem key={page}>
                       <PaginationLink
@@ -364,10 +345,10 @@ export default function CarsPage() {
                       </PaginationLink>
                     </PaginationItem>
                   ))}
-                  
+
                   <PaginationItem>
-                    <PaginationNext 
-                      href="#" 
+                    <PaginationNext
+                      href="#"
                       onClick={(e) => {
                         e.preventDefault();
                         if (currentPage < totalPages) setCurrentPage(currentPage + 1);

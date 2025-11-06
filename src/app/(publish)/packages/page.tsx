@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  Star, 
-  MapPin, 
-  Clock, 
-  Car, 
-  Award, 
-  CheckCircle, 
+import {
+  Star,
+  MapPin,
+  Clock,
+  Car,
+  Award,
+  CheckCircle,
   Filter,
   Search,
   TrendingUp,
@@ -88,7 +88,7 @@ export default function PackagesPage() {
     priceRange: "all",
     hours: "all"
   });
-  
+
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("popular");
   const [searchQuery, setSearchQuery] = useState("");
@@ -98,7 +98,7 @@ export default function PackagesPage() {
   // Generate mock packages from instructors
   const packages: PackageType[] = useMemo(() => {
     const mockPackages: PackageType[] = [];
-    
+
     instructors.forEach((instructor, idx) => {
       // Basic package
       mockPackages.push({
@@ -175,25 +175,25 @@ export default function PackagesPage() {
   // Filter and sort packages
   const filteredPackages = useMemo(() => {
     let filtered = packages.filter(pkg => {
-      const matchesSearch = searchQuery === "" || 
+      const matchesSearch = searchQuery === "" ||
         pkg.packageName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         pkg.instructorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         pkg.skills.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase()));
 
       const matchesArea = filters.area === "all" || pkg.area === filters.area;
-      
-      const matchesRoadType = filters.roadType === "all" || 
+
+      const matchesRoadType = filters.roadType === "all" ||
         pkg.roadTypes.includes(filters.roadType);
-      
-      const matchesVehicle = filters.hasVehicle === "all" || 
+
+      const matchesVehicle = filters.hasVehicle === "all" ||
         (filters.hasVehicle === "yes" && pkg.hasVehicle) ||
         (filters.hasVehicle === "no" && !pkg.hasVehicle);
-      
+
       const matchesPrice = filters.priceRange === "all" ||
         (filters.priceRange === "low" && pkg.pricePerHour < 200000) ||
         (filters.priceRange === "medium" && pkg.pricePerHour >= 200000 && pkg.pricePerHour < 300000) ||
         (filters.priceRange === "high" && pkg.pricePerHour >= 300000);
-      
+
       const matchesHours = filters.hours === "all" ||
         (filters.hours === "short" && pkg.totalHours <= 20) ||
         (filters.hours === "medium" && pkg.totalHours > 20 && pkg.totalHours <= 40) ||
@@ -250,12 +250,12 @@ export default function PackagesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
+    <div className="pt-24 pb-12 lg:pt-32 lg:pb-16 bg-gradient-to-br from-blue-50 via-white to-blue-50">
+      <div className="container mx-auto px-4 ">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Danh sách gói dịch vụ</h1>
-          <p className="text-gray-600">Chọn gói học phù hợp với nhu cầu và mục tiêu của bạn</p>
+
         </div>
 
         {/* Search Bar */}
@@ -288,26 +288,11 @@ export default function PackagesPage() {
                 </div>
 
                 <div className="space-y-6">
-                  {/* Area Filter */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Khu vực</label>
-                    <Select value={filters.area} onValueChange={(value) => setFilters({...filters, area: value})}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Chọn khu vực" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Tất cả</SelectItem>
-                        {uniqueAreas.map(area => (
-                          <SelectItem key={area} value={area}>{area}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
 
                   {/* Road Type Filter */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Loại đường</label>
-                    <Select value={filters.roadType} onValueChange={(value) => setFilters({...filters, roadType: value})}>
+                    <Select value={filters.roadType} onValueChange={(value) => setFilters({ ...filters, roadType: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn loại đường" />
                       </SelectTrigger>
@@ -323,7 +308,7 @@ export default function PackagesPage() {
                   {/* Vehicle Filter */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Xe tập</label>
-                    <Select value={filters.hasVehicle} onValueChange={(value) => setFilters({...filters, hasVehicle: value})}>
+                    <Select value={filters.hasVehicle} onValueChange={(value) => setFilters({ ...filters, hasVehicle: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Có xe hay không" />
                       </SelectTrigger>
@@ -335,26 +320,11 @@ export default function PackagesPage() {
                     </Select>
                   </div>
 
-                  {/* Price Range Filter */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Mức giá/giờ</label>
-                    <Select value={filters.priceRange} onValueChange={(value) => setFilters({...filters, priceRange: value})}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Chọn mức giá" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Tất cả</SelectItem>
-                        <SelectItem value="low">&lt; 200K</SelectItem>
-                        <SelectItem value="medium">200K - 300K</SelectItem>
-                        <SelectItem value="high">&gt; 300K</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
 
                   {/* Hours Filter */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Số giờ</label>
-                    <Select value={filters.hours} onValueChange={(value) => setFilters({...filters, hours: value})}>
+                    <Select value={filters.hours} onValueChange={(value) => setFilters({ ...filters, hours: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn số giờ" />
                       </SelectTrigger>
@@ -373,57 +343,23 @@ export default function PackagesPage() {
 
           {/* Packages Grid */}
           <div className="lg:col-span-3">
-            {/* Sort and Results Info */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-              <p className="text-gray-600">
-                Hiển thị {startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, filteredPackages.length)} trong {filteredPackages.length} gói
-              </p>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Sắp xếp theo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="popular">Phổ biến nhất</SelectItem>
-                  <SelectItem value="rating">Đánh giá cao nhất</SelectItem>
-                  <SelectItem value="price-low">Giá thấp đến cao</SelectItem>
-                  <SelectItem value="price-high">Giá cao đến thấp</SelectItem>
-                  <SelectItem value="hours-low">Ít giờ nhất</SelectItem>
-                  <SelectItem value="hours-high">Nhiều giờ nhất</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
 
             {/* Packages Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {paginatedPackages.map((pkg) => (
-                <Card key={pkg.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between mb-3">
-                      <Badge variant={pkg.popular ? "default" : "secondary"} className="flex items-center gap-1">
-                        {pkg.popular ? (
-                          <>
-                            <TrendingUp className="h-3 w-3" />
-                            Phổ biến
-                          </>
-                        ) : (
-                          <>
-                            <Package className="h-3 w-3" />
-                            Gói học
-                          </>
-                        )}
-                      </Badge>
-                      {pkg.discount && (
-                        <Badge variant="destructive">-{pkg.discount}%</Badge>
-                      )}
+                <Card key={pkg.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+                  <CardHeader className="pb-3 flex-shrink-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="text-lg font-bold text-gray-900 line-clamp-2 flex-1">{pkg.packageName}</h3>
+
+
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900">{pkg.packageName}</h3>
-                    <p className="text-sm text-gray-600 line-clamp-2">{pkg.description}</p>
                   </CardHeader>
 
-                  <CardContent className="flex-1 space-y-4">
+                  <CardContent className="flex-1 flex flex-col space-y-4 pb-4">
                     {/* Instructor Info */}
-                    <div className="flex items-center gap-3 pb-3 border-b">
-                      <Avatar className="h-10 w-10">
+                    <div className="flex items-center gap-3 pb-3 border-b flex-shrink-0">
+                      <Avatar className="h-10 w-10 flex-shrink-0">
                         <AvatarImage src={pkg.instructorAvatar} alt={pkg.instructorName} />
                         <AvatarFallback>{pkg.instructorName[0]}</AvatarFallback>
                       </Avatar>
@@ -432,69 +368,86 @@ export default function PackagesPage() {
                         <div className="flex items-center gap-1 text-xs text-gray-600">
                           <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                           <span>{pkg.instructorRating}</span>
-                          <span>({pkg.instructorReviews})</span>
+                          <span className="text-gray-400">({pkg.instructorReviews})</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Package Details */}
-                    <div className="space-y-2">
+                    <div className="space-y-2 flex-shrink-0">
                       <div className="flex items-center gap-2 text-sm">
-                        <Clock className="h-4 w-4 text-gray-500" />
+                        <Clock className="h-4 w-4 text-gray-500 flex-shrink-0" />
                         <span className="font-medium">{pkg.totalHours} giờ</span>
+                        <span className="text-gray-500">•</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <MapPin className="h-4 w-4 text-gray-500" />
-                        <span>{pkg.area}</span>
-                      </div>
-                      {pkg.hasVehicle && (
+                      {pkg.hasVehicle ? (
                         <div className="flex items-center gap-2 text-sm">
-                          <Car className="h-4 w-4 text-gray-500" />
-                          <span>{pkg.vehicleType}</span>
+                          <Car className="h-4 w-4 text-green-600 flex-shrink-0" />
+                          <span className="text-green-700 font-medium">{pkg.vehicleType}</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                          <Car className="h-4 w-4 flex-shrink-0" />
+                          <span>Không có xe</span>
                         </div>
                       )}
                     </div>
 
-                    {/* Skills */}
-                    <div className="flex flex-wrap gap-1">
-                      {pkg.skills.slice(0, 3).map((skill, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          {skill}
-                        </Badge>
-                      ))}
-                      {pkg.skills.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{pkg.skills.length - 3}
-                        </Badge>
-                      )}
-                    </div>
-
-                    {/* Road Types */}
-                    <div className="flex flex-wrap gap-1">
-                      {pkg.roadTypes.slice(0, 2).map((road, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
-                          {road}
-                        </Badge>
-                      ))}
+                    {/* Skills & Road Types */}
+                    <div className="flex-1 flex flex-col gap-2 min-h-[4rem]">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Kỹ năng:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {pkg.skills.slice(0, 3).map((skill, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {skill}
+                            </Badge>
+                          ))}
+                          {pkg.skills.length > 3 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{pkg.skills.length - 3}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Loại đường:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {pkg.roadTypes.slice(0, 2).map((road, index) => (
+                            <Badge key={index} variant="secondary" className="text-xs">
+                              {road}
+                            </Badge>
+                          ))}
+                          {pkg.roadTypes.length > 2 && (
+                            <Badge variant="secondary" className="text-xs">
+                              +{pkg.roadTypes.length - 2}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
                     </div>
 
                     {/* Pricing */}
-                    <div className="pt-3 border-t">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-bold text-blue-600">
-                          {formatPrice(pkg.totalPrice)}
-                        </span>
+                    <div className="pt-3 border-t flex-shrink-0">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <div>
+                          <span className="text-2xl font-bold text-blue-600">
+                            {formatPrice(pkg.totalPrice)}
+                          </span>
+                          {pkg.discount && (
+                            <span className="text-sm text-gray-500 line-through ml-2">
+                              {formatPrice(pkg.totalPrice / (1 - pkg.discount / 100))}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <p className="text-sm text-gray-600">
-                        {formatPrice(pkg.pricePerHour)}/giờ
-                      </p>
+
                     </div>
                   </CardContent>
 
-                  <CardFooter className="pt-0 flex gap-2">
+                  <CardFooter className="pt-0 pb-4 px-6 flex gap-2 flex-shrink-0">
                     <Button className="flex-1" size="sm">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      Đặt ngay
+                      Mua ngay
                     </Button>
                     <Button variant="outline" size="sm" asChild>
                       <Link href={`/instructors/${pkg.instructorId}`}>
@@ -511,8 +464,8 @@ export default function PackagesPage() {
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious 
-                      href="#" 
+                    <PaginationPrevious
+                      href="#"
                       onClick={(e) => {
                         e.preventDefault();
                         if (currentPage > 1) setCurrentPage(currentPage - 1);
@@ -520,7 +473,7 @@ export default function PackagesPage() {
                       className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                     />
                   </PaginationItem>
-                  
+
                   {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                     let page;
                     if (totalPages <= 5) {
@@ -547,10 +500,10 @@ export default function PackagesPage() {
                       </PaginationItem>
                     );
                   })}
-                  
+
                   <PaginationItem>
-                    <PaginationNext 
-                      href="#" 
+                    <PaginationNext
+                      href="#"
                       onClick={(e) => {
                         e.preventDefault();
                         if (currentPage < totalPages) setCurrentPage(currentPage + 1);
@@ -574,44 +527,6 @@ export default function PackagesPage() {
               </div>
             )}
 
-            {/* Info Section */}
-            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <CheckCircle className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <h4 className="font-semibold mb-2">Đảm bảo chất lượng</h4>
-                  <p className="text-sm text-gray-600">
-                    Tất cả giáo viên đều được xác minh và đánh giá
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <div className="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Users className="h-6 w-6 text-green-600" />
-                  </div>
-                  <h4 className="font-semibold mb-2">Linh hoạt lịch học</h4>
-                  <p className="text-sm text-gray-600">
-                    Tự do sắp xếp thời gian học phù hợp với bạn
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <div className="bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Award className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <h4 className="font-semibold mb-2">Hoàn tiền dễ dàng</h4>
-                  <p className="text-sm text-gray-600">
-                    Chính sách hoàn tiền rõ ràng và minh bạch
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
           </div>
         </div>
       </div>

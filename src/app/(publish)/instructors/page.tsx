@@ -37,7 +37,7 @@ export default function InstructorsPage() {
     rating: 0,
     experience: "all"
   });
-  
+
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("rating");
 
@@ -53,7 +53,7 @@ export default function InstructorsPage() {
         instructor.status === "approved" &&
         (filters.area === "all" || instructor.area === filters.area) &&
         (instructor.rating >= filters.rating) &&
-        (filters.experience === "all" || 
+        (filters.experience === "all" ||
           (filters.experience === "beginner" && instructor.experience <= 5) ||
           (filters.experience === "experienced" && instructor.experience > 5 && instructor.experience <= 10) ||
           (filters.experience === "expert" && instructor.experience > 10))
@@ -113,12 +113,11 @@ export default function InstructorsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
+    <div className="pt-24 pb-12 lg:pt-32 lg:pb-16 bg-gradient-to-br from-blue-50 via-white to-blue-50">
+      <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Danh sách người hướng dẫn</h1>
-          <p className="text-gray-600">Tìm kiếm và thuê người hướng dẫn lái xe chuyên nghiệp</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -137,7 +136,7 @@ export default function InstructorsPage() {
                   {/* Area Filter */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Khu vực</label>
-                    <Select value={filters.area} onValueChange={(value) => setFilters({...filters, area: value})}>
+                    <Select value={filters.area} onValueChange={(value) => setFilters({ ...filters, area: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn khu vực" />
                       </SelectTrigger>
@@ -153,7 +152,7 @@ export default function InstructorsPage() {
                   {/* Experience Filter */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Kinh nghiệm</label>
-                    <Select value={filters.experience} onValueChange={(value) => setFilters({...filters, experience: value})}>
+                    <Select value={filters.experience} onValueChange={(value) => setFilters({ ...filters, experience: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn mức kinh nghiệm" />
                       </SelectTrigger>
@@ -169,7 +168,7 @@ export default function InstructorsPage() {
                   {/* Rating Filter */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Đánh giá tối thiểu</label>
-                    <Select value={filters.rating.toString()} onValueChange={(value) => setFilters({...filters, rating: parseFloat(value)})}>
+                    <Select value={filters.rating.toString()} onValueChange={(value) => setFilters({ ...filters, rating: parseFloat(value) })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn đánh giá" />
                       </SelectTrigger>
@@ -190,7 +189,7 @@ export default function InstructorsPage() {
           <div className="lg:col-span-3">
             {/* Sort and Results Info */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-sm">
                 Hiển thị {startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, filteredInstructors.length)} trong {filteredInstructors.length} người hướng dẫn
               </p>
               <Select value={sortBy} onValueChange={setSortBy}>
@@ -210,70 +209,80 @@ export default function InstructorsPage() {
             {/* Instructors Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {paginatedInstructors.map((instructor) => (
-                <Card key={instructor.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4 mb-4">
-                      <Avatar className="h-16 w-16">
+                <Card key={instructor.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+                  <CardContent className="p-6 flex-1 flex flex-col space-y-4 pb-4">
+                    {/* Header with Avatar and Badge */}
+                    <div className="flex items-start gap-3 pb-3 border-b flex-shrink-0">
+                      <Avatar className="h-14 w-14 flex-shrink-0">
                         <AvatarImage src={instructor.avatar} alt={instructor.name} />
                         <AvatarFallback>{getInitials(instructor.name)}</AvatarFallback>
                       </Avatar>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{instructor.name}</h3>
-                        <div className="flex items-center gap-1 text-sm text-gray-600">
-                          <Award className="h-4 w-4" />
-                          <span>{instructor.experience} năm kinh nghiệm</span>
-                        </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-lg truncate">{instructor.name}</h3>
                       </div>
-                      <Badge variant="secondary" className="flex items-center gap-1">
-                        <CheckCircle className="h-3 w-3" />
-                        Đã duyệt
-                      </Badge>
+
                     </div>
-                    
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">{instructor.bio}</p>
-                    
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center gap-1 text-sm">
-                        <MapPin className="h-4 w-4 text-gray-500" />
-                        <span>{instructor.area}</span>
+
+                    {/* Bio */}
+                    <div className="flex-shrink-0">
+                      <p className="text-gray-600 text-sm line-clamp-3 min-h-[3.75rem]">
+                        {instructor.bio}
+                      </p>
+                    </div>
+
+                    {/* Location and Experience Level */}
+                    <div className="space-y-2 flex-shrink-0">
+                      <div className="flex items-center gap-2 text-sm">
+                        <MapPin className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                        <span className="truncate">{instructor.area}</span>
                       </div>
-                      <div className="flex items-center gap-1 text-sm">
-                        <Award className="h-4 w-4 text-gray-500" />
+                      <div className="flex items-center gap-2 text-sm">
+                        <Award className="h-4 w-4 text-gray-500 flex-shrink-0" />
                         <span>{getExperienceLevel(instructor.experience)}</span>
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-1 mb-4">
-                      {instructor.specialties.slice(0, 2).map((specialty, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          {specialty}
-                        </Badge>
-                      ))}
-                      {instructor.specialties.length > 2 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{instructor.specialties.length - 2}
-                        </Badge>
-                      )}
+                    {/* Specialties */}
+                    <div className="flex-1 flex flex-col gap-2 min-h-[3rem]">
+                      <p className="text-xs text-gray-500">Chuyên môn:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {instructor.specialties.slice(0, 3).map((specialty, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {specialty}
+                          </Badge>
+                        ))}
+                        {instructor.specialties.length > 3 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{instructor.specialties.length - 3}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-1 mb-4">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="font-medium">{instructor.rating}</span>
+                    {/* Rating */}
+                    <div className="flex items-center gap-2 flex-shrink-0 pt-3 border-t">
+                      <div className="flex items-center gap-1">
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <span className="font-medium">{instructor.rating}</span>
+                      </div>
                       <span className="text-gray-500 text-sm">({instructor.reviewCount} đánh giá)</span>
                     </div>
 
-                    <div className="text-lg font-bold text-blue-600 mb-4">
-                      {formatPrice(instructor.pricePerHour)}/giờ
+                    {/* Price */}
+                    <div className="flex-shrink-0">
+                      <div className="text-xl font-bold text-blue-600">
+                        {formatPrice(instructor.pricePerHour)}/giờ
+                      </div>
                     </div>
                   </CardContent>
 
-                  <CardFooter className="p-6 pt-0 flex gap-2">
+                  <CardFooter className="p-6 pt-0 pb-4 px-6 flex gap-2 flex-shrink-0">
                     <Button className="flex-1" size="sm">
                       <Calendar className="h-4 w-4 mr-1" />
                       Đặt ngay
                     </Button>
                     <Button variant="outline" size="sm" asChild>
-                      <Link href={`/details?instructor=${instructor.id}`}>
+                      <Link href={`/instructors/${instructor.id}`}>
                         <Eye className="h-4 w-4 mr-1" />
                         Chi tiết
                       </Link>
@@ -288,8 +297,8 @@ export default function InstructorsPage() {
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious 
-                      href="#" 
+                    <PaginationPrevious
+                      href="#"
                       onClick={(e) => {
                         e.preventDefault();
                         if (currentPage > 1) setCurrentPage(currentPage - 1);
@@ -297,7 +306,7 @@ export default function InstructorsPage() {
                       className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                     />
                   </PaginationItem>
-                  
+
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                     <PaginationItem key={page}>
                       <PaginationLink
@@ -312,10 +321,10 @@ export default function InstructorsPage() {
                       </PaginationLink>
                     </PaginationItem>
                   ))}
-                  
+
                   <PaginationItem>
-                    <PaginationNext 
-                      href="#" 
+                    <PaginationNext
+                      href="#"
                       onClick={(e) => {
                         e.preventDefault();
                         if (currentPage < totalPages) setCurrentPage(currentPage + 1);
@@ -339,16 +348,6 @@ export default function InstructorsPage() {
               </div>
             )}
 
-            {/* Call to Action */}
-            <div className="mt-12 text-center">
-              <Card className="p-8">
-                <h3 className="text-xl font-semibold mb-2">Bạn muốn trở thành người hướng dẫn?</h3>
-                <p className="text-gray-600 mb-4">Gia nhập cộng đồng giáo viên lái xe chuyên nghiệp của DriveMate</p>
-                <Button asChild>
-                  <Link href="/signup-instructor">Đăng ký ngay</Link>
-                </Button>
-              </Card>
-            </div>
           </div>
         </div>
       </div>
