@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-  import Image from "next/image";
+import Image from "next/image";
 const links = {
   Contact: ["Github", "Twitter", "Instagram"],
   Platforms: ["iOS", "Android", "Web"],
@@ -11,7 +11,10 @@ const links = {
 
 export default function Footer() {
   return (
-    <footer id="footer" className="container mx-auto sm:px-6 lg:px-8 space-y-4 p-4 sm:p-5">
+    <footer
+      id="footer"
+      className="container mx-auto sm:px-6 lg:px-8 space-y-4 p-4 sm:p-5"
+    >
       <div className="bg-background/60 rounded-2xl border p-4 sm:p-5 lg:p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6 sm:gap-8 lg:gap-12">
           {/* Brand */}
@@ -26,11 +29,11 @@ export default function Footer() {
                   priority
                   className="h-12 w-12 object-contain"
                 />
-                <h1 className="text-xl font-bold m-0 text-black">DriveMate</h1>
               </Link>
             </div>
             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-              Meet our AI-powered SaaS solution to lighten your workload, increase efficiency and make more accurate decisions.
+              Meet our AI-powered SaaS solution to lighten your workload,
+              increase efficiency and make more accurate decisions.
             </p>
           </div>
 
@@ -59,10 +62,16 @@ export default function Footer() {
               © 2024 DriveMate. All rights reserved.
             </p>
             <div className="flex items-center gap-4 text-xs sm:text-sm">
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+              <a
+                href="#"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
                 Privacy Policy
               </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+              <a
+                href="#"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
                 Terms of Service
               </a>
             </div>

@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { User } from "lucide-react";
 import Image from "next/image";
 
-
 const MAIN_MENU = [
   { path: "/", label: "Trang chủ" },
   { path: "/packages", label: "Gói dịch vụ" },
@@ -15,36 +14,50 @@ const MAIN_MENU = [
   { path: "/blogs", label: "Bài viết" },
 ];
 
-function Logo() {
+function Logo({ sizeClass = "h-16 w-16" }: { sizeClass?: string }) {
   return (
     <div className="flex flex-col items-center text-center">
       <Link href="/" className="flex items-center justify-center gap-3">
-        <Image
-          src="/logo.png"
-          alt="Logo"
-          width={64}
-          height={64}
-          priority
-          className="h-16 w-16 object-contain"
-        />
+        <div className={`relative ${sizeClass}`} aria-hidden>
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            fill
+            priority
+            className="object-contain"
+          />
+        </div>
       </Link>
     </div>
   );
 }
 
-function NavMenu({ menu, activePath }: { menu: { path: string; label: string }[]; activePath: string }) {
+function NavMenu({
+  menu,
+  activePath,
+}: {
+  menu: { path: string; label: string }[];
+  activePath: string;
+}) {
   return (
-    <nav aria-label="Main" className="group/navigation-menu relative max-w-max flex-1 items-center justify-center mx-auto hidden lg:block">
+    <nav
+      aria-label="Main"
+      className="group/navigation-menu relative max-w-max flex-1 items-center justify-center mx-auto hidden lg:block"
+    >
       <div style={{ position: "relative" }}>
-        <ul className="group flex flex-1 list-none items-center justify-center gap-1 space-x-0" dir="ltr">
+        <ul
+          className="group flex flex-1 list-none items-center justify-center gap-1 space-x-0"
+          dir="ltr"
+        >
           {menu.map((item) => (
             <li key={item.path} className="relative">
               <Link
                 href={item.path}
-                className={`group inline-flex h-9 w-max items-center justify-center rounded-md px-3 sm:px-4 py-2 text-sm font-medium transition-colors ${activePath === item.path
-                  ? "bg-[#00598a] text-white dark:bg-[#004b6a]"
-                  : "hover:bg-[#006fa8] hover:text-white dark:hover:bg-[#005a7a]"
-                  }`}
+                className={`group inline-flex h-9 w-max items-center justify-center rounded-md px-3 sm:px-4 py-2 text-sm font-medium transition-colors ${
+                  activePath === item.path
+                    ? "bg-[#00598a] text-white dark:bg-[#004b6a]"
+                    : "hover:bg-[#006fa8] hover:text-white dark:hover:bg-[#005a7a]"
+                }`}
               >
                 {item.label}
               </Link>
@@ -116,7 +129,17 @@ function UserDropdown() {
   );
 }
 
-function MobileMenu({ menu, activePath, open, onClose }: { menu: { path: string; label: string }[]; activePath: string; open: boolean; onClose: () => void }) {
+function MobileMenu({
+  menu,
+  activePath,
+  open,
+  onClose,
+}: {
+  menu: { path: string; label: string }[];
+  activePath: string;
+  open: boolean;
+  onClose: () => void;
+}) {
   if (!open) return null;
   return (
     <div className="lg:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md">
@@ -125,15 +148,31 @@ function MobileMenu({ menu, activePath, open, onClose }: { menu: { path: string;
           <Link
             key={item.path}
             href={item.path}
-            className={`block w-full max-w-sm px-6 py-3 rounded-md text-lg font-medium text-center transition-colors ${activePath === item.path ? "bg-accent text-accent-foreground" : "text-white hover:bg-accent hover:text-accent-foreground"}`}
+            className={`block w-full max-w-sm px-6 py-3 rounded-md text-lg font-medium text-center transition-colors ${
+              activePath === item.path
+                ? "bg-accent text-accent-foreground"
+                : "text-white hover:bg-accent hover:text-accent-foreground"
+            }`}
             onClick={onClose}
           >
             {item.label}
           </Link>
         ))}
         <div className="w-full max-w-sm flex flex-col gap-2 mt-4">
-          <Link href="/signin" className="block px-6 py-3 rounded-md text-lg font-medium text-white hover:bg-accent hover:text-accent-foreground text-center transition-colors" onClick={onClose}>Sign in</Link>
-          <Link href="/signup" className="block px-6 py-3 rounded-md text-lg font-medium text-white hover:bg-accent hover:text-accent-foreground text-center transition-colors" onClick={onClose}>Sign up</Link>
+          <Link
+            href="/signin"
+            className="block px-6 py-3 rounded-md text-lg font-medium text-white hover:bg-accent hover:text-accent-foreground text-center transition-colors"
+            onClick={onClose}
+          >
+            Sign in
+          </Link>
+          <Link
+            href="/signup"
+            className="block px-6 py-3 rounded-md text-lg font-medium text-white hover:bg-accent hover:text-accent-foreground text-center transition-colors"
+            onClick={onClose}
+          >
+            Sign up
+          </Link>
         </div>
       </div>
     </div>
@@ -141,7 +180,6 @@ function MobileMenu({ menu, activePath, open, onClose }: { menu: { path: string;
 }
 
 export default function Header() {
-  const [isDark, setIsDark] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
 
@@ -156,7 +194,23 @@ export default function Header() {
               aria-label="Open menu"
               className="p-1 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-menu cursor-pointer size-5 sm:size-6" type="button"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-menu cursor-pointer size-5 sm:size-6"
+                type="button"
+              >
+                <line x1="4" x2="20" y1="12" y2="12"></line>
+                <line x1="4" x2="20" y1="6" y2="6"></line>
+                <line x1="4" x2="20" y1="18" y2="18"></line>
+              </svg>
             </button>
           </div>
           <NavMenu menu={MAIN_MENU} activePath={pathname} />
@@ -165,7 +219,12 @@ export default function Header() {
           </div>
         </div>
       </div>
-      <MobileMenu menu={MAIN_MENU} activePath={pathname} open={mobileOpen} onClose={() => setMobileOpen(false)} />
+      <MobileMenu
+        menu={MAIN_MENU}
+        activePath={pathname}
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+      />
     </header>
   );
 }
