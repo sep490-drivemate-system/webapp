@@ -6,6 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
+import Image from "next/image";
 import instructorsData from "@/data/mock-instructors-enhanced.json";
 import carsData from "@/data/mock-cars.json";
 
@@ -21,11 +22,13 @@ export default function HomePage() {
       description: "Phù hợp cho người mới bắt đầu",
       hours: 20,
       price: 4000000,
-      pricePerHour: 200000,
       instructor: instructors[0],
-      skills: ["Đường đô thị", "Khu dân cư"],
+      roadTypes: ["Đường đô thị", "Khu dân cư"],
+      skills: ["Đỗ xe", "Lùi xe", "Vào cua"],
+      packageType: "instructor_vehicle", // Có người hướng dẫn + xe
+      vehicleInfo: "Toyota Vios 2023",
       hasVehicle: true,
-      popular: true
+      purchaseCount: 156
     },
     {
       id: "pkg_002",
@@ -33,23 +36,27 @@ export default function HomePage() {
       description: "Luyện tập kỹ năng nâng cao",
       hours: 40,
       price: 8800000,
-      pricePerHour: 220000,
       instructor: instructors[1],
-      skills: ["Quốc lộ", "Cao tốc"],
+      roadTypes: ["Quốc lộ", "Cao tốc"],
+      skills: ["Vượt xe", "Chuyển làn", "Xử lý tình huống"],
+      packageType: "instructor_vehicle", // Có người hướng dẫn + xe
+      vehicleInfo: "Honda City 2022",
       hasVehicle: true,
-      popular: false
+      purchaseCount: 89
     },
     {
       id: "pkg_003",
       name: "Gói luyện cao tốc",
       description: "Chuyên luyện đường cao tốc",
       hours: 15,
-      price: 4500000,
-      pricePerHour: 300000,
+      price: 3750000,
       instructor: instructors[2],
-      skills: ["Cao tốc", "Vượt xe"],
+      roadTypes: ["Cao tốc"],
+      skills: ["Vượt xe", "Giữ làn", "Tốc độ cao"],
+      packageType: "instructor_only", // Chỉ có người hướng dẫn
+      vehicleInfo: null,
       hasVehicle: false,
-      popular: false
+      purchaseCount: 67
     },
     {
       id: "pkg_004",
@@ -57,11 +64,13 @@ export default function HomePage() {
       description: "Luyện kỹ năng đường núi",
       hours: 12,
       price: 3600000,
-      pricePerHour: 300000,
       instructor: instructors[3],
-      skills: ["Đường đèo", "Cua gấp"],
+      roadTypes: ["Đường đèo", "Đường núi"],
+      skills: ["Cua gấp", "Dốc cao", "Phanh an toàn", "Kiểm soát tốc độ"],
+      packageType: "instructor_vehicle", // Có người hướng dẫn + xe
+      vehicleInfo: "Mazda 3 2023",
       hasVehicle: true,
-      popular: false
+      purchaseCount: 43
     }
   ];
 
@@ -119,42 +128,66 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredPackages.map((pkg) => (
-              <Card key={pkg.id} className="hover:shadow-lg transition-shadow flex flex-col">
-                <CardHeader className="pb-3">
-                  <h3 className="font-bold text-lg">{pkg.name}</h3>
+              <Card key={pkg.id} className="hover:shadow-lg transition-shadow flex flex-col relative overflow-hidden h-full">
+                <CardHeader>
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-bold text-lg flex-1">{pkg.name}</h3>
+                  </div>
+                  
+                  {/* Purchase Count */}
+                  <div className="flex items-center gap-1 text-sm text-gray-600">
+                    <Package className="h-4 w-4 text-orange-500" />
+                    <span className="font-medium text-orange-600">{pkg.purchaseCount}</span>
+                    <span>lượt mua</span>
+                  </div>
                 </CardHeader>
-                <CardContent className="flex-1 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={pkg.instructor.avatar} />
-                      <AvatarFallback>{pkg.instructor.name[0]}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium truncate">{pkg.instructor.name}</p>
-                      <div className="flex items-center gap-1">
-                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                        <span className="text-xs text-gray-600">{pkg.instructor.rating}</span>
-                      </div>
+
+                <CardContent className="flex-1 space-y-4">
+                  {/* Hours */}
+                  <div className="flex items-center gap-2 text-sm bg-gray-50 p-2 rounded">
+                    <Clock className="h-4 w-4 text-gray-600" />
+                    <span className="font-medium">{pkg.hours} giờ học</span>
+                  </div>
+
+                  {/* Road Types */}
+                  <div className="min-h-[60px]">
+                    <p className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1">
+                      <MapPin className="h-3 w-3" />
+                      Loại đường:
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      {pkg.roadTypes.map((road, idx) => (
+                        <Badge key={idx} className="bg-green-100 text-green-700 hover:bg-green-200 text-xs border-green-300">
+                          {road}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Clock className="h-4 w-4 text-gray-500" />
-                    <span>{pkg.hours} giờ</span>
+
+                  {/* Skills */}
+                  <div className="min-h-[80px]">
+                    <p className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1">
+                      <Award className="h-3 w-3" />
+                      Kỹ năng:
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      {pkg.skills.map((skill, idx) => (
+                        <Badge key={idx} className="bg-purple-100 text-purple-700 hover:bg-purple-200 text-xs border-purple-300">
+                          {skill}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-1">
-                    {pkg.skills.map((skill, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs">
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                  <div className="pt-2 border-t">
-                    <p className="text-2xl font-bold text-blue-600">{formatPrice(pkg.price)}</p>
+
+                  {/* Price */}
+                  <div className="flex items-center justify-between pt-3 border-t">
+                    <p className="text-2xl font-bold ">{formatPrice(pkg.price)}</p>
                   </div>
                 </CardContent>
+
                 <CardFooter className="pt-0">
-                  <Button className="w-full" size="sm" asChild>
-                    <Link href="/packages">Đặt ngay</Link>
+                  <Button variant={"green"} className="w-full" size="sm" asChild>
+                    <Link href="/packages">Mua ngay</Link>
                   </Button>
                 </CardFooter>
               </Card>
@@ -205,10 +238,9 @@ export default function HomePage() {
                       <div className="flex items-center justify-center gap-1 mb-3">
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                         <span className="font-medium">{instructor.rating}</span>
-                        <span className="text-sm text-gray-500">({instructor.reviewCount})</span>
                       </div>
                     </div>
-                    <Button className="w-full" size="sm" asChild>
+                    <Button variant="green" className="w-full" size="sm" asChild>
                       <Link href={`/instructors/${instructor.id}`}>Xem chi tiết</Link>
                     </Button>
                   </div>
@@ -245,31 +277,19 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {cars.map((car) => (
-              <Card key={car.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="relative h-48">
-                  <img
+              <Card key={car.id} className="overflow-hidden hover:shadow-lg transition-shadow p-0">
+                <div className="relative h-[200px]">
+                  <Image
                     src={car.image}
                     alt={car.name}
-                    className="w-full h-full object-cover"
+                    fill
+                    priority
+                    className="object-cover"
                   />
-                  <Badge className="absolute top-3 right-3 bg-white/90 text-gray-900">
-                    {car.brand}
-                  </Badge>
                 </div>
                 <CardContent className="p-4 space-y-3">
                   <div>
                     <h3 className="font-bold text-lg mb-1">{car.name}</h3>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="font-medium">{car.rating}</span>
-                      <span className="text-gray-500">({car.reviewCount})</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-gray-600">
-                      <MapPin className="h-3 w-3" />
-                      <span className="text-xs">{car.area}</span>
-                    </div>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-gray-600">
                     <Badge variant="outline" className="text-xs">{car.transmission}</Badge>
@@ -278,7 +298,7 @@ export default function HomePage() {
                   </div>
                 </CardContent>
                 <CardFooter className="p-4 pt-0">
-                  <Button className="w-full text-white" size="sm" asChild>
+                  <Button variant="green" className="w-full text-white" size="sm" asChild>
                     <Link href={`/cars/${car.id}`}>Xem chi tiết</Link>
                   </Button>
                 </CardFooter>
@@ -289,7 +309,7 @@ export default function HomePage() {
           <div className="text-center mt-6 sm:hidden">
             <Button variant="outline" asChild>
               <Link href="/cars">
-                Xem tất cả xe tập
+                Xem tất cả
                 <ChevronRight className="ml-1 h-4 w-4" />
               </Link>
             </Button>

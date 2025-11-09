@@ -8,16 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Star,
-  MapPin,
   Clock,
   Car,
-  Award,
-  CheckCircle,
   Filter,
   Search,
-  TrendingUp,
-  Users,
-  Calendar,
   Package
 } from "lucide-react";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
@@ -264,7 +258,7 @@ export default function PackagesPage() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <Input
               type="text"
-              placeholder="Tìm kiếm gói học, giáo viên, kỹ năng..."
+              placeholder="Tìm kiếm gói thuê"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 pr-4 py-6 text-base"
@@ -348,11 +342,9 @@ export default function PackagesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {paginatedPackages.map((pkg) => (
                 <Card key={pkg.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full">
-                  <CardHeader className="pb-3 flex-shrink-0">
-                    <div className="flex items-start justify-between gap-2">
+                  <CardHeader className="flex-shrink-0">
+                    <div className="flex items-start justify-between">
                       <h3 className="text-lg font-bold text-gray-900 line-clamp-2 flex-1">{pkg.packageName}</h3>
-
-
                     </div>
                   </CardHeader>
 
@@ -381,14 +373,12 @@ export default function PackagesPage() {
                         <span className="text-gray-500">•</span>
                       </div>
                       {pkg.hasVehicle ? (
-                        <div className="flex items-center gap-2 text-sm">
-                          <Car className="h-4 w-4 text-green-600 flex-shrink-0" />
-                          <span className="text-green-700 font-medium">{pkg.vehicleType}</span>
+                        <div className="flex items-center gap-2 text-sm">                          
+                          <span className="text-green-700 font-medium">Người hướng dẫn + Xe</span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-2 text-sm text-gray-500">
-                          <Car className="h-4 w-4 flex-shrink-0" />
-                          <span>Không có xe</span>
+                          <span>Chỉ người hướng dẫn</span>
                         </div>
                       )}
                     </div>
@@ -431,14 +421,9 @@ export default function PackagesPage() {
                     <div className="pt-3 border-t flex-shrink-0">
                       <div className="flex items-baseline justify-between gap-2">
                         <div>
-                          <span className="text-2xl font-bold text-blue-600">
+                          <span className="text-2xl font-bold ">
                             {formatPrice(pkg.totalPrice)}
                           </span>
-                          {pkg.discount && (
-                            <span className="text-sm text-gray-500 line-through ml-2">
-                              {formatPrice(pkg.totalPrice / (1 - pkg.discount / 100))}
-                            </span>
-                          )}
                         </div>
                       </div>
 
@@ -446,7 +431,7 @@ export default function PackagesPage() {
                   </CardContent>
 
                   <CardFooter className="pt-0 pb-4 px-6 flex gap-2 flex-shrink-0">
-                    <Button className="flex-1" size="sm">
+                    <Button variant="green" className="flex-1" size="sm">
                       Mua ngay
                     </Button>
                     <Button variant="outline" size="sm" asChild>

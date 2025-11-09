@@ -14,21 +14,19 @@ const MAIN_MENU = [
   { path: "/blogs", label: "Bài viết" },
 ];
 
-function Logo({ sizeClass = "h-16 w-16" }: { sizeClass?: string }) {
+function Logo({ sizeClass = "h-12 w-12 sm:h-14 sm:w-14" }: { sizeClass?: string }) {
   return (
-    <div className="flex flex-col items-center text-center">
-      <Link href="/" className="flex items-center justify-center gap-3">
-        <div className={`relative ${sizeClass}`} aria-hidden>
-          <Image
-            src="/logo.png"
-            alt="Logo"
-            fill
-            priority
-            className="object-contain"
-          />
-        </div>
-      </Link>
-    </div>
+    <Link href="/" className="flex items-center shrink-0">
+      <div className={`relative ${sizeClass}`}>
+        <Image
+          src="/logo.png"
+          alt="DriveMate Logo"
+          fill
+          priority
+          className="object-contain"
+        />
+      </div>
+    </Link>
   );
 }
 
@@ -55,8 +53,8 @@ function NavMenu({
                 href={item.path}
                 className={`group inline-flex h-9 w-max items-center justify-center rounded-md px-3 sm:px-4 py-2 text-sm font-medium transition-colors ${
                   activePath === item.path
-                    ? "bg-[#00598a] text-white dark:bg-[#004b6a]"
-                    : "hover:bg-[#006fa8] hover:text-white dark:hover:bg-[#005a7a]"
+                    ? "bg-[#1AD562] text-white dark:bg-[#1AD562]"
+                    : "hover:bg-[#1AD562] hover:text-white dark:hover:bg-[#1AD562]"
                 }`}
               >
                 {item.label}
