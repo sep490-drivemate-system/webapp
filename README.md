@@ -1,4 +1,4 @@
-# DriveMate - Driving School Management System
+# DriveMate - Driving Management System
 
 Hệ thống quản lý trường lái xe hiện đại được xây dựng với Next.js 15, TypeScript và Redux Toolkit.
 

@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Star, MapPin, Eye, Calendar, Award, CheckCircle } from "lucide-react";
+import { Star, MapPin, Eye, Calendar, Award, CheckCircle, Package } from "lucide-react";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import Link from "next/link";
 import instructorsData from "@/data/mock-instructors-enhanced.json";
+import packagesData from "@/data/mock-packages.json";
 
 interface Instructor {
   id: string;
@@ -112,6 +113,10 @@ export default function InstructorsPage() {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
+  const getPackageCount = (instructorId: string) => {
+    return packagesData.packages.filter(pkg => pkg.instructorId === instructorId).length;
+  };
+
   return (
     <div className="pt-24 pb-12 lg:pt-32 lg:pb-16 bg-gradient-to-br from-blue-50 via-white to-blue-50">
       <div className="container mx-auto px-4">
@@ -187,25 +192,6 @@ export default function InstructorsPage() {
 
           {/* Instructors Grid */}
           <div className="lg:col-span-3">
-            {/* Sort and Results Info */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-              <p className="text-gray-600 text-sm">
-                Hiển thị {startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, filteredInstructors.length)} trong {filteredInstructors.length} người hướng dẫn
-              </p>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Sắp xếp theo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="rating">Đánh giá cao nhất</SelectItem>
-                  <SelectItem value="experience">Kinh nghiệm nhiều nhất</SelectItem>
-                  <SelectItem value="price-low">Giá thấp đến cao</SelectItem>
-                  <SelectItem value="price-high">Giá cao đến thấp</SelectItem>
-                  <SelectItem value="reviews">Nhiều đánh giá nhất</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* Instructors Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {paginatedInstructors.map((instructor) => (
@@ -218,9 +204,15 @@ export default function InstructorsPage() {
                         <AvatarFallback>{getInitials(instructor.name)}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-lg truncate">{instructor.name}</h3>
+                        <h3 className="font-semibold text-lg truncate mb-1">{instructor.name}</h3>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1">
+                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            <span className="font-medium text-sm">{instructor.rating}</span>
+                          </div>
+                          <span className="text-gray-500 text-xs">({instructor.reviewCount} đánh giá)</span>
+                        </div>
                       </div>
-
                     </div>
 
                     {/* Bio */}
@@ -230,61 +222,18 @@ export default function InstructorsPage() {
                       </p>
                     </div>
 
-                    {/* Location and Experience Level */}
-                    <div className="space-y-2 flex-shrink-0">
-                      <div className="flex items-center gap-2 text-sm">
-                        <MapPin className="h-4 w-4 text-gray-500 flex-shrink-0" />
-                        <span className="truncate">{instructor.area}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Award className="h-4 w-4 text-gray-500 flex-shrink-0" />
-                        <span>{getExperienceLevel(instructor.experience)}</span>
-                      </div>
-                    </div>
-
-                    {/* Specialties */}
-                    <div className="flex-1 flex flex-col gap-2 min-h-[3rem]">
-                      <p className="text-xs text-gray-500">Chuyên môn:</p>
-                      <div className="flex flex-wrap gap-1">
-                        {instructor.specialties.slice(0, 3).map((specialty, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {specialty}
-                          </Badge>
-                        ))}
-                        {instructor.specialties.length > 3 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{instructor.specialties.length - 3}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Rating */}
-                    <div className="flex items-center gap-2 flex-shrink-0 pt-3 border-t">
-                      <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span className="font-medium">{instructor.rating}</span>
-                      </div>
-                      <span className="text-gray-500 text-sm">({instructor.reviewCount} đánh giá)</span>
-                    </div>
-
-                    {/* Price */}
-                    <div className="flex-shrink-0">
-                      <div className="text-xl font-bold text-blue-600">
-                        {formatPrice(instructor.pricePerHour)}/giờ
-                      </div>
+                    {/* Package Count */}
+                    <div className="flex items-center gap-2 pt-3 border-t">
+                      <Package className="h-4 w-4 text-blue-500" />
+                      <span className="text-sm font-medium text-blue-600">{getPackageCount(instructor.id)} gói thuê</span>
                     </div>
                   </CardContent>
 
-                  <CardFooter className="p-6 pt-0 pb-4 px-6 flex gap-2 flex-shrink-0">
-                    <Button className="flex-1" size="sm">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      Đặt ngay
-                    </Button>
-                    <Button variant="outline" size="sm" asChild>
+                  <CardFooter className="p-6 pt-0 pb-6 px-6">
+                    <Button className="w-full" variant="green" asChild>
                       <Link href={`/instructors/${instructor.id}`}>
-                        <Eye className="h-4 w-4 mr-1" />
-                        Chi tiết
+                        <Eye className="h-4 w-4 mr-2" />
+                        Xem chi tiết
                       </Link>
                     </Button>
                   </CardFooter>
