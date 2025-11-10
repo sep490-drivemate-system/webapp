@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Star, Users, Fuel, Settings, MapPin, Eye, Calendar } from "lucide-react";
+import { Star, Users, Fuel, Settings, Eye, Calendar, Car } from "lucide-react";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import Link from "next/link";
 import carsData from "@/data/mock-cars.json";
@@ -196,53 +196,6 @@ export default function CarsPage() {
                       </SelectContent>
                     </Select>
                   </div>
-
-                  {/* Area Filter */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Khu vực</label>
-                    <Select value={filters.area} onValueChange={(value) => setFilters({ ...filters, area: value })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Chọn khu vực" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Tất cả</SelectItem>
-                        {uniqueAreas.map(area => (
-                          <SelectItem key={area} value={area}>{area}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Price Range Filter */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">
-                      Giá theo giờ: {formatPrice(filters.priceRange[0])} - {formatPrice(filters.priceRange[1])}
-                    </label>
-                    <Slider
-                      value={filters.priceRange}
-                      onValueChange={(value) => setFilters({ ...filters, priceRange: value })}
-                      max={300000}
-                      min={0}
-                      step={10000}
-                      className="mt-2"
-                    />
-                  </div>
-
-                  {/* Rating Filter */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Đánh giá tối thiểu</label>
-                    <Select value={filters.rating.toString()} onValueChange={(value) => setFilters({ ...filters, rating: parseFloat(value) })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Chọn đánh giá" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="0">Tất cả</SelectItem>
-                        <SelectItem value="4">4+ sao</SelectItem>
-                        <SelectItem value="4.5">4.5+ sao</SelectItem>
-                        <SelectItem value="4.8">4.8+ sao</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -250,11 +203,10 @@ export default function CarsPage() {
 
           {/* Cars Grid */}
           <div className="lg:col-span-3">
-
             {/* Cars Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {paginatedCars.map((car) => (
-                <Card key={car.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <Card key={car.id} className="overflow-hidden hover:shadow-lg transition-shadow p-0 gap-0">
                   <div className="relative">
                     <img
                       src={car.image}
@@ -284,8 +236,8 @@ export default function CarsPage() {
                         <span>{car.fuel}</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <MapPin className="h-4 w-4 text-gray-500" />
-                        <span>{car.area}</span>
+                        <Car className="h-4 w-4 text-gray-500" />
+                        <span className="font-medium text-gray-700">{car.brand}</span>
                       </div>
                     </div>
 
@@ -295,20 +247,16 @@ export default function CarsPage() {
                       <span className="text-gray-500 text-sm">({car.reviewCount} đánh giá)</span>
                     </div>
 
-                    <div className="text-lg font-bold text-blue-600 mb-3">
+                    <div className="text-lg font-bold mb-3">
                       {formatPrice(car.pricePerHour)}/giờ
                     </div>
                   </CardContent>
 
-                  <CardFooter className="p-4 pt-0 flex gap-2">
-                    <Button className="flex-1" size="sm">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      Đặt ngay
-                    </Button>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={`/details?car=${car.id}`}>
-                        <Eye className="h-4 w-4 mr-1" />
-                        Chi tiết
+                  <CardFooter className="p-4 pt-0">
+                    <Button className="w-full bg-green-500 hover:bg-green-600 text-white" asChild>
+                      <Link href={`/details?car=${car.id}`} className="flex items-center justify-center gap-2">
+                        <Eye className="h-4 w-4" />
+                        Xem chi tiết
                       </Link>
                     </Button>
                   </CardFooter>

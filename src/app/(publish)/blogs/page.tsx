@@ -101,27 +101,9 @@ export default function BlogsPage() {
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            Blog & Cẩm Nang Lái Xe
+            Bài viết
           </h1>
         </div>
-
-        {/* Search Bar */}
-        <div className="mb-8 max-w-2xl mx-auto">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <Input
-              type="text"
-              placeholder="Tìm kiếm bài viết, chủ đề, tác giả..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="pl-10 pr-4 py-6 text-base"
-            />
-          </div>
-        </div>
-
         {/* Categories */}
         <div className="mb-8">
           <Tabs value={selectedCategory} onValueChange={(value) => {
@@ -133,7 +115,7 @@ export default function BlogsPage() {
                 <TabsTrigger
                   key={category}
                   value={category}
-                  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+                  className="data-[state=active]:bg-green-500 data-[state=active]:text-white"
                 >
                   {category}
                 </TabsTrigger>
@@ -141,77 +123,6 @@ export default function BlogsPage() {
             </TabsList>
           </Tabs>
         </div>
-
-        {/* Featured Blogs */}
-        {featuredBlogs.length > 0 && currentPage === 1 && (
-          <div className="mb-12">
-            <div className="flex items-center gap-2 mb-6">
-              <TrendingUp className="h-5 w-5 text-orange-500" />
-              <h2 className="text-2xl font-bold text-gray-900">Bài viết nổi bật</h2>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {featuredBlogs.map((blog) => (
-                <Card key={blog.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 group">
-                  <div className="relative h-64 overflow-hidden">
-                    <Image
-                      src={blog.image}
-                      alt={blog.title}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-300"
-                      unoptimized
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <Badge className="absolute top-4 left-4 bg-orange-500 text-white">
-                      <TrendingUp className="h-3 w-3 mr-1" />
-                      Nổi bật
-                    </Badge>
-                    <div className="absolute bottom-4 left-4 right-4 text-white">
-                      <Badge variant="secondary" className="mb-2">
-                        {blog.category}
-                      </Badge>
-                      <h3 className="text-xl font-bold mb-2 line-clamp-2">{blog.title}</h3>
-                      <p className="text-sm text-gray-200 line-clamp-2">{blog.excerpt}</p>
-                    </div>
-                  </div>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between text-sm text-gray-600">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={blog.author.avatar} />
-                            <AvatarFallback>{getInitials(blog.author.name)}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium text-gray-900">{blog.author.name}</p>
-                            <p className="text-xs text-gray-500">{blog.author.role}</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          <span>{blog.readTime} phút</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Eye className="h-4 w-4" />
-                          <span>{blog.views}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="p-6 pt-0">
-                    <Button className="w-full" asChild>
-                      <Link href={`/blogs/${blog.id}`}>
-                        Đọc tiếp
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Blog Grid */}
         <div className="mb-8">
@@ -252,7 +163,7 @@ export default function BlogsPage() {
               {paginatedBlogs.map((blog) => (
                 <Card
                   key={blog.id}
-                  className="overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full group"
+                  className="overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full group p-0 gap-0"
                 >
                   <div className="relative h-48 overflow-hidden">
                     <Image
@@ -291,21 +202,6 @@ export default function BlogsPage() {
                           +{blog.tags.length - 3}
                         </Badge>
                       )}
-                    </div>
-
-                    <div className="flex items-center gap-4 text-xs text-gray-500 pt-3 border-t">
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        <span>{blog.readTime} phút</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Eye className="h-3 w-3" />
-                        <span>{blog.views}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Heart className="h-3 w-3" />
-                        <span>{blog.likes}</span>
-                      </div>
                     </div>
                   </CardContent>
 
@@ -356,7 +252,7 @@ export default function BlogsPage() {
               return (
                 <Button
                   key={page}
-                  variant={currentPage === page ? "default" : "outline"}
+                  variant={currentPage === page ? "outline" : "ghost"}
                   onClick={() => setCurrentPage(page)}
                 >
                   {page}
