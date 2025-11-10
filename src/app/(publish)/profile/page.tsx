@@ -24,6 +24,13 @@ import {
   Shield,
   LogOut,
   Check,
+  Wallet,
+  Package,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Plus,
+  RefreshCw,
+  BarChart3,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,16 +40,18 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import mockData from "@/data/mock-user-profile.json";
-import { IUserProfile, IBookingHistory } from "@/types/user/user-profile.type";
+import { IUserProfile, IBookingHistory, IPackagePurchase, IUserWallet } from "@/types/user/user-profile.type";
 
 const profile = mockData.profile as IUserProfile;
 const bookingHistory = mockData.bookingHistory as IBookingHistory[];
+const packagePurchases = mockData.packagePurchases as IPackagePurchase[];
+const wallet = mockData.wallet as IUserWallet;
 const settings = mockData.settings;
 
-type TabType = "overview" | "info" | "history" | "settings";
+type TabType = "info" | "history" | "packages" | "wallet" | "settings";
 
 export default function ProfilePage() {
-  const [activeTab, setActiveTab] = useState<TabType>("overview");
+  const [activeTab, setActiveTab] = useState<TabType>("info");
   const [isEditing, setIsEditing] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [emailNotif, setEmailNotif] = useState(settings.notifications.email);
@@ -92,10 +101,11 @@ export default function ProfilePage() {
     }
   };
 
-  const menuItems = [
-    { id: "overview" as TabType, label: "Tổng quan", icon: TrendingUp },
+  const menuItems = [ 
     { id: "info" as TabType, label: "Thông tin cá nhân", icon: User },
     { id: "history" as TabType, label: "Lịch sử đặt chỗ", icon: Clock },
+    { id: "packages" as TabType, label: "Lịch sử mua gói", icon: Package },
+    { id: "wallet" as TabType, label: "Ví & Nạp tiền", icon: Wallet },
     { id: "settings" as TabType, label: "Cài đặt", icon: Settings },
   ];
 
@@ -104,12 +114,11 @@ export default function ProfilePage() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         {/* Profile Header Card */}
         <Card className="mb-8 overflow-hidden border-none shadow-xl">
-          <div className="relative bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 p-8 pb-24">
+          <div className="relative bg-[#1AD562] p-8 pb-24 mt-0">
             <div className="absolute inset-0 bg-black/10"></div>
             <div className="relative flex justify-between items-start">
               <div>
                 <h1 className="text-3xl font-bold text-white mb-2">Hồ Sơ Của Tôi</h1>
-                <p className="text-blue-100">Quản lý thông tin và hoạt động của bạn</p>
               </div>
               <Button variant="secondary" size="sm" className="gap-2">
                 <LogOut className="w-4 h-4" />
@@ -117,7 +126,7 @@ export default function ProfilePage() {
               </Button>
             </div>
           </div>
-          <div className="relative px-8 -mt-16">
+          <div className="relative px-8 mt-0">
             <div className="bg-white rounded-2xl shadow-lg p-6">
               <div className="flex flex-col md:flex-row items-center gap-6">
                 <div className="relative group">
@@ -136,7 +145,7 @@ export default function ProfilePage() {
                       </div>
                     )}
                   </div>
-                  <button className="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full p-2.5 shadow-lg hover:bg-blue-700 transition-all hover:scale-110">
+                  <button className="absolute bottom-0 right-0 bg-[#1AD562] text-white rounded-full p-2.5 shadow-lg hover:bg-[#16B854] transition-all hover:scale-110">
                     <Camera className="w-4 h-4" />
                   </button>
                 </div>
@@ -144,22 +153,13 @@ export default function ProfilePage() {
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">{profile.userName}</h2>
                   <div className="flex flex-wrap gap-4 justify-center md:justify-start text-sm text-gray-600 mb-3">
                     <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-blue-600" />
+                      <Mail className="w-4 h-4 text-[#1AD562]" />
                       <span>{profile.email}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-blue-600" />
+                      <Phone className="w-4 h-4 text-[#1AD562]" />
                       <span>{profile.phone}</span>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2 justify-center md:justify-start">
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-blue-200 border">
-                      <Shield className="w-3 h-3 mr-1" />
-                      Tài khoản đã xác thực
-                    </Badge>
-                    <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200 border">
-                      Thành viên từ {new Date(profile.createdAt).getFullYear()}
-                    </Badge>
                   </div>
                 </div>
               </div>
@@ -183,7 +183,7 @@ export default function ProfilePage() {
                         onClick={() => setActiveTab(item.id)}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                           isActive
-                            ? "bg-blue-600 text-white shadow-md"
+                            ? "bg-[#1AD562] text-white shadow-md"
                             : "text-gray-700 hover:bg-gray-100"
                         }`}
                       >
@@ -200,108 +200,17 @@ export default function ProfilePage() {
 
           {/* Main Content Area */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Overview Tab */}
-            {activeTab === "overview" && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <Card className="border-none shadow-lg hover:shadow-xl transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-4">
-                        <div className="p-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-md">
-                          <Clock className="w-7 h-7 text-white" />
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600 font-medium">Tổng buổi học</p>
-                          <p className="text-3xl font-bold text-gray-900">{profile.stats.totalSessions}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-none shadow-lg hover:shadow-xl transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-4">
-                        <div className="p-4 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-md">
-                          <BookOpen className="w-7 h-7 text-white" />
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600 font-medium">Tổng giờ học</p>
-                          <p className="text-3xl font-bold text-gray-900">{profile.stats.totalHours}h</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-none shadow-lg hover:shadow-xl transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-4">
-                        <div className="p-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-md">
-                          <Car className="w-7 h-7 text-white" />
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600 font-medium">Xe đã thuê</p>
-                          <p className="text-3xl font-bold text-gray-900">{profile.stats.carsRented}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-none shadow-lg hover:shadow-xl transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-4">
-                        <div className="p-4 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-md">
-                          <Award className="w-7 h-7 text-white" />
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600 font-medium">Gói hoàn thành</p>
-                          <p className="text-3xl font-bold text-gray-900">{profile.stats.packagesCompleted}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Recent Activity */}
-                <Card className="border-none shadow-lg">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-blue-600" />
-                      Hoạt động gần đây
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {bookingHistory.slice(0, 3).map((booking) => (
-                        <div
-                          key={booking.id}
-                          className="flex items-center gap-4 p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-                        >
-                          <div className="p-3 bg-white rounded-lg shadow-sm">
-                            {getTypeIcon(booking.type)}
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-gray-900">{booking.title}</h4>
-                            <p className="text-sm text-gray-600">{formatDate(booking.date)}</p>
-                          </div>
-                          {getStatusBadge(booking.status)}
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
 
             {/* Personal Information Tab */}
             {activeTab === "info" && (
               <Card className="border-none shadow-lg">
                 <CardHeader className="flex flex-row items-center justify-between border-b">
                   <CardTitle className="flex items-center gap-2">
-                    <User className="w-5 h-5 text-blue-600" />
+                    <User className="w-5 h-5 text-white" />
                     Thông tin cá nhân
                   </CardTitle>
                   <Button
-                    variant={isEditing ? "default" : "outline"}
+                    variant={isEditing ? "outline" : "green"}
                     size="sm"
                     onClick={() => setIsEditing(!isEditing)}
                     className="gap-2"
@@ -437,7 +346,7 @@ export default function ProfilePage() {
               <Card className="border-none shadow-lg">
                 <CardHeader className="border-b">
                   <CardTitle className="flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-blue-600" />
+                    <Clock className="w-5 h-5 text-[#1AD562]" />
                     Lịch sử đặt chỗ
                   </CardTitle>
                 </CardHeader>
@@ -459,12 +368,12 @@ export default function ProfilePage() {
                               </h3>
                               <div className="flex flex-wrap gap-3 text-sm text-gray-600 mb-2">
                                 <span className="flex items-center gap-1">
-                                  <Calendar className="w-3.5 h-3.5 text-blue-600" />
+                                  <Calendar className="w-3.5 h-3.5 text-[#1AD562]" />
                                   {formatDate(booking.date)}
                                 </span>
                                 {booking.duration && (
                                   <span className="flex items-center gap-1">
-                                    <Clock className="w-3.5 h-3.5 text-blue-600" />
+                                    <Clock className="w-3.5 h-3.5 text-[#1AD562]" />
                                     {booking.duration}
                                   </span>
                                 )}
@@ -485,7 +394,7 @@ export default function ProfilePage() {
                           </div>
                           <div className="flex flex-col items-end justify-between gap-2 sm:min-w-[140px]">
                             {getStatusBadge(booking.status)}
-                            <p className="text-xl font-bold text-blue-600">
+                            <p className="text-xl font-bold text-[#1AD562]">
                               {formatPrice(booking.price)}
                             </p>
                           </div>
@@ -497,6 +406,263 @@ export default function ProfilePage() {
               </Card>
             )}
 
+            {/* Package Purchases Tab */}
+            {activeTab === "packages" && (
+              <Card className="border-none shadow-lg">
+                <CardHeader className="border-b">
+                  <CardTitle className="flex items-center gap-2">
+                    <Package className="w-5 h-5 text-[#1AD562]" />
+                    Lịch sử mua gói
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    {packagePurchases.map((pkg) => (
+                      <div
+                        key={pkg.id}
+                        className="border rounded-xl p-5 hover:shadow-md transition-all bg-white"
+                      >
+                        <div className="flex flex-col sm:flex-row gap-4">
+                          <div className="flex items-start gap-4 flex-1">
+                            <div className="p-3 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg">
+                              <Package className="w-6 h-6 text-purple-600" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between mb-2">
+                                <h3 className="font-semibold text-lg text-gray-900">
+                                  {pkg.packageName}
+                                </h3>
+                                <Badge
+                                  className={`ml-2 ${
+                                    pkg.status === "active"
+                                      ? "bg-green-100 text-green-800 border-green-200"
+                                      : pkg.status === "completed"
+                                      ? "bg-blue-100 text-blue-800 border-blue-200"
+                                      : "bg-gray-100 text-gray-800 border-gray-200"
+                                  } border`}
+                                  variant="secondary"
+                                >
+                                  {pkg.status === "active"
+                                    ? "Đang hoạt động"
+                                    : pkg.status === "completed"
+                                    ? "Đã hoàn thành"
+                                    : "Hết hạn"}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-gray-600 mb-2">{pkg.packageType}</p>
+                              <div className="flex flex-wrap gap-3 text-sm text-gray-600 mb-3">
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="w-3.5 h-3.5 text-[#1AD562]" />
+                                  Mua: {formatDate(pkg.purchaseDate)}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Clock className="w-3.5 h-3.5 text-[#1AD562]" />
+                                  {pkg.totalHours} giờ
+                                </span>
+                              </div>
+                              {pkg.instructor && (
+                                <p className="text-sm text-gray-600 flex items-center gap-1 mb-2">
+                                  <User className="w-3.5 h-3.5" />
+                                  Giảng viên: <span className="font-medium">{pkg.instructor}</span>
+                                </p>
+                              )}
+                              <div className="flex items-center gap-4 mt-3">
+                                <div className="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
+                                  <div
+                                    className="bg-gradient-to-r from-[#1AD562] to-[#16B854] h-full transition-all"
+                                    style={{
+                                      width: `${(pkg.usedHours / pkg.totalHours) * 100}%`,
+                                    }}
+                                  />
+                                </div>
+                                <span className="text-sm font-medium text-gray-700">
+                                  {pkg.usedHours}/{pkg.totalHours}h
+                                </span>
+                              </div>
+                              <p className="text-xs text-gray-500 mt-2">
+                                Còn lại: {pkg.remainingHours} giờ
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end justify-between gap-2 sm:min-w-[140px]">
+                            <p className="text-xl font-bold text-purple-600">
+                              {formatPrice(pkg.price)}
+                            </p>
+                            <div className="text-xs text-gray-500 text-right">
+                              <p>Từ: {formatDate(pkg.startDate)}</p>
+                              <p>Đến: {formatDate(pkg.endDate)}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Wallet Tab */}
+            {activeTab === "wallet" && (
+              <div className="space-y-6">
+                {/* Wallet Balance Card */}
+                <Card className="border-none shadow-lg bg-gradient-to-br from-[#1AD562] to-[#16B854] text-white">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-3 bg-white/20 rounded-xl">
+                          <Wallet className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-blue-100">Số dư ví</p>
+                          <p className="text-3xl font-bold">{formatPrice(wallet.balance)}</p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="secondary"
+                        className="gap-2 bg-white text-[#1AD562] hover:bg-blue-50"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Nạp tiền
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-white/20">
+                      <div>
+                        <p className="text-sm text-blue-100 mb-1">Tổng nạp</p>
+                        <p className="text-lg font-semibold">
+                          {formatPrice(
+                            wallet.transactions
+                              .filter((t) => t.type === "deposit" && t.status === "completed")
+                              .reduce((sum, t) => sum + t.amount, 0)
+                          )}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-blue-100 mb-1">Tổng chi</p>
+                        <p className="text-lg font-semibold">
+                          {formatPrice(
+                            Math.abs(
+                              wallet.transactions
+                                .filter((t) => t.type === "payment" && t.status === "completed")
+                                .reduce((sum, t) => sum + t.amount, 0)
+                            )
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Quick Actions */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <Button
+                    variant="outline"
+                    className="h-auto py-4 flex-col gap-2 hover:bg-blue-50 hover:border-blue-300"
+                  >
+                    <Plus className="w-5 h-5 text-[#1AD562]" />
+                    <span className="font-medium">Nạp tiền</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-auto py-4 flex-col gap-2 hover:bg-green-50 hover:border-green-300"
+                  >
+                    <RefreshCw className="w-5 h-5 text-green-600" />
+                    <span className="font-medium">Rút tiền</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-auto py-4 flex-col gap-2 hover:bg-purple-50 hover:border-purple-300"
+                  >
+                    <BarChart3 className="w-5 h-5 text-purple-600" />
+                    <span className="font-medium">Báo cáo</span>
+                  </Button>
+                </div>
+
+                {/* Transaction History */}
+                <Card className="border-none shadow-lg">
+                  <CardHeader className="border-b">
+                    <CardTitle className="flex items-center gap-2">
+                      <Clock className="w-5 h-5 text-[#1AD562]" />
+                      Lịch sử giao dịch
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-3">
+                      {wallet.transactions.map((transaction) => (
+                        <div
+                          key={transaction.id}
+                          className="flex items-center gap-4 p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                        >
+                          <div
+                            className={`p-3 rounded-lg ${
+                              transaction.type === "deposit"
+                                ? "bg-green-100"
+                                : transaction.type === "payment"
+                                ? "bg-red-100"
+                                : "bg-blue-100"
+                            }`}
+                          >
+                            {transaction.type === "deposit" ? (
+                              <ArrowDownLeft className="w-5 h-5 text-green-600" />
+                            ) : transaction.type === "payment" ? (
+                              <ArrowUpRight className="w-5 h-5 text-red-600" />
+                            ) : (
+                              <RefreshCw className="w-5 h-5 text-[#1AD562]" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-gray-900">
+                              {transaction.description}
+                            </h4>
+                            <div className="flex flex-wrap gap-2 text-xs text-gray-600 mt-1">
+                              <span>{formatDate(transaction.date)}</span>
+                              {transaction.paymentMethod && (
+                                <>
+                                  <span>•</span>
+                                  <span>{transaction.paymentMethod}</span>
+                                </>
+                              )}
+                              {transaction.transactionCode && (
+                                <>
+                                  <span>•</span>
+                                  <span className="font-mono">{transaction.transactionCode}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p
+                              className={`text-lg font-bold ${
+                                transaction.amount > 0 ? "text-green-600" : "text-red-600"
+                              }`}
+                            >
+                              {transaction.amount > 0 ? "+" : ""}
+                              {formatPrice(transaction.amount)}
+                            </p>
+                            <Badge
+                              className={`mt-1 ${
+                                transaction.status === "completed"
+                                  ? "bg-green-100 text-green-800 border-green-200"
+                                  : transaction.status === "pending"
+                                  ? "bg-yellow-100 text-yellow-800 border-yellow-200"
+                                  : "bg-red-100 text-red-800 border-red-200"
+                              } border text-xs`}
+                              variant="secondary"
+                            >
+                              {transaction.status === "completed"
+                                ? "Thành công"
+                                : transaction.status === "pending"
+                                ? "Đang xử lý"
+                                : "Thất bại"}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
             {/* Settings Tab */}
             {activeTab === "settings" && (
               <div className="space-y-6">
@@ -504,7 +670,7 @@ export default function ProfilePage() {
                 <Card className="border-none shadow-lg">
                   <CardHeader className="border-b">
                     <CardTitle className="flex items-center gap-2">
-                      <Bell className="w-5 h-5 text-blue-600" />
+                      <Bell className="w-5 h-5 text-[#1AD562]" />
                       Cài đặt thông báo
                     </CardTitle>
                   </CardHeader>
@@ -512,7 +678,7 @@ export default function ProfilePage() {
                     <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-blue-100 rounded-lg">
-                          <Mail className="w-5 h-5 text-blue-600" />
+                          <Mail className="w-5 h-5 text-[#1AD562]" />
                         </div>
                         <div>
                           <p className="font-medium text-gray-900">Thông báo qua Email</p>
@@ -560,7 +726,7 @@ export default function ProfilePage() {
                 <Card className="border-none shadow-lg">
                   <CardHeader className="border-b">
                     <CardTitle className="flex items-center gap-2">
-                      <Lock className="w-5 h-5 text-blue-600" />
+                      <Lock className="w-5 h-5 text-[#1AD562]" />
                       Bảo mật
                     </CardTitle>
                   </CardHeader>

@@ -90,6 +90,139 @@
       "image": "/images/sessions/basic.jpg"
     }
   ],
+  "packagePurchases": [
+    {
+      "id": "package-001",
+      "packageName": "Gói học lái xe B2 cơ bản",
+      "packageType": "B2 Basic",
+      "purchaseDate": "2024-09-01T08:00:00Z",
+      "price": 8500000,
+      "status": "completed",
+      "totalHours": 30,
+      "usedHours": 30,
+      "remainingHours": 0,
+      "instructor": "Nguyễn Văn Hùng",
+      "startDate": "2024-09-05T08:00:00Z",
+      "endDate": "2024-10-15T17:00:00Z",
+      "image": "/images/packages/basic-b2.jpg"
+    },
+    {
+      "id": "package-002",
+      "packageName": "Gói học lái xe B2 nâng cao",
+      "packageType": "B2 Advanced",
+      "purchaseDate": "2024-10-20T10:00:00Z",
+      "price": 12000000,
+      "status": "active",
+      "totalHours": 40,
+      "usedHours": 15,
+      "remainingHours": 25,
+      "instructor": "Lê Văn Tùng",
+      "startDate": "2024-10-25T08:00:00Z",
+      "endDate": "2024-12-20T17:00:00Z",
+      "image": "/images/packages/advanced-b2.jpg"
+    },
+    {
+      "id": "package-003",
+      "packageName": "Gói học lái xe C",
+      "packageType": "C License",
+      "purchaseDate": "2024-08-01T09:00:00Z",
+      "price": 15000000,
+      "status": "completed",
+      "totalHours": 50,
+      "usedHours": 50,
+      "remainingHours": 0,
+      "instructor": "Trần Văn Minh",
+      "startDate": "2024-08-05T08:00:00Z",
+      "endDate": "2024-09-30T17:00:00Z",
+      "image": "/images/packages/c-license.jpg"
+    }
+  ],
+  "wallet": {
+    "balance": 2500000,
+    "currency": "VND",
+    "transactions": [
+      {
+        "id": "trans-001",
+        "type": "deposit",
+        "amount": 5000000,
+        "date": "2024-11-01T10:30:00Z",
+        "status": "completed",
+        "description": "Nạp tiền vào ví",
+        "paymentMethod": "Chuyển khoản ngân hàng",
+        "transactionCode": "TXN001234567"
+      },
+      {
+        "id": "trans-002",
+        "type": "payment",
+        "amount": -8500000,
+        "date": "2024-09-01T08:15:00Z",
+        "status": "completed",
+        "description": "Thanh toán Gói học lái xe B2 cơ bản",
+        "paymentMethod": "Ví DriveMate",
+        "transactionCode": "PAY001234567"
+      },
+      {
+        "id": "trans-003",
+        "type": "deposit",
+        "amount": 10000000,
+        "date": "2024-08-25T14:20:00Z",
+        "status": "completed",
+        "description": "Nạp tiền vào ví",
+        "paymentMethod": "Thẻ tín dụng",
+        "transactionCode": "TXN001234568"
+      },
+      {
+        "id": "trans-004",
+        "type": "payment",
+        "amount": -500000,
+        "date": "2024-11-05T14:00:00Z",
+        "status": "completed",
+        "description": "Thanh toán thuê xe Toyota Vios 2024",
+        "paymentMethod": "Ví DriveMate",
+        "transactionCode": "PAY001234568"
+      },
+      {
+        "id": "trans-005",
+        "type": "refund",
+        "amount": 600000,
+        "date": "2024-10-21T09:00:00Z",
+        "status": "completed",
+        "description": "Hoàn tiền hủy thuê xe VinFast VF5",
+        "paymentMethod": "Ví DriveMate",
+        "transactionCode": "REF001234567"
+      },
+      {
+        "id": "trans-006",
+        "type": "deposit",
+        "amount": 3000000,
+        "date": "2024-10-15T16:45:00Z",
+        "status": "completed",
+        "description": "Nạp tiền vào ví",
+        "paymentMethod": "MoMo",
+        "transactionCode": "TXN001234569"
+      },
+      {
+        "id": "trans-007",
+        "type": "payment",
+        "amount": -12000000,
+        "date": "2024-10-20T10:00:00Z",
+        "status": "completed",
+        "description": "Thanh toán Gói học lái xe B2 nâng cao",
+        "paymentMethod": "Ví DriveMate",
+        "transactionCode": "PAY001234569"
+      },
+      {
+        "id": "trans-008",
+        "type": "deposit",
+        "amount": 5000000,
+        "date": "2024-11-08T11:00:00Z",
+        "status": "pending",
+        "description": "Nạp tiền vào ví",
+        "paymentMethod": "Chuyển khoản ngân hàng",
+        "transactionCode": "TXN001234570"
+      }
+    ]
+  },
   "settings": {
     "notifications": {
       "email": true,
