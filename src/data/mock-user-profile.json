@@ -1,0 +1,104 @@
+{
+  "profile": {
+    "id": "user-001",
+    "userName": "Nguyễn Văn An",
+    "email": "nguyenvanan@gmail.com",
+    "phone": "0901234567",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=An",
+    "role": 2,
+    "dateOfBirth": "1995-05-15",
+    "address": "123 Đường Võ Văn Ngân, Thủ Đức, TP.HCM",
+    "licenseNumber": "012345678",
+    "licenseType": "B2",
+    "createdAt": "2024-01-15T08:00:00Z",
+    "stats": {
+      "totalSessions": 24,
+      "totalHours": 48,
+      "carsRented": 3,
+      "packagesCompleted": 2
+    }
+  },
+  "bookingHistory": [
+    {
+      "id": "booking-001",
+      "type": "package",
+      "title": "Gói học lái xe B2 cơ bản",
+      "date": "2024-10-01T09:00:00Z",
+      "status": "completed",
+      "price": 8500000,
+      "instructor": "Nguyễn Văn Hùng",
+      "car": "Honda City 2023",
+      "duration": "30 giờ",
+      "image": "/images/packages/basic-b2.jpg"
+    },
+    {
+      "id": "booking-002",
+      "type": "car",
+      "title": "Thuê xe Toyota Vios 2024",
+      "date": "2024-11-05T14:00:00Z",
+      "status": "ongoing",
+      "price": 500000,
+      "car": "Toyota Vios 2024",
+      "duration": "4 giờ",
+      "image": "/images/cars/toyota-vios.jpg"
+    },
+    {
+      "id": "booking-003",
+      "type": "session",
+      "title": "Buổi học lái xe nâng cao",
+      "date": "2024-11-15T10:00:00Z",
+      "status": "upcoming",
+      "price": 300000,
+      "instructor": "Trần Thị Mai",
+      "car": "Honda City 2023",
+      "duration": "2 giờ",
+      "image": "/images/sessions/advanced.jpg"
+    },
+    {
+      "id": "booking-004",
+      "type": "package",
+      "title": "Gói học lái xe B2 nâng cao",
+      "date": "2024-09-01T08:00:00Z",
+      "status": "completed",
+      "price": 12000000,
+      "instructor": "Lê Văn Tùng",
+      "car": "Toyota Vios 2023",
+      "duration": "40 giờ",
+      "image": "/images/packages/advanced-b2.jpg"
+    },
+    {
+      "id": "booking-005",
+      "type": "car",
+      "title": "Thuê xe VinFast VF5",
+      "date": "2024-10-20T16:00:00Z",
+      "status": "cancelled",
+      "price": 600000,
+      "car": "VinFast VF5",
+      "duration": "3 giờ",
+      "image": "/images/cars/vinfast-vf5.jpg"
+    },
+    {
+      "id": "booking-006",
+      "type": "session",
+      "title": "Buổi học lái xe cơ bản",
+      "date": "2024-08-10T09:00:00Z",
+      "status": "completed",
+      "price": 250000,
+      "instructor": "Phạm Văn Đức",
+      "car": "Honda City 2022",
+      "duration": "2 giờ",
+      "image": "/images/sessions/basic.jpg"
+    }
+  ],
+  "settings": {
+    "notifications": {
+      "email": true,
+      "sms": true,
+      "push": false
+    },
+    "privacy": {
+      "showProfile": true,
+      "showBookingHistory": false
+    }
+  }
+}
