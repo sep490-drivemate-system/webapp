@@ -14,7 +14,11 @@ const MAIN_MENU = [
   { path: "/blogs", label: "Bài viết" },
 ];
 
-function Logo({ sizeClass = "h-12 w-12 sm:h-14 sm:w-14" }: { sizeClass?: string }) {
+function Logo({
+  sizeClass = "h-12 w-12 sm:h-14 sm:w-14",
+}: {
+  sizeClass?: string;
+}) {
   return (
     <Link href="/" className="flex items-center shrink-0">
       <div className={`relative ${sizeClass}`}>
@@ -95,7 +99,7 @@ function UserDropdown() {
         aria-haspopup="true"
         aria-expanded={open}
       >
-        <User className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 hover:text-blue-600 transition-colors" />
+        <User className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 hover:text-shadow-black transition-colors" />
       </button>
       {open && (
         <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border">

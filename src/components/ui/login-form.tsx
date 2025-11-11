@@ -1,25 +1,31 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { FcGoogle } from "react-icons/fc";
-import Link from "next/link"
-import Image from "next/image"
-import bgLogin from "@/../public/bg-login.jpg"
-import { useSignIn } from "@/hooks/auth/useSignIn"
+import Link from "next/link";
+import Image from "next/image";
+import bgLogin from "@/../public/bg-login.jpg";
+import { useSignIn } from "@/hooks/auth/useSignIn";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const { handleSignIn, isLoading, signInData, updateEmailOrPhone, updatePassword } = useSignIn()
+  const {
+    handleSignIn,
+    isLoading,
+    signInData,
+    updateEmailOrPhone,
+    updatePassword,
+  } = useSignIn();
 
   const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    await handleSignIn()
-  }
+    e.preventDefault();
+    await handleSignIn();
+  };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -28,7 +34,10 @@ export function LoginForm({
           <form className="p-6 md:p-8" onSubmit={onSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
-                <Link href="/" className="flex items-center justify-center gap-3">
+                <Link
+                  href="/"
+                  className="flex items-center justify-center gap-3"
+                >
                   <Image
                     src="/logo.png"
                     alt="Logo"
@@ -37,11 +46,8 @@ export function LoginForm({
                     priority
                     className="h-12 w-12 object-contain"
                   />
-                  <h1 className="text-xl font-bold m-0">Drive Mate</h1>
                 </Link>
-                <p >
-                  Đăng nhập vào tài khoản của bạn
-                </p>
+                <p>Đăng nhập vào tài khoản của bạn</p>
               </div>
               <div className="grid gap-3">
                 <Input
@@ -101,11 +107,13 @@ export function LoginForm({
 
               <div className="text-center text-sm text-gray-300">
                 Bạn chưa có tài khoản?{" "}
-                <Link href="/signup" className="underline underline-offset-4 text-white hover:text-gray-300">
+                <Link
+                  href="/signup"
+                  className="underline underline-offset-4 text-white hover:text-gray-300"
+                >
                   Đăng ký
                 </Link>
               </div>
-
             </div>
           </form>
           <div className="bg-muted relative hidden md:block">
@@ -120,5 +128,5 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
