@@ -60,6 +60,11 @@ const data = {
       icon: IconUserCog,
     },
     {
+      title: "Vai trò & Quyền",
+      url: "/management-role",
+      icon: IconUsers,
+    },
+    {
       title: "Quản lý gói thuê",
       url: "/management-package",
       icon: IconPackage,
@@ -78,11 +83,6 @@ const data = {
       title: "Analytics",
       url: "/analytics",
       icon: IconChartBar,
-    },
-    {
-      title: "Team",
-      url: "/dashboard/team",
-      icon: IconUsers,
     },
   ],
   navClouds: [
