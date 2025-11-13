@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 import {
   LineChart,
@@ -23,7 +23,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, Users, Zap } from "lucide-react";
+import { TrendingUp, Users, Zap, Star, StarIcon } from "lucide-react";
 import { useRequireAuth } from "@/hooks/auth/useRequireAuth";
 import { UserRole } from "@/types/auth/user-role.enum";
 
@@ -73,6 +73,12 @@ const revenueData = [
   { month: "Th4", revenue: 61000, commission: 18300 },
   { month: "Th5", revenue: 55000, commission: 16500 },
   { month: "Th6", revenue: 71000, commission: 21300 },
+  { month: "Th7", revenue: 68000, commission: 20400 },
+  { month: "Th8", revenue: 75000, commission: 22500 },
+  { month: "Th9", revenue: 72000, commission: 21600 },
+  { month: "Th10", revenue: 80000, commission: 24000 },
+  { month: "Th11", revenue: 78000, commission: 23400 },
+  { month: "Th12", revenue: 85000, commission: 25500 },
 ];
 
 const topPackages = [
@@ -105,6 +111,14 @@ const changeClassMap: Record<(typeof financialStats)[number]["color"], string> =
     down: "text-destructive",
   };
 
+// Helper function to determine color based on change percentage
+const getChangeColor = (change: string): "up" | "down" | "neutral" => {
+  const changeValue = parseFloat(change.replace(/[+%]/g, ""));
+  if (changeValue > 0) return "up";
+  if (changeValue < 0) return "down";
+  return "neutral";
+};
+
 export default function Page() {
   // useRequireAuth([UserRole.Admin]);
   return <AdminDashboard />;
@@ -112,6 +126,209 @@ export default function Page() {
 
 export function AdminDashboard() {
   const [timeRange, setTimeRange] = useState<TimeRange>("month");
+
+  // Get current date info
+  const now = useMemo(() => new Date(), []);
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth(); // 0-11
+  const daysInCurrentMonth = new Date(
+    currentYear,
+    currentMonth + 1,
+    0
+  ).getDate();
+
+  // Generate filtered data based on timeRange
+  const filteredRevenueData = useMemo(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+
+    switch (timeRange) {
+      case "day": {
+        // Show days in current month
+        return Array.from({ length: daysInCurrentMonth }, (_, i) => {
+          const day = i + 1;
+          // Generate sample data based on day (you can replace with real data)
+          const baseRevenue = 2000 + (day % 7) * 500;
+          const revenue = baseRevenue * 20;
+          const commission = revenue * 0.3;
+          return {
+            month: `Ngày ${day}`,
+            revenue: Math.round(revenue),
+            commission: Math.round(commission),
+          };
+        });
+      }
+      case "month": {
+        // Show months in current year
+        return Array.from({ length: 12 }, (_, i) => {
+          const monthIndex = i;
+          // Use existing revenueData if available, otherwise generate sample data
+          if (i < revenueData.length) {
+            return revenueData[i];
+          }
+          const baseRevenue = 50000 + (monthIndex % 6) * 5000;
+          return {
+            month: `Th${monthIndex + 1}`,
+            revenue: baseRevenue,
+            commission: Math.round(baseRevenue * 0.3),
+          };
+        });
+      }
+      case "quarter": {
+        // Show years: current year and 5 years back (total 6 years)
+        const years = [];
+        const startYear = year - 5;
+
+        for (let y = startYear; y <= year; y++) {
+          // Generate sample data for each year
+          const baseRevenue = 600000 + (y - startYear) * 50000;
+          years.push({
+            month: `${y}`,
+            revenue: baseRevenue,
+            commission: Math.round(baseRevenue * 0.3),
+          });
+        }
+        return years;
+      }
+      default:
+        return revenueData;
+    }
+  }, [timeRange, daysInCurrentMonth]);
+
+  // Filter user stats based on timeRange
+  const filteredUserStats = useMemo(() => {
+    const baseValue =
+      timeRange === "day" ? 100 : timeRange === "month" ? 1000 : 5000;
+    const multiplier =
+      timeRange === "day" ? daysInCurrentMonth : timeRange === "month" ? 12 : 6;
+
+    return userStats.map((stat, index) => {
+      const variation = (index % 3) * 0.1;
+      const value = Math.round(baseValue * multiplier * (1 + variation));
+      const change =
+        timeRange === "day"
+          ? "+15.2%"
+          : timeRange === "month"
+          ? "+12.5%"
+          : "+18.3%";
+      const color = getChangeColor(change);
+      return {
+        ...stat,
+        value,
+        change,
+        color,
+      };
+    });
+  }, [timeRange, daysInCurrentMonth]);
+
+  // Filter financial stats based on timeRange
+  const filteredFinancialStats = useMemo(() => {
+    const baseMultiplier =
+      timeRange === "day" ? daysInCurrentMonth : timeRange === "month" ? 12 : 6;
+
+    return financialStats.map((stat) => {
+      const baseValue =
+        stat.label === "Tổng doanh thu"
+          ? 542350
+          : stat.label === "Tổng chi trả người hướng dẫn"
+          ? 387240
+          : stat.label === "Tổng hoa hồng của hệ thống"
+          ? 155110
+          : 48920;
+      const multiplier =
+        baseMultiplier *
+        (stat.label === "Tổng doanh thu"
+          ? 1
+          : stat.label === "Tổng chi trả người hướng dẫn"
+          ? 0.7
+          : stat.label === "Tổng hoa hồng của hệ thống"
+          ? 0.3
+          : 0.1);
+      const value = Math.round(baseValue * multiplier);
+      const formattedValue = value.toLocaleString("vi-VN") + " VNĐ";
+      const color = getChangeColor(stat.change);
+
+      return {
+        ...stat,
+        value: formattedValue,
+        color,
+      };
+    });
+  }, [timeRange, daysInCurrentMonth]);
+
+  // Filter activity data based on timeRange (percentages remain the same)
+  const filteredActivityData = useMemo(() => {
+    return activityData;
+  }, [timeRange]);
+
+  // Filter top packages based on timeRange
+  const filteredTopPackages = useMemo(() => {
+    const multiplier =
+      timeRange === "day"
+        ? daysInCurrentMonth / 30
+        : timeRange === "month"
+        ? 1
+        : 6;
+    return topPackages.map((pkg) => ({
+      ...pkg,
+      purchases: Math.round(pkg.purchases * multiplier),
+    }));
+  }, [timeRange, daysInCurrentMonth]);
+
+  // Filter top instructors based on timeRange
+  const filteredTopInstructors = useMemo(() => {
+    const multiplier =
+      timeRange === "day"
+        ? daysInCurrentMonth / 30
+        : timeRange === "month"
+        ? 1
+        : 6;
+    return topInstructors.map((instructor) => ({
+      ...instructor,
+      sessions: Math.round(instructor.sessions * multiplier),
+    }));
+  }, [timeRange, daysInCurrentMonth]);
+
+  // Filter top vehicles based on timeRange
+  const filteredTopVehicles = useMemo(() => {
+    const multiplier =
+      timeRange === "day"
+        ? daysInCurrentMonth / 30
+        : timeRange === "month"
+        ? 1
+        : 6;
+    return topVehicles.map((vehicle) => ({
+      ...vehicle,
+      rentals: Math.round(vehicle.rentals * multiplier),
+    }));
+  }, [timeRange, daysInCurrentMonth]);
+
+  // Get dynamic description text
+  const getDescriptionText = () => {
+    switch (timeRange) {
+      case "day":
+        return `Tổng quan hoạt động hệ thống trong ${daysInCurrentMonth} ngày của tháng hiện tại`;
+      case "month":
+        return "Tổng quan hoạt động hệ thống trong 12 tháng của năm hiện tại";
+      case "quarter":
+        return "Tổng quan hoạt động hệ thống trong 6 năm vừa qua";
+      default:
+        return "Tổng quan hoạt động hệ thống";
+    }
+  };
+
+  const getTimeRangeDescription = () => {
+    switch (timeRange) {
+      case "day":
+        return "Theo ngày";
+      case "month":
+        return "Theo tháng";
+      case "quarter":
+        return "Theo năm";
+      default:
+        return "Theo tháng";
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -123,7 +340,7 @@ export function AdminDashboard() {
                 Dashboard Admin
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Tổng quan hoạt động hệ thống
+                {getDescriptionText()}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -139,7 +356,7 @@ export function AdminDashboard() {
                     ? "Ngày"
                     : range === "month"
                     ? "Tháng"
-                    : "Quý"}
+                    : "Năm"}
                 </Button>
               ))}
             </div>
@@ -153,7 +370,7 @@ export function AdminDashboard() {
             Thống Kê Người Dùng
           </h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            {userStats.map((stat) => (
+            {filteredUserStats.map((stat) => (
               <Card key={stat.label} className="bg-card">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -164,7 +381,9 @@ export function AdminDashboard() {
                   <div className="text-3xl font-bold text-foreground">
                     {stat.value}
                   </div>
-                  <p className="mt-2 text-sm text-primary">{stat.change}</p>
+                  <p className={`mt-2 text-sm ${changeClassMap[stat.color]}`}>
+                    {stat.change}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -176,7 +395,7 @@ export function AdminDashboard() {
             Thống Kê Tài Chính
           </h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {financialStats.map((stat) => (
+            {filteredFinancialStats.map((stat) => (
               <Card key={stat.label} className="flex h-full flex-col bg-card">
                 <CardHeader className="flex min-h-[72px] flex-col justify-center pb-3">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -209,7 +428,7 @@ export function AdminDashboard() {
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
-                    data={activityData}
+                    data={filteredActivityData}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
@@ -217,7 +436,7 @@ export function AdminDashboard() {
                     paddingAngle={2}
                     dataKey="value"
                   >
-                    {activityData.map((entry, index) => (
+                    {filteredActivityData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
@@ -231,7 +450,7 @@ export function AdminDashboard() {
                 </PieChart>
               </ResponsiveContainer>
               <div className="mt-4 space-y-2">
-                {activityData.map((item) => (
+                {filteredActivityData.map((item) => (
                   <div
                     key={item.name}
                     className="flex items-center justify-between text-sm"
@@ -258,44 +477,55 @@ export function AdminDashboard() {
                 <TrendingUp className="h-5 w-5 text-primary" />
                 Dòng Tiền & Doanh Thu
               </CardTitle>
-              <CardDescription>Theo tháng</CardDescription>
+              <CardDescription>{getTimeRangeDescription()}</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={revenueData}>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="hsl(var(--border))"
-                  />
-                  <XAxis
-                    dataKey="month"
-                    stroke="hsl(var(--muted-foreground))"
-                  />
-                  <YAxis stroke="hsl(var(--muted-foreground))" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      color: "hsl(var(--foreground))",
-                    }}
-                  />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="revenue"
-                    stroke="rgb(26, 213, 98)"
-                    strokeWidth={2}
-                    name="Doanh Thu"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="commission"
-                    stroke="#3b82f6"
-                    strokeWidth={2}
-                    name="Hoa Hồng"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              <div className="w-full overflow-x-auto">
+                <div
+                  style={{
+                    minWidth: Math.max(600, filteredRevenueData.length * 60),
+                  }}
+                >
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={filteredRevenueData}>
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="hsl(var(--border))"
+                      />
+                      <XAxis
+                        dataKey="month"
+                        stroke="hsl(var(--muted-foreground))"
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
+                      />
+                      <YAxis stroke="hsl(var(--muted-foreground))" />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--card))",
+                          border: "1px solid hsl(var(--border))",
+                          color: "hsl(var(--foreground))",
+                        }}
+                      />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="revenue"
+                        stroke="rgb(26, 213, 98)"
+                        strokeWidth={2}
+                        name="Doanh Thu"
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="commission"
+                        stroke="#3b82f6"
+                        strokeWidth={2}
+                        name="Hoa Hồng"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -311,7 +541,7 @@ export function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {topPackages.map((pkg, idx) => (
+                {filteredTopPackages.map((pkg, idx) => (
                   <div
                     key={idx}
                     className="flex items-start justify-between border-b border-border pb-3 last:border-0"
@@ -323,8 +553,13 @@ export function AdminDashboard() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-semibold text-primary">
-                        ★ {pkg.rating}
+                      <div className="flex items-center gap-1 text-sm font-semibold">
+                        <Star
+                          fill="#FDCC0D"
+                          className="h-4 w-4"
+                          style={{ color: "#FDCC0D" }}
+                        />
+                        <span style={{ color: "#DC0A21" }}>{pkg.rating}</span>
                       </div>
                     </div>
                   </div>
@@ -343,7 +578,7 @@ export function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {topInstructors.map((instructor, idx) => (
+                {filteredTopInstructors.map((instructor, idx) => (
                   <div
                     key={idx}
                     className="flex items-start justify-between border-b border-border pb-3 last:border-0"
@@ -357,8 +592,15 @@ export function AdminDashboard() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-semibold text-primary">
-                        ★ {instructor.rating}
+                      <div className="flex items-center gap-1 text-sm font-semibold">
+                        <Star
+                          fill="#FDCC0D"
+                          className="h-4 w-4"
+                          style={{ color: "#FDCC0D" }}
+                        />
+                        <span style={{ color: "#DC0A21" }}>
+                          {instructor.rating}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -377,7 +619,7 @@ export function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {topVehicles.map((vehicle, idx) => (
+                {filteredTopVehicles.map((vehicle, idx) => (
                   <div
                     key={idx}
                     className="flex items-start justify-between border-b border-border pb-3 last:border-0"
@@ -391,8 +633,15 @@ export function AdminDashboard() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-semibold text-primary">
-                        ★ {vehicle.rating}
+                      <div className="flex items-center gap-1 text-sm font-semibold">
+                        <StarIcon
+                          fill="#FDCC0D"
+                          className="h-4 w-4"
+                          style={{ color: "#FDCC0D" }}
+                        />
+                        <span style={{ color: "#DC0A21" }}>
+                          {vehicle.rating}
+                        </span>
                       </div>
                     </div>
                   </div>
