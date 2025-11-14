@@ -30,6 +30,68 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#F0F8FF]`}
       >
         <Providers>{children}</Providers>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                function hideDevOverlay() {
+                  // Hide Next.js dev overlay elements
+                  const selectors = [
+                    '[data-nextjs-dialog]',
+                    '[data-nextjs-toast]',
+                    '#__next-build-watcher',
+                    'nextjs-portal',
+                    'body > div[style*="position: fixed"][style*="bottom"]',
+                    'body > div[style*="position: fixed"][style*="right"]'
+                  ];
+                  
+                  selectors.forEach(selector => {
+                    const elements = document.querySelectorAll(selector);
+                    elements.forEach(el => {
+                      if (el) {
+                        el.style.display = 'none';
+                        el.style.visibility = 'hidden';
+                        el.style.opacity = '0';
+                        el.style.pointerEvents = 'none';
+                      }
+                    });
+                  });
+                  
+                  // Hide any fixed positioned divs that might be the dev indicator
+                  const allDivs = document.querySelectorAll('body > div');
+                  allDivs.forEach(div => {
+                    const style = window.getComputedStyle(div);
+                    if (style.position === 'fixed' && 
+                        (style.bottom !== 'auto' || style.right !== 'auto') &&
+                        div.offsetWidth < 100 && div.offsetHeight < 100) {
+                      div.style.display = 'none';
+                    }
+                  });
+                }
+                
+                // Run immediately
+                hideDevOverlay();
+                
+                // Run after DOM is ready
+                if (document.readyState === 'loading') {
+                  document.addEventListener('DOMContentLoaded', hideDevOverlay);
+                }
+                
+                // Run after a short delay to catch late-loading elements
+                setTimeout(hideDevOverlay, 100);
+                setTimeout(hideDevOverlay, 500);
+                setTimeout(hideDevOverlay, 1000);
+                
+                // Use MutationObserver to catch dynamically added elements
+                const observer = new MutationObserver(hideDevOverlay);
+                observer.observe(document.body, {
+                  childList: true,
+                  subtree: true
+                });
+              })();
+            `,
+          }}
+        />
       </body>
     </html>
   );

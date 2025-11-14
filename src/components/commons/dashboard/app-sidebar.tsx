@@ -2,20 +2,26 @@
 
 import * as React from "react";
 import {
+  IconBell,
+  IconCalendar,
   IconCamera,
   IconChartBar,
   IconDashboard,
   IconDatabase,
+  IconFile,
   IconFileAi,
   IconFileDescription,
   IconFileWord,
   IconFolder,
   IconHelp,
+  IconHistory,
   IconInnerShadowTop,
   IconListDetails,
   IconReport,
   IconSearch,
   IconSettings,
+  IconStar,
+  IconStarFilled,
   IconUsers,
 } from "@tabler/icons-react";
 import { IconUserCog } from "@tabler/icons-react";
@@ -26,6 +32,7 @@ import { IconUsersGroup } from "@tabler/icons-react";
 import { IconCar } from "@tabler/icons-react";
 import { NavDocuments } from "@/components/commons/dashboard/nav-documents";
 import { NavMain } from "@/components/commons/dashboard/nav-main";
+import { NavInstructor } from "@/components/commons/dashboard/nav-instructor";
 import { NavSecondary } from "@/components/commons/dashboard/nav-secondary";
 import { NavUser } from "@/components/commons/dashboard/nav-user";
 import {
@@ -40,7 +47,13 @@ import {
 import Link from "next/link";
 import { getUserRole } from "@/lib/jwt/jwt.utils";
 import { UserRole } from "@/types/auth/user-role.enum";
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const data = {
   user: {
@@ -172,37 +185,106 @@ const data = {
       icon: IconFileWord,
     },
   ],
+
+  navInstructor: [
+    {
+      name: "Tổng quan",
+      url: "/overview",
+      icon: IconDashboard,
+    },
+
+    {
+      name: "Lịch làm việc",
+      url: "/schedule-management",
+      icon: IconCalendar,
+    },
+    {
+      name: "Quản lý xe học lái",
+      url: "/",
+      icon: IconCar,
+    },
+    {
+      name: "Quản lý buổi huấn luyện",
+      url: "/",
+      icon: IconPackage,
+    },
+    {
+      name: "Thông báo",
+      url: "/",
+      icon: IconBell,
+    },
+    {
+      name: "Lịch sử giao dịch",
+      url: "/",
+      icon: IconHistory,
+    },
+    {
+      name: "Đánh giá",
+      url: "/",
+      icon: IconStar,
+    },
+    {
+      name: "Giấy tờ tùy thân",
+      url: "/",
+      icon: IconFile,
+    },
+  ],
 };
+
+const DEV_ROLE_OVERRIDE_KEY = "dev_role_override";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [userRole, setUserRole] = React.useState<UserRole | null>(null);
 
   React.useEffect(() => {
-    // Get user role from JWT token
-    const role = getUserRole();
-    setUserRole(role);
+    // Check for dev role override first, then fall back to JWT token
+    const overrideRole = localStorage.getItem(DEV_ROLE_OVERRIDE_KEY);
+    if (overrideRole !== null) {
+      const role = parseInt(overrideRole, 10) as UserRole;
+      setUserRole(role);
+    } else {
+      // Get user role from JWT token
+      const role = getUserRole();
+      setUserRole(role);
+    }
   }, []);
+
+  const handleRoleChange = (role: string) => {
+    const roleValue = parseInt(role, 10) as UserRole;
+    localStorage.setItem(DEV_ROLE_OVERRIDE_KEY, role);
+    setUserRole(roleValue);
+  };
 
   // Filter navigation items based on user role
   const getFilteredNavItems = () => {
     if (userRole === UserRole.Admin) {
-      // Admin has access to all navigation items
+      // Admin only has access to NavMain
       return {
         navMain: data.navMain,
-        documents: data.documents
+        documents: [],
+        navInstructor: [],
       };
     } else if (userRole === UserRole.Inspector) {
       // Inspector only has access to NavDocuments
       return {
-        navMain: [], // No access to main navigation
-        documents: data.documents
+        navMain: [],
+        documents: data.documents,
+        navInstructor: [],
+      };
+    } else if (userRole === UserRole.Instructor) {
+      // Instructor only has access to NavInstructor
+      return {
+        navMain: [],
+        documents: [],
+        navInstructor: data.navInstructor,
       };
     } else {
       // For development or when no role is set, show all items
       // In production, you might want to redirect to login instead
       return {
         navMain: data.navMain,
-        documents: data.documents
+        documents: data.documents,
+        navInstructor: data.navInstructor,
       };
     }
   };
@@ -219,8 +301,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <Link href="#">
-                <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">DriveMate</span>
+                <IconChartBar className="!size-5 text-[#1AD562]" />
+                <span className="text-base font-semibold text-[#1AD562]">
+                  DriveMate System
+                </span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -228,19 +312,42 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         {/* Show NavMain only for Admin */}
-        {/* {filteredNav.navMain.length > 0 && (
-         
-        )} */}
-        <NavMain items={filteredNav.navMain} />
-        {/* Show NavDocuments for Admin and Inspector */}
-        {/* {filteredNav.documents.length > 0 && (
-        
-        )} */}
-        <NavDocuments items={filteredNav.documents} />
+        {userRole === UserRole.Admin && <NavMain items={filteredNav.navMain} />}
+        {/* Show NavDocuments only for Inspector */}
+        {userRole === UserRole.Inspector && (
+          <NavDocuments items={filteredNav.documents} />
+        )}
+        {/* Show NavInstructor only for Instructor */}
+        {userRole === UserRole.Instructor && (
+          <NavInstructor items={filteredNav.navInstructor} />
+        )}
         {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
+        {/* Role Switcher for Development */}
+        <div className="px-2 py-2 border-t">
+          <div className="px-2 py-1 text-xs text-muted-foreground mb-1">
+            Dev: Switch Role
+          </div>
+          <Select
+            value={userRole?.toString() || ""}
+            onValueChange={handleRoleChange}
+          >
+            <SelectTrigger className="w-full h-8 text-xs">
+              <SelectValue placeholder="Select Role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={UserRole.Admin.toString()}>Admin</SelectItem>
+              <SelectItem value={UserRole.Inspector.toString()}>
+                Inspector
+              </SelectItem>
+              <SelectItem value={UserRole.Instructor.toString()}>
+                Instructor
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </SidebarFooter>
     </Sidebar>
   );

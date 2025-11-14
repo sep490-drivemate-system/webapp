@@ -209,3 +209,25 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 }
+
+/* Hide Next.js dev overlay/indicator */
+#__next-build-watcher,
+[data-nextjs-dialog],
+[data-nextjs-toast],
+nextjs-portal,
+body > div[style*="position: fixed"][style*="bottom"],
+body > div[style*="position: fixed"][style*="right"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Hide Next.js dev indicator button/logo */
+body > div[data-nextjs-toast],
+body > div[role="dialog"][data-nextjs-dialog],
+iframe[src*="__nextjs"],
+div[class*="nextjs"],
+div[id*="__next"] > div[style*="position: fixed"]:last-child {
+  display: none !important;
+}

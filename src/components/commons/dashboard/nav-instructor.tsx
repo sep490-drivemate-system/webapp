@@ -1,9 +1,8 @@
 "use client";
 
-import { IconCirclePlusFilled, IconMail, type Icon } from "@tabler/icons-react";
+import { type Icon } from "@tabler/icons-react";
 import { usePathname } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -14,11 +13,11 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 
-export function NavMain({
+export function NavInstructor({
   items,
 }: {
   items: {
-    title: string;
+    name: string;
     url: string;
     icon?: Icon;
   }[];
@@ -27,22 +26,22 @@ export function NavMain({
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Quản trị viên</SidebarGroupLabel>
+      <SidebarGroupLabel>Người hướng dẫn</SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2"></SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
           {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
+            <SidebarMenuItem key={item.name}>
               <SidebarMenuButton
-                tooltip={item.title}
+                tooltip={item.name}
                 isActive={pathname === item.url}
                 asChild
               >
                 <Link href={item.url}>
                   {item.icon && <item.icon />}
-                  <span>{item.title}</span>
+                  <span>{item.name}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
