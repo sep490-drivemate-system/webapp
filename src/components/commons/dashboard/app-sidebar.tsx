@@ -2,20 +2,26 @@
 
 import * as React from "react";
 import {
+  IconBell,
+  IconCalendar,
   IconCamera,
   IconChartBar,
   IconDashboard,
   IconDatabase,
+  IconFile,
   IconFileAi,
   IconFileDescription,
   IconFileWord,
   IconFolder,
   IconHelp,
+  IconHistory,
   IconInnerShadowTop,
   IconListDetails,
   IconReport,
   IconSearch,
   IconSettings,
+  IconStar,
+  IconStarFilled,
   IconUsers,
 } from "@tabler/icons-react";
 import { IconUserCog } from "@tabler/icons-react";
@@ -184,12 +190,43 @@ const data = {
     {
       name: "Tổng quan",
       url: "/overview",
-      icon: IconUsersGroup,
+      icon: IconDashboard,
+    },
+
+    {
+      name: "Lịch làm việc",
+      url: "/",
+      icon: IconCalendar,
     },
     {
-      name: "Quản lý khách hàng",
-      url: "/management-instructor",
-      icon: IconUsersGroup,
+      name: "Quản lý xe học lái",
+      url: "/",
+      icon: IconCar,
+    },
+    {
+      name: "Quản lý buổi huấn luyện",
+      url: "/",
+      icon: IconPackage,
+    },
+    {
+      name: "Thông báo",
+      url: "/",
+      icon: IconBell,
+    },
+    {
+      name: "Lịch sử giao dịch",
+      url: "/",
+      icon: IconHistory,
+    },
+    {
+      name: "Đánh giá",
+      url: "/",
+      icon: IconStar,
+    },
+    {
+      name: "Giấy tờ tùy thân",
+      url: "/",
+      icon: IconFile,
     },
   ],
 };
