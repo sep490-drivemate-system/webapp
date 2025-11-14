@@ -195,7 +195,7 @@ const data = {
 
     {
       name: "Lịch làm việc",
-      url: "/",
+      url: "/schedule-management",
       icon: IconCalendar,
     },
     {
@@ -301,8 +301,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <Link href="#">
-                <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">DriveMate</span>
+                <IconChartBar className="!size-5 text-[#1AD562]" />
+                <span className="text-base font-semibold text-[#1AD562]">
+                  DriveMate System
+                </span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
