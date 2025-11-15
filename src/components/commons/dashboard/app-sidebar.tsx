@@ -200,7 +200,7 @@ const data = {
     },
     {
       name: "Quản lý xe học lái",
-      url: "/",
+      url: "/car-management",
       icon: IconCar,
     },
     {

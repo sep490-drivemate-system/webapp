@@ -34,10 +34,13 @@ export function NavInstructor({
         <SidebarMenu>
           {items.map((item) => {
             // Special handling for "Lịch làm việc" to keep it active on both /schedule-management and /schedule-detail
+            // Special handling for "Quản lý xe học lái" to keep it active on both /car-management and /car-upload
             const isActive =
               item.url === "/schedule-management"
                 ? pathname === "/schedule-management" ||
                   pathname === "/schedule-detail"
+                : item.url === "/car-management"
+                ? pathname === "/car-management" || pathname === "/car-upload"
                 : pathname === item.url;
 
             return (
