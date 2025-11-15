@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   Calendar,
@@ -438,7 +439,7 @@ function ScheduleCalendar({
           >
             <span>{dayNumber}</span>
 
-            <div className="flex items-center justify-center gap-1 mt-1 h-1.5">
+            <div className="flex items-center justify-center gap-1 mt-0.5 h-1.5">
               {hasBookings && (
                 <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
               )}
@@ -580,10 +581,10 @@ function ScheduleBookingList({
 }
 
 function UpdateScheduleButton() {
-  const handleClick = () => {
-    // Add navigation or modal logic here
+  const router = useRouter();
 
-    console.log("Update schedule clicked");
+  const handleClick = () => {
+    router.push("/schedule-detail");
   };
 
   return (
@@ -593,7 +594,7 @@ function UpdateScheduleButton() {
     >
       <SquarePen size={18} />
 
-      <span>Cập nhật lịch</span>
+      <span>Cập nhật lịch bận</span>
     </button>
   );
 }
@@ -631,7 +632,7 @@ export default function SchedulePage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <main className="min-h-screen">
       <div className="container mx-auto px-4 py-8">
         {/* Header with Update Button */}
 

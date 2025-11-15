@@ -32,20 +32,29 @@ export function NavInstructor({
           <SidebarMenuItem className="flex items-center gap-2"></SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.name}>
-              <SidebarMenuButton
-                tooltip={item.name}
-                isActive={pathname === item.url}
-                asChild
-              >
-                <Link href={item.url}>
-                  {item.icon && <item.icon />}
-                  <span>{item.name}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {items.map((item) => {
+            // Special handling for "Lịch làm việc" to keep it active on both /schedule-management and /schedule-detail
+            const isActive =
+              item.url === "/schedule-management"
+                ? pathname === "/schedule-management" ||
+                  pathname === "/schedule-detail"
+                : pathname === item.url;
+
+            return (
+              <SidebarMenuItem key={item.name}>
+                <SidebarMenuButton
+                  tooltip={item.name}
+                  isActive={isActive}
+                  asChild
+                >
+                  <Link href={item.url}>
+                    {item.icon && <item.icon />}
+                    <span>{item.name}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
