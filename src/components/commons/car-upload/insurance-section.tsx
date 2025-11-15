@@ -51,7 +51,7 @@ export default function InsuranceSection({
         {/* Dates */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <Label htmlFor="inspIssuedDate" className="text-foreground">
+            <Label htmlFor="inspIssuedDate" className="text-foreground pb-2">
               Ngày Cấp
             </Label>
             <Input
@@ -63,7 +63,7 @@ export default function InsuranceSection({
             />
           </div>
           <div>
-            <Label htmlFor="inspExpiryDate" className="text-foreground">
+            <Label htmlFor="inspExpiryDate" className="text-foreground pb-2">
               Ngày Hết Hạn
             </Label>
             <Input

@@ -65,12 +65,12 @@ export default function RegistrationSection({
 
         {/* Owner Info */}
         <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-foreground">
+          <h3 className="text-md font-semibold text-foreground">
             Thông Tin Chủ Sở Hữu
           </h3>
           <div className="space-y-3">
             <div>
-              <Label htmlFor="ownerName" className="text-foreground">
+              <Label htmlFor="ownerName" className="text-foreground pb-2">
                 Họ và Tên
               </Label>
               <Input
@@ -82,7 +82,7 @@ export default function RegistrationSection({
               />
             </div>
             <div>
-              <Label htmlFor="licensePlate" className="text-foreground">
+              <Label htmlFor="licensePlate" className="text-foreground pb-2">
                 Biển Số Xe
               </Label>
               <Input
@@ -100,12 +100,12 @@ export default function RegistrationSection({
 
         {/* Vehicle Details */}
         <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-foreground">
+          <h3 className="text-md font-semibold text-foreground">
             Thông Tin Xe
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="brand" className="text-foreground">
+              <Label htmlFor="brand" className="text-foreground pb-2">
                 Tên Hãng Xe
               </Label>
               <Input
@@ -117,7 +117,7 @@ export default function RegistrationSection({
               />
             </div>
             <div>
-              <Label htmlFor="model" className="text-foreground">
+              <Label htmlFor="model" className="text-foreground pb-2">
                 Tên Mẫu Xe
               </Label>
               <Input
@@ -129,7 +129,7 @@ export default function RegistrationSection({
               />
             </div>
             <div>
-              <Label htmlFor="color" className="text-foreground">
+              <Label htmlFor="color" className="text-foreground pb-2">
                 Màu Xe
               </Label>
               <Input
@@ -141,7 +141,7 @@ export default function RegistrationSection({
               />
             </div>
             <div>
-              <Label htmlFor="seats" className="text-foreground">
+              <Label htmlFor="seats" className="text-foreground pb-2">
                 Số Chỗ Ngồi
               </Label>
               <Input
@@ -159,7 +159,7 @@ export default function RegistrationSection({
         {/* Fuel & Date */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <Label htmlFor="issuedDate" className="text-foreground">
+            <Label htmlFor="issuedDate" className="text-foreground pb-2">
               Ngày Cấp
             </Label>
             <Input
@@ -173,7 +173,7 @@ export default function RegistrationSection({
 
           {/* Fuel Type Dropdown */}
           <div>
-            <Label htmlFor="fuelType" className="text-foreground">
+            <Label htmlFor="fuelType" className="text-foreground pb-2">
               Loại Nhiên Liệu
             </Label>
             <div className="relative">

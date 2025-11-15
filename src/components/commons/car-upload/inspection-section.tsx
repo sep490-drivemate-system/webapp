@@ -51,7 +51,7 @@ export default function InspectionSection({
         {/* Dates */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <Label htmlFor="insIssuedDate" className="text-foreground">
+            <Label htmlFor="insIssuedDate" className="text-foreground pb-2">
               Ngày Cấp
             </Label>
             <Input
@@ -63,7 +63,7 @@ export default function InspectionSection({
             />
           </div>
           <div>
-            <Label htmlFor="insExpiryDate" className="text-foreground">
+            <Label htmlFor="insExpiryDate" className="text-foreground pb-2">
               Ngày Hết Hạn
             </Label>
             <Input

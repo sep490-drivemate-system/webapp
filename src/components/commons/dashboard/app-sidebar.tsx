@@ -205,7 +205,7 @@ const data = {
     },
     {
       name: "Quản lý buổi huấn luyện",
-      url: "/",
+      url: "/driving-session-management",
       icon: IconPackage,
     },
     {
