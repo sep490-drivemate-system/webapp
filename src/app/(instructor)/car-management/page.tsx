@@ -142,7 +142,7 @@ function VehicleCard({ vehicle, onDetail, onDelete }: VehicleCardProps) {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <Card className="overflow-hidden transition-shadow hover:shadow-md">
+    <Card className="overflow-hidden transition-shadow hover:shadow-md pt-0">
       <div className="relative h-48 w-full bg-muted">
         <div className="absolute right-3 top-3 z-10">
           <Badge

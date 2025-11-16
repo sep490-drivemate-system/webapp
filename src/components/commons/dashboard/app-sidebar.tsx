@@ -17,6 +17,7 @@ import {
   IconHistory,
   IconInnerShadowTop,
   IconListDetails,
+  IconNavigation,
   IconReport,
   IconSearch,
   IconSettings,
@@ -204,9 +205,14 @@ const data = {
       icon: IconCar,
     },
     {
+      name: "Quản lý gói dịch vụ",
+      url: "/service-package-management",
+      icon: IconPackage,
+    },
+    {
       name: "Quản lý buổi huấn luyện",
       url: "/driving-session-management",
-      icon: IconPackage,
+      icon: IconNavigation,
     },
     {
       name: "Thông báo",

@@ -346,7 +346,7 @@ function UpdateScheduleCalendar({
         <div className="flex items-center gap-3">
           <div className="w-3 h-3 rounded-full bg-green-400"></div>
 
-          <span className="text-slate-600">Ngày đã được khách book</span>
+          <span className="text-slate-600">Ngày đã được khách đặt lịch</span>
         </div>
 
         <div className="flex items-center gap-3">
