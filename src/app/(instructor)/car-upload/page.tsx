@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -13,6 +15,7 @@ import DocumentForm from "@/components/commons/car-upload/document-form";
 import BulkUploadForm from "@/components/commons/car-upload/bulk-upload-form";
 
 export default function CarUploadPage() {
+  const router = useRouter();
   const [uploadStatus, setUploadStatus] = useState<
     "idle" | "success" | "error"
   >("idle");
@@ -33,17 +36,25 @@ export default function CarUploadPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <section>
+      <section className="space-y-3">
         <Card className="rounded-2xl border bg-white p-6 shadow-sm">
           <CardHeader>
-            <div className="space-y-2">
-              <CardTitle className="text-2xl">
-                Hệ Thống Upload Tài Liệu Xe
-              </CardTitle>
-              <CardDescription>
-                Upload giấy đăng kiểm xe, bảo hiểm, giấy đăng ký và ảnh xác thực
-                xe của bạn
-              </CardDescription>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => router.back()}
+                className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-600" />
+              </button>
+              <div className="space-y-1">
+                <CardTitle className="text-2xl text-foreground">
+                  Tải Lên Tài Liệu Xe
+                </CardTitle>
+                <CardDescription className="text-sm text-muted-foreground">
+                  Tải lên giấy đăng kiểm xe, bảo hiểm, giấy đăng ký và ảnh xác
+                  thực xe của bạn
+                </CardDescription>
+              </div>
             </div>
           </CardHeader>
         </Card>
@@ -76,8 +87,8 @@ export default function CarUploadPage() {
       <section>
         <Tabs defaultValue="form" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="form">Nhập Liệu Thủ Công</TabsTrigger>
-            <TabsTrigger value="bulk">Upload Hàng Loạt (JSON)</TabsTrigger>
+            <TabsTrigger value="form">Tải Lên Thủ Công</TabsTrigger>
+            <TabsTrigger value="bulk">Tải Lên Hàng Loạt (JSON)</TabsTrigger>
           </TabsList>
 
           <TabsContent value="form" className="space-y-6 mt-6">

@@ -97,25 +97,25 @@ export default function DocumentForm({
         <TabsList className="grid w-full grid-cols-4 bg-secondary">
           <TabsTrigger
             value="inspection"
-            className="text-sm text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            className="text-sm text-foreground data-[state=active]:bg-emerald-600 data-[state=active]:text-primary-foreground"
           >
             Đăng Kiểm
           </TabsTrigger>
           <TabsTrigger
             value="insurance"
-            className="text-sm text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            className="text-sm text-foreground data-[state=active]:bg-emerald-600 data-[state=active]:text-primary-foreground"
           >
             Bảo Hiểm
           </TabsTrigger>
           <TabsTrigger
             value="registration"
-            className="text-sm text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            className="text-sm text-foreground data-[state=active]:bg-emerald-600 data-[state=active]:text-primary-foreground"
           >
             Đăng Ký
           </TabsTrigger>
           <TabsTrigger
             value="verification"
-            className="text-sm text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            className="text-sm text-foreground data-[state=active]:bg-emerald-600 data-[state=active]:text-primary-foreground"
           >
             Xác Thực
           </TabsTrigger>
@@ -165,7 +165,7 @@ export default function DocumentForm({
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground"
+          className="bg-emerald-600 hover:bg-emerald-700 text-primary-foreground"
         >
           {isSubmitting ? "Đang Tải Lên..." : "Gửi Toàn Bộ Tài Liệu"}
         </Button>

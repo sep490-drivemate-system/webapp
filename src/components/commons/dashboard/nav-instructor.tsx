@@ -35,12 +35,16 @@ export function NavInstructor({
           {items.map((item) => {
             // Special handling for "Lịch làm việc" to keep it active on both /schedule-management and /schedule-detail
             // Special handling for "Quản lý xe học lái" to keep it active on both /car-management and /car-upload
+            // Special handling for "Quản lý gói dịch vụ" to keep it active on both /service-package-management and /service-package-detail
             const isActive =
               item.url === "/schedule-management"
                 ? pathname === "/schedule-management" ||
                   pathname === "/schedule-detail"
                 : item.url === "/car-management"
                 ? pathname === "/car-management" || pathname === "/car-upload"
+                : item.url === "/service-package-management"
+                ? pathname === "/service-package-management" ||
+                  pathname === "/service-package-detail"
                 : pathname === item.url;
 
             return (

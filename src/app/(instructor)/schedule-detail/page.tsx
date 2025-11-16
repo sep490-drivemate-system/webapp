@@ -11,7 +11,14 @@ import {
   X,
   Check,
   Calendar,
+  ArrowLeft,
 } from "lucide-react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 
 interface BookingItem {
   id: string;
@@ -594,28 +601,31 @@ export default function UpdateSchedulePage() {
   };
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={handleBack}
-            className="p-2 hover:bg-white rounded-lg transition-colors"
-          >
-            <ChevronLeft size={24} className="text-slate-600" />
-          </button>
-
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">
-              Cập Nhật Lịch Bận
-            </h1>
-
-            <p className="text-slate-600 mt-1">
-              Chọn những ngày bạn không thể làm việc
-            </p>
-          </div>
-        </div>
+        <section className="space-y-3 mb-8">
+          <Card className="rounded-2xl border bg-white p-6 shadow-sm">
+            <CardHeader>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={handleBack}
+                  className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <ArrowLeft className="w-5 h-5 text-gray-600" />
+                </button>
+                <div className="space-y-1">
+                  <CardTitle className="text-2xl text-foreground">
+                    Cập Nhật Lịch Bận
+                  </CardTitle>
+                  <CardDescription className="text-sm text-muted-foreground">
+                    Chọn những ngày bạn không thể làm việc
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
+        </section>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Calendar Section */}
