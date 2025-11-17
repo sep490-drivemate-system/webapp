@@ -231,7 +231,7 @@ const data = {
     },
     {
       name: "Giấy tờ tùy thân",
-      url: "/",
+      url: "/identification-document-management",
       icon: IconFile,
     },
   ],

@@ -33,20 +33,31 @@ export function NavMain({
           <SidebarMenuItem className="flex items-center gap-2"></SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton
-                tooltip={item.title}
-                isActive={pathname === item.url}
-                asChild
-              >
-                <Link href={item.url}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {items.map((item) => {
+            const isIdentificationDocumentNav =
+              item.url === "/identification-document-management";
+            const isActive = isIdentificationDocumentNav
+              ? [
+                  "/identification-document-management",
+                  "/identification-document-upload",
+                ].includes(pathname)
+              : pathname === item.url;
+
+            return (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
+                  tooltip={item.title}
+                  isActive={isActive}
+                  asChild
+                >
+                  <Link href={item.url}>
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

@@ -1,0 +1,176 @@
+"use client";
+
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import ImageUploadField from "../image-upload-field";
+
+export default function CitizenIdSection() {
+  const [formData, setFormData] = useState({
+    frontImage: "" as string,
+    backImage: "" as string,
+    citizenIdNumber: "",
+    issuedDate: "",
+    expiredDate: "",
+    issuedPlace: "",
+    permanentAddress: "",
+    gender: "",
+    dateOfBirth: "",
+  });
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleImageUpload = (field: string, base64: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: base64,
+    }));
+  };
+
+  return (
+    <Card className="border border-slate-200 dark:border-slate-700">
+      <CardHeader>
+        <CardTitle className="text-foreground">Căn Cước Công Dân</CardTitle>
+      </CardHeader>
+
+      <CardContent className="pt-6 space-y-6">
+        {/* Images */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <ImageUploadField
+            label="Ảnh Mặt Trước"
+            onUpload={(base64: string) =>
+              handleImageUpload("frontImage", base64)
+            }
+            preview={formData.frontImage}
+          />
+          <ImageUploadField
+            label="Ảnh Mặt Sau"
+            onUpload={(base64: string) =>
+              handleImageUpload("backImage", base64)
+            }
+            preview={formData.backImage}
+          />
+        </div>
+
+        {/* Form Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              Số Căn Cước Công Dân <span className="text-red-500">*</span>
+            </label>
+            <Input
+              type="text"
+              placeholder="Nhập số CCCD"
+              value={formData.citizenIdNumber}
+              onChange={(e) =>
+                handleInputChange("citizenIdNumber", e.target.value)
+              }
+              className="border-slate-300 dark:border-slate-600"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              Giới Tính <span className="text-red-500">*</span>
+            </label>
+            <Select
+              value={formData.gender}
+              onValueChange={(value) => handleInputChange("gender", value)}
+            >
+              <SelectTrigger className="border-slate-300 dark:border-slate-600">
+                <SelectValue placeholder="Chọn giới tính" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="male">Nam</SelectItem>
+                <SelectItem value="female">Nữ</SelectItem>
+                <SelectItem value="other">Khác</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              Ngày Sinh <span className="text-red-500">*</span>
+            </label>
+            <Input
+              type="date"
+              value={formData.dateOfBirth}
+              onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
+              className="border-slate-300 dark:border-slate-600"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              Ngày Cấp <span className="text-red-500">*</span>
+            </label>
+            <Input
+              type="date"
+              value={formData.issuedDate}
+              onChange={(e) => handleInputChange("issuedDate", e.target.value)}
+              className="border-slate-300 dark:border-slate-600"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              Ngày Hết Hạn <span className="text-red-500">*</span>
+            </label>
+            <Input
+              type="date"
+              value={formData.expiredDate}
+              onChange={(e) => handleInputChange("expiredDate", e.target.value)}
+              className="border-slate-300 dark:border-slate-600"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              Nơi Cấp <span className="text-red-500">*</span>
+            </label>
+            <Input
+              type="text"
+              placeholder="Nhập nơi cấp"
+              value={formData.issuedPlace}
+              onChange={(e) => handleInputChange("issuedPlace", e.target.value)}
+              className="border-slate-300 dark:border-slate-600"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            Địa Chỉ Thường Trú <span className="text-red-500">*</span>
+          </label>
+          <Input
+            type="text"
+            placeholder="Nhập địa chỉ thường trú"
+            value={formData.permanentAddress}
+            onChange={(e) =>
+              handleInputChange("permanentAddress", e.target.value)
+            }
+            className="border-slate-300 dark:border-slate-600"
+          />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

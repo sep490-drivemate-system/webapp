@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Upload, Download } from "lucide-react";
+import { Upload, Download, FileJson } from "lucide-react";
 
 interface BulkUploadFormProps {
   onSuccess: (msg: string) => void;
@@ -132,7 +132,7 @@ export default function BulkUploadForm({
       <CardHeader>
         <CardTitle className="text-foreground">Upload Hàng Loạt</CardTitle>
         <CardDescription className="text-muted-foreground">
-          Tải lên nhiều bản ghi xe cùng lúc bằng file JSON
+          Tải lên toàn bộ thông tin tài liệu xe bằng file JSON đã định dạng sẵn
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -149,7 +149,7 @@ export default function BulkUploadForm({
               Tải Mẫu JSON
             </Button>
             <p className="text-sm text-muted-foreground">
-              Lấy mẫu để điền thông tin xe của bạn
+              Tải mẫu JSON và điền thông tin tài liệu xe của bạn
             </p>
           </div>
 
@@ -162,7 +162,7 @@ export default function BulkUploadForm({
               onClick={() => fileInputRef.current?.click()}
               className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:bg-secondary transition-colors"
             >
-              <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+              <FileJson className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
               <p className="text-foreground font-medium">
                 {fileName || "Nhấp để chọn file hoặc kéo và thả"}
               </p>
@@ -199,7 +199,7 @@ export default function BulkUploadForm({
               disabled={isSubmitting || !fileName}
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
-              {isSubmitting ? "Đang Tải Lên..." : "Tải Lên Bản Ghi"}
+              {isSubmitting ? "Đang Tải Lên..." : "Tải Lên JSON"}
             </Button>
           </div>
         </form>
