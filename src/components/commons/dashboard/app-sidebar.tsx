@@ -162,7 +162,7 @@ const data = {
     },
     {
       name: "Quản lý xe tập lái",
-      url: "/management-article",
+      url: "/car-instructor-management",
       icon: IconCar,
     },
     {
@@ -172,7 +172,7 @@ const data = {
     },
     {
       name: "Quản lý tin tức và bài viết",
-      url: "/dashboard/documents/word-assistant",
+      url: "/blogs-instructor-management",
       icon: IconNews,
     },
     {
