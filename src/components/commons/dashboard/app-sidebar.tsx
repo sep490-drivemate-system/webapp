@@ -166,15 +166,16 @@ const data = {
       icon: IconCar,
     },
     {
+      name: "Quản lý tin tức và bài viết",
+      url: "/blogs-management",
+      icon: IconNews,
+    },
+    {
       name: "Quản lý buổi huấn luyện tập lái ",
       url: "/dashboard/documents/reports",
       icon: IconNavigation,
     },
-    {
-      name: "Quản lý tin tức và bài viết",
-      url: "/blogs-instructor-management",
-      icon: IconNews,
-    },
+
     {
       name: "Quản lý chính sách bảo mật",
       url: "/dashboard/documents/word-assistant",

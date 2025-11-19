@@ -11,6 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -40,8 +41,6 @@ import {
   Clock,
   Search,
   FileText,
-  AlertTriangle,
-  RefreshCw,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -56,10 +55,6 @@ export default function ManagementInstructorPage() {
   const [applications, setApplications] = useState<InstructorApplication[]>(
     mockData.instructors as InstructorApplication[]
   );
-  const [reapplyDocument, setReapplyDocument] = useState<{
-    instructorId: string;
-    docType: string;
-  } | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
     "all" | "pending" | "approved" | "rejected"
@@ -178,30 +173,6 @@ export default function ManagementInstructorPage() {
     };
   };
 
-  const handleReapplyDocument = (instructorId: string, docType: string) => {
-    setReapplyDocument({ instructorId, docType });
-    // TODO: Implement reapply logic with image upload
-  };
-
-  const handleVerifyDocument = (instructorId: string, docType: string) => {
-    setApplications((prev) =>
-      prev.map((app) =>
-        app.id === instructorId
-          ? {
-              ...app,
-              documents: {
-                ...app.documents,
-                [docType]: {
-                  ...app.documents[docType as keyof typeof app.documents],
-                  verified: true,
-                },
-              },
-            }
-          : app
-      )
-    );
-  };
-
   return (
     <div className="space-y-8">
       <section className="rounded-3xl border bg-background shadow-sm">
@@ -302,6 +273,12 @@ export default function ManagementInstructorPage() {
                 </TableRow>
               ) : (
                 paginatedApplications.map((instructor, index) => {
+                  const {
+                    cccd,
+                    b2License,
+                    professionalCertificate,
+                    healthCertificate,
+                  } = instructor.documents;
                   const docStatus = checkDocumentStatus(instructor.documents);
                   const globalIndex = startIndex + index;
                   return (
@@ -349,185 +326,146 @@ export default function ManagementInstructorPage() {
                                 </DialogTitle>
                               </DialogHeader>
                               <div className="space-y-6">
-                                <div className="grid gap-4 rounded-xl border bg-muted/30 p-5 sm:grid-cols-2">
-                                  <div className="space-y-2 text-sm">
-                                    <p className="text-xs font-semibold uppercase text-muted-foreground">
-                                      Thông tin cá nhân
-                                    </p>
-                                    <p>
-                                      <span className="font-medium">
-                                        Họ tên:
-                                      </span>{" "}
-                                      {instructor.name}
-                                    </p>
-                                    <p>
-                                      <span className="font-medium">
-                                        Email:
-                                      </span>{" "}
-                                      {instructor.email}
-                                    </p>
-                                    <p>
-                                      <span className="font-medium">
-                                        Ngày nộp:
-                                      </span>{" "}
-                                      {formatDate(instructor.submittedAt)}
-                                    </p>
-                                  </div>
-                                  <div className="space-y-2">
-                                    <p className="text-xs font-semibold uppercase text-muted-foreground">
-                                      Trạng thái
-                                    </p>
-                                    {getStatusBadge(instructor.status)}
-                                  </div>
-                                </div>
-
-                                <div className="space-y-4">
-                                  <h3 className="text-base font-semibold">
-                                    Tổng quan giấy tờ
-                                  </h3>
-                                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                    {Object.entries(instructor.documents).map(
-                                      ([key, doc]) => (
-                                        <div
-                                          key={key}
-                                          className="rounded-xl border bg-card p-4 text-center shadow-sm"
-                                        >
-                                          <div className="mb-3">
-                                            <div className="mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-lg border bg-muted text-lg font-semibold text-muted-foreground">
-                                              {key === "b2License"
-                                                ? "B2"
-                                                : key === "cccd"
-                                                ? "CC"
-                                                : key ===
-                                                  "professionalCertificate"
-                                                ? "PC"
-                                                : key === "healthCertificate"
-                                                ? "HC"
-                                                : key === "vehiclePapers"
-                                                ? "VP"
-                                                : "BH"}
-                                            </div>
-                                            <p className="text-sm font-medium">
-                                              {key === "b2License"
-                                                ? "Bằng B2"
-                                                : key === "cccd"
-                                                ? "CCCD"
-                                                : key ===
-                                                  "professionalCertificate"
-                                                ? "Chứng chỉ"
-                                                : key === "healthCertificate"
-                                                ? "Khám sức khỏe"
-                                                : key === "vehiclePapers"
-                                                ? "Giấy tờ xe"
-                                                : "Bảo hiểm"}
-                                            </p>
-                                          </div>
-                                          <div className="space-y-2">
-                                            {doc.verified ? (
-                                              <Badge className="bg-emerald-50 text-emerald-700">
-                                                <CheckCircle className="mr-1 size-3" />
-                                                Đã xác thực
-                                              </Badge>
-                                            ) : (
-                                              <div className="space-y-2">
-                                                <Badge className="bg-amber-50 text-amber-700">
-                                                  <Clock className="mr-1 size-3" />
-                                                  Chưa xác thực
-                                                </Badge>
-                                                <div className="flex justify-center gap-2">
-                                                  <Button
-                                                    size="icon"
-                                                    variant="outline"
-                                                    aria-label="Xác thực giấy tờ"
-                                                    className="h-7 w-7 text-emerald-600"
-                                                    onClick={() =>
-                                                      handleVerifyDocument(
-                                                        instructor.id,
-                                                        key
-                                                      )
-                                                    }
-                                                  >
-                                                    <CheckCircle className="size-4" />
-                                                  </Button>
-                                                  <Button
-                                                    size="icon"
-                                                    variant="outline"
-                                                    aria-label="Yêu cầu nộp lại"
-                                                    className="h-7 w-7 text-amber-600"
-                                                    onClick={() =>
-                                                      handleReapplyDocument(
-                                                        instructor.id,
-                                                        key
-                                                      )
-                                                    }
-                                                  >
-                                                    <RefreshCw className="size-4" />
-                                                  </Button>
-                                                </div>
-                                              </div>
-                                            )}
-                                          </div>
-                                        </div>
-                                      )
-                                    )}
-                                  </div>
-                                  <div className="rounded-xl border bg-muted/20 p-4">
-                                    <div className="flex flex-wrap items-center justify-between gap-2">
-                                      <span className="text-sm font-medium">
-                                        Tổng kết giấy tờ
-                                      </span>
-                                      <Badge
-                                        className={`${
-                                          docStatus.allVerified
-                                            ? "bg-emerald-50 text-emerald-700"
-                                            : "bg-amber-50 text-amber-700"
-                                        }`}
+                                <div className="rounded-xl border bg-muted/30 p-5">
+                                  <div className="grid gap-4 sm:grid-cols-2">
+                                    <InfoItem
+                                      label="Họ và tên"
+                                      value={instructor.name}
+                                    />
+                                    <InfoItem
+                                      label="Ngày nộp"
+                                      value={formatDate(instructor.submittedAt)}
+                                    />
+                                    <InfoItem
+                                      label="Email"
+                                      value={instructor.email}
+                                    >
+                                      <a
+                                        href={`mailto:${instructor.email}`}
+                                        className="text-primary underline"
                                       >
-                                        {docStatus.allVerified ? (
-                                          <>
-                                            <CheckCircle className="mr-1 size-3" />
-                                            Đã xác thực đầy đủ (
-                                            {docStatus.verified}/
-                                            {docStatus.total})
-                                          </>
-                                        ) : (
-                                          <>
-                                            <AlertTriangle className="mr-1 size-3" />
-                                            Chưa đầy đủ ({docStatus.verified}/
-                                            {docStatus.total})
-                                          </>
-                                        )}
-                                      </Badge>
-                                    </div>
+                                        {instructor.email}
+                                      </a>
+                                    </InfoItem>
+                                    <InfoItem
+                                      label="Số điện thoại"
+                                      value={instructor.phone}
+                                    >
+                                      <a
+                                        href={`tel:${instructor.phone}`}
+                                        className="text-primary"
+                                      >
+                                        {instructor.phone}
+                                      </a>
+                                    </InfoItem>
+                                    <InfoItem
+                                      label="Trạng thái"
+                                      value={instructor.status}
+                                    >
+                                      {getStatusBadge(instructor.status)}
+                                    </InfoItem>
                                   </div>
                                 </div>
 
-                                {instructor.status === "pending" && (
-                                  <div className="flex justify-end gap-3 border-t pt-4">
-                                    <Button
-                                      variant="outline"
-                                      className="border-red-200 text-red-600 hover:bg-red-50"
-                                      onClick={() => {
-                                        handleReject(instructor.id);
-                                        setSelectedInstructor(null);
-                                      }}
-                                    >
-                                      <XCircle className="mr-2 size-4" />
-                                      Từ chối
-                                    </Button>
-                                    <Button
-                                      className="bg-emerald-600 text-white hover:bg-emerald-700"
-                                      disabled={!docStatus.allVerified}
-                                      onClick={() => {
-                                        handleApprove(instructor.id);
-                                        setSelectedInstructor(null);
-                                      }}
-                                    >
-                                      <CheckCircle className="mr-2 size-4" />
-                                      Duyệt
-                                    </Button>
-                                  </div>
-                                )}
+                                <div className="space-y-5">
+                                  <SectionShell title="Căn Cước Công Dân">
+                                    <div className="grid gap-4 sm:grid-cols-3">
+                                      <InfoItem
+                                        label="Họ và tên"
+                                        value={cccd.fullName ?? "Chưa cập nhật"}
+                                      />
+                                      <InfoItem
+                                        label="Ngày sinh"
+                                        value={
+                                          cccd.dateOfBirth
+                                            ? formatDate(cccd.dateOfBirth)
+                                            : "Chưa cập nhật"
+                                        }
+                                      />
+                                      <InfoItem
+                                        label="Giới tính"
+                                        value={cccd.gender ?? "Chưa cập nhật"}
+                                      />
+                                    </div>
+                                  </SectionShell>
+
+                                  <SectionShell title="Giấy Phép Lái Xe">
+                                    <ImagePair
+                                      firstLabel="ẢNH MẶT TRƯỚC"
+                                      firstSrc={b2License.front ?? null}
+                                      secondLabel="ẢNH MẶT SAU"
+                                      secondSrc={b2License.back ?? null}
+                                    />
+                                    <div className="grid gap-4 sm:grid-cols-2">
+                                      <InfoItem
+                                        label="Hạng lái xe"
+                                        value={
+                                          b2License.licenseClass ??
+                                          "Chưa cập nhật"
+                                        }
+                                      />
+                                    </div>
+                                  </SectionShell>
+
+                                  <SectionShell title="Chứng Chỉ Hành Nghề">
+                                    <div className="grid gap-4 md:grid-cols-1">
+                                      <ImageTile
+                                        label="ẢNH CHỨNG CHỈ"
+                                        src={
+                                          professionalCertificate.front ?? null
+                                        }
+                                      />
+                                      <div className="grid gap-4 sm:grid-cols-2">
+                                        <InfoItem
+                                          label="Hạng lái xe được đào tạo"
+                                          value={
+                                            professionalCertificate.vehicleClass ??
+                                            "Chưa cập nhật"
+                                          }
+                                        />
+                                      </div>
+                                    </div>
+                                  </SectionShell>
+
+                                  <SectionShell title="Giấy Khám Sức Khỏe">
+                                    <ImageTile
+                                      label="ẢNH GIẤY KHÁM SỨC KHỎE"
+                                      src={healthCertificate.front ?? null}
+                                    />
+                                  </SectionShell>
+
+                                  <SectionShell title="Thông Tin Liên Hệ Khẩn Cấp">
+                                    <div className="grid gap-4 sm:grid-cols-2">
+                                      <InfoItem
+                                        label="Tên người liên hệ"
+                                        value={
+                                          instructor.emergencyContact?.name ??
+                                          "Chưa cập nhật"
+                                        }
+                                      />
+                                      <InfoItem
+                                        label="Số điện thoại người liên hệ"
+                                        value={
+                                          instructor.emergencyContact?.phone ??
+                                          "Chưa cập nhật"
+                                        }
+                                      >
+                                        {instructor.emergencyContact?.phone ? (
+                                          <a
+                                            href={`tel:${instructor.emergencyContact.phone}`}
+                                            className="text-primary"
+                                          >
+                                            {instructor.emergencyContact.phone}
+                                          </a>
+                                        ) : (
+                                          "Chưa cập nhật"
+                                        )}
+                                      </InfoItem>
+                                    </div>
+                                  </SectionShell>
+                                </div>
+
+                                {/* Thao tác duyệt/từ chối đã được xử lý ngay trên danh sách */}
                               </div>
                             </DialogContent>
                           </Dialog>
@@ -630,62 +568,6 @@ export default function ManagementInstructorPage() {
           </div>
         </div>
       </section>
-
-      <Dialog
-        open={!!reapplyDocument}
-        onOpenChange={() => setReapplyDocument(null)}
-      >
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Nộp lại giấy tờ</DialogTitle>
-          </DialogHeader>
-          {reapplyDocument && (
-            <div className="space-y-6">
-              <div className="rounded-xl border bg-muted/30 p-4 text-sm">
-                <p className="text-muted-foreground">
-                  Bạn đang yêu cầu nộp lại:
-                </p>
-                <p className="text-base font-semibold">
-                  {reapplyDocument.docType === "b2License"
-                    ? "Bằng lái xe B2"
-                    : reapplyDocument.docType === "cccd"
-                    ? "Căn cước công dân"
-                    : reapplyDocument.docType === "professionalCertificate"
-                    ? "Chứng chỉ hành nghề"
-                    : reapplyDocument.docType === "healthCertificate"
-                    ? "Giấy khám sức khỏe"
-                    : reapplyDocument.docType === "vehiclePapers"
-                    ? "Giấy tờ xe"
-                    : "Bảo hiểm xe"}
-                </p>
-              </div>
-              <div className="space-y-4">
-                <UploadPlaceholder label="Chụp ảnh mặt trước" />
-                {(reapplyDocument.docType === "b2License" ||
-                  reapplyDocument.docType === "cccd") && (
-                  <UploadPlaceholder label="Chụp ảnh mặt sau" />
-                )}
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setReapplyDocument(null)}
-                >
-                  Hủy
-                </Button>
-                <Button
-                  onClick={() => {
-                    console.log("Reapplying document:", reapplyDocument);
-                    setReapplyDocument(null);
-                  }}
-                >
-                  Nộp lại
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
@@ -714,15 +596,93 @@ function StatCard({
   );
 }
 
-function UploadPlaceholder({ label }: { label: string }) {
+function SectionShell({
+  title,
+  badge,
+  badgeTone,
+  children,
+}: {
+  title: string;
+  badge?: string;
+  badgeTone?: "success" | "warning";
+  children: React.ReactNode;
+}) {
   return (
-    <div>
-      <p className="mb-2 text-sm font-medium">{label}</p>
-      <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/30 p-6 text-center text-sm text-muted-foreground">
-        <AlertTriangle className="mb-3 size-8 text-muted-foreground/60" />
-        Nhấp để chọn ảnh hoặc kéo thả vào đây
-        <input type="file" accept="image/*" className="hidden" />
+    <section className="rounded-2xl border bg-card p-6 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+        {badge && (
+          <Badge
+            className={
+              badgeTone === "success"
+                ? "bg-emerald-50 text-emerald-700"
+                : "bg-amber-50 text-amber-700"
+            }
+          >
+            {badge}
+          </Badge>
+        )}
       </div>
+      <div className="mt-4 space-y-4">{children}</div>
+    </section>
+  );
+}
+
+function InfoItem({
+  label,
+  value,
+  children,
+}: {
+  label: string;
+  value: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1">
+      <Label className="text-xs font-semibold uppercase text-muted-foreground">
+        {label}
+      </Label>
+      {children ?? <p className="text-sm font-medium">{value}</p>}
+    </div>
+  );
+}
+
+function ImagePair({
+  firstLabel,
+  firstSrc,
+  secondLabel,
+  secondSrc,
+}: {
+  firstLabel: string;
+  firstSrc: string | null;
+  secondLabel: string;
+  secondSrc: string | null;
+}) {
+  return (
+    <div className="grid gap-4 md:grid-cols-2">
+      <ImageTile label={firstLabel} src={firstSrc} />
+      <ImageTile label={secondLabel} src={secondSrc} />
+    </div>
+  );
+}
+
+function ImageTile({ label, src }: { label: string; src: string | null }) {
+  return (
+    <div className="space-y-2">
+      <Label className="text-xs font-medium text-muted-foreground">
+        {label}
+      </Label>
+      {src ? (
+        <img
+          src={src}
+          alt={label}
+          className="h-48 w-full rounded-lg border object-cover"
+        />
+      ) : (
+        <div className="flex h-48 w-full items-center justify-center rounded-lg border bg-muted text-xs text-muted-foreground">
+          Chưa tải
+        </div>
+      )}
     </div>
   );
 }

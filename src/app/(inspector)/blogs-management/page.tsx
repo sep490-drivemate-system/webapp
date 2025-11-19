@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  Eye,
   Plus,
   Search,
 } from "lucide-react";
@@ -113,10 +115,10 @@ export default function BlogsInstructorManagementPage() {
             </CardDescription>
           </div>
           <Link href="/blogs/new/form">
-            <Button className="gap-2">
-              <Plus className="size-4" />
-              Tạo bài viết
-            </Button>
+            <button className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-green-400 to-green-500 text-white rounded-full font-medium shadow-lg hover:shadow-xl hover:from-green-500 hover:to-green-600 transition-all active:scale-95">
+              <Plus size={18} />
+              <span>Tạo bài viết</span>
+            </button>
           </Link>
         </CardHeader>
         <CardContent className="p-6">
@@ -175,7 +177,7 @@ export default function BlogsInstructorManagementPage() {
           </div>
           <div className="flex flex-col items-center gap-4 sm:flex-row">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Số hàng</span>
+              <span className="text-sm text-muted-foreground">Số bài viết</span>
               <Select
                 value={`${itemsPerPage}`}
                 onValueChange={(value) => setItemsPerPage(Number(value))}
@@ -295,20 +297,31 @@ function BlogCardItem({
         </CardDescription>
       </CardHeader>
       <CardContent className="mt-auto space-y-2 text-sm text-muted-foreground">
-        <p className="font-medium text-foreground">{post.author.name}</p>
-        <p>{post.author.role}</p>
+        <div className="flex items-center gap-3">
+          <Image
+            src={post.author.avatar || "/placeholder.svg"}
+            alt={post.author.name}
+            width={40}
+            height={40}
+            className="rounded-full object-cover"
+          />
+          <div>
+            <p className="font-medium text-foreground">{post.author.name}</p>
+            <p className="text-xs">{post.author.role}</p>
+          </div>
+        </div>
       </CardContent>
-      <CardFooter className="flex items-center justify-between gap-2 border-t bg-muted/30">
-        <Button variant="ghost" size="sm" asChild>
-          <Link href={`/blogs/${post.id}`}>Xem chi tiết</Link>
-        </Button>
+      <CardFooter className="flex items-center justify-end gap-2 border-t bg-muted/30">
         <Button
           variant="outline"
           size="sm"
-          className="border-red-200 text-red-600 hover:bg-red-50"
-          onClick={() => onDelete(post.id)}
+          className="gap-2 border border-border"
+          asChild
         >
-          Xóa
+          <Link href={`/blogs-detail/${post.id}`}>
+            <Eye className="size-4" />
+            Xem chi tiết
+          </Link>
         </Button>
       </CardFooter>
     </Card>

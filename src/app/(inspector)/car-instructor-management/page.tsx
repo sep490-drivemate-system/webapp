@@ -405,11 +405,10 @@ function DocumentViewerModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[95vh] max-w-5xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Chi tiết tài liệu</DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-            {document.vehicleBrand} {document.vehicleModel} -{" "}
-            {document.licensePlate}
-          </DialogDescription>
+          <DialogTitle>
+            Chi tiết tài liệu - {document.vehicleBrand} {document.vehicleModel}{" "}
+            - {document.licensePlate}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-8 pb-6">
@@ -431,6 +430,23 @@ function DocumentViewerModal({
               >
                 {document.email}
               </a>
+            </InfoItem>
+            <InfoItem label="Trạng thái" value={document.status}>
+              <Badge
+                className={`px-3 py-1 text-xs ${
+                  document.status === "pending"
+                    ? "bg-amber-50 text-amber-700"
+                    : document.status === "approved"
+                    ? "bg-emerald-50 text-emerald-700"
+                    : "bg-red-50 text-red-700"
+                }`}
+              >
+                {document.status === "pending"
+                  ? "Chờ duyệt"
+                  : document.status === "approved"
+                  ? "Đã duyệt"
+                  : "Từ chối"}
+              </Badge>
             </InfoItem>
           </div>
 
@@ -496,11 +512,11 @@ function InspectionDocumentSection({
 }) {
   const { inspection } = document.documents;
   return (
-    <SectionShell title="Giấy đăng kiểm xe">
+    <SectionShell title="Giấy Đăng Kiểm Xe">
       <ImagePair
-        firstLabel="Ảnh mặt trước"
+        firstLabel="ẢNH MẶT TRƯỚC"
         firstSrc={inspection.frontImage}
-        secondLabel="Ảnh mặt sau"
+        secondLabel="ẢNH MẶT SAU"
         secondSrc={inspection.backImage}
       />
       <div className="grid gap-4 sm:grid-cols-2">
@@ -520,11 +536,11 @@ function InspectionDocumentSection({
 function InsuranceDocumentSection({ document }: { document: VehicleDocument }) {
   const { insurance } = document.documents;
   return (
-    <SectionShell title="Bảo hiểm xe">
+    <SectionShell title="Bảo Hiểm Xe">
       <ImagePair
-        firstLabel="Ảnh mặt trước"
+        firstLabel="ẢNH MẶT TRƯỚC"
         firstSrc={insurance.frontImage}
-        secondLabel="Ảnh mặt sau"
+        secondLabel="ẢNH MẶT SAU"
         secondSrc={insurance.backImage}
       />
       <div className="grid gap-4 sm:grid-cols-2">
@@ -548,11 +564,11 @@ function RegistrationDocumentSection({
 }) {
   const { registration } = document.documents;
   return (
-    <SectionShell title="Giấy đăng ký xe">
+    <SectionShell title="Giấy Đăng Ký Xe">
       <ImagePair
-        firstLabel="Ảnh mặt trước"
+        firstLabel="ẢNH MẶT TRƯỚC"
         firstSrc={registration.frontImage}
-        secondLabel="Ảnh mặt sau"
+        secondLabel="ẢNH MẶT SAU"
         secondSrc={registration.backImage}
       />
 
@@ -618,12 +634,12 @@ function VerificationImagesSection({
 }) {
   const { verification } = document.documents;
   return (
-    <SectionShell title="Ảnh xác minh xe">
+    <SectionShell title="Ảnh Xác Minh Xe">
       <div className="grid gap-4 md:grid-cols-2">
-        <ImageTile label="Ảnh phía trước" src={verification.frontView} />
-        <ImageTile label="Ảnh phía sau" src={verification.backView} />
-        <ImageTile label="Ảnh bên hông" src={verification.sideView} />
-        <ImageTile label="Ảnh nội thất" src={verification.interiorView} />
+        <ImageTile label="ẢNH PHÍA TRƯỚC" src={verification.frontView} />
+        <ImageTile label="ẢNH PHÍA SAU" src={verification.backView} />
+        <ImageTile label="ẢNH BÊN HÔNG" src={verification.sideView} />
+        <ImageTile label="ẢNH NỘI THẤT" src={verification.interiorView} />
       </div>
     </SectionShell>
   );
