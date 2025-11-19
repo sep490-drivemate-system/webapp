@@ -68,15 +68,24 @@ export default function ManagementInstructorPage() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const filteredApplications = useMemo(() => {
-    return applications.filter((instructor) => {
-      const matchesSearch =
-        instructor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        instructor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        instructor.phone.includes(searchTerm);
-      const matchesStatus =
-        statusFilter === "all" || instructor.status === statusFilter;
-      return matchesSearch && matchesStatus;
-    });
+    return (
+      applications
+        .filter((instructor) => {
+          const matchesSearch =
+            instructor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            instructor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            instructor.phone.includes(searchTerm);
+          const matchesStatus =
+            statusFilter === "all" || instructor.status === statusFilter;
+          return matchesSearch && matchesStatus;
+        })
+        // Sort by submitted date (latest first) so the newest appears at STT 1
+        .sort(
+          (a, b) =>
+            new Date(b.submittedAt).getTime() -
+            new Date(a.submittedAt).getTime()
+        )
+    );
   }, [applications, searchTerm, statusFilter]);
 
   const totalPages = Math.ceil(filteredApplications.length / itemsPerPage);
@@ -274,7 +283,8 @@ export default function ManagementInstructorPage() {
               <TableRow>
                 <TableHead className="text-center font-semibold">STT</TableHead>
                 <TableHead>Họ và tên</TableHead>
-                <TableHead>Liên hệ</TableHead>
+                <TableHead>Số điện thoại</TableHead>
+                <TableHead>Email</TableHead>
                 <TableHead>Ngày nộp</TableHead>
                 <TableHead>Trạng thái</TableHead>
                 <TableHead className="text-center">Thao tác</TableHead>
@@ -302,16 +312,16 @@ export default function ManagementInstructorPage() {
                       <TableCell>
                         <div className="font-medium">{instructor.name}</div>
                       </TableCell>
-                      <TableCell>
-                        <div className="space-y-1 text-sm">
-                          <p>{instructor.email}</p>
-                          <a
-                            href={`tel:${instructor.phone}`}
-                            className="text-primary"
-                          >
-                            {instructor.phone}
-                          </a>
-                        </div>
+                      <TableCell className="text-sm">
+                        <a
+                          href={`tel:${instructor.phone}`}
+                          className="text-primary"
+                        >
+                          {instructor.phone}
+                        </a>
+                      </TableCell>
+                      <TableCell className="text-sm underline">
+                        {instructor.email}
                       </TableCell>
                       <TableCell className="text-sm">
                         {formatDate(instructor.submittedAt)}

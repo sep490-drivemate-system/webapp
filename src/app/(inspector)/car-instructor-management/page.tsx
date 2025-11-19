@@ -111,6 +111,15 @@ interface VehicleDocument {
   rejectionReason?: string;
 }
 
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return dateString;
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+};
+
 const mockDocuments: VehicleDocument[] = [
   {
     id: 1,
@@ -406,7 +415,10 @@ function DocumentViewerModal({
         <div className="space-y-8 pb-6">
           <div className="grid gap-4 rounded-lg border bg-muted/30 p-5 sm:grid-cols-2">
             <InfoItem label="Người hướng dẫn" value={document.instructorName} />
-            <InfoItem label="Ngày nộp" value={document.submittedDate} />
+            <InfoItem
+              label="Ngày nộp"
+              value={formatDate(document.submittedDate)}
+            />
             <InfoItem label="Số điện thoại" value={document.phoneNumber}>
               <a href={`tel:${document.phoneNumber}`} className="text-primary">
                 {document.phoneNumber}
@@ -710,7 +722,9 @@ function DocumentRow({
           {document.email}
         </a>
       </td>
-      <td className="px-4 py-3 text-sm">{document.submittedDate}</td>
+      <td className="px-4 py-3 text-sm">
+        {formatDate(document.submittedDate)}
+      </td>
       <td className="px-4 py-3">
         <Badge className={`${statusStyles} px-3 py-1 text-xs`}>
           {statusLabel}

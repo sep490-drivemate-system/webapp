@@ -157,7 +157,7 @@ const data = {
   documents: [
     {
       name: "Quản lý người hướng dẫn",
-      url: "/management-instructor",
+      url: "/instructor-management",
       icon: IconUsersGroup,
     },
     {
