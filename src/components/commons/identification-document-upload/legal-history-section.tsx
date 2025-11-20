@@ -8,21 +8,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import ImageUploadField from "../image-upload-field";
 
 export default function LegalHistorySection() {
   const [formData, setFormData] = useState({
     image: "" as string,
-    issuedDate: "",
   });
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
 
   const handleImageUpload = (base64: string) => {
     setFormData((prev) => ({
@@ -43,18 +34,6 @@ export default function LegalHistorySection() {
           onUpload={(base64: string) => handleImageUpload(base64)}
           preview={formData.image}
         />
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-            Ngày Cấp <span className="text-red-500">*</span>
-          </label>
-          <Input
-            type="date"
-            value={formData.issuedDate}
-            onChange={(e) => handleInputChange("issuedDate", e.target.value)}
-            className="border-slate-300 dark:border-slate-600"
-          />
-        </div>
       </CardContent>
     </Card>
   );

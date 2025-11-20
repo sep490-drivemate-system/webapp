@@ -1,13 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -22,13 +16,9 @@ export default function CitizenIdSection() {
   const [formData, setFormData] = useState({
     frontImage: "" as string,
     backImage: "" as string,
-    citizenIdNumber: "",
-    issuedDate: "",
-    expiredDate: "",
-    issuedPlace: "",
-    permanentAddress: "",
-    gender: "",
+    fullName: "",
     dateOfBirth: "",
+    gender: "",
   });
 
   const handleInputChange = (field: string, value: string) => {
@@ -74,15 +64,25 @@ export default function CitizenIdSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Số Căn Cước Công Dân <span className="text-red-500">*</span>
+              Họ và Tên <span className="text-red-500">*</span>
             </label>
             <Input
               type="text"
-              placeholder="Nhập số CCCD"
-              value={formData.citizenIdNumber}
-              onChange={(e) =>
-                handleInputChange("citizenIdNumber", e.target.value)
-              }
+              placeholder="Nhập họ và tên"
+              value={formData.fullName}
+              onChange={(e) => handleInputChange("fullName", e.target.value)}
+              className="border-slate-300 dark:border-slate-600"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              Ngày Sinh <span className="text-red-500">*</span>
+            </label>
+            <Input
+              type="date"
+              value={formData.dateOfBirth}
+              onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
               className="border-slate-300 dark:border-slate-600"
             />
           </div>
@@ -105,70 +105,6 @@ export default function CitizenIdSection() {
               </SelectContent>
             </Select>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Ngày Sinh <span className="text-red-500">*</span>
-            </label>
-            <Input
-              type="date"
-              value={formData.dateOfBirth}
-              onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
-              className="border-slate-300 dark:border-slate-600"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Ngày Cấp <span className="text-red-500">*</span>
-            </label>
-            <Input
-              type="date"
-              value={formData.issuedDate}
-              onChange={(e) => handleInputChange("issuedDate", e.target.value)}
-              className="border-slate-300 dark:border-slate-600"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Ngày Hết Hạn <span className="text-red-500">*</span>
-            </label>
-            <Input
-              type="date"
-              value={formData.expiredDate}
-              onChange={(e) => handleInputChange("expiredDate", e.target.value)}
-              className="border-slate-300 dark:border-slate-600"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Nơi Cấp <span className="text-red-500">*</span>
-            </label>
-            <Input
-              type="text"
-              placeholder="Nhập nơi cấp"
-              value={formData.issuedPlace}
-              onChange={(e) => handleInputChange("issuedPlace", e.target.value)}
-              className="border-slate-300 dark:border-slate-600"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-            Địa Chỉ Thường Trú <span className="text-red-500">*</span>
-          </label>
-          <Input
-            type="text"
-            placeholder="Nhập địa chỉ thường trú"
-            value={formData.permanentAddress}
-            onChange={(e) =>
-              handleInputChange("permanentAddress", e.target.value)
-            }
-            className="border-slate-300 dark:border-slate-600"
-          />
         </div>
       </CardContent>
     </Card>
