@@ -3,108 +3,154 @@
         {
             "id": "INST013",
             "name": "Nguyễn Văn An",
-            "email": "nguyenvanan@email.com",
             "phone": "0901234567",
             "submittedAt": "2024-01-15",
             "status": "pending",
             "documents": {
-                "b2License": {
-                    "front": "/mock-docs/b2-front-1.jpg",
-                    "back": "/mock-docs/b2-back-1.jpg",
-                    "verified": false
-                },
-                "cccd": {
-                    "front": "/mock-docs/cccd-front-1.jpg",
-                    "back": "/mock-docs/cccd-back-1.jpg",
+                "drivingLicense": {
+                    "front": "/mock-docs/driving-license-front-1.jpg",
+                    "back": "/mock-docs/driving-license-back-1.jpg",
                     "verified": false
                 },
                 "professionalCertificate": {
                     "front": "/mock-docs/prof-cert-1.jpg",
                     "verified": false
                 },
+                "criminalRecord": {
+                    "front": "/mock-docs/criminal-record-1.jpg",
+                    "verified": false
+                },
                 "healthCertificate": {
                     "front": "/mock-docs/health-cert-1.jpg",
                     "verified": false
+                }
+            },
+            "vehicle": {
+                "id": "VEH001",
+                "brand": "Honda",
+                "model": "City",
+                "seats": 5,
+                "issueDate": "2023-05-15",
+                "fuelType": "gasoline",
+                "licensePlate": "51A-12345",
+                "ownerName": "Nguyễn Văn An",
+                "price": {
+                    "hourly": 150000,
+                    "daily": 800000,
+                    "monthly": 18000000
                 },
-                "vehiclePapers": {
-                    "front": "/mock-docs/vehicle-papers-1.jpg",
-                    "verified": false
+                "images": {
+                    "front": "/mock-vehicles/honda-city-front-1.jpg",
+                    "back": "/mock-vehicles/honda-city-back-1.jpg",
+                    "side": "/mock-vehicles/honda-city-side-1.jpg",
+                    "interior": "/mock-vehicles/honda-city-interior-1.jpg"
                 },
-                "vehicleInsurance": {
-                    "front": "/mock-docs/vehicle-insurance-1.jpg",
-                    "verified": false
+                "documents": {
+                    "registration": {
+                        "front": "/mock-docs/vehicle-reg-front-1.jpg",
+                        "back": "/mock-docs/vehicle-reg-back-1.jpg",
+                        "verified": false
+                    },
+                    "insurance": {
+                        "front": "/mock-docs/vehicle-insurance-front-1.jpg",
+                        "back": "/mock-docs/vehicle-insurance-back-1.jpg",
+                        "verified": false
+                    },
+                    "inspection": {
+                        "front": "/mock-docs/vehicle-inspection-front-1.jpg",
+                        "back": "/mock-docs/vehicle-inspection-back-1.jpg",
+                        "verified": false
+                    }
                 }
             }
         },
         {
             "id": "INST001",
-            "name": "Nguyễn Văn An",
-            "email": "nguyenvanan@email.com",
-            "phone": "0901234567",
-            "submittedAt": "2024-01-15",
+            "name": "Trần Thị Bình",
+            "phone": "0902345678",
+            "submittedAt": "2024-01-16",
             "status": "pending",
             "documents": {
-                "b2License": {
-                    "front": "/mock-docs/b2-front-1.jpg",
-                    "back": "/mock-docs/b2-back-1.jpg",
-                    "verified": false
-                },
-                "cccd": {
-                    "front": "/mock-docs/cccd-front-1.jpg",
-                    "back": "/mock-docs/cccd-back-1.jpg",
-                    "verified": false
+                "drivingLicense": {
+                    "front": "/mock-docs/driving-license-front-2.jpg",
+                    "back": "/mock-docs/driving-license-back-2.jpg",
+                    "verified": true
                 },
                 "professionalCertificate": {
-                    "front": "/mock-docs/prof-cert-1.jpg",
+                    "front": "/mock-docs/prof-cert-2.jpg",
+                    "verified": true
+                },
+                "criminalRecord": {
+                    "front": "/mock-docs/criminal-record-2.jpg",
                     "verified": false
                 },
                 "healthCertificate": {
-                    "front": "/mock-docs/health-cert-1.jpg",
-                    "verified": false
-                },
-                "vehiclePapers": {
-                    "front": "/mock-docs/vehicle-papers-1.jpg",
-                    "verified": false
-                },
-                "vehicleInsurance": {
-                    "front": "/mock-docs/vehicle-insurance-1.jpg",
-                    "verified": false
+                    "front": "/mock-docs/health-cert-2.jpg",
+                    "verified": true
                 }
             }
         },
         {
             "id": "INST011",
-            "name": "Nguyễn Văn An",
-            "email": "nguyenvanan@email.com",
-            "phone": "0901234567",
-            "submittedAt": "2024-01-15",
-            "status": "pending",
+            "name": "Lê Văn Cường",
+            "phone": "0903456789",
+            "submittedAt": "2024-01-17",
+            "status": "approved",
             "documents": {
-                "b2License": {
-                    "front": "/mock-docs/b2-front-1.jpg",
-                    "back": "/mock-docs/b2-back-1.jpg",
-                    "verified": false
-                },
-                "cccd": {
-                    "front": "/mock-docs/cccd-front-1.jpg",
-                    "back": "/mock-docs/cccd-back-1.jpg",
-                    "verified": false
+                "drivingLicense": {
+                    "front": "/mock-docs/driving-license-front-3.jpg",
+                    "back": "/mock-docs/driving-license-back-3.jpg",
+                    "verified": true
                 },
                 "professionalCertificate": {
-                    "front": "/mock-docs/prof-cert-1.jpg",
-                    "verified": false
+                    "front": "/mock-docs/prof-cert-3.jpg",
+                    "verified": true
+                },
+                "criminalRecord": {
+                    "front": "/mock-docs/criminal-record-3.jpg",
+                    "verified": true
                 },
                 "healthCertificate": {
-                    "front": "/mock-docs/health-cert-1.jpg",
-                    "verified": false
+                    "front": "/mock-docs/health-cert-3.jpg",
+                    "verified": true
+                }
+            },
+            "vehicle": {
+                "id": "VEH003",
+                "brand": "Toyota",
+                "model": "Vios",
+                "seats": 5,
+                "issueDate": "2023-03-20",
+                "fuelType": "gasoline",
+                "licensePlate": "51B-67890",
+                "ownerName": "Lê Văn Cường",
+                "price": {
+                    "hourly": 160000,
+                    "daily": 850000,
+                    "monthly": 19000000
                 },
-                "vehiclePapers": {
-                    "front": "/mock-docs/vehicle-papers-1.jpg",
-                    "verified": false
+                "images": {
+                    "front": "/mock-vehicles/toyota-vios-front-3.jpg",
+                    "back": "/mock-vehicles/toyota-vios-back-3.jpg",
+                    "side": "/mock-vehicles/toyota-vios-side-3.jpg",
+                    "interior": "/mock-vehicles/toyota-vios-interior-3.jpg"
                 },
-                "vehicleInsurance": {
-                    "front": "/mock-docs/vehicle-insurance-1.jpg",
-                    "verified": false
+                "documents": {
+                    "registration": {
+                        "front": "/mock-docs/vehicle-reg-front-3.jpg",
+                        "back": "/mock-docs/vehicle-reg-back-3.jpg",
+                        "verified": true
+                    },
+                    "insurance": {
+                        "front": "/mock-docs/vehicle-insurance-front-3.jpg",
+                        "back": "/mock-docs/vehicle-insurance-back-3.jpg",
+                        "verified": true
+                    },
+                    "inspection": {
+                        "front": "/mock-docs/vehicle-inspection-front-3.jpg",
+                        "back": "/mock-docs/vehicle-inspection-back-3.jpg",
+                        "verified": true
+                    }
                 }
             }
         },

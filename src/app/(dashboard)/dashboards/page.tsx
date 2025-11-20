@@ -16,6 +16,8 @@ import {
   ResponsiveContainer,
   AreaChart,
   Area,
+  BarChart,
+  Bar,
 } from "recharts";
 import {
   Card,
@@ -25,7 +27,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, Users, Zap, Star, StarIcon, Car, MapPin, Calendar, XCircle } from "lucide-react";
+import { TrendingUp, Users, Zap, Star, StarIcon, Car, MapPin, Calendar, XCircle, Filter, ChevronDown, CreditCard } from "lucide-react";
 import { useRequireAuth } from "@/hooks/auth/useRequireAuth";
 import { UserRole } from "@/types/auth/user-role.enum";
 
@@ -104,44 +106,164 @@ const topVehicles = [
   { model: "Mazda 3 2022", rentals: 245, rating: 4.75 },
 ];
 
-// New mock data for additional statistics
-const roadTypeData = [
-  { name: "Đường đô thị", value: 1245, color: "#3b82f6" },
-  { name: "Quốc lộ", value: 892, color: "#10b981" },
-  { name: "Đường cao tốc", value: 567, color: "#f59e0b" },
-  { name: "Đường tỉnh", value: 434, color: "#ef4444" },
-  { name: "Đường đèo", value: 298, color: "#8b5cf6" },
-  { name: "Đường trường", value: 234, color: "#06b6d4" },
+// New mock data for session status statistics
+const sessionStatusData = [
+  { name: "Hoàn thành", value: 1245, color: "#10b981" },
+  { name: "Đang diễn ra", value: 89, color: "#3b82f6" },
+  { name: "Đã đặt chờ", value: 234, color: "#f59e0b" },
+  { name: "Bị hủy", value: 156, color: "#ef4444" },
 ];
 
-const sessionDurationData = [
-  { day: "T2", avgDuration: 2.5, totalSessions: 145 },
-  { day: "T3", avgDuration: 2.8, totalSessions: 167 },
-  { day: "T4", avgDuration: 3.2, totalSessions: 189 },
-  { day: "T5", avgDuration: 2.9, totalSessions: 201 },
-  { day: "T6", avgDuration: 3.5, totalSessions: 234 },
-  { day: "T7", avgDuration: 4.1, totalSessions: 298 },
-  { day: "CN", avgDuration: 3.8, totalSessions: 267 },
+// Mock data for cancel & refund statistics (Pie Chart format)
+const cancelRefundData = [
+  { 
+    name: "Hủy >=12h (Hoàn 100%)", 
+    value: 68, // 45 + 23
+    color: "#10b981",
+    details: "Novice: 45, Instructor: 23"
+  },
+  { 
+    name: "Hủy <12h (Không hoàn)", 
+    value: 40, // 28 + 12
+    color: "#ef4444",
+    details: "Novice: 28, Instructor: 12"
+  },
+  { 
+    name: "Instructor hủy <12h (+50%)", 
+    value: 15,
+    color: "#f59e0b",
+    details: "Đền bù 150% cho Novice"
+  },
+  { 
+    name: "Đổi lịch >24h (Miễn phí)", 
+    value: 101, // 67 + 34
+    color: "#8b5cf6",
+    details: "Novice: 67, Instructor: 34"
+  },
 ];
 
-const refundReasonData = [
-  { name: "Hủy sớm (>12h)", value: 45, color: "#10b981" },
-  { name: "Hủy muộn (<12h)", value: 25, color: "#f59e0b" },
-  { name: "Instructor hủy", value: 20, color: "#ef4444" },
-  { name: "Hủy gói", value: 10, color: "#8b5cf6" },
+// Mock data for booking time (when sessions are booked)
+const bookingTimeData = [
+  { month: "Th1", bookingCount: 145 },
+  { month: "Th2", bookingCount: 167 },
+  { month: "Th3", bookingCount: 189 },
+  { month: "Th4", bookingCount: 201 },
+  { month: "Th5", bookingCount: 234 },
+  { month: "Th6", bookingCount: 298 },
+  { month: "Th7", bookingCount: 267 },
+  { month: "Th8", bookingCount: 312 },
+  { month: "Th9", bookingCount: 289 },
+  { month: "Th10", bookingCount: 334 },
+  { month: "Th11", bookingCount: 298 },
+  { month: "Th12", bookingCount: 356 },
 ];
 
-const geographicalData = [
-  { area: "Quận 1", instructors: 45, bookings: 234, revenue: 156000 },
-  { area: "Quận 2", instructors: 38, bookings: 198, revenue: 142000 },
-  { area: "Quận 3", instructors: 42, bookings: 212, revenue: 148000 },
-  { area: "Thủ Đức", instructors: 67, bookings: 345, revenue: 234000 },
-  { area: "Quận 7", instructors: 34, bookings: 167, revenue: 123000 },
-  { area: "Bình Thạnh", instructors: 29, bookings: 145, revenue: 98000 },
-  { area: "Tân Bình", instructors: 31, bookings: 156, revenue: 112000 },
+// Mock data for session execution time (actual session duration)
+const sessionExecutionData = [
+  { day: "T2", avgExecutionTime: 2.3, completedSessions: 142 },
+  { day: "T3", avgExecutionTime: 2.6, completedSessions: 159 },
+  { day: "T4", avgExecutionTime: 2.9, completedSessions: 178 },
+  { day: "T5", avgExecutionTime: 2.7, completedSessions: 195 },
+  { day: "T6", avgExecutionTime: 3.2, completedSessions: 221 },
+  { day: "T7", avgExecutionTime: 3.8, completedSessions: 287 },
+  { day: "CN", avgExecutionTime: 3.5, completedSessions: 251 },
 ];
 
-type TimeRange = "week" | "month" | "quarter" | "year";
+// Mock data for system transaction history
+const transactionHistoryData = [
+  {
+    id: "TXN001",
+    date: "2024-11-13 14:30",
+    type: "Thanh toán gói",
+    novice: "Nguyễn Văn A",
+    instructor: "Trần Thị B",
+    amount: 2500000,
+    commission: 750000,
+    status: "Hoàn thành",
+    method: "VNPay"
+  },
+  {
+    id: "TXN002",
+    date: "2024-11-13 13:15",
+    type: "Hoàn tiền",
+    novice: "Lê Văn C",
+    instructor: "Phạm Thị D",
+    amount: -1200000,
+    commission: 0,
+    status: "Đã hoàn",
+    method: "Chuyển khoản"
+  },
+  {
+    id: "TXN003",
+    date: "2024-11-13 12:45",
+    type: "Đền bù hủy muộn",
+    novice: "Hoàng Văn E",
+    instructor: "Võ Thị F",
+    amount: 600000,
+    commission: 0,
+    status: "Đang xử lý",
+    method: "Ví DriveMate"
+  },
+  {
+    id: "TXN004",
+    date: "2024-11-13 11:20",
+    type: "Thanh toán session",
+    novice: "Đặng Văn G",
+    instructor: "Bùi Thị H",
+    amount: 500000,
+    commission: 150000,
+    status: "Hoàn thành",
+    method: "Momo"
+  },
+  {
+    id: "TXN005",
+    date: "2024-11-13 10:30",
+    type: "Thanh toán gói",
+    novice: "Vũ Văn I",
+    instructor: "Đinh Thị K",
+    amount: 3500000,
+    commission: 1050000,
+    status: "Hoàn thành",
+    method: "VNPay"
+  },
+  {
+    id: "TXN006",
+    date: "2024-11-13 09:15",
+    type: "Rút tiền",
+    novice: "-",
+    instructor: "Ngô Văn L",
+    amount: -2000000,
+    commission: -50000,
+    status: "Đã chuyển",
+    method: "Ngân hàng"
+  },
+  {
+    id: "TXN007",
+    date: "2024-11-13 08:45",
+    type: "Phí phạt",
+    novice: "Trịnh Văn M",
+    instructor: "-",
+    amount: 200000,
+    commission: 200000,
+    status: "Hoàn thành",
+    method: "Tự động"
+  },
+  {
+    id: "TXN008",
+    date: "2024-11-12 16:30",
+    type: "Thanh toán gói",
+    novice: "Phan Thị N",
+    instructor: "Lý Văn O",
+    amount: 1800000,
+    commission: 540000,
+    status: "Hoàn thành",
+    method: "ZaloPay"
+  }
+];
+
+
+
+type TimeRange = "week" | "month" | "year";
 
 const changeClassMap: Record<(typeof financialStats)[number]["color"], string> =
   {
@@ -159,25 +281,89 @@ const getChangeColor = (change: string): "up" | "down" | "neutral" => {
 };
 
 function AdminDashboard() {
+  const [viewMode, setViewMode] = useState<"year" | "month" | "week">("month");
   const [timeRange, setTimeRange] = useState("month");
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [selectedQuarter, setSelectedQuarter] = useState(Math.ceil((new Date().getMonth() + 1) / 3));
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
-  const [selectedWeek, setSelectedWeek] = useState(1);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  
+  // Get current date dynamically
+  const now = new Date();
+  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
+  
+  // Calculate current week of the month dynamically
+  const getCurrentWeekOfMonth = (year: number, month: number, day?: number) => {
+    const targetDate = day ? new Date(year, month - 1, day) : new Date();
+    const firstDayOfMonth = new Date(year, month - 1, 1);
+    const firstWeekday = firstDayOfMonth.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const currentDay = targetDate.getDate();
+    
+    // Calculate which week of the month this day falls into
+    return Math.ceil((currentDay + firstWeekday) / 7);
+  };
+  
+  const [selectedWeek, setSelectedWeek] = useState(getCurrentWeekOfMonth(now.getFullYear(), now.getMonth() + 1, now.getDate()));
+  
+  // Calculate available years (current year and previous years)
+  const getAvailableYears = () => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let i = 0; i < 10; i++) {
+      years.push(currentYear - i);
+    }
+    return years;
+  };
+  
+  // Calculate available months for selected year
+  const getAvailableMonths = (year: number) => {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1;
+    
+    if (year === currentYear) {
+      // For current year, only show months up to current month
+      return Array.from({ length: currentMonth }, (_, i) => i + 1);
+    } else if (year < currentYear) {
+      // For past years, show all 12 months
+      return Array.from({ length: 12 }, (_, i) => i + 1);
+    } else {
+      // For future years (shouldn't happen), show no months
+      return [];
+    }
+  };
+  
+  // Calculate available weeks for selected month/year
+  const getAvailableWeeks = (year: number, month: number) => {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1;
+    
+    // Get the last day of the selected month
+    const lastDayOfMonth = new Date(year, month, 0).getDate();
+    const firstDayOfMonth = new Date(year, month - 1, 1);
+    const firstWeekday = firstDayOfMonth.getDay();
+    
+    // Calculate total weeks in this month
+    const totalWeeks = Math.ceil((lastDayOfMonth + firstWeekday) / 7);
+    
+    if (year === currentYear && month === currentMonth) {
+      // For current month, only show weeks up to current week
+      const currentWeek = getCurrentWeekOfMonth(year, month, currentDate.getDate());
+      return Array.from({ length: currentWeek }, (_, i) => i + 1);
+    } else if (year < currentYear || (year === currentYear && month < currentMonth)) {
+      // For past months, show all weeks
+      return Array.from({ length: totalWeeks }, (_, i) => i + 1);
+    } else {
+      // For future months (shouldn't happen), show no weeks
+      return [];
+    }
+  };
 
-  // Get current date info
-  const now = useMemo(() => new Date(), []);
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth(); // 0-11
-  const daysInCurrentMonth = new Date(
-    currentYear,
-    currentMonth + 1,
-    0
-  ).getDate();
+  // Use viewMode as the current time range
+  const currentTimeRange = viewMode;
 
   // Generate filtered data based on timeRange
   const filteredRevenueData = useMemo(() => {
-    switch (timeRange) {
+    switch (currentTimeRange) {
       case "week": {
         // Show 7 days of the selected week
         return Array.from({ length: 7 }, (_, i) => {
@@ -207,21 +393,6 @@ function AdminDashboard() {
           };
         });
       }
-      case "quarter": {
-        // Show 3 months of selected quarter
-        const startMonth = (selectedQuarter - 1) * 3 + 1;
-        return Array.from({ length: 3 }, (_, i) => {
-          const monthNum = startMonth + i;
-          const baseRevenue = 50000 + (monthNum % 6) * 8000;
-          const revenue = baseRevenue + Math.random() * 20000;
-          const commission = revenue * 0.3;
-          return {
-            month: `T${monthNum}`,
-            revenue: Math.round(revenue),
-            commission: Math.round(commission),
-          };
-        });
-      }
       case "year": {
         // Show 12 months of selected year
         return Array.from({ length: 12 }, (_, i) => {
@@ -242,25 +413,23 @@ function AdminDashboard() {
       default:
         return revenueData;
     }
-  }, [timeRange, selectedYear, selectedMonth, selectedQuarter, selectedWeek]);
+  }, [viewMode, selectedYear, selectedMonth, selectedWeek]);
 
   // Filter user stats based on timeRange
   const filteredUserStats = useMemo(() => {
     const baseValue =
-      timeRange === "week" ? 50 : timeRange === "month" ? 200 : timeRange === "quarter" ? 800 : 3000;
+      currentTimeRange === "week" ? 50 : currentTimeRange === "month" ? 200 : 3000;
     const multiplier =
-      timeRange === "week" ? 7 : timeRange === "month" ? 30 : timeRange === "quarter" ? 90 : 365;
+      currentTimeRange === "week" ? 7 : currentTimeRange === "month" ? 30 : 365;
 
     return userStats.map((stat, index) => {
       const variation = (index % 3) * 0.1;
       const value = Math.round(baseValue * (1 + variation));
       const change =
-        timeRange === "week"
+        currentTimeRange === "week"
           ? "+8.2%"
-          : timeRange === "month"
+          : currentTimeRange === "month"
           ? "+12.5%"
-          : timeRange === "quarter"
-          ? "+15.8%"
           : "+18.3%";
       const color = getChangeColor(change);
       return {
@@ -275,7 +444,7 @@ function AdminDashboard() {
   // Filter financial stats based on timeRange
   const filteredFinancialStats = useMemo(() => {
     const baseMultiplier =
-      timeRange === "week" ? 0.25 : timeRange === "month" ? 1 : timeRange === "quarter" ? 3 : 12;
+      currentTimeRange === "week" ? 0.25 : currentTimeRange === "month" ? 1 : 12;
 
     return financialStats.map((stat) => {
       const baseValue =
@@ -305,85 +474,62 @@ function AdminDashboard() {
         color,
       };
     });
-  }, [timeRange]);
+  }, [viewMode]);
 
   // Filter activity data based on timeRange (percentages remain the same)
   const filteredActivityData = useMemo(() => {
     return activityData;
-  }, [timeRange]);
+  }, [viewMode]);
 
   // Filter top packages based on timeRange
   const filteredTopPackages = useMemo(() => {
     const multiplier =
-      timeRange === "week"
+      currentTimeRange === "week"
         ? 0.25
-        : timeRange === "month"
+        : currentTimeRange === "month"
         ? 1
-        : timeRange === "quarter"
-        ? 3
         : 12;
     return topPackages.map((pkg) => ({
       ...pkg,
       purchases: Math.round(pkg.purchases * multiplier),
     }));
-  }, [timeRange]);
+  }, [viewMode]);
 
   // Filter top instructors based on timeRange
   const filteredTopInstructors = useMemo(() => {
     const multiplier =
-      timeRange === "week"
+      currentTimeRange === "week"
         ? 0.25
-        : timeRange === "month"
+        : currentTimeRange === "month"
         ? 1
-        : timeRange === "quarter"
-        ? 3
         : 12;
     return topInstructors.map((instructor) => ({
       ...instructor,
       sessions: Math.round(instructor.sessions * multiplier),
     }));
-  }, [timeRange]);
+  }, [viewMode]);
 
   // Filter top vehicles based on timeRange
   const filteredTopVehicles = useMemo(() => {
     const multiplier =
-      timeRange === "week"
+      currentTimeRange === "week"
         ? 0.25
-        : timeRange === "month"
+        : currentTimeRange === "month"
         ? 1
-        : timeRange === "quarter"
-        ? 3
         : 12;
     return topVehicles.map((vehicle) => ({
       ...vehicle,
       rentals: Math.round(vehicle.rentals * multiplier),
     }));
-  }, [timeRange]);
+  }, [viewMode]);
 
-  // Get dynamic description text
-  const getDescriptionText = () => {
-    switch (timeRange) {
-      case "week":
-        return `Tổng quan hoạt động hệ thống trong tuần ${selectedWeek} tháng ${selectedMonth}/${selectedYear}`;
-      case "month":
-        return `Tổng quan hoạt động hệ thống trong tháng ${selectedMonth}/${selectedYear}`;
-      case "quarter":
-        return `Tổng quan hoạt động hệ thống trong quý ${selectedQuarter}/${selectedYear}`;
-      case "year":
-        return `Tổng quan hoạt động hệ thống trong năm ${selectedYear}`;
-      default:
-        return "Tổng quan hoạt động hệ thống";
-    }
-  };
 
   const getTimeRangeDescription = () => {
-    switch (timeRange) {
+    switch (currentTimeRange) {
       case "week":
         return `Tuần ${selectedWeek}, Tháng ${selectedMonth}/${selectedYear}`;
       case "month":
         return `Tháng ${selectedMonth}/${selectedYear}`;
-      case "quarter":
-        return `Quý ${selectedQuarter}/${selectedYear}`;
       case "year":
         return `Năm ${selectedYear}`;
       default:
@@ -398,96 +544,152 @@ function AdminDashboard() {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-3xl font-bold text-foreground">
-                Dashboard Admin
+                Tổng Quan Hệ Thống
               </h1>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {getDescriptionText()}
-              </p>
             </div>
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-3">
-                {(["week", "month", "quarter", "year"] as const).map((range) => (
-                  <Button
-                    key={range}
-                    variant={timeRange === range ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setTimeRange(range)}
-                    className="capitalize"
-                  >
-                    {range === "week"
-                      ? "Tuần"
-                      : range === "month"
-                      ? "Tháng"
-                      : range === "quarter"
-                      ? "Quý"
-                      : "Năm"}
-                  </Button>
-                ))}
-              </div>
+            <div className="relative">
+              {/* Filter Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  console.log("Filter button clicked, current state:", isFilterOpen);
+                  setIsFilterOpen(!isFilterOpen);
+                }}
+                className="flex items-center gap-2"
+              >
+                <Filter className="h-4 w-4" />
+                <span>Bộ lọc {isFilterOpen ? '(Mở)' : '(Đóng)'}</span>
+                <ChevronDown className={`h-4 w-4 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+              </Button>
 
-              {/* Time Period Selectors - Grid Layout */}
-              <div className="grid grid-cols-4 gap-4 items-center min-h-[40px]">
-                {/* Year Selector - Always in first position */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground whitespace-nowrap">Năm:</span>
-                  <select 
-                    value={selectedYear} 
-                    onChange={(e) => setSelectedYear(Number(e.target.value))}
-                    className="flex-1 px-2 py-1 border rounded-md text-sm bg-background"
-                  >
-                    {Array.from({ length: timeRange === "year" ? 10 : 5 }, (_, i) => {
-                      const year = new Date().getFullYear() - i;
-                      return <option key={year} value={year}>{year}</option>;
-                    })}
-                  </select>
-                </div>
+              {/* Filter Dropdown */}
+              {isFilterOpen && (
+                <div className="absolute top-full right-0 mt-2 w-80 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-4" style={{backgroundColor: 'white', border: '1px solid #ccc'}}>
+                  <div className="space-y-4">
+                    {/* View Mode Selection */}
+                    <div>
+                      <label className="text-sm font-medium text-black mb-2 block">Xem theo:</label>
+                      <div className="flex gap-2">
+                        {(["year", "month", "week"] as const).map((mode) => (
+                          <Button
+                            key={mode}
+                            variant={viewMode === mode ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setViewMode(mode)}
+                            className="flex-1"
+                          >
+                            {mode === "year" ? "Năm" : mode === "month" ? "Tháng" : "Tuần"}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
 
-                {/* Quarter Selector - Second position */}
-                <div className={`flex items-center gap-2 ${timeRange !== "quarter" ? "opacity-50 pointer-events-none" : ""}`}>
-                  <span className="text-sm text-muted-foreground whitespace-nowrap">Quý:</span>
-                  <select 
-                    value={selectedQuarter} 
-                    onChange={(e) => setSelectedQuarter(Number(e.target.value))}
-                    className="flex-1 px-2 py-1 border rounded-md text-sm bg-background"
-                    disabled={timeRange !== "quarter"}
-                  >
-                    <option value={1}>Q1</option>
-                    <option value={2}>Q2</option>
-                    <option value={3}>Q3</option>
-                    <option value={4}>Q4</option>
-                  </select>
-                </div>
+                    {/* Time Period Selectors */}
+                    <div className="space-y-3">
+                      {/* Year Selector - Always visible */}
+                      <div>
+                        <label className="text-sm font-medium text-foreground mb-1 block">Năm:</label>
+                        <select 
+                          value={selectedYear} 
+                          onChange={(e) => {
+                            const newYear = Number(e.target.value);
+                            setSelectedYear(newYear);
+                            
+                            // Reset month to latest available month for the selected year
+                            if (viewMode !== "year") {
+                              const availableMonths = getAvailableMonths(newYear);
+                              const latestMonth = availableMonths[availableMonths.length - 1] || 1;
+                              setSelectedMonth(latestMonth);
+                              
+                              // Reset week to latest available week for the selected month
+                              if (viewMode === "week") {
+                                const availableWeeks = getAvailableWeeks(newYear, latestMonth);
+                                const latestWeek = availableWeeks[availableWeeks.length - 1] || 1;
+                                setSelectedWeek(latestWeek);
+                              }
+                            }
+                          }}
+                          className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background"
+                        >
+                          {getAvailableYears().map((year) => (
+                            <option key={year} value={year}>{year}</option>
+                          ))}
+                        </select>
+                      </div>
 
-                {/* Month Selector - Third position */}
-                <div className={`flex items-center gap-2 ${timeRange !== "month" && timeRange !== "week" ? "opacity-50 pointer-events-none" : ""}`}>
-                  <span className="text-sm text-muted-foreground whitespace-nowrap">Tháng:</span>
-                  <select 
-                    value={selectedMonth} 
-                    onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                    className="flex-1 px-2 py-1 border rounded-md text-sm bg-background"
-                    disabled={timeRange !== "month" && timeRange !== "week"}
-                  >
-                    {Array.from({ length: 12 }, (_, i) => (
-                      <option key={i + 1} value={i + 1}>{i + 1}</option>
-                    ))}
-                  </select>
-                </div>
+                      {/* Month Selector - Show only if viewMode is month or week */}
+                      {(viewMode === "month" || viewMode === "week") && (
+                        <div>
+                          <label className="text-sm font-medium text-foreground mb-1 block">Tháng:</label>
+                          <select 
+                            value={selectedMonth} 
+                            onChange={(e) => {
+                              const newMonth = Number(e.target.value);
+                              setSelectedMonth(newMonth);
+                              
+                              // Reset week to latest available week for the selected month
+                              if (viewMode === "week") {
+                                const availableWeeks = getAvailableWeeks(selectedYear, newMonth);
+                                const latestWeek = availableWeeks[availableWeeks.length - 1] || 1;
+                                setSelectedWeek(latestWeek);
+                              }
+                            }}
+                            className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background"
+                          >
+                            {getAvailableMonths(selectedYear).map((month) => (
+                              <option key={month} value={month}>{month}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
 
-                {/* Week Selector - Fourth position */}
-                <div className={`flex items-center gap-2 ${timeRange !== "week" ? "opacity-50 pointer-events-none" : ""}`}>
-                  <span className="text-sm text-muted-foreground whitespace-nowrap">Tuần:</span>
-                  <select 
-                    value={selectedWeek} 
-                    onChange={(e) => setSelectedWeek(Number(e.target.value))}
-                    className="flex-1 px-2 py-1 border rounded-md text-sm bg-background"
-                    disabled={timeRange !== "week"}
-                  >
-                    {Array.from({ length: 4 }, (_, i) => (
-                      <option key={i + 1} value={i + 1}>{i + 1}</option>
-                    ))}
-                  </select>
+                      {/* Week Selector - Show only if viewMode is week */}
+                      {viewMode === "week" && (
+                        <div>
+                          <label className="text-sm font-medium text-foreground mb-1 block">Tuần:</label>
+                          <select 
+                            value={selectedWeek} 
+                            onChange={(e) => setSelectedWeek(Number(e.target.value))}
+                            className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background"
+                          >
+                            {getAvailableWeeks(selectedYear, selectedMonth).map((week) => (
+                              <option key={week} value={week}>{week}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Apply/Close buttons */}
+                    <div className="flex gap-2 pt-2 border-t border-border">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsFilterOpen(false)}
+                        className="flex-1"
+                      >
+                        Đóng
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => setIsFilterOpen(false)}
+                        className="flex-1"
+                      >
+                        Áp dụng
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* Click outside to close */}
+              {isFilterOpen && (
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setIsFilterOpen(false)}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -689,16 +891,16 @@ function AdminDashboard() {
           <Card className="bg-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Car className="h-5 w-5 text-primary" />
-                Phân Bố Loại Đường
+                <Calendar className="h-5 w-5 text-primary" />
+                Thống Kê Trạng Thái Session
               </CardTitle>
-              <CardDescription>Được chọn nhiều nhất</CardDescription>
+              <CardDescription>Tình trạng các buổi học</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
-                    data={roadTypeData}
+                    data={sessionStatusData}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
@@ -706,7 +908,7 @@ function AdminDashboard() {
                     paddingAngle={2}
                     dataKey="value"
                   >
-                    {roadTypeData.map((entry, index) => (
+                    {sessionStatusData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
@@ -716,11 +918,74 @@ function AdminDashboard() {
                       border: "1px solid hsl(var(--border))",
                       color: "hsl(var(--foreground))",
                     }}
+                    formatter={(value, name) => [
+                      `${value} buổi`,
+                      name
+                    ]}
                   />
                 </PieChart>
               </ResponsiveContainer>
               <div className="mt-4 space-y-2">
-                {roadTypeData.slice(0, 4).map((item) => (
+                {sessionStatusData.map((item) => (
+                  <div
+                    key={item.name}
+                    className="flex items-center justify-between text-sm"
+                  >
+                    <span className="flex items-center gap-2 text-muted-foreground">
+                      <span
+                        className="h-2 w-2 rounded-full"
+                        style={{ backgroundColor: item.color }}
+                      />
+                      {item.name}
+                    </span>
+                    <span className="font-medium text-foreground">
+                      {item.value} buổi
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <XCircle className="h-5 w-5 text-primary" />
+                Thống Kê Cancel & Refund
+              </CardTitle>
+              <CardDescription>Phân tích hủy lịch và hoàn tiền</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={cancelRefundData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    paddingAngle={2}
+                    dataKey="value"
+                  >
+                    {cancelRefundData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
+                      color: "hsl(var(--foreground))",
+                    }}
+                    formatter={(value, name) => [
+                      `${value} trường hợp`,
+                      name
+                    ]}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="mt-4 space-y-2">
+                {cancelRefundData.map((item) => (
                   <div
                     key={item.name}
                     className="flex items-center justify-between text-sm"
@@ -740,73 +1005,6 @@ function AdminDashboard() {
               </div>
             </CardContent>
           </Card>
-
-          <Card className="bg-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-primary" />
-                Khung Giờ Booking
-              </CardTitle>
-              <CardDescription>Phân bố theo giờ</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={[
-                      { name: "Sáng (6-12h)", value: 35, color: "#3b82f6" },
-                      { name: "Chiều (12-18h)", value: 45, color: "#10b981" },
-                      { name: "Tối (18-20h)", value: 20, color: "#f59e0b" },
-                    ]}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={2}
-                    dataKey="value"
-                  >
-                    {[
-                      { name: "Sáng (6-12h)", value: 35, color: "#3b82f6" },
-                      { name: "Chiều (12-18h)", value: 45, color: "#10b981" },
-                      { name: "Tối (18-20h)", value: 20, color: "#f59e0b" },
-                    ].map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      color: "hsl(var(--foreground))",
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="mt-4 space-y-2">
-                {[
-                  { name: "Sáng (6-12h)", value: 35, color: "#3b82f6" },
-                  { name: "Chiều (12-18h)", value: 45, color: "#10b981" },
-                  { name: "Tối (18-20h)", value: 20, color: "#f59e0b" },
-                ].map((item) => (
-                  <div
-                    key={item.name}
-                    className="flex items-center justify-between text-sm"
-                  >
-                    <span className="flex items-center gap-2 text-muted-foreground">
-                      <span
-                        className="h-2 w-2 rounded-full"
-                        style={{ backgroundColor: item.color }}
-                      />
-                      {item.name}
-                    </span>
-                    <span className="font-medium text-foreground">
-                      {item.value}%
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* 2 Charts Row */}
@@ -814,75 +1012,68 @@ function AdminDashboard() {
           <Card className="bg-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Car className="h-5 w-5 text-primary" />
-                Gói Có Xe vs Không Có Xe
+                <Calendar className="h-5 w-5 text-primary" />
+                Thời Gian Đặt Lịch Session
               </CardTitle>
-              <CardDescription>Tỷ lệ lựa chọn phương tiện</CardDescription>
+              <CardDescription>Số lượng booking theo tháng</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="w-full overflow-x-auto">
                 <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={[
-                    { month: "Th1", coXe: 68, khongCoXe: 32 },
-                    { month: "Th2", coXe: 72, khongCoXe: 28 },
-                    { month: "Th3", coXe: 65, khongCoXe: 35 },
-                    { month: "Th4", coXe: 70, khongCoXe: 30 },
-                    { month: "Th5", coXe: 75, khongCoXe: 25 },
-                    { month: "Th6", coXe: 68, khongCoXe: 32 },
-                  ]}>
+                  <AreaChart data={bookingTimeData}>
                     <defs>
-                      <linearGradient id="colorCoXe" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
-                      </linearGradient>
-                      <linearGradient id="colorKhongCoXe" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#ef4444" stopOpacity={0.1}/>
+                      <linearGradient id="colorBooking" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
                       </linearGradient>
                     </defs>
                     <CartesianGrid
                       strokeDasharray="3 3"
                       stroke="hsl(var(--border))"
+                      horizontal={true}
+                      vertical={true}
                     />
                     <XAxis
                       dataKey="month"
                       stroke="hsl(var(--muted-foreground))"
                       fontSize={12}
+                      axisLine={true}
+                      tickLine={true}
                     />
-                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                    <YAxis 
+                      stroke="hsl(var(--muted-foreground))" 
+                      fontSize={12}
+                      axisLine={true}
+                      tickLine={true}
+                    />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: "hsl(var(--card))",
                         border: "1px solid hsl(var(--border))",
                         color: "hsl(var(--foreground))",
                       }}
+                      formatter={(value) => [`${value} booking`, "Số lượng đặt lịch"]}
                     />
+                    <Legend />
                     <Area
                       type="monotone"
-                      dataKey="coXe"
-                      stackId="1"
-                      stroke="#10b981"
-                      fill="url(#colorCoXe)"
-                      strokeWidth={2}
+                      dataKey="bookingCount"
+                      stroke="#3b82f6"
+                      fillOpacity={1}
+                      fill="url(#colorBooking)"
+                      strokeWidth={3}
+                      name="Số lượng booking"
                       dot={{ 
-                        fill: "#10b981", 
+                        fill: "#3b82f6", 
                         strokeWidth: 2, 
                         stroke: "#ffffff",
-                        r: 4 
+                        r: 5 
                       }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="khongCoXe"
-                      stackId="1"
-                      stroke="#ef4444"
-                      fill="url(#colorKhongCoXe)"
-                      strokeWidth={2}
-                      dot={{ 
-                        fill: "#ef4444", 
-                        strokeWidth: 2, 
-                        stroke: "#ffffff",
-                        r: 4 
+                      activeDot={{ 
+                        r: 7, 
+                        stroke: "#3b82f6", 
+                        strokeWidth: 2,
+                        fill: "#ffffff"
                       }}
                     />
                   </AreaChart>
@@ -894,19 +1085,19 @@ function AdminDashboard() {
           <Card className="bg-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-primary" />
-                Thời Gian Session & Booking
+                <Zap className="h-5 w-5 text-primary" />
+                Thời Gian Thực Thi Session
               </CardTitle>
-              <CardDescription>Theo ngày trong tuần</CardDescription>
+              <CardDescription>Thời gian thực tế thực hiện session theo ngày</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="w-full overflow-x-auto">
                 <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={sessionDurationData}>
+                  <AreaChart data={sessionExecutionData}>
                     <defs>
-                      <linearGradient id="colorDuration" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                      <linearGradient id="colorExecution" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
                       </linearGradient>
                     </defs>
                     <CartesianGrid
@@ -925,16 +1116,17 @@ function AdminDashboard() {
                         border: "1px solid hsl(var(--border))",
                         color: "hsl(var(--foreground))",
                       }}
+                      formatter={(value) => [`${value} giờ`, "Thời gian trung bình"]}
                     />
                     <Area
                       type="monotone"
-                      dataKey="avgDuration"
-                      stroke="#3b82f6"
+                      dataKey="avgExecutionTime"
+                      stroke="#10b981"
                       fillOpacity={1}
-                      fill="url(#colorDuration)"
+                      fill="url(#colorExecution)"
                       strokeWidth={2}
                       dot={{ 
-                        fill: "#3b82f6", 
+                        fill: "#10b981", 
                         strokeWidth: 2, 
                         stroke: "#ffffff",
                         r: 4 
@@ -1067,6 +1259,87 @@ function AdminDashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Lịch Sử Giao Dịch Hệ Thống */}
+        <Card className="mt-8 bg-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-primary" />
+              Lịch Sử Giao Dịch Hệ Thống
+            </CardTitle>
+            <CardDescription>Các giao dịch gần đây trong hệ thống</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Mã GD</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Thời gian</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Loại</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Novice</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Instructor</th>
+                    <th className="text-right py-3 px-4 font-medium text-muted-foreground">Số tiền</th>
+                    <th className="text-right py-3 px-4 font-medium text-muted-foreground">Hoa hồng</th>
+                    <th className="text-center py-3 px-4 font-medium text-muted-foreground">Trạng thái</th>
+                    <th className="text-center py-3 px-4 font-medium text-muted-foreground">Phương thức</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {transactionHistoryData.map((transaction, index) => (
+                    <tr key={transaction.id} className="border-b border-border hover:bg-muted/50">
+                      <td className="py-3 px-4 font-mono text-sm">{transaction.id}</td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">{transaction.date}</td>
+                      <td className="py-3 px-4 text-sm">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          transaction.type === 'Thanh toán gói' ? 'bg-blue-100 text-blue-800' :
+                          transaction.type === 'Hoàn tiền' ? 'bg-red-100 text-red-800' :
+                          transaction.type === 'Đền bù hủy muộn' ? 'bg-orange-100 text-orange-800' :
+                          transaction.type === 'Thanh toán session' ? 'bg-green-100 text-green-800' :
+                          transaction.type === 'Rút tiền' ? 'bg-purple-100 text-purple-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {transaction.type}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-sm">{transaction.novice}</td>
+                      <td className="py-3 px-4 text-sm">{transaction.instructor}</td>
+                      <td className={`py-3 px-4 text-sm text-right font-medium ${
+                        transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {transaction.amount >= 0 ? '+' : ''}{transaction.amount.toLocaleString('vi-VN')} VNĐ
+                      </td>
+                      <td className={`py-3 px-4 text-sm text-right font-medium ${
+                        transaction.commission >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {transaction.commission >= 0 ? '+' : ''}{transaction.commission.toLocaleString('vi-VN')} VNĐ
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          transaction.status === 'Hoàn thành' ? 'bg-green-100 text-green-800' :
+                          transaction.status === 'Đã hoàn' ? 'bg-blue-100 text-blue-800' :
+                          transaction.status === 'Đang xử lý' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {transaction.status}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-sm text-center text-muted-foreground">{transaction.method}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-4 flex justify-between items-center">
+              <p className="text-sm text-muted-foreground">
+                Hiển thị {transactionHistoryData.length} giao dịch gần đây
+              </p>
+              <Button variant="outline" size="sm">
+                Xem tất cả
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </main>
     </div>
   );

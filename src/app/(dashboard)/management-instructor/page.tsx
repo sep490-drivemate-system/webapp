@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Eye, CheckCircle, XCircle, Clock, User, Users, UserCheck, UserX, Search, X, FileText, AlertTriangle, RefreshCw, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { InstructorApplication } from "@/types/instructor-management.types";
-import mockData from "@/data/mock-instructors.json";
+import mockData from "@/data/mock-instructors-updated.json";
 
 export default function ManagementInstructorPage() {
     const [selectedInstructor, setSelectedInstructor] = useState<InstructorApplication | null>(null);
@@ -24,8 +24,9 @@ export default function ManagementInstructorPage() {
     // Filter applications based on search term
     const filteredApplications = applications.filter(instructor =>
         instructor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        instructor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        instructor.phone.includes(searchTerm)
+        instructor.phone.includes(searchTerm) ||
+        instructor.emergencyContact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        instructor.emergencyContact.phone.includes(searchTerm)
     );
 
     // Pagination calculations
@@ -85,9 +86,16 @@ export default function ManagementInstructorPage() {
         // TODO: Implement reject logic
     };
 
-    const checkDocumentStatus = (documents: any) => {
-        const totalDocs = Object.keys(documents).length;
-        const verifiedDocs = Object.values(documents).filter((doc: any) => doc.verified).length;
+    const checkDocumentStatus = (instructor: InstructorApplication) => {
+        let totalDocs = Object.keys(instructor.documents).length;
+        let verifiedDocs = Object.values(instructor.documents).filter((doc: any) => doc.verified).length;
+        
+        // Add vehicle documents if vehicle exists
+        if (instructor.vehicle) {
+            totalDocs += Object.keys(instructor.vehicle.documents).length;
+            verifiedDocs += Object.values(instructor.vehicle.documents).filter((doc: any) => doc.verified).length;
+        }
+        
         return { total: totalDocs, verified: verifiedDocs, allVerified: verifiedDocs === totalDocs };
     };
 
@@ -165,7 +173,32 @@ export default function ManagementInstructorPage() {
                 </Card>
             </div>
 
-            {/* Search and Table */}
+            {/* Search */}
+            <Card>
+                <CardContent className="p-4">
+                    <div className="flex items-center gap-2">
+                        <Search className="h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Tìm kiếm theo tên, số điện thoại hoặc thông tin liên hệ khẩn cấp..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="flex-1"
+                        />
+                        {searchTerm && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSearchTerm("")}
+                                className="h-8 w-8 p-0"
+                            >
+                                <X className="h-4 w-4" />
+                            </Button>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Table */}
             <Card className="py-0">
                 <CardContent className="p-0">
                     <div className="overflow-x-auto">
@@ -174,15 +207,16 @@ export default function ManagementInstructorPage() {
                                 <TableRow>
                                     <TableHead className="text-center">STT</TableHead>
                                     <TableHead>Họ và tên</TableHead>
-                                    <TableHead>Liên hệ</TableHead>
+                                    <TableHead>Số điện thoại</TableHead>
                                     <TableHead>Ngày nộp</TableHead>
+                                    <TableHead>Có xe</TableHead>
                                     <TableHead>Trạng thái</TableHead>
                                     <TableHead className="text-center">Thao tác</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {paginatedApplications.map((instructor, index) => {
-                                    const docStatus = checkDocumentStatus(instructor.documents);
+                                    const docStatus = checkDocumentStatus(instructor);
                                     const globalIndex = startIndex + index;
                                     return (
                                         <TableRow key={instructor.id}>
@@ -193,15 +227,25 @@ export default function ManagementInstructorPage() {
                                                 <div className="font-medium">{instructor.name}</div>
                                             </TableCell>
                                             <TableCell>
-                                                <div className="space-y-1">
-                                                    <div className="text-sm">{instructor.email}</div>
-                                                    <div className="text-sm text-muted-foreground">{instructor.phone}</div>
-                                                </div>
+                                                <div className="text-sm">{instructor.phone}</div>
                                             </TableCell>
                                             <TableCell>
                                                 <div className="text-sm">
                                                     {formatDate(instructor.submittedAt)}
                                                 </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                {instructor.vehicle ? (
+                                                    <Badge variant="default" className="bg-blue-100 text-blue-800">
+                                                        <CheckCircle className="w-3 h-3 mr-1" />
+                                                        Có xe
+                                                    </Badge>
+                                                ) : (
+                                                    <Badge variant="secondary" className="bg-gray-100 text-gray-800">
+                                                        <XCircle className="w-3 h-3 mr-1" />
+                                                        Không có xe
+                                                    </Badge>
+                                                )}
                                             </TableCell>
                                             <TableCell>
                                                 {getStatusBadge(instructor.status)}
@@ -230,8 +274,15 @@ export default function ManagementInstructorPage() {
                                                                         <h3 className="font-semibold mb-2">Thông tin cá nhân</h3>
                                                                         <div className="space-y-2 text-sm">
                                                                             <div><strong>Họ tên:</strong> {instructor.name}</div>
-                                                                            <div><strong>Email:</strong> {instructor.email}</div>
+                                                                            <div><strong>Số điện thoại:</strong> {instructor.phone}</div>
                                                                             <div><strong>Ngày nộp:</strong> {formatDate(instructor.submittedAt)}</div>
+                                                                        </div>
+                                                                        <div className="mt-4">
+                                                                            <h4 className="font-medium text-sm mb-2">Liên hệ khẩn cấp</h4>
+                                                                            <div className="space-y-1 text-sm">
+                                                                                <div><strong>Họ tên:</strong> {instructor.emergencyContact.name}</div>
+                                                                                <div><strong>Số điện thoại:</strong> {instructor.emergencyContact.phone}</div>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                     <div>
@@ -249,19 +300,17 @@ export default function ManagementInstructorPage() {
                                                                                 <div className="mb-2">
                                                                                     <div className="w-16 h-16 mx-auto bg-gray-100 rounded border flex items-center justify-center mb-2">
                                                                                         <span className="text-lg font-bold text-gray-600">
-                                                                                            {key === 'b2License' ? 'B2' :
-                                                                                                key === 'cccd' ? 'CC' :
-                                                                                                    key === 'professionalCertificate' ? 'PC' :
-                                                                                                        key === 'healthCertificate' ? 'HC' :
-                                                                                                            key === 'vehiclePapers' ? 'VP' : 'VI'}
+                                                                                            {key === 'drivingLicense' ? 'DL' :
+                                                                                                key === 'professionalCertificate' ? 'PC' :
+                                                                                                    key === 'criminalRecord' ? 'CR' :
+                                                                                                        key === 'healthCertificate' ? 'HC' : 'XX'}
                                                                                         </span>
                                                                                     </div>
                                                                                     <h4 className="text-sm font-medium">
-                                                                                        {key === 'b2License' ? 'Bằng B2' :
-                                                                                            key === 'cccd' ? 'CCCD' :
-                                                                                                key === 'professionalCertificate' ? 'Chứng chỉ' :
-                                                                                                    key === 'healthCertificate' ? 'Khám sức khỏe' :
-                                                                                                        key === 'vehiclePapers' ? 'Giấy tờ xe' : 'Bảo hiểm'}
+                                                                                        {key === 'drivingLicense' ? 'Giấy phép lái xe' :
+                                                                                            key === 'professionalCertificate' ? 'Chứng chỉ hành nghề' :
+                                                                                                key === 'criminalRecord' ? 'Lý lịch tư pháp' :
+                                                                                                    key === 'healthCertificate' ? 'Giấy khám sức khỏe' : 'Khác'}
                                                                                     </h4>
                                                                                 </div>
                                                                                 <div className="space-y-2">
@@ -306,21 +355,135 @@ export default function ManagementInstructorPage() {
                                                                         <div className="flex items-center justify-between">
                                                                             <span className="text-sm font-medium">Tổng kết giấy tờ:</span>
                                                                             <div className="flex items-center gap-2">
-                                                                                {checkDocumentStatus(instructor.documents).allVerified ? (
+                                                                                {checkDocumentStatus(instructor).allVerified ? (
                                                                                     <Badge variant="default" className="bg-green-100 text-green-800">
                                                                                         <CheckCircle className="w-3 h-3 mr-1" />
-                                                                                        Đã xác thực đầy đủ ({checkDocumentStatus(instructor.documents).verified}/{checkDocumentStatus(instructor.documents).total})
+                                                                                        Đã xác thực đầy đủ ({checkDocumentStatus(instructor).verified}/{checkDocumentStatus(instructor).total})
                                                                                     </Badge>
                                                                                 ) : (
                                                                                     <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
                                                                                         <AlertTriangle className="w-3 h-3 mr-1" />
-                                                                                        Chưa đầy đủ ({checkDocumentStatus(instructor.documents).verified}/{checkDocumentStatus(instructor.documents).total})
+                                                                                        Chưa đầy đủ ({checkDocumentStatus(instructor).verified}/{checkDocumentStatus(instructor).total})
                                                                                     </Badge>
                                                                                 )}
                                                                             </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
+
+                                                                {/* Vehicle Information */}
+                                                                {instructor.vehicle && (
+                                                                    <div>
+                                                                        <h3 className="font-semibold mb-4">Thông tin xe đăng ký</h3>
+                                                                        <div className="grid grid-cols-2 gap-6">
+                                                                            {/* Vehicle Details */}
+                                                                            <div className="space-y-4">
+                                                                                <h4 className="font-medium text-sm">Chi tiết xe</h4>
+                                                                                <div className="space-y-2 text-sm">
+                                                                                    <div><strong>Hãng xe:</strong> {instructor.vehicle.brand}</div>
+                                                                                    <div><strong>Mẫu xe:</strong> {instructor.vehicle.model}</div>
+                                                                                    <div><strong>Số chỗ ngồi:</strong> {instructor.vehicle.seats}</div>
+                                                                                    <div><strong>Biển số:</strong> {instructor.vehicle.licensePlate}</div>
+                                                                                    <div><strong>Loại nhiên liệu:</strong> {instructor.vehicle.fuelType === 'gasoline' ? 'Xăng' : instructor.vehicle.fuelType === 'diesel' ? 'Dầu' : instructor.vehicle.fuelType === 'electric' ? 'Điện' : 'Hybrid'}</div>
+                                                                                    <div><strong>Chủ xe:</strong> {instructor.vehicle.ownerName}</div>
+                                                                                    <div><strong>Ngày cấp:</strong> {formatDate(instructor.vehicle.issueDate)}</div>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <h4 className="font-medium text-sm mb-2">Giá thuê</h4>
+                                                                                    <div className="space-y-1 text-sm">
+                                                                                        <div><strong>Theo giờ:</strong> {instructor.vehicle.price.hourly.toLocaleString('vi-VN')} VNĐ</div>
+                                                                                        <div><strong>Theo ngày:</strong> {instructor.vehicle.price.daily.toLocaleString('vi-VN')} VNĐ</div>
+                                                                                        <div><strong>Theo tháng:</strong> {instructor.vehicle.price.monthly.toLocaleString('vi-VN')} VNĐ</div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            {/* Vehicle Documents */}
+                                                                            <div>
+                                                                                <h4 className="font-medium text-sm mb-3">Giấy tờ xe</h4>
+                                                                                <div className="grid grid-cols-1 gap-3">
+                                                                                    {Object.entries(instructor.vehicle.documents).map(([key, doc]) => (
+                                                                                        <div key={key} className="border rounded-lg p-3">
+                                                                                            <div className="flex items-center justify-between">
+                                                                                                <div className="flex items-center gap-2">
+                                                                                                    <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+                                                                                                        <span className="text-xs font-bold text-gray-600">
+                                                                                                            {key === 'registration' ? 'REG' :
+                                                                                                                key === 'insurance' ? 'INS' :
+                                                                                                                    key === 'inspection' ? 'INSP' : 'DOC'}
+                                                                                                        </span>
+                                                                                                    </div>
+                                                                                                    <span className="text-sm font-medium">
+                                                                                                        {key === 'registration' ? 'Giấy đăng ký xe' :
+                                                                                                            key === 'insurance' ? 'Bảo hiểm xe' :
+                                                                                                                key === 'inspection' ? 'Giấy đăng kiểm' : 'Giấy tờ khác'}
+                                                                                                    </span>
+                                                                                                </div>
+                                                                                                <div className="flex items-center gap-1">
+                                                                                                    {doc.verified ? (
+                                                                                                        <Badge variant="default" className="bg-green-100 text-green-800 text-xs">
+                                                                                                            <CheckCircle className="w-3 h-3 mr-1" />
+                                                                                                            Đã xác thực
+                                                                                                        </Badge>
+                                                                                                    ) : (
+                                                                                                        <div className="flex gap-1">
+                                                                                                            <Badge variant="secondary" className="text-xs">
+                                                                                                                <Clock className="w-3 h-3 mr-1" />
+                                                                                                                Chưa xác thực
+                                                                                                            </Badge>
+                                                                                                            <Button
+                                                                                                                size="sm"
+                                                                                                                variant="outline"
+                                                                                                                className="h-6 px-2 text-xs"
+                                                                                                                onClick={() => {
+                                                                                                                    // Handle vehicle document verification
+                                                                                                                    console.log('Verify vehicle document:', key);
+                                                                                                                }}
+                                                                                                            >
+                                                                                                                <CheckCircle className="w-3 h-3" />
+                                                                                                            </Button>
+                                                                                                        </div>
+                                                                                                    )}
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    ))}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        {/* Vehicle Images */}
+                                                                        <div className="mt-4">
+                                                                            <h4 className="font-medium text-sm mb-3">Hình ảnh xe</h4>
+                                                                            <div className="grid grid-cols-2 gap-3">
+                                                                                <div className="text-center">
+                                                                                    <div className="w-full h-24 bg-gray-100 rounded border mb-1 flex items-center justify-center">
+                                                                                        <span className="text-xs text-gray-500">Mặt trước</span>
+                                                                                    </div>
+                                                                                    <span className="text-xs text-gray-600">Front</span>
+                                                                                </div>
+                                                                                <div className="text-center">
+                                                                                    <div className="w-full h-24 bg-gray-100 rounded border mb-1 flex items-center justify-center">
+                                                                                        <span className="text-xs text-gray-500">Mặt sau</span>
+                                                                                    </div>
+                                                                                    <span className="text-xs text-gray-600">Back</span>
+                                                                                </div>
+                                                                                <div className="text-center">
+                                                                                    <div className="w-full h-24 bg-gray-100 rounded border mb-1 flex items-center justify-center">
+                                                                                        <span className="text-xs text-gray-500">Bên hông</span>
+                                                                                    </div>
+                                                                                    <span className="text-xs text-gray-600">Side</span>
+                                                                                </div>
+                                                                                <div className="text-center">
+                                                                                    <div className="w-full h-24 bg-gray-100 rounded border mb-1 flex items-center justify-center">
+                                                                                        <span className="text-xs text-gray-500">Nội thất</span>
+                                                                                    </div>
+                                                                                    <span className="text-xs text-gray-600">Interior</span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
 
                                                                 {/* Action Buttons */}
                                                                 {instructor.status === 'pending' && (
@@ -342,7 +505,7 @@ export default function ManagementInstructorPage() {
                                                                                 handleApprove(instructor.id);
                                                                                 setSelectedInstructor(null);
                                                                             }}
-                                                                            disabled={!checkDocumentStatus(instructor.documents).allVerified}
+                                                                            disabled={!checkDocumentStatus(instructor).allVerified}
                                                                         >
                                                                             <CheckCircle className="w-4 h-4 mr-2" />
                                                                             Duyệt đơn
@@ -470,11 +633,13 @@ export default function ManagementInstructorPage() {
                             <div className="text-sm text-gray-600">
                                 <p>Bạn đang yêu cầu nộp lại giấy tờ:</p>
                                 <p className="font-semibold">
-                                    {reapplyDocument.docType === 'b2License' ? 'Bằng lái xe B2' :
-                                        reapplyDocument.docType === 'cccd' ? 'Căn cước công dân' :
-                                            reapplyDocument.docType === 'professionalCertificate' ? 'Chứng chỉ hành nghề' :
+                                    {reapplyDocument.docType === 'drivingLicense' ? 'Giấy phép lái xe' :
+                                        reapplyDocument.docType === 'professionalCertificate' ? 'Chứng chỉ hành nghề' :
+                                            reapplyDocument.docType === 'criminalRecord' ? 'Lý lịch tư pháp' :
                                                 reapplyDocument.docType === 'healthCertificate' ? 'Giấy khám sức khỏe' :
-                                                    reapplyDocument.docType === 'vehiclePapers' ? 'Giấy tờ xe' : 'Bảo hiểm xe'}
+                                                    reapplyDocument.docType === 'registration' ? 'Giấy đăng ký xe' :
+                                                        reapplyDocument.docType === 'insurance' ? 'Bảo hiểm xe' :
+                                                            reapplyDocument.docType === 'inspection' ? 'Giấy đăng kiểm xe' : 'Giấy tờ khác'}
                                 </p>
                             </div>
 
@@ -488,7 +653,7 @@ export default function ManagementInstructorPage() {
                                     </div>
                                 </div>
 
-                                {(reapplyDocument.docType === 'b2License' || reapplyDocument.docType === 'cccd') && (
+                                {(reapplyDocument.docType === 'drivingLicense' || reapplyDocument.docType === 'registration' || reapplyDocument.docType === 'insurance' || reapplyDocument.docType === 'inspection') && (
                                     <div>
                                         <label className="block text-sm font-medium mb-2">Chụp ảnh mặt sau</label>
                                         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
