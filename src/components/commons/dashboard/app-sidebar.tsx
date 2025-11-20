@@ -15,11 +15,19 @@ import {
   IconFolder,
   IconHelp,
   IconHistory,
+  IconHotelService,
   IconInnerShadowTop,
+  IconKey,
   IconListDetails,
+  IconNavigation,
+  IconNews,
   IconReport,
+  IconRulerMeasure,
+  IconRulerOff,
   IconSearch,
+  IconServicemark,
   IconSettings,
+  IconShieldLock,
   IconStar,
   IconStarFilled,
   IconUsers,
@@ -146,43 +154,37 @@ const data = {
       ],
     },
   ],
-  // navSecondary: [
-  //   {
-  //     title: "Settings",
-  //     url: "/dashboard/settings",
-  //     icon: IconSettings,
-  //   },
-  //   {
-  //     title: "Get Help",
-  //     url: "/dashboard/help",
-  //     icon: IconHelp,
-  //   },
-  //   {
-  //     title: "Search",
-  //     url: "/dashboard/search",
-  //     icon: IconSearch,
-  //   },
-  // ],
   documents: [
     {
       name: "Quản lý người hướng dẫn",
-      url: "/management-instructor",
+      url: "/instructor-management",
       icon: IconUsersGroup,
     },
     {
-      name: "Quản lý bài viết",
-      url: "/management-article",
-      icon: IconBook,
+      name: "Quản lý xe tập lái",
+      url: "/car-instructor-management",
+      icon: IconCar,
     },
     {
-      name: "Reports",
+      name: "Quản lý tin tức và bài viết",
+      url: "/blogs-management",
+      icon: IconNews,
+    },
+    {
+      name: "Quản lý buổi huấn luyện tập lái ",
       url: "/dashboard/documents/reports",
-      icon: IconReport,
+      icon: IconNavigation,
+    },
+
+    {
+      name: "Quản lý chính sách bảo mật",
+      url: "/dashboard/documents/word-assistant",
+      icon: IconShieldLock,
     },
     {
-      name: "Word Assistant",
+      name: "Quản lý điều khoản dịch vụ",
       url: "/dashboard/documents/word-assistant",
-      icon: IconFileWord,
+      icon: IconKey,
     },
   ],
 
@@ -200,13 +202,18 @@ const data = {
     },
     {
       name: "Quản lý xe học lái",
-      url: "/",
+      url: "/car-management",
       icon: IconCar,
     },
     {
-      name: "Quản lý buổi huấn luyện",
-      url: "/",
+      name: "Quản lý gói dịch vụ",
+      url: "/service-package-management",
       icon: IconPackage,
+    },
+    {
+      name: "Quản lý buổi huấn luyện",
+      url: "/driving-session-management",
+      icon: IconNavigation,
     },
     {
       name: "Thông báo",
@@ -225,7 +232,7 @@ const data = {
     },
     {
       name: "Giấy tờ tùy thân",
-      url: "/",
+      url: "/identification-document-management",
       icon: IconFile,
     },
   ],

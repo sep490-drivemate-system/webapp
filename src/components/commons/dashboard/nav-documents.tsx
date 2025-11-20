@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   IconDots,
@@ -6,8 +6,8 @@ import {
   IconShare3,
   IconTrash,
   type Icon,
-} from "@tabler/icons-react"
-import { usePathname } from "next/navigation"
+} from "@tabler/icons-react";
+import { usePathname } from "next/navigation";
 
 import {
   DropdownMenu,
@@ -15,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -24,19 +24,19 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
+} from "@/components/ui/sidebar";
+import Link from "next/link";
 
 export function NavDocuments({
   items,
 }: {
   items: {
-    name: string
-    url: string
-    icon: Icon
-  }[]
+    name: string;
+    url: string;
+    icon: Icon;
+  }[];
 }) {
-  const { isMobile } = useSidebar()
+  const { isMobile } = useSidebar();
   const pathname = usePathname();
 
   return (
@@ -45,10 +45,7 @@ export function NavDocuments({
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton
-              asChild
-              isActive={pathname === item.url}
-            >
+            <SidebarMenuButton asChild isActive={pathname === item.url}>
               <Link href={item.url}>
                 <item.icon />
                 <span>{item.name}</span>
@@ -86,13 +83,7 @@ export function NavDocuments({
             </DropdownMenu>
           </SidebarMenuItem>
         ))}
-        <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
-            <IconDots className="text-sidebar-foreground/70" />
-            <span>More</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
-  )
+  );
 }

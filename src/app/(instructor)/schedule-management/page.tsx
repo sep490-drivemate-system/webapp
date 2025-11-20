@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   Calendar,
@@ -11,6 +12,14 @@ import {
   Clock,
   SquarePen,
 } from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface BookingItem {
   id: string;
@@ -438,7 +447,7 @@ function ScheduleCalendar({
           >
             <span>{dayNumber}</span>
 
-            <div className="flex items-center justify-center gap-1 mt-1 h-1.5">
+            <div className="flex items-center justify-center gap-1 mt-0.5 h-1.5">
               {hasBookings && (
                 <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
               )}
@@ -580,10 +589,10 @@ function ScheduleBookingList({
 }
 
 function UpdateScheduleButton() {
-  const handleClick = () => {
-    // Add navigation or modal logic here
+  const router = useRouter();
 
-    console.log("Update schedule clicked");
+  const handleClick = () => {
+    router.push("/schedule-detail");
   };
 
   return (
@@ -593,7 +602,7 @@ function UpdateScheduleButton() {
     >
       <SquarePen size={18} />
 
-      <span>Cập nhật lịch</span>
+      <span>Cập nhật lịch bận</span>
     </button>
   );
 }
@@ -631,21 +640,22 @@ export default function SchedulePage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="container mx-auto px-4 py-8">
+    <main className="min-h-screen">
+      <div className="container mx-autopy-8">
         {/* Header with Update Button */}
-
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">Lịch Làm Việc</h1>
-
-            <p className="text-slate-600 mt-2">
-              Quản lý lịch trình công việc của bạn
-            </p>
-          </div>
-
-          <UpdateScheduleButton />
-        </div>
+        <Card className="rounded-2xl border bg-white p-6 shadow-sm mb-8">
+          <CardHeader>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-2">
+                <CardTitle className="text-2xl">Lịch Làm Việc</CardTitle>
+                <CardDescription>
+                  Quản lý lịch trình công việc của bạn
+                </CardDescription>
+              </div>
+              <UpdateScheduleButton />
+            </div>
+          </CardHeader>
+        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Calendar Section */}
