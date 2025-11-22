@@ -68,7 +68,7 @@ export default function ManagementInstructorPage() {
         .filter((instructor) => {
           const matchesSearch =
             instructor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            instructor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (instructor.email?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
             instructor.phone.includes(searchTerm);
           const matchesStatus =
             statusFilter === "all" || instructor.status === statusFilter;
@@ -338,7 +338,7 @@ export default function ManagementInstructorPage() {
                                     />
                                     <InfoItem
                                       label="Email"
-                                      value={instructor.email}
+                                      value={instructor.email ?? "Chưa cập nhật"}
                                     >
                                       <a
                                         href={`mailto:${instructor.email}`}
@@ -372,19 +372,19 @@ export default function ManagementInstructorPage() {
                                     <div className="grid gap-4 sm:grid-cols-3">
                                       <InfoItem
                                         label="Họ và tên"
-                                        value={cccd.fullName ?? "Chưa cập nhật"}
+                                        value={cccd?.fullName ?? "Chưa cập nhật"}
                                       />
                                       <InfoItem
                                         label="Ngày sinh"
                                         value={
-                                          cccd.dateOfBirth
+                                          cccd?.dateOfBirth
                                             ? formatDate(cccd.dateOfBirth)
                                             : "Chưa cập nhật"
                                         }
                                       />
                                       <InfoItem
                                         label="Giới tính"
-                                        value={cccd.gender ?? "Chưa cập nhật"}
+                                        value={cccd?.gender ?? "Chưa cập nhật"}
                                       />
                                     </div>
                                   </SectionShell>
@@ -392,15 +392,15 @@ export default function ManagementInstructorPage() {
                                   <SectionShell title="Giấy Phép Lái Xe">
                                     <ImagePair
                                       firstLabel="ẢNH MẶT TRƯỚC"
-                                      firstSrc={b2License.front ?? null}
+                                      firstSrc={b2License?.front ?? null}
                                       secondLabel="ẢNH MẶT SAU"
-                                      secondSrc={b2License.back ?? null}
+                                      secondSrc={b2License?.back ?? null}
                                     />
                                     <div className="grid gap-4 sm:grid-cols-2">
                                       <InfoItem
                                         label="Hạng lái xe"
                                         value={
-                                          b2License.licenseClass ??
+                                          b2License?.licenseClass ??
                                           "Chưa cập nhật"
                                         }
                                       />
@@ -412,14 +412,14 @@ export default function ManagementInstructorPage() {
                                       <ImageTile
                                         label="ẢNH CHỨNG CHỈ"
                                         src={
-                                          professionalCertificate.front ?? null
+                                          professionalCertificate?.front ?? null
                                         }
                                       />
                                       <div className="grid gap-4 sm:grid-cols-2">
                                         <InfoItem
                                           label="Hạng lái xe được đào tạo"
                                           value={
-                                            professionalCertificate.vehicleClass ??
+                                            professionalCertificate?.vehicleClass ??
                                             "Chưa cập nhật"
                                           }
                                         />
@@ -430,7 +430,7 @@ export default function ManagementInstructorPage() {
                                   <SectionShell title="Giấy Khám Sức Khỏe">
                                     <ImageTile
                                       label="ẢNH GIẤY KHÁM SỨC KHỎE"
-                                      src={healthCertificate.front ?? null}
+                                      src={healthCertificate?.front ?? null}
                                     />
                                   </SectionShell>
 
@@ -686,3 +686,4 @@ function ImageTile({ label, src }: { label: string; src: string | null }) {
     </div>
   );
 }
+

@@ -19,12 +19,13 @@ export interface ProfessionalCertificateDocument extends BaseInstructorDocument 
 }
 
 export interface InstructorDocuments {
-    b2License: DriverLicenseDocument;
-    cccd: CitizenIdDocument;
-    professionalCertificate: ProfessionalCertificateDocument;
-    healthCertificate: BaseInstructorDocument;
-    vehiclePapers: BaseInstructorDocument;
-    vehicleInsurance: BaseInstructorDocument;
+    b2License?: DriverLicenseDocument;
+    drivingLicense?: DriverLicenseDocument; // Alternative name for b2License
+    cccd?: CitizenIdDocument;
+    professionalCertificate?: ProfessionalCertificateDocument;
+    healthCertificate?: BaseInstructorDocument;
+    vehiclePapers?: BaseInstructorDocument;
+    vehicleInsurance?: BaseInstructorDocument;
 }
 
 export interface EmergencyContact {
@@ -36,11 +37,11 @@ export interface InstructorApplication {
     id: string;
     name: string;
     phone: string;
-    emergencyContact: EmergencyContact; // Thông tin liên hệ khẩn cấp
+    email?: string; // Optional email field
+    emergencyContact?: EmergencyContact; // Thông tin liên hệ khẩn cấp
     submittedAt: string;
     status: 'pending' | 'approved' | 'rejected';
     documents: InstructorDocuments;
-    emergencyContact?: EmergencyContact;
 }
 
 export interface InstructorManagementData {
