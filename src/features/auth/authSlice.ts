@@ -166,7 +166,7 @@ const authSlice = createSlice({
                     basicInfo: { signUpRequest: { userName: '', password: '', emailOrPhone: '' }, confirmPassword: '' }
                 };
             })
-            .addCase(signUp.rejected, (state, action) => {
+            .addCase(signUp.rejected, (state) => {
                 state.isLoading = false;
                 // state.errorMessage = action.error?.message || "Đăng ký thất bại";
             })

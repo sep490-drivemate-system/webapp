@@ -9,15 +9,17 @@ export const AUTH_PATH = "auth";
 export const signIn = createThunk<ISignInResponse, ISignInRequest>(
   HttpMethod.POST,
   `signin`,
-  `${AUTH_PATH}/signin`,
+  `/${AUTH_PATH}/signin`,
   {
     onSuccess: (res) => {
-      const accessToken = res.value?.accessToken;
-      const refreshToken = res.value?.refreshToken;
-      if (accessToken && refreshToken) {
-        handleTokenStorage(accessToken, refreshToken);
+      const accessToken = res.value?.token;
+      if (accessToken) {
+        handleTokenStorage(accessToken);
       }
     },
+    onError: (error) => {
+      console.log("[auth thunk] error in signIn", error);
+    }
   }
 );
 
@@ -36,8 +38,6 @@ export const signOut = createThunk<void, { refreshToken: string }>(
   }
 );
 
-
-
 export const signUp = createThunk<ISignUpResponse, ISignUpRequest>(
   HttpMethod.POST,
   `signup`,
@@ -47,34 +47,34 @@ export const signUp = createThunk<ISignUpResponse, ISignUpRequest>(
 export const sendEmailCode = createThunk<string, { email: string }>(
   HttpMethod.POST,
   `verify-email`,
-  `${AUTH_PATH}/verify-email`,
+  `${AUTH_PATH}/verify-email`
 );
 
-import type { InstructorSignupResponse, InstructorSignupRequest } from "@/types/auth/signup-instructor.types";
+import type {
+  InstructorSignupResponse,
+  InstructorSignupRequest,
+} from "@/types/auth/signup-instructor.types";
 import type { TestDto } from "@/types/test";
 
-export const signUpInstructor = createThunk<InstructorSignupResponse, InstructorSignupRequest>(
-  HttpMethod.POST,
-  `signup-instructor`,
-  `${AUTH_PATH}/instructor/signup`,
-  {
-    config: (payload) => {
-      const form = new FormData();
-      form.append("email", payload.email);
-      form.append("b2LicenseFront", payload.b2LicenseFront);
-      form.append("b2LicenseBack", payload.b2LicenseBack);
-      form.append("cccdFront", payload.cccdFront);
-      form.append("cccdBack", payload.cccdBack);
-      form.append("professionalCertificate", payload.professionalCertificate);
-      form.append("healthCertificate", payload.healthCertificate);
-      form.append("vehiclePapers", payload.vehiclePapers);
-      form.append("vehicleInsurance", payload.vehicleInsurance);
+export const signUpInstructor = createThunk<
+  InstructorSignupResponse,
+  InstructorSignupRequest
+>(HttpMethod.POST, `signup-instructor`, `${AUTH_PATH}/instructor/signup`, {
+  config: (payload) => {
+    const form = new FormData();
+    form.append("email", payload.email);
+    form.append("b2LicenseFront", payload.b2LicenseFront);
+    form.append("b2LicenseBack", payload.b2LicenseBack);
+    form.append("cccdFront", payload.cccdFront);
+    form.append("cccdBack", payload.cccdBack);
+    form.append("professionalCertificate", payload.professionalCertificate);
+    form.append("healthCertificate", payload.healthCertificate);
+    form.append("vehiclePapers", payload.vehiclePapers);
+    form.append("vehicleInsurance", payload.vehicleInsurance);
 
-      return { data: form } as any;
-    },
-  }
-);
-
+    return { data: form } as any;
+  },
+});
 
 export const test = createThunk<any, TestDto>(
   HttpMethod.POST,
@@ -87,10 +87,12 @@ export const test = createThunk<any, TestDto>(
       form.append("testccdmat.cccdmt", payload.testccdmat.cccdmt.toString());
       form.append("testccdmat.formFilecccd", payload.testccdmat.formFilecccd);
       form.append("testccdmas.cccdms", payload.testccdmas.cccdms.toString());
-      form.append("testccdmas.formFilecccdms", payload.testccdmas.formFilecccdms);
+      form.append(
+        "testccdmas.formFilecccdms",
+        payload.testccdmas.formFilecccdms
+      );
 
       return { data: form } as any;
     },
   }
 );
-

@@ -3,15 +3,12 @@ import { UserRole } from "@/types/auth/user-role.enum";
 import { jwtDecode } from "jwt-decode";
 
 export const ACCESS_TOKEN_KEY = "access_token";
-export const REFRESH_TOKEN_KEY = "refresh_token";
 
 export const handleTokenStorage = (
-  accessToken: string,
-  refreshToken: string
+  accessToken: string
 ): void => {
   if (typeof window === "undefined") return;
   localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
 };
 
 export const getAccessToken = (): string | null => {
@@ -19,15 +16,9 @@ export const getAccessToken = (): string | null => {
   return localStorage.getItem(ACCESS_TOKEN_KEY);
 };
 
-export const getRefreshToken = (): string | null => {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(REFRESH_TOKEN_KEY);
-};
-
 export const clearTokens = (): void => {
   if (typeof window === "undefined") return;
   localStorage.removeItem(ACCESS_TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
 };
 
 export const decodeAccessToken = (): IJwtPayload | null => {
@@ -49,14 +40,14 @@ export const isAccessTokenExpired = (): boolean => {
 
 export const getUserRole = (): UserRole | null => {
   const payload = decodeAccessToken();
-  if (!payload?.Role) return null;
+  if (!payload?.role) return null;
   
   // Debug: Log payload to console (remove in production)
   console.log("JWT Payload:", payload);
-  console.log("Role from payload:", payload.Role);
+  console.log("Role from payload:", payload.role);
   
   // Map string role names to enum values
-  switch (payload.Role.toLowerCase()) {
+  switch (payload.role.toLowerCase()) {
     case "demo":
       return UserRole.Demo;
     case "admin":
@@ -68,7 +59,7 @@ export const getUserRole = (): UserRole | null => {
     case "instructor":
       return UserRole.Instructor;
     default:
-      console.log("Unknown role:", payload.Role);
+      console.log("Unknown role:", payload.role);
       return null;
   }
 };
@@ -79,10 +70,10 @@ export const getUserInfo = () => {
   if (!payload) return null;
   
   return {
-    userName: payload.UserName,
-    email: payload.Email,
+    userName: payload.username,
+    email: payload.email,
     role: getUserRole(),
-    id: payload.Id,
-    createdAt: payload.CreatedAt
+    id: payload.id,
+    // createdAt: payload.createdAt
   };
 };

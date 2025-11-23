@@ -21,14 +21,14 @@ export const useSignIn = () => {
     const dispatch = useAppDispatch();
     const auth = useAppSelector((state) => state.auth);
 
-    const handleSignIn = async (data?: ISignInRequest) => {
-        const signInData = data || auth.signInData;
+    const handleSignIn = async () => {
+        const signInData = auth.signInData;
         const res = await runSignIn(signInData);
         if (res.ok) {
             dispatch(resetSignInData());
             const role = getUserRole();
             if (role === UserRole.Admin) router.push("/dashboard");
-            else if (role === UserRole.Inspector) router.push("/management-instructor");
+            else if (role === UserRole.Inspector) router.push("/instructor-management");
             else router.push("/");
         }
     };

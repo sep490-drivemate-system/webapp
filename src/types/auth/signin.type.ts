@@ -6,7 +6,5 @@ export interface ISignInRequest {
 
 // properties for responde singin
 export interface ISignInResponse {
-  accessToken: string;
-  refreshToken: string;
+  token: string;
 }
-

@@ -16,10 +16,12 @@ export function createThunk<ResponseType = void, RequestType = void>(
     { rejectValue: string }
   >(typePrefix, async (payload, { rejectWithValue }) => {
     const url = options?.buildUrl?.(payload) ?? defaultUrl;
+    const body = options?.buildBody?.(payload) ?? payload;
     const config = options?.config?.(payload);
 
     console.log(`[Thunk] Sending request - ${method} ${url}`);
     console.log(`[Thunk] Payload:`, payload);
+    console.log(`[Thunk] Body:`, body);
 
     try {
       let response;
@@ -34,21 +36,21 @@ export function createThunk<ResponseType = void, RequestType = void>(
         case HttpMethod.POST:
           response = await axiosInstance.post<GenericResponse<ResponseType>>(
             url,
-            payload,
+            body,
             config
           );
           break;
         case HttpMethod.PUT:
           response = await axiosInstance.put<GenericResponse<ResponseType>>(
             url,
-            payload,
+            body,
             config
           );
           break;
         case HttpMethod.PATCH:
           response = await axiosInstance.patch<GenericResponse<ResponseType>>(
             url,
-            payload,
+            body,
             config
           );
           break;

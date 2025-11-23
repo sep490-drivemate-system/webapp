@@ -1,3 +1,5 @@
+"use client";
+
 import { LoginForm } from "@/components/ui/login-form"
 import bgAuth from "@/../public/bg-auth.avif"
 

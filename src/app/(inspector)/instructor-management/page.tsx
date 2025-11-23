@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,8 +9,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -19,13 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Spinner } from "@/components/ui/shadcn-io/spinner";
 import {
   Table,
   TableBody,
@@ -35,31 +41,29 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  Eye,
+  getAllInstructorApplications,
+  handleInstructorApplication,
+} from "@/features/instructor/instructorThunk";
+import { useThunkAction } from "@/lib/redux/useThunkAction";
+import {
+  DrivingLicenseTier,
+  InstructorApplication,
+  InstructorStatus,
+} from "@/types/instructor-management.types";
+import {
   CheckCircle,
-  XCircle,
-  Clock,
-  Search,
-  FileText,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  MoreVertical,
+  Clock,
+  Eye,
+  FileText,
   MoreHorizontal,
+  Search,
+  XCircle,
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  InstructorApplication,
-  InstructorStatus,
-} from "@/types/instructor-management.types";
-import mockData from "@/data/mock-instructors.json";
+import React, { useMemo, useState } from "react";
 
 // Helper functions to convert between enum and string
 const statusToString = (status: InstructorStatus): string => {
@@ -75,28 +79,48 @@ const statusToString = (status: InstructorStatus): string => {
   }
 };
 
-const stringToStatus = (status: string): InstructorStatus => {
-  switch (status) {
-    case "pending":
-      return InstructorStatus.Pending;
-    case "approved":
-      return InstructorStatus.Approved;
-    case "rejected":
-      return InstructorStatus.Rejected;
+const drivingLicenseTierToString = (tier: DrivingLicenseTier): string => {
+  switch (tier) {
+    case DrivingLicenseTier.B:
+      return "B";
+    case DrivingLicenseTier.C1:
+      return "C1";
+    case DrivingLicenseTier.C:
+      return "C";
+    case DrivingLicenseTier.D1:
+      return "D1";
+    case DrivingLicenseTier.D2:
+      return "D2";
+    case DrivingLicenseTier.D:
+      return "D";
+    case DrivingLicenseTier.BE:
+      return "BE";
+    case DrivingLicenseTier.C1E:
+      return "C1E";
+    case DrivingLicenseTier.CE:
+      return "CE";
+    case DrivingLicenseTier.D1E:
+      return "D1E";
+    case DrivingLicenseTier.D2E:
+      return "D2E";
+    case DrivingLicenseTier.DE:
+      return "DE";
     default:
-      return InstructorStatus.Pending;
+      return "Chưa cập nhật";
   }
 };
 
 export default function ManagementInstructorPage() {
+  const {
+    runSafe: runGetAllInstructorApplications,
+    loading: getAllInstructorApplicationsLoading,
+  } = useThunkAction(getAllInstructorApplications);
+  const { runSafe: runHandleInstructorApplication } = useThunkAction(
+    handleInstructorApplication
+  );
   const [selectedInstructor, setSelectedInstructor] =
     useState<InstructorApplication | null>(null);
-  const [applications, setApplications] = useState<InstructorApplication[]>(
-    (mockData.instructors as any[]).map((instructor) => ({
-      ...instructor,
-      status: stringToStatus(instructor.status),
-    }))
-  );
+  const [applications, setApplications] = useState<InstructorApplication[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
     "all" | "pending" | "approved" | "rejected"
@@ -105,26 +129,30 @@ export default function ManagementInstructorPage() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const filteredApplications = useMemo(() => {
+    if (!applications || applications.length === 0) return [];
     return (
       applications
-        .filter((instructor) => {
+        .filter((instructorApplication) => {
           const matchesSearch =
-            instructor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (instructor.email
+            (instructorApplication.fullname
               ?.toLowerCase()
               .includes(searchTerm.toLowerCase()) ??
               false) ||
-            instructor.phone.includes(searchTerm);
+            (instructorApplication.email
+              ?.toLowerCase()
+              .includes(searchTerm.toLowerCase()) ??
+              false) ||
+            (instructorApplication.phone?.includes(searchTerm) ?? false);
           const matchesStatus =
             statusFilter === "all" ||
-            statusToString(instructor.status) === statusFilter;
+            statusToString(instructorApplication.applicationStatus) ===
+              statusFilter;
           return matchesSearch && matchesStatus;
         })
         // Sort by submitted date (latest first) so the newest appears at STT 1
         .sort(
           (a, b) =>
-            new Date(b.submittedAt).getTime() -
-            new Date(a.submittedAt).getTime()
+            new Date(b.submitDate).getTime() - new Date(a.submitDate).getTime()
         )
     );
   }, [applications, searchTerm, statusFilter]);
@@ -139,7 +167,19 @@ export default function ManagementInstructorPage() {
 
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, statusFilter, itemsPerPage]);
+    const fetchInstructorApplications = async () => {
+      const res = await runGetAllInstructorApplications();
+      if (res.ok) {
+        console.log(
+          "Instructor applications fetched successfully",
+          res.data.value
+        );
+        setApplications(res.data.value as InstructorApplication[]);
+      }
+    };
+    fetchInstructorApplications();
+    // }, [searchTerm, statusFilter, itemsPerPage]);
+  }, []);
 
   const goToFirstPage = () => setCurrentPage(1);
   const goToLastPage = () => setCurrentPage(totalPages);
@@ -155,13 +195,13 @@ export default function ManagementInstructorPage() {
     () => ({
       total: applications.length,
       pending: applications.filter(
-        (app) => app.status === InstructorStatus.Pending
+        (app) => app.applicationStatus === InstructorStatus.Pending
       ).length,
       approved: applications.filter(
-        (app) => app.status === InstructorStatus.Approved
+        (app) => app.applicationStatus === InstructorStatus.Approved
       ).length,
       rejected: applications.filter(
-        (app) => app.status === InstructorStatus.Rejected
+        (app) => app.applicationStatus === InstructorStatus.Rejected
       ).length,
     }),
     [applications]
@@ -203,37 +243,50 @@ export default function ManagementInstructorPage() {
     }
   };
 
-  const handleApprove = (id: string) => {
-    setApplications((prev) =>
-      prev.map((instructor) =>
-        instructor.id === id
-          ? { ...instructor, status: InstructorStatus.Approved }
-          : instructor
-      )
-    );
+  const handleApprove = async (id: string) => {
+    const res = await runHandleInstructorApplication({
+      applicationId: id,
+      action: "approve",
+      note: "",
+    });
+    if (res.ok) {
+      console.log("Instructor application approved successfully");
+      setApplications((prev) =>
+        prev.map((instructor) =>
+          instructor.applicationId === id
+            ? { ...instructor, applicationStatus: InstructorStatus.Approved }
+            : instructor
+        )
+      );
+    }
   };
 
-  const handleReject = (id: string) => {
-    setApplications((prev) =>
-      prev.map((instructor) =>
-        instructor.id === id
-          ? { ...instructor, status: InstructorStatus.Rejected }
-          : instructor
-      )
-    );
+  const handleReject = async (id: string) => {
+    const res = await runHandleInstructorApplication({
+      applicationId: id,
+      action: "reject",
+      note: "",
+    });
+    if (res.ok) {
+      console.log("Instructor application rejected successfully");
+      setApplications((prev) =>
+        prev.map((instructor) =>
+          instructor.applicationId === id
+            ? { ...instructor, applicationStatus: InstructorStatus.Rejected }
+            : instructor
+        )
+      );
+    }
   };
 
-  const checkDocumentStatus = (documents: any) => {
-    const totalDocs = Object.keys(documents).length;
-    const verifiedDocs = Object.values(documents).filter(
-      (doc: any) => doc.verified
-    ).length;
-    return {
-      total: totalDocs,
-      verified: verifiedDocs,
-      allVerified: verifiedDocs === totalDocs,
-    };
-  };
+  if (getAllInstructorApplicationsLoading) {
+    return (
+      <div className="flex flex-col gap-4 h-[calc(100vh-10rem)] items-center justify-center">
+        <Spinner variant="circle" className="size-10" />
+        <p className="text-sm text-muted-foreground">Đang tải dữ liệu...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -334,38 +387,39 @@ export default function ManagementInstructorPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                paginatedApplications.map((instructor, index) => {
-                  const {
-                    cccd,
-                    b2License,
-                    professionalCertificate,
-                    healthCertificate,
-                  } = instructor.documents;
-                  const docStatus = checkDocumentStatus(instructor.documents);
-                  const globalIndex = startIndex + index;
+                paginatedApplications.map((instructorApplication, index) => {
                   return (
-                    <TableRow key={instructor.id} className="hover:bg-muted/30">
+                    <TableRow
+                      key={instructorApplication.applicationId}
+                      className="hover:bg-muted/30"
+                    >
                       <TableCell className="text-center text-sm font-semibold text-muted-foreground">
-                        {globalIndex + 1}
+                        {index + 1}
                       </TableCell>
                       <TableCell>
-                        <div className="font-medium">{instructor.name}</div>
+                        <div className="font-medium">
+                          {instructorApplication.fullname}
+                        </div>
                       </TableCell>
                       <TableCell className="text-sm">
                         <a
-                          href={`tel:${instructor.phone}`}
+                          href={`tel:${instructorApplication.phone}`}
                           className="text-primary"
                         >
-                          {instructor.phone}
+                          {instructorApplication.phone}
                         </a>
                       </TableCell>
                       <TableCell className="text-sm underline">
-                        {instructor.email}
+                        {instructorApplication.email}
                       </TableCell>
                       <TableCell className="text-sm">
-                        {formatDate(instructor.submittedAt)}
+                        {formatDate(instructorApplication.submitDate)}
                       </TableCell>
-                      <TableCell>{getStatusBadge(instructor.status)}</TableCell>
+                      <TableCell>
+                        {getStatusBadge(
+                          instructorApplication.applicationStatus
+                        )}
+                      </TableCell>
                       <TableCell>
                         <div className="flex justify-center">
                           <DropdownMenu>
@@ -381,25 +435,33 @@ export default function ManagementInstructorPage() {
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
                                 onSelect={() => {
-                                  setSelectedInstructor(instructor);
+                                  setSelectedInstructor(instructorApplication);
                                 }}
                               >
                                 <Eye className="mr-2 size-4" />
                                 Xem chi tiết
                               </DropdownMenuItem>
-                              {instructor.status ===
+                              {instructorApplication.applicationStatus ===
                                 InstructorStatus.Pending && (
                                 <>
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem
-                                    onClick={() => handleApprove(instructor.id)}
+                                    onClick={() =>
+                                      handleApprove(
+                                        instructorApplication.applicationId
+                                      )
+                                    }
                                     className="text-emerald-600"
                                   >
                                     <CheckCircle className="mr-2 size-4" />
                                     Duyệt hồ sơ
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handleReject(instructor.id)}
+                                    onClick={() =>
+                                      handleReject(
+                                        instructorApplication.applicationId
+                                      )
+                                    }
                                     className="text-red-600"
                                   >
                                     <XCircle className="mr-2 size-4" />
@@ -495,16 +557,19 @@ export default function ManagementInstructorPage() {
           <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
-                Chi tiết đơn đăng ký - {selectedInstructor.name}
+                Chi tiết đơn đăng ký - {selectedInstructor.fullname}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-6">
               <div className="rounded-xl border bg-muted/30 p-5">
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <InfoItem label="Họ và tên" value={selectedInstructor.name} />
+                  <InfoItem
+                    label="Họ và tên"
+                    value={selectedInstructor.fullname}
+                  />
                   <InfoItem
                     label="Ngày nộp"
-                    value={formatDate(selectedInstructor.submittedAt)}
+                    value={formatDate(selectedInstructor.submitDate)}
                   />
                   <InfoItem
                     label="Email"
@@ -530,9 +595,9 @@ export default function ManagementInstructorPage() {
                   </InfoItem>
                   <InfoItem
                     label="Trạng thái"
-                    value={statusToString(selectedInstructor.status)}
+                    value={statusToString(selectedInstructor.applicationStatus)}
                   >
-                    {getStatusBadge(selectedInstructor.status)}
+                    {getStatusBadge(selectedInstructor.applicationStatus)}
                   </InfoItem>
                 </div>
               </div>
@@ -542,26 +607,24 @@ export default function ManagementInstructorPage() {
                   <div className="grid gap-4 sm:grid-cols-3">
                     <InfoItem
                       label="Họ và tên"
-                      value={
-                        selectedInstructor.documents.cccd?.fullName ??
-                        "Chưa cập nhật"
-                      }
+                      value={selectedInstructor.fullname ?? "Chưa cập nhật"}
                     />
                     <InfoItem
                       label="Ngày sinh"
                       value={
-                        selectedInstructor.documents.cccd?.dateOfBirth
-                          ? formatDate(
-                              selectedInstructor.documents.cccd.dateOfBirth
-                            )
+                        selectedInstructor.birthDate
+                          ? formatDate(selectedInstructor.birthDate)
                           : "Chưa cập nhật"
                       }
                     />
                     <InfoItem
                       label="Giới tính"
                       value={
-                        selectedInstructor.documents.cccd?.gender ??
-                        "Chưa cập nhật"
+                        selectedInstructor.gender
+                          ? selectedInstructor.gender === "Male"
+                            ? "Nam"
+                            : "Nữ"
+                          : "Chưa cập nhật"
                       }
                     />
                   </div>
@@ -570,21 +633,16 @@ export default function ManagementInstructorPage() {
                 <SectionShell title="Giấy Phép Lái Xe">
                   <ImagePair
                     firstLabel="ẢNH MẶT TRƯỚC"
-                    firstSrc={
-                      selectedInstructor.documents.b2License?.front ?? null
-                    }
+                    firstSrc={selectedInstructor.drivingLicenseFront ?? null}
                     secondLabel="ẢNH MẶT SAU"
-                    secondSrc={
-                      selectedInstructor.documents.b2License?.back ?? null
-                    }
+                    secondSrc={selectedInstructor.drivingLicenseFront ?? null}
                   />
                   <div className="grid gap-4 sm:grid-cols-2">
                     <InfoItem
                       label="Hạng lái xe"
-                      value={
-                        selectedInstructor.documents.b2License?.licenseClass ??
-                        "Chưa cập nhật"
-                      }
+                      value={drivingLicenseTierToString(
+                        selectedInstructor.drivingLicenseTier
+                      )}
                     />
                   </div>
                 </SectionShell>
@@ -593,18 +651,14 @@ export default function ManagementInstructorPage() {
                   <div className="grid gap-4 md:grid-cols-1">
                     <ImageTile
                       label="ẢNH CHỨNG CHỈ"
-                      src={
-                        selectedInstructor.documents.professionalCertificate
-                          ?.front ?? null
-                      }
+                      src={selectedInstructor.teachingLicenseFront ?? null}
                     />
                     <div className="grid gap-4 sm:grid-cols-2">
                       <InfoItem
                         label="Hạng lái xe được đào tạo"
-                        value={
-                          selectedInstructor.documents.professionalCertificate
-                            ?.vehicleClass ?? "Chưa cập nhật"
-                        }
+                        value={drivingLicenseTierToString(
+                          selectedInstructor.teachingLicenseTier
+                        )}
                       />
                     </div>
                   </div>
@@ -613,23 +667,18 @@ export default function ManagementInstructorPage() {
                 <SectionShell title="Giấy Khám Sức Khỏe">
                   <ImageTile
                     label="ẢNH GIẤY KHÁM SỨC KHỎE"
-                    src={
-                      selectedInstructor.documents.healthCertificate?.front ??
-                      null
-                    }
+                    src={selectedInstructor.healthCheckup ?? null}
                   />
                 </SectionShell>
 
                 <SectionShell title="Lý Lịch Tư Pháp">
                   <ImageTile
                     label="ẢNH LÝ LỊCH TƯ PHÁP"
-                    src={
-                      selectedInstructor.documents.criminalRecord?.front ?? null
-                    }
+                    src={selectedInstructor.personalProfile ?? null}
                   />
                 </SectionShell>
 
-                <SectionShell title="Thông Tin Liên Hệ Khẩn Cấp">
+                {/* <SectionShell title="Thông Tin Liên Hệ Khẩn Cấp">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <InfoItem
                       label="Tên người liên hệ"
@@ -657,7 +706,7 @@ export default function ManagementInstructorPage() {
                       )}
                     </InfoItem>
                   </div>
-                </SectionShell>
+                </SectionShell> */}
               </div>
             </div>
           </DialogContent>
