@@ -24,6 +24,7 @@ export interface InstructorDocuments {
     cccd?: CitizenIdDocument;
     professionalCertificate?: ProfessionalCertificateDocument;
     healthCertificate?: BaseInstructorDocument;
+    criminalRecord?: BaseInstructorDocument;
     vehiclePapers?: BaseInstructorDocument;
     vehicleInsurance?: BaseInstructorDocument;
 }
@@ -33,6 +34,12 @@ export interface EmergencyContact {
     phone?: string;
 }
 
+export enum InstructorStatus {
+    Pending = 1,
+    Approved = 2,
+    Rejected = 3,
+}
+
 export interface InstructorApplication {
     id: string;
     name: string;
@@ -40,7 +47,7 @@ export interface InstructorApplication {
     email?: string; // Optional email field
     emergencyContact?: EmergencyContact; // Thông tin liên hệ khẩn cấp
     submittedAt: string;
-    status: 'pending' | 'approved' | 'rejected';
+    status: InstructorStatus;
     documents: InstructorDocuments;
 }
 

@@ -45,15 +45,57 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  MoreVertical,
+  MoreHorizontal,
 } from "lucide-react";
-import { InstructorApplication } from "@/types/instructor-management.types";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  InstructorApplication,
+  InstructorStatus,
+} from "@/types/instructor-management.types";
 import mockData from "@/data/mock-instructors.json";
+
+// Helper functions to convert between enum and string
+const statusToString = (status: InstructorStatus): string => {
+  switch (status) {
+    case InstructorStatus.Pending:
+      return "pending";
+    case InstructorStatus.Approved:
+      return "approved";
+    case InstructorStatus.Rejected:
+      return "rejected";
+    default:
+      return "pending";
+  }
+};
+
+const stringToStatus = (status: string): InstructorStatus => {
+  switch (status) {
+    case "pending":
+      return InstructorStatus.Pending;
+    case "approved":
+      return InstructorStatus.Approved;
+    case "rejected":
+      return InstructorStatus.Rejected;
+    default:
+      return InstructorStatus.Pending;
+  }
+};
 
 export default function ManagementInstructorPage() {
   const [selectedInstructor, setSelectedInstructor] =
     useState<InstructorApplication | null>(null);
   const [applications, setApplications] = useState<InstructorApplication[]>(
-    mockData.instructors as InstructorApplication[]
+    (mockData.instructors as any[]).map((instructor) => ({
+      ...instructor,
+      status: stringToStatus(instructor.status),
+    }))
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
@@ -68,10 +110,14 @@ export default function ManagementInstructorPage() {
         .filter((instructor) => {
           const matchesSearch =
             instructor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (instructor.email?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
+            (instructor.email
+              ?.toLowerCase()
+              .includes(searchTerm.toLowerCase()) ??
+              false) ||
             instructor.phone.includes(searchTerm);
           const matchesStatus =
-            statusFilter === "all" || instructor.status === statusFilter;
+            statusFilter === "all" ||
+            statusToString(instructor.status) === statusFilter;
           return matchesSearch && matchesStatus;
         })
         // Sort by submitted date (latest first) so the newest appears at STT 1
@@ -108,9 +154,15 @@ export default function ManagementInstructorPage() {
   const stats = useMemo(
     () => ({
       total: applications.length,
-      pending: applications.filter((app) => app.status === "pending").length,
-      approved: applications.filter((app) => app.status === "approved").length,
-      rejected: applications.filter((app) => app.status === "rejected").length,
+      pending: applications.filter(
+        (app) => app.status === InstructorStatus.Pending
+      ).length,
+      approved: applications.filter(
+        (app) => app.status === InstructorStatus.Approved
+      ).length,
+      rejected: applications.filter(
+        (app) => app.status === InstructorStatus.Rejected
+      ).length,
     }),
     [applications]
   );
@@ -123,23 +175,23 @@ export default function ManagementInstructorPage() {
     });
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: InstructorStatus) => {
     switch (status) {
-      case "pending":
+      case InstructorStatus.Pending:
         return (
           <Badge className="bg-amber-50 text-amber-700">
             <Clock className="mr-1 size-3" />
             Chờ duyệt
           </Badge>
         );
-      case "approved":
+      case InstructorStatus.Approved:
         return (
           <Badge className="bg-emerald-50 text-emerald-700">
             <CheckCircle className="mr-1 size-3" />
             Đã duyệt
           </Badge>
         );
-      case "rejected":
+      case InstructorStatus.Rejected:
         return (
           <Badge className="bg-red-50 text-red-700">
             <XCircle className="mr-1 size-3" />
@@ -147,18 +199,28 @@ export default function ManagementInstructorPage() {
           </Badge>
         );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant="outline">{statusToString(status)}</Badge>;
     }
   };
 
   const handleApprove = (id: string) => {
-    console.log("Approving instructor:", id);
-    // TODO: Implement approve logic
+    setApplications((prev) =>
+      prev.map((instructor) =>
+        instructor.id === id
+          ? { ...instructor, status: InstructorStatus.Approved }
+          : instructor
+      )
+    );
   };
 
   const handleReject = (id: string) => {
-    console.log("Rejecting instructor:", id);
-    // TODO: Implement reject logic
+    setApplications((prev) =>
+      prev.map((instructor) =>
+        instructor.id === id
+          ? { ...instructor, status: InstructorStatus.Rejected }
+          : instructor
+      )
+    );
   };
 
   const checkDocumentStatus = (documents: any) => {
@@ -305,193 +367,48 @@ export default function ManagementInstructorPage() {
                       </TableCell>
                       <TableCell>{getStatusBadge(instructor.status)}</TableCell>
                       <TableCell>
-                        <div className="flex justify-center gap-2">
-                          <Dialog>
-                            <DialogTrigger asChild>
+                        <div className="flex justify-center">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
                               <Button
                                 variant="outline"
                                 size="icon"
-                                aria-label="Xem chi tiết"
-                                onClick={() =>
-                                  setSelectedInstructor(instructor)
-                                }
+                                aria-label="Thao tác"
                               >
-                                <Eye className="size-4" />
+                                <MoreHorizontal className="size-4" />
                               </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
-                              <DialogHeader>
-                                <DialogTitle>
-                                  Chi tiết đơn đăng ký - {instructor.name}
-                                </DialogTitle>
-                              </DialogHeader>
-                              <div className="space-y-6">
-                                <div className="rounded-xl border bg-muted/30 p-5">
-                                  <div className="grid gap-4 sm:grid-cols-2">
-                                    <InfoItem
-                                      label="Họ và tên"
-                                      value={instructor.name}
-                                    />
-                                    <InfoItem
-                                      label="Ngày nộp"
-                                      value={formatDate(instructor.submittedAt)}
-                                    />
-                                    <InfoItem
-                                      label="Email"
-                                      value={instructor.email ?? "Chưa cập nhật"}
-                                    >
-                                      <a
-                                        href={`mailto:${instructor.email}`}
-                                        className="text-primary underline"
-                                      >
-                                        {instructor.email}
-                                      </a>
-                                    </InfoItem>
-                                    <InfoItem
-                                      label="Số điện thoại"
-                                      value={instructor.phone}
-                                    >
-                                      <a
-                                        href={`tel:${instructor.phone}`}
-                                        className="text-primary"
-                                      >
-                                        {instructor.phone}
-                                      </a>
-                                    </InfoItem>
-                                    <InfoItem
-                                      label="Trạng thái"
-                                      value={instructor.status}
-                                    >
-                                      {getStatusBadge(instructor.status)}
-                                    </InfoItem>
-                                  </div>
-                                </div>
-
-                                <div className="space-y-5">
-                                  <SectionShell title="Căn Cước Công Dân">
-                                    <div className="grid gap-4 sm:grid-cols-3">
-                                      <InfoItem
-                                        label="Họ và tên"
-                                        value={cccd?.fullName ?? "Chưa cập nhật"}
-                                      />
-                                      <InfoItem
-                                        label="Ngày sinh"
-                                        value={
-                                          cccd?.dateOfBirth
-                                            ? formatDate(cccd.dateOfBirth)
-                                            : "Chưa cập nhật"
-                                        }
-                                      />
-                                      <InfoItem
-                                        label="Giới tính"
-                                        value={cccd?.gender ?? "Chưa cập nhật"}
-                                      />
-                                    </div>
-                                  </SectionShell>
-
-                                  <SectionShell title="Giấy Phép Lái Xe">
-                                    <ImagePair
-                                      firstLabel="ẢNH MẶT TRƯỚC"
-                                      firstSrc={b2License?.front ?? null}
-                                      secondLabel="ẢNH MẶT SAU"
-                                      secondSrc={b2License?.back ?? null}
-                                    />
-                                    <div className="grid gap-4 sm:grid-cols-2">
-                                      <InfoItem
-                                        label="Hạng lái xe"
-                                        value={
-                                          b2License?.licenseClass ??
-                                          "Chưa cập nhật"
-                                        }
-                                      />
-                                    </div>
-                                  </SectionShell>
-
-                                  <SectionShell title="Chứng Chỉ Hành Nghề">
-                                    <div className="grid gap-4 md:grid-cols-1">
-                                      <ImageTile
-                                        label="ẢNH CHỨNG CHỈ"
-                                        src={
-                                          professionalCertificate?.front ?? null
-                                        }
-                                      />
-                                      <div className="grid gap-4 sm:grid-cols-2">
-                                        <InfoItem
-                                          label="Hạng lái xe được đào tạo"
-                                          value={
-                                            professionalCertificate?.vehicleClass ??
-                                            "Chưa cập nhật"
-                                          }
-                                        />
-                                      </div>
-                                    </div>
-                                  </SectionShell>
-
-                                  <SectionShell title="Giấy Khám Sức Khỏe">
-                                    <ImageTile
-                                      label="ẢNH GIẤY KHÁM SỨC KHỎE"
-                                      src={healthCertificate?.front ?? null}
-                                    />
-                                  </SectionShell>
-
-                                  <SectionShell title="Thông Tin Liên Hệ Khẩn Cấp">
-                                    <div className="grid gap-4 sm:grid-cols-2">
-                                      <InfoItem
-                                        label="Tên người liên hệ"
-                                        value={
-                                          instructor.emergencyContact?.name ??
-                                          "Chưa cập nhật"
-                                        }
-                                      />
-                                      <InfoItem
-                                        label="Số điện thoại người liên hệ"
-                                        value={
-                                          instructor.emergencyContact?.phone ??
-                                          "Chưa cập nhật"
-                                        }
-                                      >
-                                        {instructor.emergencyContact?.phone ? (
-                                          <a
-                                            href={`tel:${instructor.emergencyContact.phone}`}
-                                            className="text-primary"
-                                          >
-                                            {instructor.emergencyContact.phone}
-                                          </a>
-                                        ) : (
-                                          "Chưa cập nhật"
-                                        )}
-                                      </InfoItem>
-                                    </div>
-                                  </SectionShell>
-                                </div>
-
-                                {/* Thao tác duyệt/từ chối đã được xử lý ngay trên danh sách */}
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                          {instructor.status === "pending" && (
-                            <>
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                aria-label="Duyệt hồ sơ"
-                                className="text-emerald-600"
-                                disabled={!docStatus.allVerified}
-                                onClick={() => handleApprove(instructor.id)}
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onSelect={() => {
+                                  setSelectedInstructor(instructor);
+                                }}
                               >
-                                <CheckCircle className="size-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                aria-label="Từ chối hồ sơ"
-                                className="text-red-600"
-                                onClick={() => handleReject(instructor.id)}
-                              >
-                                <XCircle className="size-4" />
-                              </Button>
-                            </>
-                          )}
+                                <Eye className="mr-2 size-4" />
+                                Xem chi tiết
+                              </DropdownMenuItem>
+                              {instructor.status ===
+                                InstructorStatus.Pending && (
+                                <>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    onClick={() => handleApprove(instructor.id)}
+                                    className="text-emerald-600"
+                                  >
+                                    <CheckCircle className="mr-2 size-4" />
+                                    Duyệt hồ sơ
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleReject(instructor.id)}
+                                    className="text-red-600"
+                                  >
+                                    <XCircle className="mr-2 size-4" />
+                                    Từ chối hồ sơ
+                                  </DropdownMenuItem>
+                                </>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -568,6 +485,184 @@ export default function ManagementInstructorPage() {
           </div>
         </div>
       </section>
+
+      {/* Dialog for viewing instructor details */}
+      {selectedInstructor && (
+        <Dialog
+          open={!!selectedInstructor}
+          onOpenChange={(open) => !open && setSelectedInstructor(null)}
+        >
+          <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                Chi tiết đơn đăng ký - {selectedInstructor.name}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-6">
+              <div className="rounded-xl border bg-muted/30 p-5">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <InfoItem label="Họ và tên" value={selectedInstructor.name} />
+                  <InfoItem
+                    label="Ngày nộp"
+                    value={formatDate(selectedInstructor.submittedAt)}
+                  />
+                  <InfoItem
+                    label="Email"
+                    value={selectedInstructor.email ?? "Chưa cập nhật"}
+                  >
+                    <a
+                      href={`mailto:${selectedInstructor.email}`}
+                      className="text-primary underline"
+                    >
+                      {selectedInstructor.email}
+                    </a>
+                  </InfoItem>
+                  <InfoItem
+                    label="Số điện thoại"
+                    value={selectedInstructor.phone}
+                  >
+                    <a
+                      href={`tel:${selectedInstructor.phone}`}
+                      className="text-primary"
+                    >
+                      {selectedInstructor.phone}
+                    </a>
+                  </InfoItem>
+                  <InfoItem
+                    label="Trạng thái"
+                    value={statusToString(selectedInstructor.status)}
+                  >
+                    {getStatusBadge(selectedInstructor.status)}
+                  </InfoItem>
+                </div>
+              </div>
+
+              <div className="space-y-5">
+                <SectionShell title="Căn Cước Công Dân">
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <InfoItem
+                      label="Họ và tên"
+                      value={
+                        selectedInstructor.documents.cccd?.fullName ??
+                        "Chưa cập nhật"
+                      }
+                    />
+                    <InfoItem
+                      label="Ngày sinh"
+                      value={
+                        selectedInstructor.documents.cccd?.dateOfBirth
+                          ? formatDate(
+                              selectedInstructor.documents.cccd.dateOfBirth
+                            )
+                          : "Chưa cập nhật"
+                      }
+                    />
+                    <InfoItem
+                      label="Giới tính"
+                      value={
+                        selectedInstructor.documents.cccd?.gender ??
+                        "Chưa cập nhật"
+                      }
+                    />
+                  </div>
+                </SectionShell>
+
+                <SectionShell title="Giấy Phép Lái Xe">
+                  <ImagePair
+                    firstLabel="ẢNH MẶT TRƯỚC"
+                    firstSrc={
+                      selectedInstructor.documents.b2License?.front ?? null
+                    }
+                    secondLabel="ẢNH MẶT SAU"
+                    secondSrc={
+                      selectedInstructor.documents.b2License?.back ?? null
+                    }
+                  />
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <InfoItem
+                      label="Hạng lái xe"
+                      value={
+                        selectedInstructor.documents.b2License?.licenseClass ??
+                        "Chưa cập nhật"
+                      }
+                    />
+                  </div>
+                </SectionShell>
+
+                <SectionShell title="Chứng Chỉ Hành Nghề">
+                  <div className="grid gap-4 md:grid-cols-1">
+                    <ImageTile
+                      label="ẢNH CHỨNG CHỈ"
+                      src={
+                        selectedInstructor.documents.professionalCertificate
+                          ?.front ?? null
+                      }
+                    />
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <InfoItem
+                        label="Hạng lái xe được đào tạo"
+                        value={
+                          selectedInstructor.documents.professionalCertificate
+                            ?.vehicleClass ?? "Chưa cập nhật"
+                        }
+                      />
+                    </div>
+                  </div>
+                </SectionShell>
+
+                <SectionShell title="Giấy Khám Sức Khỏe">
+                  <ImageTile
+                    label="ẢNH GIẤY KHÁM SỨC KHỎE"
+                    src={
+                      selectedInstructor.documents.healthCertificate?.front ??
+                      null
+                    }
+                  />
+                </SectionShell>
+
+                <SectionShell title="Lý Lịch Tư Pháp">
+                  <ImageTile
+                    label="ẢNH LÝ LỊCH TƯ PHÁP"
+                    src={
+                      selectedInstructor.documents.criminalRecord?.front ?? null
+                    }
+                  />
+                </SectionShell>
+
+                <SectionShell title="Thông Tin Liên Hệ Khẩn Cấp">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <InfoItem
+                      label="Tên người liên hệ"
+                      value={
+                        selectedInstructor.emergencyContact?.name ??
+                        "Chưa cập nhật"
+                      }
+                    />
+                    <InfoItem
+                      label="Số điện thoại người liên hệ"
+                      value={
+                        selectedInstructor.emergencyContact?.phone ??
+                        "Chưa cập nhật"
+                      }
+                    >
+                      {selectedInstructor.emergencyContact?.phone ? (
+                        <a
+                          href={`tel:${selectedInstructor.emergencyContact.phone}`}
+                          className="text-primary"
+                        >
+                          {selectedInstructor.emergencyContact.phone}
+                        </a>
+                      ) : (
+                        "Chưa cập nhật"
+                      )}
+                    </InfoItem>
+                  </div>
+                </SectionShell>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
@@ -686,4 +781,3 @@ function ImageTile({ label, src }: { label: string; src: string | null }) {
     </div>
   );
 }
-
