@@ -170,11 +170,16 @@ export default function ManagementInstructorPage() {
     const fetchInstructorApplications = async () => {
       const res = await runGetAllInstructorApplications();
       if (res.ok) {
+        const fetchedApplications = Array.isArray(res.data?.value)
+          ? (res.data?.value as InstructorApplication[])
+          : [];
         console.log(
           "Instructor applications fetched successfully",
-          res.data.value
+          fetchedApplications
         );
-        setApplications(res.data.value as InstructorApplication[]);
+        setApplications(fetchedApplications);
+      } else {
+        setApplications([]);
       }
     };
     fetchInstructorApplications();
@@ -191,21 +196,21 @@ export default function ManagementInstructorPage() {
   const canGoNext = currentPage < totalPages;
 
   // Calculate stats
-  const stats = useMemo(
-    () => ({
-      total: applications.length,
-      pending: applications.filter(
+  const stats = useMemo(() => {
+    const apps = Array.isArray(applications) ? applications : [];
+    return {
+      total: apps.length,
+      pending: apps.filter(
         (app) => app.applicationStatus === InstructorStatus.Pending
       ).length,
-      approved: applications.filter(
+      approved: apps.filter(
         (app) => app.applicationStatus === InstructorStatus.Approved
       ).length,
-      rejected: applications.filter(
+      rejected: apps.filter(
         (app) => app.applicationStatus === InstructorStatus.Rejected
       ).length,
-    }),
-    [applications]
-  );
+    };
+  }, [applications]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("vi-VN", {
@@ -213,6 +218,18 @@ export default function ManagementInstructorPage() {
       month: "2-digit",
       day: "2-digit",
     });
+  };
+
+  const getRemainingValidityDays = (
+    submitDate: string,
+    validityWindowDays = 14
+  ) => {
+    const submitted = new Date(submitDate);
+    const expiration = new Date(submitted);
+    expiration.setDate(submitted.getDate() + validityWindowDays);
+    const diffMs = expiration.getTime() - Date.now();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    return diffDays;
   };
 
   const getStatusBadge = (status: InstructorStatus) => {
@@ -372,6 +389,7 @@ export default function ManagementInstructorPage() {
                 <TableHead>Số điện thoại</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Ngày nộp</TableHead>
+                <TableHead>Số ngày hiệu lực</TableHead>
                 <TableHead>Trạng thái</TableHead>
                 <TableHead className="text-center">Thao tác</TableHead>
               </TableRow>
@@ -380,7 +398,7 @@ export default function ManagementInstructorPage() {
               {paginatedApplications.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={6}
+                    colSpan={8}
                     className="py-8 text-center text-sm text-muted-foreground"
                   >
                     Không tìm thấy ứng viên phù hợp.
@@ -388,6 +406,9 @@ export default function ManagementInstructorPage() {
                 </TableRow>
               ) : (
                 paginatedApplications.map((instructorApplication, index) => {
+                  const remainingDays = getRemainingValidityDays(
+                    instructorApplication.submitDate
+                  );
                   return (
                     <TableRow
                       key={instructorApplication.applicationId}
@@ -414,6 +435,15 @@ export default function ManagementInstructorPage() {
                       </TableCell>
                       <TableCell className="text-sm">
                         {formatDate(instructorApplication.submitDate)}
+                      </TableCell>
+                      <TableCell className="text-sm font-medium">
+                        {remainingDays > 0 ? (
+                          <span className="text-emerald-600">
+                            {remainingDays} ngày
+                          </span>
+                        ) : (
+                          <span className="text-red-600">Hết hạn</span>
+                        )}
                       </TableCell>
                       <TableCell>
                         {getStatusBadge(
