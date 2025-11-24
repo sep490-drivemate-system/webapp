@@ -79,7 +79,7 @@ const data = {
       icon: IconUsers,
     },
     {
-      title: "Quản lý gói thuê",
+      title: "Quản lý gói dịch vụ",
       url: "/management-package",
       icon: IconPackage,
     },
@@ -89,14 +89,14 @@ const data = {
       icon: IconArticle,
     },
     {
-      title: "Quản lý xe",
+      title: "Quản lý xe tập lái",
       url: "/management-car",
       icon: IconCar,
     },
     {
-      title: "Analytics",
-      url: "/analytics",
-      icon: IconChartBar,
+      title: "Quản lý điều khoản dịch vụ",
+      url: "/dashboard/documents/word-assistant",
+      icon: IconKey,
     },
   ],
   navClouds: [
@@ -163,22 +163,6 @@ const data = {
       url: "/blogs-management",
       icon: IconNews,
     },
-    {
-      name: "Quản lý buổi huấn luyện tập lái ",
-      url: "/dashboard/documents/reports",
-      icon: IconNavigation,
-    },
-
-    {
-      name: "Quản lý chính sách bảo mật",
-      url: "/dashboard/documents/word-assistant",
-      icon: IconShieldLock,
-    },
-    {
-      name: "Quản lý điều khoản dịch vụ",
-      url: "/dashboard/documents/word-assistant",
-      icon: IconKey,
-    },
   ],
 
   navInstructor: [
@@ -217,11 +201,6 @@ const data = {
       name: "Lịch sử giao dịch",
       url: "/",
       icon: IconHistory,
-    },
-    {
-      name: "Đánh giá",
-      url: "/",
-      icon: IconStar,
     },
     {
       name: "Giấy tờ tùy thân",
