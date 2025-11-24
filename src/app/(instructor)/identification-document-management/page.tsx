@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import {
@@ -10,9 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-
-type DocumentStatus = "approved" | "pending" | "rejected";
 
 interface DocumentField {
   label: string;
@@ -21,37 +17,46 @@ interface DocumentField {
 
 interface DocumentFile {
   label: string;
-  fileName: string;
-  note?: string;
+  imageUrl: string | null;
 }
 
 interface DocumentRecord {
   id: string;
   title: string;
   description: string;
-  status: DocumentStatus;
   updatedAt: string;
   reviewer?: string;
-  notes?: string;
   fields: DocumentField[];
   files: DocumentFile[];
 }
 
-const statusConfig: Record<
-  DocumentStatus,
-  { label: string; className: string }
-> = {
-  approved: {
-    label: "Đã duyệt",
-    className: "bg-emerald-100 text-emerald-700 border border-emerald-200",
-  },
-  pending: {
-    label: "Chờ duyệt",
-    className: "bg-amber-100 text-amber-700 border border-amber-200",
-  },
-  rejected: {
-    label: "Bị từ chối",
-    className: "bg-rose-100 text-rose-700 border border-rose-200",
+enum OverallStatus {
+  Pending = 1,
+  Approved = 2,
+  Rejected = 3,
+}
+
+const overallStatusToString = (status: OverallStatus) => {
+  switch (status) {
+    case OverallStatus.Pending:
+      return "Chờ duyệt";
+    case OverallStatus.Approved:
+      return "Đã duyệt";
+    case OverallStatus.Rejected:
+      return "Bị từ chối";
+    default:
+      return "Chưa xác định";
+  }
+};
+
+const userProfile = {
+  fullName: "Nguyễn Văn An",
+  email: "an.nguyen@example.com",
+  phone: "0901 234 567",
+  overallStatus: OverallStatus.Pending,
+  emergencyContact: {
+    name: "Trần Thị Bình",
+    phone: "0912 345 678",
   },
 };
 
@@ -61,69 +66,61 @@ const mockDocumentRecords: DocumentRecord[] = [
     title: "Căn Cước Công Dân",
     description:
       "Thông tin nhận dạng bắt buộc để xác thực tài khoản người hướng dẫn.",
-    status: "approved",
     updatedAt: "20/10/2024 - 14:32",
-    reviewer: "Nguyễn Văn B",
     fields: [
-      { label: "Số CCCD", value: "079203001234" },
-      { label: "Giới tính", value: "Nam" },
+      { label: "Họ và tên", value: "Nguyễn Văn An" },
       { label: "Ngày sinh", value: "12/03/1992" },
-      { label: "Ngày cấp", value: "08/08/2021" },
-      { label: "Ngày hết hạn", value: "08/08/2031" },
-      { label: "Nơi cấp", value: "Công an TP. Hồ Chí Minh" },
-      {
-        label: "Địa chỉ thường trú",
-        value: "123 Nguyễn Trãi, Phường 7, Quận 5, TP. Hồ Chí Minh",
-      },
+      { label: "Giới tính", value: "Nam" },
     ],
-    files: [
-      { label: "Ảnh mặt trước", fileName: "cccd_front.png" },
-      { label: "Ảnh mặt sau", fileName: "cccd_back.png" },
-    ],
+    files: [],
   },
   {
     id: "legalHistory",
     title: "Lý Lịch Tư Pháp",
     description: "Giấy xác nhận không có tiền án tiền sự trong vòng 06 tháng.",
-    status: "approved",
     updatedAt: "18/10/2024 - 09:10",
-    reviewer: "Trần Thị C",
     fields: [
       { label: "Ngày cấp", value: "15/09/2024" },
       { label: "Số hồ sơ", value: "LLTP-45879" },
     ],
-    files: [{ label: "Ảnh/Scan tài liệu", fileName: "legal_history.pdf" }],
+    files: [
+      {
+        label: "Ảnh lý lịch tư pháp",
+        imageUrl: "/images/mock/legal-history.jpg",
+      },
+    ],
   },
   {
     id: "healthCertificate",
     title: "Giấy Khám Sức Khỏe",
     description: "Bản khám sức khỏe tổng quát đủ điều kiện lái xe.",
-    status: "pending",
     updatedAt: "05/11/2024 - 16:48",
     fields: [
       { label: "Ngày cấp", value: "01/11/2024" },
       { label: "Cơ sở y tế", value: "Bệnh viện Đa khoa Quốc tế" },
     ],
-    files: [{ label: "Ảnh/Scan tài liệu", fileName: "suc_khoe.pdf" }],
-    notes:
-      "Chờ kiểm tra bổ sung chữ ký bác sĩ. Vui lòng theo dõi email nếu cần cập nhật.",
+    files: [
+      {
+        label: "Ảnh giấy khám sức khỏe",
+        imageUrl: "/images/mock/health-check.jpg",
+      },
+    ],
   },
   {
     id: "driverLicense",
     title: "Bằng Lái Xe",
     description: "Bản sao bằng lái xe hiện hành của người hướng dẫn.",
-    status: "approved",
     updatedAt: "12/10/2024 - 11:05",
-    reviewer: "Phạm Quang D",
-    fields: [
-      { label: "Hạng bằng lái", value: "B2" },
-      { label: "Số GPLX", value: "790230045678" },
-      { label: "Ngày cấp", value: "10/06/2020" },
-      { label: "Ngày hết hạn", value: "10/06/2030" },
-    ],
+    fields: [{ label: "Hạng bằng lái", value: "B2" }],
     files: [
-      { label: "Ảnh mặt trước", fileName: "gplx_front.jpg" },
-      { label: "Ảnh mặt sau", fileName: "gplx_back.jpg" },
+      {
+        label: "Ảnh mặt trước",
+        imageUrl: "/images/mock/driver-license-front.jpg",
+      },
+      {
+        label: "Ảnh mặt sau",
+        imageUrl: "/images/mock/driver-license-back.jpg",
+      },
     ],
   },
   {
@@ -131,40 +128,19 @@ const mockDocumentRecords: DocumentRecord[] = [
     title: "Chứng Chỉ Hành Nghề",
     description:
       "Chứng chỉ đào tạo nghiệp vụ đảm bảo chuyên môn giảng dạy lái xe.",
-    status: "rejected",
     updatedAt: "25/09/2024 - 08:20",
-    reviewer: "Lê Minh E",
-    fields: [
-      { label: "Lớp đào tạo", value: "B2 nâng cao" },
-      { label: "Ngày cấp", value: "12/07/2022" },
-      { label: "Đơn vị cấp", value: "Trung tâm Đào tạo Lái xe ABC" },
+    fields: [{ label: "Hạng lái xe giảng dạy", value: "B2 nâng cao" }],
+    files: [
+      {
+        label: "Ảnh chứng chỉ hành nghề",
+        imageUrl: "/images/mock/training-cert.jpg",
+      },
     ],
-    files: [{ label: "Ảnh/Scan tài liệu", fileName: "training_cert.pdf" }],
-    notes: "Ảnh mờ, đề nghị tải lại file chất lượng cao hơn.",
   },
 ];
 
 export default function IdentificationDocumentManagementPage() {
   const router = useRouter();
-
-  const summaryStats = useMemo(() => {
-    const approved = mockDocumentRecords.filter(
-      (doc) => doc.status === "approved"
-    ).length;
-    const pending = mockDocumentRecords.filter(
-      (doc) => doc.status === "pending"
-    ).length;
-    const rejected = mockDocumentRecords.filter(
-      (doc) => doc.status === "rejected"
-    ).length;
-
-    return [
-      { label: "Tổng tài liệu", value: mockDocumentRecords.length },
-      { label: "Đã duyệt", value: approved },
-      { label: "Chờ duyệt", value: pending },
-      { label: "Bị từ chối", value: rejected },
-    ];
-  }, []);
 
   return (
     <div className="space-y-8">
@@ -193,29 +169,49 @@ export default function IdentificationDocumentManagementPage() {
         </Card>
       </section>
 
-      {/* Summary */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {summaryStats.map((stat) => (
-          <Card key={stat.label} className="border-dashed border-muted">
-            <CardHeader className="pb-2">
-              <CardDescription className="text-xs uppercase tracking-wide">
-                {stat.label}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <p className="text-3xl font-semibold text-foreground">
-                {stat.value}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
+      {/* User profile & emergency contact */}
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card className="lg:col-span-2 border border-border/60">
+          <CardHeader>
+            <CardTitle>Thông tin cá nhân</CardTitle>
+            <CardDescription>
+              Thông tin được sử dụng để xác minh hồ sơ người hướng dẫn.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4 sm:grid-cols-2">
+            <InfoItem label="Họ và tên" value={userProfile.fullName} />
+            <InfoItem label="Email" value={userProfile.email} />
+            <InfoItem label="Số điện thoại" value={userProfile.phone} />
+            <InfoItem
+              label="Trạng thái giấy tờ"
+              value={overallStatusToString(userProfile.overallStatus)}
+            />
+          </CardContent>
+        </Card>
+
+        <Card className="border border-border/60">
+          <CardHeader>
+            <CardTitle>Liên hệ khẩn cấp</CardTitle>
+            <CardDescription>
+              Sử dụng trong trường hợp cần liên lạc gấp.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <InfoItem
+              label="Tên người liên hệ"
+              value={userProfile.emergencyContact.name}
+            />
+            <InfoItem
+              label="Số điện thoại"
+              value={userProfile.emergencyContact.phone}
+            />
+          </CardContent>
+        </Card>
       </section>
 
       {/* Document detail cards */}
       <section className="space-y-6">
         {mockDocumentRecords.map((record) => {
-          const status = statusConfig[record.status];
-
           return (
             <Card key={record.id} className="border-border">
               <CardHeader className="gap-4">
@@ -223,7 +219,6 @@ export default function IdentificationDocumentManagementPage() {
                   <CardTitle className="text-xl text-foreground">
                     {record.title}
                   </CardTitle>
-                  <Badge className={status.className}>{status.label}</Badge>
                 </div>
                 <CardDescription className="text-muted-foreground">
                   {record.description}
@@ -241,22 +236,25 @@ export default function IdentificationDocumentManagementPage() {
                 {record.files.length > 0 && (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {record.files.map((file) => (
-                      <div
+                      <figure
                         key={file.label}
-                        className="rounded-lg border border-dashed border-border p-4 bg-muted/30"
+                        className="rounded-xl border border-border/70 bg-muted/20 p-3 space-y-3"
                       >
-                        <p className="text-sm font-medium text-foreground">
+                        <figcaption className="text-sm font-semibold text-foreground">
                           {file.label}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {file.fileName || "Chưa cung cấp tệp"}
-                        </p>
-                        {file.note && (
-                          <p className="text-xs text-muted-foreground mt-2">
-                            {file.note}
-                          </p>
+                        </figcaption>
+                        {file.imageUrl ? (
+                          <img
+                            src={file.imageUrl}
+                            alt={file.label}
+                            className="h-48 w-full rounded-lg object-cover border border-border/60"
+                          />
+                        ) : (
+                          <div className="flex h-48 w-full items-center justify-center rounded-lg border border-dashed border-border text-xs text-muted-foreground">
+                            Chưa cung cấp ảnh
+                          </div>
                         )}
-                      </div>
+                      </figure>
                     ))}
                   </div>
                 )}
@@ -278,17 +276,23 @@ export default function IdentificationDocumentManagementPage() {
                   ))}
                 </div>
 
-                {/* Notes */}
-                {record.notes && (
-                  <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-                    {record.notes}
-                  </div>
-                )}
+                {/* Notes removed as per requirement */}
               </CardContent>
             </Card>
           );
         })}
       </section>
+    </div>
+  );
+}
+
+function InfoItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="space-y-1 rounded-lg border border-border/60 p-3 bg-white">
+      <p className="text-xs uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
+      <p className="text-base font-semibold text-foreground">{value || "—"}</p>
     </div>
   );
 }
