@@ -379,10 +379,7 @@ export default function InstructorOverviewPage() {
         <div className="rounded-2xl border bg-white p-6 shadow-sm">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="space-y-2">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                Tổng quan hoạt động
-              </p>
-              <h1 className="text-2xl font-bold text-foreground">
+              <h1 className="text-2xl font-medium text-foreground">
                 Quản lý doanh thu, khách hàng và gói dịch vụ
               </h1>
               <p className="text-sm text-muted-foreground">
@@ -390,87 +387,87 @@ export default function InstructorOverviewPage() {
                 hàng theo {currentData.label}.
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">
-                Đang xem theo:{" "}
-                <span className="font-medium text-foreground">
-                  {timeRange === "week"
-                    ? "Tuần hiện tại"
-                    : timeRange === "month"
-                    ? "Tháng hiện tại"
-                    : "Năm hiện tại"}
-                </span>
-              </span>
-              <div className="relative">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsFilterOpen((prev) => !prev)}
-                  className="flex items-center gap-2"
-                >
-                  <Filter className="h-4 w-4" />
-                  <span>Bộ lọc</span>
-                  <ChevronDown
-                    className={`h-4 w-4 transition-transform ${
-                      isFilterOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </Button>
-                {isFilterOpen && (
-                  <>
-                    <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border bg-white p-3 shadow-lg">
-                      <p className="mb-2 text-xs font-medium text-muted-foreground">
-                        Chọn khoảng thời gian
-                      </p>
-                      <div className="space-y-2">
-                        <Button
-                          variant={timeRange === "week" ? "default" : "outline"}
-                          size="sm"
-                          className="w-full justify-start"
-                          onClick={() => {
-                            setTimeRange("week");
-                            setIsFilterOpen(false);
-                          }}
-                        >
-                          Tuần hiện tại
-                        </Button>
-                        <Button
-                          variant={
-                            timeRange === "month" ? "default" : "outline"
-                          }
-                          size="sm"
-                          className="w-full justify-start"
-                          onClick={() => {
-                            setTimeRange("month");
-                            setIsFilterOpen(false);
-                          }}
-                        >
-                          Tháng hiện tại
-                        </Button>
-                        <Button
-                          variant={timeRange === "year" ? "default" : "outline"}
-                          size="sm"
-                          className="w-full justify-start"
-                          onClick={() => {
-                            setTimeRange("year");
-                            setIsFilterOpen(false);
-                          }}
-                        >
-                          Năm hiện tại
-                        </Button>
-                      </div>
-                    </div>
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() => setIsFilterOpen(false)}
-                    />
-                  </>
-                )}
-              </div>
-            </div>
           </div>
         </div>
       </section>
+      <div className="flex justify-end">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">
+            Đang xem theo:{" "}
+            <span className="font-medium text-foreground">
+              {timeRange === "week"
+                ? "Tuần hiện tại"
+                : timeRange === "month"
+                ? "Tháng hiện tại"
+                : "Năm hiện tại"}
+            </span>
+          </span>
+          <div className="relative">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsFilterOpen((prev) => !prev)}
+              className="flex items-center gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              <span>Bộ lọc</span>
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${
+                  isFilterOpen ? "rotate-180" : ""
+                }`}
+              />
+            </Button>
+            {isFilterOpen && (
+              <>
+                <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border bg-white p-3 shadow-lg">
+                  <p className="mb-2 text-xs font-medium text-muted-foreground">
+                    Chọn khoảng thời gian
+                  </p>
+                  <div className="space-y-2">
+                    <Button
+                      variant={timeRange === "week" ? "default" : "outline"}
+                      size="sm"
+                      className="w-full justify-start"
+                      onClick={() => {
+                        setTimeRange("week");
+                        setIsFilterOpen(false);
+                      }}
+                    >
+                      Tuần hiện tại
+                    </Button>
+                    <Button
+                      variant={timeRange === "month" ? "default" : "outline"}
+                      size="sm"
+                      className="w-full justify-start"
+                      onClick={() => {
+                        setTimeRange("month");
+                        setIsFilterOpen(false);
+                      }}
+                    >
+                      Tháng hiện tại
+                    </Button>
+                    <Button
+                      variant={timeRange === "year" ? "default" : "outline"}
+                      size="sm"
+                      className="w-full justify-start"
+                      onClick={() => {
+                        setTimeRange("year");
+                        setIsFilterOpen(false);
+                      }}
+                    >
+                      Năm hiện tại
+                    </Button>
+                  </div>
+                </div>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setIsFilterOpen(false)}
+                />
+              </>
+            )}
+          </div>
+        </div>
+      </div>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {kpis.map((kpi) => {

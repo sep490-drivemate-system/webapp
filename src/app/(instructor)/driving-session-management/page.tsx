@@ -286,32 +286,21 @@ export default function DrivingSessionManagementPage() {
   return (
     <div className="space-y-8">
       {/* Header Section */}
-      <section className="space-y-3">
+      <section className="space-y-4">
         <Card className="rounded-2xl border bg-white p-6 shadow-sm">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-2">
-              <h1 className="text-2xl font-bold text-foreground">
-                Buổi huấn luyện của tôi
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Quản lý các buổi huấn luyện đang diễn ra
-              </p>
+          <CardHeader>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-2">
+                <CardTitle className="text-2xl">
+                  Buổi huấn luyện của tôi
+                </CardTitle>
+                <CardDescription>
+                  Quản lý lịch trình huấn luyện và theo dõi tiến trình của học
+                  viên
+                </CardDescription>
+              </div>
             </div>
-            <div className="flex items-center gap-4">
-              <Card className="border bg-muted/20">
-                <CardContent className="px-6">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-foreground">
-                      {filteredSessions.length}
-                    </div>
-                    <div className="text-sm font-medium text-muted-foreground">
-                      Tổng
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+          </CardHeader>
         </Card>
       </section>
 

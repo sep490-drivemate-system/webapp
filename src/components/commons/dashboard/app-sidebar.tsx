@@ -194,7 +194,7 @@ const data = {
     },
     {
       name: "Thông báo",
-      url: "/",
+      url: "/notification-management",
       icon: IconBell,
     },
     {
