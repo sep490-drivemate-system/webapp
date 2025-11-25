@@ -199,7 +199,7 @@ const data = {
     },
     {
       name: "Lịch sử giao dịch",
-      url: "/",
+      url: "/transaction-management",
       icon: IconHistory,
     },
     {
