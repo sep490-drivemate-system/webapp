@@ -1,36 +1,21 @@
 "use client";
 
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
+import { Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { MockBlogPost } from "@/lib/mock-data";
-
-const CATEGORY_OPTIONS = [
-  "Kỹ năng lái xe",
-  "Thi bằng lái",
-  "Luật giao thông",
-  "Bảo dưỡng xe",
-  "Tư vấn xe",
-];
+import { stripHtmlTags } from "@/lib/text-utils";
+import { ShadcnEditor } from "@/components/shadcn-editor/shadcn-editor";
 
 export type BlogFormValues = {
   title: string;
-  category: string;
-  excerpt: string;
   content: string;
-  image: string;
-  tags: string[];
+  thumbnail: string;
+  galleryImages: string[];
 };
 
 type BlogFormProps = {
@@ -42,41 +27,31 @@ type BlogFormProps = {
 export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
   const [values, setValues] = useState<BlogFormValues>(() => ({
     title: initialPost?.title ?? "",
-    category: initialPost?.category ?? CATEGORY_OPTIONS[0],
-    excerpt: initialPost?.excerpt ?? "",
     content: initialPost?.content ?? "",
-    image: initialPost?.thumbnail ?? "",
-    tags: initialPost?.tags.map((tag) => tag.name) ?? [],
+    thumbnail: initialPost?.thumbnail ?? "",
+    galleryImages: initialPost?.galleryImages ?? [],
   }));
-  const [tagInput, setTagInput] = useState(
-    initialPost?.tags.map((tag) => tag.name).join(", ") ?? ""
-  );
+  const [galleryInput, setGalleryInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setValues({
       title: initialPost?.title ?? "",
-      category: initialPost?.category ?? CATEGORY_OPTIONS[0],
-      excerpt: initialPost?.excerpt ?? "",
       content: initialPost?.content ?? "",
-      image: initialPost?.thumbnail ?? "",
-      tags: initialPost?.tags.map((tag) => tag.name) ?? [],
+      thumbnail: initialPost?.thumbnail ?? "",
+      galleryImages: initialPost?.galleryImages ?? [],
     });
-    setTagInput(initialPost?.tags.map((tag) => tag.name).join(", ") ?? "");
+    setGalleryInput("");
   }, [initialPost]);
 
-  const parsedTags = useMemo(
-    () =>
-      tagInput
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter(Boolean),
-    [tagInput]
+  const isContentEmpty = useMemo(
+    () => !stripHtmlTags(values.content),
+    [values.content]
   );
 
   const handleChange =
     (field: keyof BlogFormValues) =>
-    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    (event: ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value;
       setValues((prev) => ({
         ...prev,
@@ -84,23 +59,50 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
       }));
     };
 
-  const handleCategoryChange = (category: string) => {
+  const handleContentChange = (html: string) => {
     setValues((prev) => ({
       ...prev,
-      category,
+      content: html,
+    }));
+  };
+
+  const handleGalleryAdd = () => {
+    if (!galleryInput.trim()) {
+      return;
+    }
+    setValues((prev) => ({
+      ...prev,
+      galleryImages: [...prev.galleryImages, galleryInput.trim()],
+    }));
+    setGalleryInput("");
+  };
+
+  const handleGalleryChange = (index: number, value: string) => {
+    setValues((prev) => {
+      const updated = [...prev.galleryImages];
+      updated[index] = value;
+      return {
+        ...prev,
+        galleryImages: updated,
+      };
+    });
+  };
+
+  const handleGalleryRemove = (index: number) => {
+    setValues((prev) => ({
+      ...prev,
+      galleryImages: prev.galleryImages.filter((_, itemIndex) => itemIndex !== index),
     }));
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isContentEmpty) {
+      return;
+    }
     setIsSubmitting(true);
 
-    const payload: BlogFormValues = {
-      ...values,
-      tags: parsedTags,
-    };
-
-    onSubmit?.(payload);
+    onSubmit?.(values);
     setIsSubmitting(false);
   };
 
@@ -112,7 +114,7 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
             {mode === "edit" ? "Thông tin bài viết" : "Tạo bài viết"}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="title">Tiêu đề</Label>
             <Input
@@ -124,72 +126,83 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="category">Danh mục</Label>
-            <Select
-              value={values.category}
-              onValueChange={handleCategoryChange}
-            >
-              <SelectTrigger id="category">
-                <SelectValue placeholder="Chọn danh mục" />
-              </SelectTrigger>
-              <SelectContent>
-                {CATEGORY_OPTIONS.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label>Nội dung</Label>
+            <div className="rounded-xl border bg-muted/30">
+              <ShadcnEditor
+                key={initialPost?.id ?? "new-blog"}
+                initialValue={initialPost?.content ?? ""}
+                onChange={handleContentChange}
+                placeholder="Viết nội dung chính của bài blog..."
+              />
+            </div>
+            {isContentEmpty ? (
+              <p className="text-xs text-destructive">
+                Nội dung không được để trống.
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Nội dung được định dạng với Shadcn Editor (Lexical).
+              </p>
+            )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="excerpt">Mô tả ngắn</Label>
-            <Textarea
-              id="excerpt"
-              placeholder="Nhập mô tả ngắn gọn"
-              value={values.excerpt}
-              onChange={handleChange("excerpt")}
-              rows={3}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="content">Nội dung</Label>
-            <Textarea
-              id="content"
-              placeholder="Nhập nội dung chính"
-              value={values.content}
-              onChange={handleChange("content")}
-              rows={8}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="image">Ảnh đại diện</Label>
+            <Label htmlFor="thumbnail">Ảnh đại diện</Label>
             <Input
-              id="image"
+              id="thumbnail"
               placeholder="https://example.com/image.jpg"
-              value={values.image}
-              onChange={handleChange("image")}
+              value={values.thumbnail}
+              onChange={handleChange("thumbnail")}
               type="url"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="tags">Thẻ (cách nhau bởi dấu phẩy)</Label>
-            <Input
-              id="tags"
-              placeholder="An toàn, Lái xe, Kỹ thuật"
-              value={tagInput}
-              onChange={(event) => setTagInput(event.target.value)}
-            />
-            {parsedTags.length > 0 ? (
+          <div className="space-y-3">
+            <Label>Danh sách ảnh bổ sung</Label>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Input
+                placeholder="https://example.com/gallery-image.jpg"
+                value={galleryInput}
+                onChange={(event) => setGalleryInput(event.target.value)}
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleGalleryAdd}
+                disabled={!galleryInput.trim()}
+              >
+                Thêm ảnh
+              </Button>
+            </div>
+            {values.galleryImages.length > 0 ? (
+              <div className="space-y-2">
+                {values.galleryImages.map((image, index) => (
+                  <div key={`${image}-${index}`} className="flex items-center gap-2">
+                    <Input
+                      value={image}
+                      onChange={(event) => handleGalleryChange(index, event.target.value)}
+                      placeholder={`Ảnh #${index + 1}`}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleGalleryRemove(index)}
+                    >
+                      <Trash2 className="size-4" />
+                      <span className="sr-only">Xóa ảnh</span>
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
               <p className="text-sm text-muted-foreground">
-                Thẻ hiện tại: {parsedTags.map((tag) => `#${tag}`).join(", ")}
+                Chưa có ảnh bổ sung nào. Bạn có thể thêm nhiều ảnh để hiển thị cuối bài viết.
               </p>
-            ) : null}
+            )}
           </div>
         </CardContent>
       </Card>
       <div className="flex justify-end">
-        <Button type="submit" className="gap-2" disabled={isSubmitting}>
+        <Button type="submit" className="gap-2" disabled={isSubmitting || isContentEmpty}>
           {mode === "edit" ? "Lưu thay đổi" : "Tạo bài viết"}
         </Button>
       </div>

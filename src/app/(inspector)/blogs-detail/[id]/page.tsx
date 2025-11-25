@@ -5,9 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 
 import { BlogLayout } from "@/components/blog-layout";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { mockBlogPosts, type MockBlogPost } from "@/lib/mock-data";
 import { ArrowLeft, Edit, Trash2 } from "lucide-react";
 
@@ -62,7 +60,7 @@ export default function BlogDetailPage() {
             src={post.thumbnail || "/placeholder.svg"}
             alt={post.title}
             fill
-            className="object-cover"
+            className="object-cover transition-transform duration-300 hover:scale-105"
             sizes="(max-width: 768px) 100vw, 768px"
           />
         </div>
@@ -72,17 +70,6 @@ export default function BlogDetailPage() {
             <h1 className="mb-3 text-4xl font-bold text-foreground">
               {post.title}
             </h1>
-            <div className="mb-4 flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
-                <Badge
-                  key={tag.id}
-                  variant="secondary"
-                  className="text-[11px] font-medium"
-                >
-                  {tag.name}
-                </Badge>
-              ))}
-            </div>
             <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
               <span className="font-medium text-foreground">
                 {post.author.name}
@@ -98,13 +85,39 @@ export default function BlogDetailPage() {
             </div>
           </div>
 
-          <Card className="bg-card p-6">
-            <div className="prose prose-sm max-w-none text-foreground dark:prose-invert">
-              <p className="whitespace-pre-wrap text-lg leading-relaxed">
-                {post.content}
+          <div className="prose prose-sm max-w-none text-foreground dark:prose-invert">
+            <div
+              className="space-y-4 text-lg leading-relaxed prose-headings:mb-3 prose-p:mb-4 prose-strong:font-semibold"
+              dangerouslySetInnerHTML={{
+                __html: post.content || "<p>Chưa có nội dung.</p>",
+              }}
+            />
+          </div>
+          <div className="space-y-4">
+            <div></div>
+            {post.galleryImages?.length ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {post.galleryImages.map((image, index) => (
+                  <div
+                    key={`${post.id}-gallery-${index}`}
+                    className="relative h-44 overflow-hidden rounded-xl border bg-muted"
+                  >
+                    <Image
+                      src={image || "/placeholder.svg"}
+                      alt={`Hình ảnh ${index + 1} của ${post.title}`}
+                      fill
+                      className="object-cover transition-transform duration-300 hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Bài viết chưa có hình ảnh bổ sung.
               </p>
-            </div>
-          </Card>
+            )}
+          </div>
           <div className="flex flex-wrap gap-2 justify-end">
             <Link href={`/blogs/${post.id}/form`}>
               <Button

@@ -17,7 +17,11 @@
       "readTime": 5,
       "views": 1250,
       "likes": 89,
-      "featured": true
+      "featured": true,
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1493238792000-8113da705763?w=800",
+        "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?w=800"
+      ]
     },
     {
       "id": "blog_002",
@@ -36,7 +40,11 @@
       "readTime": 8,
       "views": 2100,
       "likes": 156,
-      "featured": true
+      "featured": true,
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?w=800",
+        "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800"
+      ]
     },
     {
       "id": "blog_003",
@@ -55,7 +63,11 @@
       "readTime": 6,
       "views": 980,
       "likes": 72,
-      "featured": false
+      "featured": false,
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?w=800",
+        "https://images.unsplash.com/photo-1483721310020-03333e577078?w=800"
+      ]
     },
     {
       "id": "blog_004",
@@ -74,7 +86,10 @@
       "readTime": 4,
       "views": 750,
       "likes": 45,
-      "featured": false
+      "featured": false,
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800"
+      ]
     },
     {
       "id": "blog_005",
@@ -93,7 +108,11 @@
       "readTime": 7,
       "views": 1890,
       "likes": 134,
-      "featured": false
+      "featured": false,
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?w=800",
+        "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?w=800"
+      ]
     },
     {
       "id": "blog_006",
@@ -112,7 +131,10 @@
       "readTime": 6,
       "views": 1120,
       "likes": 67,
-      "featured": false
+      "featured": false,
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?w=800"
+      ]
     },
     {
       "id": "blog_007",
@@ -131,7 +153,11 @@
       "readTime": 5,
       "views": 890,
       "likes": 58,
-      "featured": false
+      "featured": false,
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1483721310020-03333e577078?w=800",
+        "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800"
+      ]
     },
     {
       "id": "blog_008",
@@ -150,7 +176,11 @@
       "readTime": 6,
       "views": 1050,
       "likes": 78,
-      "featured": false
+      "featured": false,
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800",
+        "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?w=800"
+      ]
     }
   ],
   "categories": [

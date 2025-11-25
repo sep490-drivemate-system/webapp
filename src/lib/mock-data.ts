@@ -11,12 +11,14 @@ export type MockBlogPost = Omit<RawBlogPost, "tags"> & {
   tags: BlogTag[];
   thumbnail: string;
   createdAt: string;
+  galleryImages: string[];
 };
 
 export const mockBlogPosts: MockBlogPost[] = blogsData.blogs.map((post) => ({
   ...post,
   thumbnail: post.image,
   createdAt: post.publishedAt,
+  galleryImages: post.galleryImages ?? [],
   tags: post.tags.map((tag, index) => ({
     id: `${post.id}-tag-${index}`,
     name: tag,

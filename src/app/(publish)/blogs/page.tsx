@@ -1,98 +1,98 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Search,
   Clock,
-  Eye,
-  Heart,
   Calendar,
   User,
   BookOpen,
-  TrendingUp,
-  ArrowRight
+  ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import blogsData from "@/data/mock-blogs.json";
+import { getPreviewFromContent, stripHtmlTags } from "@/lib/text-utils";
 
 interface Blog {
   id: string;
   title: string;
-  excerpt: string;
   author: {
     name: string;
     avatar: string;
     role: string;
   };
-  category: string;
-  tags: string[];
   image: string;
   publishedAt: string;
   readTime: number;
   views: number;
   likes: number;
   featured: boolean;
+  content: string;
 }
 
 const ITEMS_PER_PAGE = 6;
 
 export default function BlogsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("Tất cả");
   const [currentPage, setCurrentPage] = useState(1);
 
   const blogs: Blog[] = blogsData.blogs;
-  const categories = blogsData.categories;
 
-  // Filter blogs
   const filteredBlogs = useMemo(() => {
-    let filtered = blogs.filter(blog => {
-      const matchesSearch = searchQuery === "" ||
-        blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        blog.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        blog.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    const normalizedSearch = searchQuery.trim().toLowerCase();
 
-      const matchesCategory = selectedCategory === "Tất cả" || blog.category === selectedCategory;
+    const filtered = blogs.filter((blog) => {
+      if (!normalizedSearch) {
+        return true;
+      }
 
-      return matchesSearch && matchesCategory;
+      const contentText = stripHtmlTags(blog.content).toLowerCase();
+      const haystack = `${blog.title} ${contentText}`.toLowerCase();
+      return haystack.includes(normalizedSearch);
     });
 
-    // Sort: featured first, then by published date
-    filtered.sort((a, b) => {
-      if (a.featured && !b.featured) return -1;
-      if (!a.featured && b.featured) return 1;
-      return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
-    });
+    return filtered.sort(
+      (a, b) =>
+        Number(b.featured) - Number(a.featured) ||
+        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    );
+  }, [blogs, searchQuery]);
 
-    return filtered;
-  }, [blogs, searchQuery, selectedCategory]);
-
-  // Pagination
-  const totalPages = Math.ceil(filteredBlogs.length / ITEMS_PER_PAGE);
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredBlogs.length / ITEMS_PER_PAGE)
+  );
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedBlogs = filteredBlogs.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
-  // Featured blogs (first 2)
-  const featuredBlogs = filteredBlogs.filter(blog => blog.featured).slice(0, 2);
+  const paginatedBlogs = filteredBlogs.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  );
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+    return date.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
   };
 
   const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
   };
 
   return (
@@ -100,35 +100,33 @@ export default function BlogsPage() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            Bài viết
-          </h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">Bài viết</h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Tìm kiếm cẩm nang học lái xe mới nhất từ đội ngũ huấn luyện viên của
+            DriveMate.
+          </p>
         </div>
-        {/* Categories */}
-        <div className="mb-8">
-          <Tabs value={selectedCategory} onValueChange={(value) => {
-            setSelectedCategory(value);
-            setCurrentPage(1);
-          }}>
-            <TabsList className="flex flex-wrap justify-center gap-2 h-auto p-1 bg-white/80 backdrop-blur-sm">
-              {categories.map((category) => (
-                <TabsTrigger
-                  key={category}
-                  value={category}
-                  className="data-[state=active]:bg-green-500 data-[state=active]:text-white"
-                >
-                  {category}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+        {/* Search */}
+        <div className="mb-10">
+          <div className="relative mx-auto max-w-2xl">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+            <Input
+              value={searchQuery}
+              onChange={(event) => {
+                setSearchQuery(event.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Tìm bài viết theo tiêu đề hoặc nội dung…"
+              className="pl-10 h-11 bg-white/80 backdrop-blur-sm"
+            />
+          </div>
         </div>
 
         {/* Blog Grid */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
             <h2 className="text-2xl font-bold text-gray-900">
-              {selectedCategory === "Tất cả" ? "Tất cả bài viết" : selectedCategory}
+              Tất cả bài viết
             </h2>
             <p className="text-sm text-gray-600">
               {filteredBlogs.length} bài viết
@@ -144,16 +142,10 @@ export default function BlogsPage() {
                     Không tìm thấy bài viết
                   </h3>
                   <p className="text-gray-600 mb-4">
-                    Thử thay đổi từ khóa tìm kiếm hoặc chọn danh mục khác
+                    Thử thay đổi từ khóa tìm kiếm để có kết quả phù hợp hơn.
                   </p>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setSearchQuery("");
-                      setSelectedCategory("Tất cả");
-                    }}
-                  >
-                    Xóa bộ lọc
+                  <Button variant="outline" onClick={() => setSearchQuery("")}>
+                    Xóa từ khóa
                   </Button>
                 </div>
               </CardContent>
@@ -173,11 +165,6 @@ export default function BlogsPage() {
                       className="object-cover group-hover:scale-110 transition-transform duration-300"
                       unoptimized
                     />
-                    <div className="absolute top-3 left-3">
-                      <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm">
-                        {blog.category}
-                      </Badge>
-                    </div>
                   </div>
 
                   <CardHeader className="flex-shrink-0">
@@ -188,32 +175,39 @@ export default function BlogsPage() {
 
                   <CardContent className="flex-1 flex flex-col space-y-4 pb-4">
                     <p className="text-sm text-gray-600 line-clamp-3 flex-1">
-                      {blog.excerpt}
+                      {getPreviewFromContent(blog.content, 120)}
                     </p>
-
-                    <div className="flex flex-wrap gap-1">
-                      {blog.tags.slice(0, 3).map((tag, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                      {blog.tags.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{blog.tags.length - 3}
-                        </Badge>
-                      )}
-                    </div>
                   </CardContent>
 
                   <CardFooter className="pt-0 pb-4 px-6 flex items-center justify-between flex-shrink-0">
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={blog.author.avatar} />
-                        <AvatarFallback>{getInitials(blog.author.name)}</AvatarFallback>
+                        <AvatarFallback>
+                          {getInitials(blog.author.name)}
+                        </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="text-xs font-medium text-gray-900">{blog.author.name}</p>
-                        <p className="text-xs text-gray-500">{formatDate(blog.publishedAt)}</p>
+                        <p className="text-xs font-medium text-gray-900">
+                          {blog.author.name}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {formatDate(blog.publishedAt)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-gray-500">
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-3.5 w-3.5" />
+                        <span>{blog.readTime} phút đọc</span>
+                      </div>
+                      <div className="hidden md:flex items-center gap-1">
+                        <Calendar className="h-3.5 w-3.5" />
+                        <span>
+                          {new Date(blog.publishedAt).toLocaleDateString(
+                            "vi-VN"
+                          )}
+                        </span>
                       </div>
                     </div>
                     <Button variant="ghost" size="sm" asChild>
@@ -229,11 +223,11 @@ export default function BlogsPage() {
         </div>
 
         {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex justify-center gap-2">
+        {filteredBlogs.length > ITEMS_PER_PAGE && (
+          <div className="flex justify-center gap-2 flex-wrap">
             <Button
               variant="outline"
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
             >
               Trước
@@ -261,7 +255,9 @@ export default function BlogsPage() {
             })}
             <Button
               variant="outline"
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
               disabled={currentPage === totalPages}
             >
               Sau

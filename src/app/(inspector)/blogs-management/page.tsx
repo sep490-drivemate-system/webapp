@@ -21,7 +21,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -32,6 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import blogsData from "@/data/mock-blogs.json";
+import { getPreviewFromContent } from "@/lib/text-utils";
 
 type BlogPost = (typeof blogsData.blogs)[number] & {
   status?: "published" | "draft" | "scheduled";
@@ -274,6 +274,7 @@ function BlogCardItem({
     month: "2-digit",
     year: "numeric",
   });
+  const contentPreview = getPreviewFromContent(post.content, 110);
 
   return (
     <Card className="flex h-full flex-col overflow-hidden">
@@ -285,15 +286,10 @@ function BlogCardItem({
         />
       </div>
       <CardHeader className="space-y-3">
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{formattedDate}</span>
-          <Badge variant="secondary" className="text-[11px] font-medium">
-            {post.category}
-          </Badge>
-        </div>
+        <p className="text-xs text-muted-foreground">{formattedDate}</p>
         <CardTitle className="line-clamp-2 text-lg">{post.title}</CardTitle>
         <CardDescription className="line-clamp-3">
-          {post.excerpt}
+          {contentPreview}
         </CardDescription>
       </CardHeader>
       <CardContent className="mt-auto space-y-2 text-sm text-muted-foreground">
