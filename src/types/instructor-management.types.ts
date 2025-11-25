@@ -76,6 +76,7 @@ export interface InstructorApplication {
   healthCheckup: string;
   personalProfile: string;
   trackingHistories: string[];
+  dateUntilAutoRejection: string;
 }
 
 export interface InstructorManagementData {

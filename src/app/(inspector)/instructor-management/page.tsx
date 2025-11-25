@@ -222,12 +222,11 @@ export default function ManagementInstructorPage() {
 
   const getRemainingValidityDays = (
     submitDate: string,
-    validityWindowDays = 14
+    dateUntilAutoRejection: string
   ) => {
     const submitted = new Date(submitDate);
-    const expiration = new Date(submitted);
-    expiration.setDate(submitted.getDate() + validityWindowDays);
-    const diffMs = expiration.getTime() - Date.now();
+    const autoRejectionDate = new Date(dateUntilAutoRejection);
+    const diffMs = autoRejectionDate.getTime() - submitted.getTime();
     const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
     return diffDays;
   };
@@ -407,7 +406,8 @@ export default function ManagementInstructorPage() {
               ) : (
                 paginatedApplications.map((instructorApplication, index) => {
                   const remainingDays = getRemainingValidityDays(
-                    instructorApplication.submitDate
+                    instructorApplication.submitDate,
+                    instructorApplication.dateUntilAutoRejection
                   );
                   return (
                     <TableRow
