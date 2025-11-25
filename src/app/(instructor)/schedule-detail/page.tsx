@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -52,11 +52,10 @@ const BOOKINGS_DATA: BookingItem[] = [
   { id: "BKG012", date: "2025-12-18" },
 ];
 
-// Mock saved busy dates - in production, fetch from API
+// Mock saved available dates - in production, fetch from API
+const SAVED_AVAILABLE_DATES = ["2025-11-30"];
 
-const SAVED_BUSY_DATES = ["2025-11-30"];
-
-function UpdateScheduleCalendar({
+function AvailabilityCalendar({
   currentDate,
 
   selectedDates,
@@ -69,7 +68,7 @@ function UpdateScheduleCalendar({
 
   today,
 
-  savedBusyDates,
+  savedAvailableDates,
 }: {
   currentDate: Date;
 
@@ -83,7 +82,7 @@ function UpdateScheduleCalendar({
 
   today: Date;
 
-  savedBusyDates: string[];
+  savedAvailableDates: string[];
 }) {
   const [selectionStart, setSelectionStart] = useState<string | null>(null);
 
@@ -103,42 +102,13 @@ function UpdateScheduleCalendar({
     onCurrentDateChange(newDate);
   };
 
-  const formatDateString = (date: Date): string => {
-    const year = date.getFullYear();
-
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-
-    const day = String(date.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-  };
-
   const isDateDisabled = (dateString: string): boolean => {
     const [year, month, day] = dateString.split("-").map(Number);
-
     const checkDate = new Date(year, month - 1, day);
 
-    const todayStr = formatDateString(today);
-
-    const tomorrowStr = formatDateString(
-      new Date(today.getTime() + 24 * 60 * 60 * 1000)
-    );
-
-    // Disable if: past date (before today), today, or booked dates
-
-    if (checkDate < today) return true;
-
-    if (dateString === todayStr) return true;
-
+    // Only allow selecting availability starting tomorrow and never on booked days
+    if (checkDate <= today) return true;
     if (bookedDates.has(dateString)) return true;
-
-    // Check if date is within 30 days from tomorrow
-
-    const thirtyDaysFromTomorrow = new Date(
-      today.getTime() + 31 * 24 * 60 * 60 * 1000
-    );
-
-    if (checkDate >= thirtyDaysFromTomorrow) return true;
 
     return false;
   };
@@ -215,10 +185,6 @@ function UpdateScheduleCalendar({
 
     const calendarDays: React.ReactNode[] = [];
 
-    const today = new Date();
-
-    const todayStr = formatDateString(today);
-
     for (let week = 0; week < 6; week++) {
       for (let day = 0; day < 7; day++) {
         const currentCellDate = new Date(startDate);
@@ -246,7 +212,7 @@ function UpdateScheduleCalendar({
 
         const isBooked = bookedDates.has(dateString);
 
-        const isSavedBusy = savedBusyDates.includes(dateString);
+        const isSavedAvailable = savedAvailableDates.includes(dateString);
 
         const isStartSelection = dateString === selectionStart;
 
@@ -263,9 +229,9 @@ function UpdateScheduleCalendar({
                 isDisabled
                   ? "opacity-30 cursor-not-allowed bg-slate-100 text-slate-400"
                   : isSelected
-                  ? "bg-gradient-to-br from-red-400 to-red-500 text-white shadow-lg"
+                  ? "bg-gradient-to-br from-emerald-400 to-emerald-500 text-white shadow-lg"
                   : isStartSelection
-                  ? "bg-orange-300 text-white shadow-md"
+                  ? "bg-emerald-200 text-emerald-900 shadow-md"
                   : isCurrent
                   ? "bg-white text-slate-900 hover:bg-slate-50 border border-slate-200 cursor-pointer"
                   : "bg-slate-100 text-slate-400 border border-transparent opacity-40"
@@ -282,22 +248,22 @@ function UpdateScheduleCalendar({
             <div className="flex items-center justify-center gap-1 mt-0.5 h-1.5">
               {isBooked && (
                 <div
-                  className="w-1.5 h-1.5 rounded-full bg-green-400"
-                  title="Ngày đã được book"
+                  className="w-1.5 h-1.5 rounded-full bg-red-500"
+                  title="Ngày đã có khách hàng đặt lịch"
                 ></div>
               )}
 
               {isSelected && (
                 <div
-                  className="w-1.5 h-1.5 rounded-full bg-yellow-300"
-                  title="Ngày đã chọn"
+                  className="w-1.5 h-1.5 rounded-full bg-emerald-400"
+                  title="Ngày rảnh vừa chọn"
                 ></div>
               )}
 
-              {isSavedBusy && !isSelected && (
+              {isSavedAvailable && !isSelected && (
                 <div
-                  className="w-1.5 h-1.5 rounded-full bg-red-500"
-                  title="Ngày bận đã lưu"
+                  className="w-1.5 h-1.5 rounded-full bg-blue-500"
+                  title="Ngày rảnh đã lưu"
                 ></div>
               )}
             </div>
@@ -345,37 +311,37 @@ function UpdateScheduleCalendar({
 
       <div className="mt-6 pt-6 border-t border-slate-200 space-y-2 text-sm">
         <div className="flex items-center gap-3">
-          <div className="w-3 h-3 rounded-full bg-red-400"></div>
+          <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
 
-          <span className="text-slate-600">Ngày bận được chọn</span>
+          <span className="text-slate-600">Ngày rảnh vừa chọn (chờ lưu)</span>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="w-3 h-3 rounded-full bg-green-400"></div>
+          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
 
-          <span className="text-slate-600">Ngày đã được khách đặt lịch</span>
+          <span className="text-slate-600">Ngày rảnh đã lưu</span>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="w-3 h-3 rounded-full bg-red-500"></div>
 
-          <span className="text-slate-600">Ngày bận đã lưu</span>
+          <span className="text-slate-600">Ngày đã có khách hàng đặt lịch</span>
         </div>
 
         <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800">
           <p className="font-semibold text-xs mb-1">Lưu ý:</p>
 
           <ul className="text-xs space-y-1">
-            <li>• Chỉ có thể cập nhật lịch bận cho ngày mai trở đi</li>
+            <li>• Chỉ có thể thêm lịch rảnh từ ngày mai trở đi.</li>
 
             <li>
-              • Không thể cập nhật lịch bận cho những ngày đã được khách đặt
-              lịch
+              • Không thể xóa lịch rảnh cho những ngày đã có khách hàng đặt
+              lịch.
             </li>
 
             <li>
-              • Lịch bận chỉ được cập nhật cho các ngày nằm trong phạm vi 30
-              ngày tiếp theo kể từ hôm nay.
+              • Mọi cập nhật lịch rảnh trong tương lai, người hướng dẫn hoàn
+              toàn chịu trách nhiệm.
             </li>
           </ul>
         </div>
@@ -384,12 +350,14 @@ function UpdateScheduleCalendar({
   );
 }
 
-function BusyDatesList({
+function AvailabilityList({
   dates,
 
   onRemoveDate,
 
   savedDates,
+
+  bookedDates,
 
   onRemoveSavedDate,
 
@@ -400,6 +368,8 @@ function BusyDatesList({
   onRemoveDate: (date: string) => void;
 
   savedDates: string[];
+
+  bookedDates: Set<string>;
 
   onRemoveSavedDate: (date: string) => void;
 
@@ -427,11 +397,10 @@ function BusyDatesList({
 
   return (
     <div className="space-y-6">
-      {/* New Busy Dates */}
-
+      {/* Newly selected availability */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <h3 className="text-lg font-semibold text-slate-900 mb-4">
-          Ngày bận mới ({dates.size})
+          Ngày rảnh mới ({dates.size})
         </h3>
 
         {dates.size > 0 ? (
@@ -439,10 +408,10 @@ function BusyDatesList({
             {sortedDates.map((date) => (
               <div
                 key={date}
-                className="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
+                className="flex items-center justify-between p-3 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
 
                   <span className="text-slate-700 font-medium">
                     {formatDate(date)}
@@ -452,51 +421,68 @@ function BusyDatesList({
                 <button
                   onClick={() => onRemoveDate(date)}
                   disabled={isSaving}
-                  className="p-2 hover:bg-red-200 rounded-lg transition-colors disabled:opacity-50"
+                  className="p-2 hover:bg-emerald-200 rounded-lg transition-colors disabled:opacity-50"
                 >
-                  <Trash2 size={18} className="text-red-600" />
+                  <Trash2 size={18} className="text-emerald-700" />
                 </button>
               </div>
             ))}
           </div>
         ) : (
           <div className="text-center py-6 text-slate-500">
-            Chưa chọn ngày bận nào
+            Chưa chọn ngày rảnh nào
           </div>
         )}
       </div>
 
-      {/* Saved Busy Dates */}
-
+      {/* Saved availability */}
       {sortedSavedDates.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <h3 className="text-lg font-semibold text-slate-900 mb-4">
-            Ngày bận đã lưu ({savedDates.length})
+            Ngày rảnh đã lưu ({savedDates.length})
           </h3>
 
           <div className="space-y-2">
-            {sortedSavedDates.map((date) => (
-              <div
-                key={date}
-                className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+            {sortedSavedDates.map((date) => {
+              const isBooked = bookedDates.has(date);
 
-                  <span className="text-slate-700 font-medium">
-                    {formatDate(date)}
-                  </span>
-                </div>
-
-                <button
-                  onClick={() => onRemoveSavedDate(date)}
-                  disabled={isSaving}
-                  className="p-2 hover:bg-slate-300 rounded-lg transition-colors disabled:opacity-50"
+              return (
+                <div
+                  key={date}
+                  className="flex flex-col gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg"
                 >
-                  <Trash2 size={18} className="text-slate-600" />
-                </button>
-              </div>
-            ))}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+
+                      <span className="text-slate-700 font-medium">
+                        {formatDate(date)}
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => onRemoveSavedDate(date)}
+                      disabled={isSaving || isBooked}
+                      className="p-2 hover:bg-slate-200 rounded-lg transition-colors disabled:opacity-50"
+                      title={
+                        isBooked
+                          ? "Không thể xóa vì đã có khách hàng đặt lịch"
+                          : "Xóa ngày rảnh này"
+                      }
+                    >
+                      <Trash2 size={18} className="text-slate-700" />
+                    </button>
+                  </div>
+
+                  {isBooked && (
+                    <div className="inline-flex items-center gap-2 text-xs text-red-600 font-semibold">
+                      <X size={14} />
+                      <span>Ngày này đã có khách hàng, không thể xóa.</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -511,8 +497,9 @@ export default function UpdateSchedulePage() {
 
   const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
 
-  const [savedBusyDates, setSavedBusyDates] =
-    useState<string[]>(SAVED_BUSY_DATES);
+  const [savedAvailableDates, setSavedAvailableDates] = useState<string[]>(
+    SAVED_AVAILABLE_DATES
+  );
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -567,7 +554,8 @@ export default function UpdateSchedulePage() {
   };
 
   const handleRemoveSavedDate = (date: string) => {
-    setSavedBusyDates(savedBusyDates.filter((d) => d !== date));
+    if (bookedDates.has(date)) return;
+    setSavedAvailableDates(savedAvailableDates.filter((d) => d !== date));
   };
 
   const handleCancel = () => {
@@ -578,11 +566,12 @@ export default function UpdateSchedulePage() {
     setIsSaving(true);
 
     try {
-      // Simulate API call - in production, send to backend
+      // Simulate API call - in production, send instructor availability to backend
+      const allAvailableDates = [
+        ...new Set([...savedAvailableDates, ...selectedDates]),
+      ];
 
-      const allBusyDates = [...new Set([...savedBusyDates, ...selectedDates])];
-
-      setSavedBusyDates(allBusyDates);
+      setSavedAvailableDates(allAvailableDates);
 
       setSelectedDates(new Set());
 
@@ -616,10 +605,10 @@ export default function UpdateSchedulePage() {
                 </button>
                 <div className="space-y-1">
                   <CardTitle className="text-2xl text-foreground">
-                    Cập Nhật Lịch Bận
+                    Thiết Lập Lịch Rảnh Huấn Luyện
                   </CardTitle>
                   <CardDescription className="text-sm text-muted-foreground">
-                    Chọn những ngày bạn không thể làm việc
+                    Chọn những ngày bạn sẵn sàng huấn luyện cho khách hàng
                   </CardDescription>
                 </div>
               </div>
@@ -631,24 +620,25 @@ export default function UpdateSchedulePage() {
           {/* Calendar Section */}
 
           <div className="lg:col-span-1">
-            <UpdateScheduleCalendar
+            <AvailabilityCalendar
               currentDate={currentDate}
               selectedDates={selectedDates}
               onCurrentDateChange={setCurrentDate}
               onDateRangeSelect={handleDateRangeSelect}
               bookedDates={bookedDates}
               today={today}
-              savedBusyDates={savedBusyDates}
+              savedAvailableDates={savedAvailableDates}
             />
           </div>
 
-          {/* Busy Dates List Section */}
+          {/* Availability List Section */}
 
           <div className="lg:col-span-2">
-            <BusyDatesList
+            <AvailabilityList
               dates={selectedDates}
               onRemoveDate={handleRemoveDate}
-              savedDates={savedBusyDates}
+              savedDates={savedAvailableDates}
+              bookedDates={bookedDates}
               onRemoveSavedDate={handleRemoveSavedDate}
               isSaving={isSaving}
             />

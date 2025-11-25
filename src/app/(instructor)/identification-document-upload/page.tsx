@@ -10,9 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import PersonalDocumentForm from "@/components/commons/identification-document-upload/personal-document-form";
-import JsonUploadSection from "@/components/commons/identification-document-upload/json-upload-section";
 
 export default function Home() {
   const router = useRouter();
@@ -83,23 +82,11 @@ export default function Home() {
         </Card>
       )}
 
-      {/* Tabs */}
+      {/* Manual Form */}
       <section>
         <Tabs defaultValue="manual" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="manual">Nhập Thủ Công</TabsTrigger>
-            <TabsTrigger value="json">Tải JSON</TabsTrigger>
-          </TabsList>
-
           <TabsContent value="manual" className="space-y-6 mt-6">
             <PersonalDocumentForm
-              onSuccess={handleSuccess}
-              onError={handleError}
-            />
-          </TabsContent>
-
-          <TabsContent value="json" className="space-y-6 mt-6">
-            <JsonUploadSection
               onSuccess={handleSuccess}
               onError={handleError}
             />

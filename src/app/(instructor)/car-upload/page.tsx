@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import {
   Card,
   CardContent,
@@ -12,7 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import DocumentForm from "@/components/commons/car-upload/document-form";
-import BulkUploadForm from "@/components/commons/car-upload/bulk-upload-form";
 
 export default function CarUploadPage() {
   const router = useRouter();
@@ -83,23 +82,11 @@ export default function CarUploadPage() {
         </Card>
       )}
 
-      {/* Tabs */}
+      {/* Manual Upload */}
       <section>
         <Tabs defaultValue="form" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="form">Tải Lên Thủ Công</TabsTrigger>
-            <TabsTrigger value="bulk">Tải Lên Hàng Loạt (JSON)</TabsTrigger>
-          </TabsList>
-
           <TabsContent value="form" className="space-y-6 mt-6">
             <DocumentForm
-              onSuccess={handleFormSuccess}
-              onError={handleFormError}
-            />
-          </TabsContent>
-
-          <TabsContent value="bulk" className="space-y-6 mt-6">
-            <BulkUploadForm
               onSuccess={handleFormSuccess}
               onError={handleFormError}
             />

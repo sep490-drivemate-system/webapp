@@ -451,9 +451,6 @@ function ScheduleCalendar({
               {hasBookings && (
                 <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
               )}
-              {isBusyDay && (
-                <div className="w-1.5 h-1.5 rounded-full bg-red-400"></div>
-              )}
             </div>
           </button>
         );
@@ -507,11 +504,6 @@ function ScheduleCalendar({
         <div className="flex items-center gap-3">
           <div className="w-3 h-3 rounded-full bg-green-400"></div>
           <span className="text-sm text-slate-600">Ngày có buổi tập lái</span>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="w-3 h-3 rounded-full bg-red-400"></div>
-          <span className="text-sm text-slate-600">Ngày bận</span>
         </div>
       </div>
     </div>
@@ -602,7 +594,7 @@ function UpdateScheduleButton() {
     >
       <SquarePen size={18} />
 
-      <span>Cập nhật lịch bận</span>
+      <span>Thiết lập lịch rảnh huấn luyện</span>
     </button>
   );
 }
