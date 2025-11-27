@@ -40,6 +40,22 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 
+enum VehicleStatus {
+  Pending = 1,
+  Approved,
+}
+
+const getVehicleStatusLabel = (status: VehicleStatus) => {
+  switch (status) {
+    case VehicleStatus.Approved:
+      return "Đã Duyệt";
+    case VehicleStatus.Pending:
+      return "Chờ Duyệt";
+    default:
+      return "Không xác định";
+  }
+};
+
 interface Vehicle {
   id: number;
   brand: string;
@@ -48,7 +64,7 @@ interface Vehicle {
   seats: number;
   price: number;
   image: string;
-  status: "approved" | "pending";
+  status: VehicleStatus;
   approvedDate: string | null;
   year: number;
   fuelType: string;
@@ -65,7 +81,7 @@ const mockVehicles: Vehicle[] = [
     seats: 5,
     price: 150000,
     image: "https://img1.oto.com.vn/2022/01/04/1OANJGk2/camry-4e90.jpg",
-    status: "approved",
+    status: VehicleStatus.Approved,
     approvedDate: "2025-01-15",
     year: 2023,
     fuelType: "Petrol",
@@ -80,7 +96,7 @@ const mockVehicles: Vehicle[] = [
     seats: 5,
     price: 250000,
     image: "https://img1.oto.com.vn/2022/01/04/1OANJGk2/camry-4e90.jpg",
-    status: "approved",
+    status: VehicleStatus.Approved,
     approvedDate: "2025-01-10",
     year: 2024,
     fuelType: "Petrol",
@@ -101,7 +117,7 @@ const mockVehicles: Vehicle[] = [
     seats: 5,
     price: 450000,
     image: "https://img1.oto.com.vn/2022/01/04/1OANJGk2/camry-4e90.jpg",
-    status: "pending",
+    status: VehicleStatus.Pending,
     approvedDate: null,
     year: 2024,
     fuelType: "Diesel",
@@ -123,7 +139,7 @@ const mockVehicles: Vehicle[] = [
     seats: 5,
     price: 180000,
     image: "https://img1.oto.com.vn/2022/01/04/1OANJGk2/camry-4e90.jpg",
-    status: "approved",
+    status: VehicleStatus.Approved,
     approvedDate: "2025-01-20",
     year: 2023,
     fuelType: "Petrol",
@@ -146,14 +162,18 @@ function VehicleCard({ vehicle, onDetail, onDelete }: VehicleCardProps) {
       <div className="relative h-48 w-full bg-muted">
         <div className="absolute right-3 top-3 z-10">
           <Badge
-            variant={vehicle.status === "approved" ? "default" : "secondary"}
+            variant={
+              vehicle.status === VehicleStatus.Approved
+                ? "default"
+                : "secondary"
+            }
             className={
-              vehicle.status === "approved"
+              vehicle.status === VehicleStatus.Approved
                 ? "bg-emerald-500 text-white hover:bg-emerald-600"
                 : "bg-amber-500 text-white hover:bg-amber-600"
             }
           >
-            {vehicle.status === "approved" ? "Đã Duyệt" : "Chờ Duyệt"}
+            {getVehicleStatusLabel(vehicle.status)}
           </Badge>
         </div>
         {vehicle.image && !imageError ? (
@@ -272,15 +292,17 @@ function VehicleModal({ vehicle, open, onOpenChange }: VehicleModalProps) {
               </Label>
               <Badge
                 variant={
-                  vehicle.status === "approved" ? "default" : "secondary"
+                  vehicle.status === VehicleStatus.Approved
+                    ? "default"
+                    : "secondary"
                 }
                 className={
-                  vehicle.status === "approved"
+                  vehicle.status === VehicleStatus.Approved
                     ? "bg-emerald-500 text-white hover:bg-emerald-600"
                     : "bg-amber-500 text-white hover:bg-amber-600"
                 }
               >
-                {vehicle.status === "approved" ? "Đã Duyệt" : "Chờ Duyệt"}
+                {getVehicleStatusLabel(vehicle.status)}
               </Badge>
             </div>
             {vehicle.approvedDate && (
@@ -328,8 +350,12 @@ export default function CarManagementPage() {
     }
   };
 
-  const approvedCount = vehicles.filter((v) => v.status === "approved").length;
-  const pendingCount = vehicles.filter((v) => v.status === "pending").length;
+  const approvedCount = vehicles.filter(
+    (v) => v.status === VehicleStatus.Approved
+  ).length;
+  const pendingCount = vehicles.filter(
+    (v) => v.status === VehicleStatus.Pending
+  ).length;
   const averagePrice =
     vehicles.length > 0
       ? Math.round(vehicles.reduce((s, v) => s + v.price, 0) / vehicles.length)

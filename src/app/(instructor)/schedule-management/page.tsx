@@ -20,6 +20,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { BookingStatus, bookingStatusToText } from "@/types/booking";
 
 interface BookingItem {
   id: string;
@@ -28,14 +29,7 @@ interface BookingItem {
   startTime: string;
   endTime: string;
   totalHours: number;
-  status:
-    | "route_planning"
-    | "pending"
-    | "upcoming"
-    | "ongoing"
-    | "completed"
-    | "rescheduled"
-    | "cancelled";
+  status: BookingStatus;
   route: string;
   vehicle: string;
 }
@@ -48,7 +42,7 @@ const BOOKINGS_DATA: BookingItem[] = [
     startTime: "07:00",
     endTime: "09:00",
     totalHours: 2,
-    status: "route_planning",
+    status: BookingStatus.RoutePlanning,
     route: "Quận 9 - Quận 1",
     vehicle: "KIA Carnival 2024",
   },
@@ -59,7 +53,7 @@ const BOOKINGS_DATA: BookingItem[] = [
     startTime: "10:00",
     endTime: "12:30",
     totalHours: 2.5,
-    status: "pending",
+    status: BookingStatus.Pending,
     route: "Quận 2 - Quận 7",
     vehicle: "Xe khách hàng",
   },
@@ -70,7 +64,7 @@ const BOOKINGS_DATA: BookingItem[] = [
     startTime: "08:00",
     endTime: "11:00",
     totalHours: 3,
-    status: "upcoming",
+    status: BookingStatus.Upcoming,
     route: "Tân Hòa, Quận 9 - Cống Quỳnh, Quận 1",
     vehicle: "KIA Carnival 2024",
   },
@@ -81,7 +75,7 @@ const BOOKINGS_DATA: BookingItem[] = [
     startTime: "13:30",
     endTime: "16:00",
     totalHours: 2.5,
-    status: "ongoing",
+    status: BookingStatus.Ongoing,
     route: "Quận 7 - Quận 1",
     vehicle: "Toyota Vios",
   },
@@ -92,7 +86,7 @@ const BOOKINGS_DATA: BookingItem[] = [
     startTime: "17:00",
     endTime: "20:00",
     totalHours: 3,
-    status: "completed",
+    status: BookingStatus.Completed,
     route: "Quận 2 - Quận 3",
     vehicle: "Honda City",
   },
@@ -103,7 +97,7 @@ const BOOKINGS_DATA: BookingItem[] = [
     startTime: "08:30",
     endTime: "11:30",
     totalHours: 3,
-    status: "rescheduled",
+    status: BookingStatus.Rescheduled,
     route: "Quận 4 - Quận 5",
     vehicle: "Mazda 3",
   },
@@ -114,7 +108,7 @@ const BOOKINGS_DATA: BookingItem[] = [
     startTime: "14:00",
     endTime: "17:30",
     totalHours: 3.5,
-    status: "ongoing",
+    status: BookingStatus.Ongoing,
     route: "Quận 1 - Quận 3",
     vehicle: "Hyundai Accent",
   },
@@ -125,7 +119,7 @@ const BOOKINGS_DATA: BookingItem[] = [
     startTime: "09:00",
     endTime: "12:00",
     totalHours: 3,
-    status: "upcoming",
+    status: BookingStatus.Upcoming,
     route: "Quận 4 - Quận 7",
     vehicle: "Xe khách hàng",
   },
@@ -136,7 +130,7 @@ const BOOKINGS_DATA: BookingItem[] = [
     startTime: "13:00",
     endTime: "15:30",
     totalHours: 2.5,
-    status: "cancelled",
+    status: BookingStatus.Cancelled,
     route: "Quận 5 - Quận 8",
     vehicle: "Toyota Camry",
   },
@@ -147,7 +141,7 @@ const BOOKINGS_DATA: BookingItem[] = [
     startTime: "08:30",
     endTime: "11:30",
     totalHours: 3,
-    status: "upcoming",
+    status: BookingStatus.Upcoming,
     route: "Quận 10 - Quận 11",
     vehicle: "Honda Civic",
   },
@@ -158,7 +152,7 @@ const BOOKINGS_DATA: BookingItem[] = [
     startTime: "13:30",
     endTime: "16:30",
     totalHours: 3,
-    status: "ongoing",
+    status: BookingStatus.Ongoing,
     route: "Quận 6 - Quận 9",
     vehicle: "Nissan Altima",
   },
@@ -169,7 +163,7 @@ const BOOKINGS_DATA: BookingItem[] = [
     startTime: "18:00",
     endTime: "20:00",
     totalHours: 2,
-    status: "completed",
+    status: BookingStatus.Completed,
     route: "Quận 12 - Thủ Đức",
     vehicle: "KIA Sorento",
   },
@@ -177,51 +171,51 @@ const BOOKINGS_DATA: BookingItem[] = [
 
 const BUSY_DATES = ["2025-11-30", "2025-11-31"];
 
-const getStatusColor = (status: string) => {
+const getStatusColor = (status: BookingStatus) => {
   switch (status) {
-    case "route_planning":
+    case BookingStatus.RoutePlanning:
       return {
         bg: "bg-violet-50",
         border: "border-violet-200",
         badge: "bg-violet-100 text-violet-700",
         dot: "bg-violet-500",
       };
-    case "pending":
+    case BookingStatus.Pending:
       return {
         bg: "bg-amber-50",
         border: "border-amber-200",
         badge: "bg-amber-100 text-amber-700",
         dot: "bg-amber-500",
       };
-    case "upcoming":
+    case BookingStatus.Upcoming:
       return {
         bg: "bg-slate-50",
         border: "border-slate-200",
         badge: "bg-slate-100 text-slate-700",
         dot: "bg-slate-500",
       };
-    case "ongoing":
+    case BookingStatus.Ongoing:
       return {
         bg: "bg-green-50",
         border: "border-green-200",
         badge: "bg-green-100 text-green-700",
         dot: "bg-green-500",
       };
-    case "completed":
+    case BookingStatus.Completed:
       return {
         bg: "bg-blue-50",
         border: "border-blue-200",
         badge: "bg-blue-100 text-blue-700",
         dot: "bg-blue-500",
       };
-    case "rescheduled":
+    case BookingStatus.Rescheduled:
       return {
         bg: "bg-orange-50",
         border: "border-orange-200",
         badge: "bg-orange-100 text-orange-700",
         dot: "bg-orange-500",
       };
-    case "cancelled":
+    case BookingStatus.Cancelled:
       return {
         bg: "bg-red-50",
         border: "border-red-200",
@@ -238,26 +232,7 @@ const getStatusColor = (status: string) => {
   }
 };
 
-const getStatusText = (status: string) => {
-  switch (status) {
-    case "route_planning":
-      return "Lên lộ trình";
-    case "pending":
-      return "Đợi xác nhận";
-    case "upcoming":
-      return "Sắp diễn ra";
-    case "ongoing":
-      return "Đang diễn ra";
-    case "completed":
-      return "Hoàn thành";
-    case "rescheduled":
-      return "Đổi lịch";
-    case "cancelled":
-      return "Đã hủy";
-    default:
-      return "Chưa xác định";
-  }
-};
+const getStatusText = (status: BookingStatus) => bookingStatusToText(status);
 
 const formatTimeRange = (booking: BookingItem) =>
   `${booking.startTime} - ${booking.endTime}`;

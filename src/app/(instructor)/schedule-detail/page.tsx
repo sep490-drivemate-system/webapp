@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -19,37 +19,27 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { BookingStatus, bookingStatusToText } from "@/types/booking";
 
 interface BookingItem {
   id: string;
-
   date: string;
+  status: BookingStatus;
 }
 
 const BOOKINGS_DATA: BookingItem[] = [
-  { id: "BKG001", date: "2025-11-14" },
-
-  { id: "BKG002", date: "2025-11-14" },
-
-  { id: "BKG003", date: "2025-10-15" },
-
-  { id: "BKG004", date: "2025-10-15" },
-
-  { id: "BKG005", date: "2025-11-16" },
-
-  { id: "BKG006", date: "2025-12-01" },
-
-  { id: "BKG007", date: "2025-10-16" },
-
-  { id: "BKG008", date: "2025-11-17" },
-
-  { id: "BKG009", date: "2025-11-17" },
-
-  { id: "BKG010", date: "2025-11-18" },
-
-  { id: "BKG011", date: "2025-10-18" },
-
-  { id: "BKG012", date: "2025-12-18" },
+  { id: "BKG001", date: "2025-11-14", status: BookingStatus.RoutePlanning },
+  { id: "BKG002", date: "2025-11-14", status: BookingStatus.Pending },
+  { id: "BKG003", date: "2025-10-15", status: BookingStatus.Upcoming },
+  { id: "BKG004", date: "2025-10-15", status: BookingStatus.Ongoing },
+  { id: "BKG005", date: "2025-11-16", status: BookingStatus.Completed },
+  { id: "BKG006", date: "2025-12-01", status: BookingStatus.Rescheduled },
+  { id: "BKG007", date: "2025-10-16", status: BookingStatus.Ongoing },
+  { id: "BKG008", date: "2025-11-17", status: BookingStatus.Upcoming },
+  { id: "BKG009", date: "2025-11-17", status: BookingStatus.Cancelled },
+  { id: "BKG010", date: "2025-11-18", status: BookingStatus.Upcoming },
+  { id: "BKG011", date: "2025-10-18", status: BookingStatus.Ongoing },
+  { id: "BKG012", date: "2025-12-18", status: BookingStatus.Completed },
 ];
 
 // Mock saved available dates - in production, fetch from API
@@ -66,6 +56,8 @@ function AvailabilityCalendar({
 
   bookedDates,
 
+  bookedDateStatusMap,
+
   today,
 
   savedAvailableDates,
@@ -79,6 +71,8 @@ function AvailabilityCalendar({
   onDateRangeSelect: (startDate: string, endDate: string) => void;
 
   bookedDates: Set<string>;
+
+  bookedDateStatusMap: Map<string, Set<BookingStatus>>;
 
   today: Date;
 
@@ -214,6 +208,15 @@ function AvailabilityCalendar({
 
         const isSavedAvailable = savedAvailableDates.includes(dateString);
 
+        const bookedStatuses = bookedDateStatusMap.get(dateString);
+
+        const bookedStatusLabel =
+          bookedStatuses && bookedStatuses.size > 0
+            ? Array.from(bookedStatuses)
+                .map((status) => bookingStatusToText(status))
+                .join(", ")
+            : null;
+
         const isStartSelection = dateString === selectionStart;
 
         calendarDays.push(
@@ -249,7 +252,11 @@ function AvailabilityCalendar({
               {isBooked && (
                 <div
                   className="w-1.5 h-1.5 rounded-full bg-red-500"
-                  title="Ngày đã có khách hàng đặt lịch"
+                  title={
+                    bookedStatusLabel
+                      ? `Ngày đã có khách (${bookedStatusLabel})`
+                      : "Ngày đã có khách hàng đặt lịch"
+                  }
                 ></div>
               )}
 
@@ -359,6 +366,8 @@ function AvailabilityList({
 
   bookedDates,
 
+  bookedDateStatusMap,
+
   onRemoveSavedDate,
 
   isSaving,
@@ -370,6 +379,8 @@ function AvailabilityList({
   savedDates: string[];
 
   bookedDates: Set<string>;
+
+  bookedDateStatusMap: Map<string, Set<BookingStatus>>;
 
   onRemoveSavedDate: (date: string) => void;
 
@@ -446,6 +457,14 @@ function AvailabilityList({
             {sortedSavedDates.map((date) => {
               const isBooked = bookedDates.has(date);
 
+              const bookedStatusLabel = (() => {
+                const statuses = bookedDateStatusMap.get(date);
+                if (!statuses || statuses.size === 0) return null;
+                return Array.from(statuses)
+                  .map((status) => bookingStatusToText(status))
+                  .join(", ");
+              })();
+
               return (
                 <div
                   key={date}
@@ -477,7 +496,11 @@ function AvailabilityList({
                   {isBooked && (
                     <div className="inline-flex items-center gap-2 text-xs text-red-600 font-semibold">
                       <X size={14} />
-                      <span>Ngày này đã có khách hàng, không thể xóa.</span>
+                      <span>
+                        Ngày này đã có khách hàng
+                        {bookedStatusLabel ? ` (${bookedStatusLabel})` : ""},
+                        không thể xóa.
+                      </span>
                     </div>
                   )}
                 </div>
@@ -511,9 +534,25 @@ export default function UpdateSchedulePage() {
     return t;
   });
 
+  const bookedDateStatusMap = useMemo(() => {
+    return BOOKINGS_DATA.reduce<Map<string, Set<BookingStatus>>>(
+      (acc, booking) => {
+        if (!acc.has(booking.date)) {
+          acc.set(booking.date, new Set());
+        }
+        acc.get(booking.date)!.add(booking.status);
+        return acc;
+      },
+      new Map()
+    );
+  }, []);
+
   // Get unique booked dates from BOOKINGS_DATA
 
-  const bookedDates = new Set(BOOKINGS_DATA.map((booking) => booking.date));
+  const bookedDates = useMemo(
+    () => new Set(Array.from(bookedDateStatusMap.keys())),
+    [bookedDateStatusMap]
+  );
 
   const handleDateRangeSelect = (startDate: string, endDate: string) => {
     const [startYear, startMonth, startDay] = startDate
@@ -626,6 +665,7 @@ export default function UpdateSchedulePage() {
               onCurrentDateChange={setCurrentDate}
               onDateRangeSelect={handleDateRangeSelect}
               bookedDates={bookedDates}
+              bookedDateStatusMap={bookedDateStatusMap}
               today={today}
               savedAvailableDates={savedAvailableDates}
             />
@@ -639,6 +679,7 @@ export default function UpdateSchedulePage() {
               onRemoveDate={handleRemoveDate}
               savedDates={savedAvailableDates}
               bookedDates={bookedDates}
+              bookedDateStatusMap={bookedDateStatusMap}
               onRemoveSavedDate={handleRemoveSavedDate}
               isSaving={isSaving}
             />
