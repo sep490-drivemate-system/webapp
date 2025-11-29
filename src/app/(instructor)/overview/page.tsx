@@ -302,7 +302,175 @@ export default function InstructorOverviewPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
 
-  const currentData = overviewDataByRange[timeRange];
+  // Filter states matching dashboard
+  const [viewMode, setViewMode] = useState<"year" | "month" | "week">("week");
+
+  // Get current date dynamically
+  const now = new Date();
+  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
+
+  // Calculate current week of the month dynamically
+  const getCurrentWeekOfMonth = (year: number, month: number, day?: number) => {
+    const targetDate = day ? new Date(year, month - 1, day) : new Date();
+    const firstDayOfMonth = new Date(year, month - 1, 1);
+    const firstWeekday = firstDayOfMonth.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const currentDay = targetDate.getDate();
+
+    // Calculate which week of the month this day falls into
+    return Math.ceil((currentDay + firstWeekday) / 7);
+  };
+
+  const [selectedWeek, setSelectedWeek] = useState(
+    getCurrentWeekOfMonth(now.getFullYear(), now.getMonth() + 1, now.getDate())
+  );
+
+  // Calculate available years (current year and previous years)
+  const getAvailableYears = () => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let i = 0; i < 10; i++) {
+      years.push(currentYear - i);
+    }
+    return years;
+  };
+
+  // Calculate available months for selected year
+  const getAvailableMonths = (year: number) => {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1;
+
+    if (year === currentYear) {
+      // For current year, only show months up to current month
+      return Array.from({ length: currentMonth }, (_, i) => i + 1);
+    } else if (year < currentYear) {
+      // For past years, show all 12 months
+      return Array.from({ length: 12 }, (_, i) => i + 1);
+    } else {
+      // For future years (shouldn't happen), show no months
+      return [];
+    }
+  };
+
+  // Calculate available weeks for selected month/year
+  const getAvailableWeeks = (year: number, month: number) => {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1;
+
+    // Get the last day of the selected month
+    const lastDayOfMonth = new Date(year, month, 0).getDate();
+    const firstDayOfMonth = new Date(year, month - 1, 1);
+    const firstWeekday = firstDayOfMonth.getDay();
+
+    // Calculate total weeks in this month
+    const totalWeeks = Math.ceil((lastDayOfMonth + firstWeekday) / 7);
+
+    if (year === currentYear && month === currentMonth) {
+      // For current month, only show weeks up to current week
+      const currentWeek = getCurrentWeekOfMonth(
+        year,
+        month,
+        currentDate.getDate()
+      );
+      return Array.from({ length: currentWeek }, (_, i) => i + 1);
+    } else if (
+      year < currentYear ||
+      (year === currentYear && month < currentMonth)
+    ) {
+      // For past months, show all weeks
+      return Array.from({ length: totalWeeks }, (_, i) => i + 1);
+    } else {
+      // For future months (shouldn't happen), show no weeks
+      return [];
+    }
+  };
+
+  // Sync viewMode with timeRange when viewMode changes
+  const handleViewModeChange = (mode: "year" | "month" | "week") => {
+    setViewMode(mode);
+    // Map viewMode to timeRange
+    if (mode === "week") setTimeRange("week");
+    else if (mode === "month") setTimeRange("month");
+    else if (mode === "year") setTimeRange("year");
+  };
+
+  // Format time range description based on selected values
+  const getTimeRangeDescription = () => {
+    switch (viewMode) {
+      case "week":
+        return `Tuần ${selectedWeek}, Tháng ${selectedMonth}/${selectedYear}`;
+      case "month":
+        return `Tháng ${selectedMonth}/${selectedYear}`;
+      case "year":
+        return `Năm ${selectedYear}`;
+      default:
+        return "Tuần hiện tại";
+    }
+  };
+
+  // Get scaled data based on selected time period
+  const getScaledData = useMemo(() => {
+    const baseData = overviewDataByRange[timeRange];
+
+    // Calculate scale factor based on selected time vs current time
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+    // Calculate current week of month
+    const firstDayOfCurrentMonth = new Date(currentYear, currentMonth - 1, 1);
+    const firstWeekday = firstDayOfCurrentMonth.getDay();
+    const currentDay = now.getDate();
+    const currentWeek = Math.ceil((currentDay + firstWeekday) / 7);
+
+    // For past periods, use a slight variation factor
+    // For future periods (shouldn't happen), use base data
+    let scaleFactor = 1;
+
+    if (viewMode === "year") {
+      // Scale based on year difference (slight variation for different years)
+      const yearDiff = Math.abs(selectedYear - currentYear);
+      scaleFactor = 1 - yearDiff * 0.05; // 5% variation per year
+      if (scaleFactor < 0.5) scaleFactor = 0.5; // Minimum 50%
+    } else if (viewMode === "month") {
+      // Scale based on month difference
+      if (selectedYear === currentYear) {
+        const monthDiff = Math.abs(selectedMonth - currentMonth);
+        scaleFactor = 1 - monthDiff * 0.08; // 8% variation per month
+        if (scaleFactor < 0.6) scaleFactor = 0.6; // Minimum 60%
+      } else {
+        scaleFactor = 0.7; // Different year, use 70%
+      }
+    } else if (viewMode === "week") {
+      // Scale based on week difference
+      if (selectedYear === currentYear && selectedMonth === currentMonth) {
+        const weekDiff = Math.abs(selectedWeek - currentWeek);
+        scaleFactor = 1 - weekDiff * 0.1; // 10% variation per week
+        if (scaleFactor < 0.7) scaleFactor = 0.7; // Minimum 70%
+      } else {
+        scaleFactor = 0.8; // Different month/year, use 80%
+      }
+    }
+
+    return {
+      packageData: baseData.packageData.map((pkg) => ({
+        ...pkg,
+        buyers: Math.round(pkg.buyers * scaleFactor),
+        sessions: Math.round(pkg.sessions * scaleFactor),
+      })),
+      students: baseData.students.map((student) => ({
+        ...student,
+        sessions: Math.round(student.sessions * scaleFactor),
+        completed: Math.round(student.completed * scaleFactor),
+        rescheduled: Math.round(student.rescheduled * scaleFactor),
+        cancelled: Math.round(student.cancelled * scaleFactor),
+      })),
+      grossRevenue: Math.round(baseData.grossRevenue * scaleFactor),
+    };
+  }, [timeRange, viewMode, selectedYear, selectedMonth, selectedWeek]);
+
+  const currentData = getScaledData;
   const packageData = currentData.packageData;
   const students = currentData.students;
   const grossRevenue = currentData.grossRevenue;
@@ -334,7 +502,7 @@ export default function InstructorOverviewPage() {
     {
       title: "Tổng số buổi tập lái",
       value: `${totalSessions}`,
-      sub: `${totalCancelled} hủy · ${totalRescheduled} dời (${currentData.label})`,
+      sub: `${totalCancelled} hủy · ${totalRescheduled} dời `,
       icon: Navigation,
       accent: "bg-sky-50 text-sky-600",
     },
@@ -357,10 +525,51 @@ export default function InstructorOverviewPage() {
     [packageData]
   );
 
-  const sessionsData = useMemo(
-    () => getSessionsByRange(timeRange),
-    [timeRange]
-  );
+  // Get sessions data based on selected time period
+  const sessionsData = useMemo(() => {
+    const baseSessions = getSessionsByRange(timeRange);
+
+    // Calculate scale factor
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+    // Calculate current week of month
+    const firstDayOfCurrentMonth = new Date(currentYear, currentMonth - 1, 1);
+    const firstWeekday = firstDayOfCurrentMonth.getDay();
+    const currentDay = now.getDate();
+    const currentWeek = Math.ceil((currentDay + firstWeekday) / 7);
+
+    let scaleFactor = 1;
+
+    if (viewMode === "year") {
+      const yearDiff = Math.abs(selectedYear - currentYear);
+      scaleFactor = 1 - yearDiff * 0.05;
+      if (scaleFactor < 0.5) scaleFactor = 0.5;
+    } else if (viewMode === "month") {
+      if (selectedYear === currentYear) {
+        const monthDiff = Math.abs(selectedMonth - currentMonth);
+        scaleFactor = 1 - monthDiff * 0.08;
+        if (scaleFactor < 0.6) scaleFactor = 0.6;
+      } else {
+        scaleFactor = 0.7;
+      }
+    } else if (viewMode === "week") {
+      if (selectedYear === currentYear && selectedMonth === currentMonth) {
+        const weekDiff = Math.abs(selectedWeek - currentWeek);
+        scaleFactor = 1 - weekDiff * 0.1;
+        if (scaleFactor < 0.7) scaleFactor = 0.7;
+      } else {
+        scaleFactor = 0.8;
+      }
+    }
+
+    return baseSessions.map((session) => ({
+      ...session,
+      completed: Math.round(session.completed * scaleFactor),
+      rescheduled: Math.round(session.rescheduled * scaleFactor),
+      cancelled: Math.round(session.cancelled * scaleFactor),
+    }));
+  }, [timeRange, viewMode, selectedYear, selectedMonth, selectedWeek]);
 
   const sessionTotals = useMemo(() => {
     return sessionsData.reduce(
@@ -384,7 +593,7 @@ export default function InstructorOverviewPage() {
               </h1>
               <p className="text-sm text-muted-foreground">
                 Theo dõi hiệu suất buổi tập lái, doanh thu và danh sách khách
-                hàng theo {currentData.label}.
+                hàng.
               </p>
             </div>
           </div>
@@ -395,75 +604,192 @@ export default function InstructorOverviewPage() {
           <span className="text-sm text-muted-foreground">
             Đang xem theo:{" "}
             <span className="font-medium text-foreground">
-              {timeRange === "week"
-                ? "Tuần hiện tại"
-                : timeRange === "month"
-                ? "Tháng hiện tại"
-                : "Năm hiện tại"}
+              {getTimeRangeDescription()}
             </span>
           </span>
           <div className="relative">
+            {/* Filter Button */}
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsFilterOpen((prev) => !prev)}
+              onClick={() => {
+                console.log(
+                  "Filter button clicked, current state:",
+                  isFilterOpen
+                );
+                setIsFilterOpen(!isFilterOpen);
+              }}
               className="flex items-center gap-2"
             >
               <Filter className="h-4 w-4" />
-              <span>Bộ lọc</span>
+              <span>Bộ lọc {isFilterOpen ? "(Mở)" : "(Đóng)"}</span>
               <ChevronDown
                 className={`h-4 w-4 transition-transform ${
                   isFilterOpen ? "rotate-180" : ""
                 }`}
               />
             </Button>
+
+            {/* Filter Dropdown */}
             {isFilterOpen && (
-              <>
-                <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border bg-white p-3 shadow-lg">
-                  <p className="mb-2 text-xs font-medium text-muted-foreground">
-                    Chọn khoảng thời gian
-                  </p>
-                  <div className="space-y-2">
+              <div
+                className="absolute top-full right-0 mt-2 w-80 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-4"
+                style={{ backgroundColor: "white", border: "1px solid #ccc" }}
+              >
+                <div className="space-y-4">
+                  {/* View Mode Selection */}
+                  <div>
+                    <label className="text-sm font-medium text-black mb-2 block">
+                      Xem theo:
+                    </label>
+                    <div className="flex gap-2">
+                      {(["year", "month", "week"] as const).map((mode) => (
+                        <Button
+                          key={mode}
+                          variant={viewMode === mode ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => handleViewModeChange(mode)}
+                          className="flex-1"
+                        >
+                          {mode === "year"
+                            ? "Năm"
+                            : mode === "month"
+                            ? "Tháng"
+                            : "Tuần"}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Time Period Selectors */}
+                  <div className="space-y-3">
+                    {/* Year Selector - Always visible */}
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-1 block">
+                        Năm:
+                      </label>
+                      <select
+                        value={selectedYear}
+                        onChange={(e) => {
+                          const newYear = Number(e.target.value);
+                          setSelectedYear(newYear);
+
+                          // Reset month to latest available month for the selected year
+                          if (viewMode !== "year") {
+                            const availableMonths = getAvailableMonths(newYear);
+                            const latestMonth =
+                              availableMonths[availableMonths.length - 1] || 1;
+                            setSelectedMonth(latestMonth);
+
+                            // Reset week to latest available week for the selected month
+                            if (viewMode === "week") {
+                              const availableWeeks = getAvailableWeeks(
+                                newYear,
+                                latestMonth
+                              );
+                              const latestWeek =
+                                availableWeeks[availableWeeks.length - 1] || 1;
+                              setSelectedWeek(latestWeek);
+                            }
+                          }
+                        }}
+                        className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background"
+                      >
+                        {getAvailableYears().map((year) => (
+                          <option key={year} value={year}>
+                            {year}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Month Selector - Show only if viewMode is month or week */}
+                    {(viewMode === "month" || viewMode === "week") && (
+                      <div>
+                        <label className="text-sm font-medium text-foreground mb-1 block">
+                          Tháng:
+                        </label>
+                        <select
+                          value={selectedMonth}
+                          onChange={(e) => {
+                            const newMonth = Number(e.target.value);
+                            setSelectedMonth(newMonth);
+
+                            // Reset week to latest available week for the selected month
+                            if (viewMode === "week") {
+                              const availableWeeks = getAvailableWeeks(
+                                selectedYear,
+                                newMonth
+                              );
+                              const latestWeek =
+                                availableWeeks[availableWeeks.length - 1] || 1;
+                              setSelectedWeek(latestWeek);
+                            }
+                          }}
+                          className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background"
+                        >
+                          {getAvailableMonths(selectedYear).map((month) => (
+                            <option key={month} value={month}>
+                              {month}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Week Selector - Show only if viewMode is week */}
+                    {viewMode === "week" && (
+                      <div>
+                        <label className="text-sm font-medium text-foreground mb-1 block">
+                          Tuần:
+                        </label>
+                        <select
+                          value={selectedWeek}
+                          onChange={(e) =>
+                            setSelectedWeek(Number(e.target.value))
+                          }
+                          className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background"
+                        >
+                          {getAvailableWeeks(selectedYear, selectedMonth).map(
+                            (week) => (
+                              <option key={week} value={week}>
+                                {week}
+                              </option>
+                            )
+                          )}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Apply/Close buttons */}
+                  <div className="flex gap-2 pt-2 border-t border-border">
                     <Button
-                      variant={timeRange === "week" ? "default" : "outline"}
+                      variant="outline"
                       size="sm"
-                      className="w-full justify-start"
-                      onClick={() => {
-                        setTimeRange("week");
-                        setIsFilterOpen(false);
-                      }}
+                      onClick={() => setIsFilterOpen(false)}
+                      className="flex-1"
                     >
-                      Tuần hiện tại
+                      Đóng
                     </Button>
                     <Button
-                      variant={timeRange === "month" ? "default" : "outline"}
                       size="sm"
-                      className="w-full justify-start"
-                      onClick={() => {
-                        setTimeRange("month");
-                        setIsFilterOpen(false);
-                      }}
+                      onClick={() => setIsFilterOpen(false)}
+                      className="flex-1"
                     >
-                      Tháng hiện tại
-                    </Button>
-                    <Button
-                      variant={timeRange === "year" ? "default" : "outline"}
-                      size="sm"
-                      className="w-full justify-start"
-                      onClick={() => {
-                        setTimeRange("year");
-                        setIsFilterOpen(false);
-                      }}
-                    >
-                      Năm hiện tại
+                      Áp dụng
                     </Button>
                   </div>
                 </div>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setIsFilterOpen(false)}
-                />
-              </>
+              </div>
+            )}
+
+            {/* Click outside to close */}
+            {isFilterOpen && (
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setIsFilterOpen(false)}
+              />
             )}
           </div>
         </div>
@@ -499,12 +825,10 @@ export default function InstructorOverviewPage() {
             <div className="flex items-center gap-2">
               <CalendarDays className="size-5 text-primary" />
               <div>
-                <CardTitle>
-                  Gói dịch vụ được ưa chuộng theo {currentData.label}
-                </CardTitle>
+                <CardTitle>Gói dịch vụ được ưa chuộng</CardTitle>
                 <CardDescription>
                   Top gói theo số lượng học viên đăng ký trong{" "}
-                  {currentData.label}
+                  {getTimeRangeDescription()}
                 </CardDescription>
               </div>
             </div>
@@ -585,12 +909,10 @@ export default function InstructorOverviewPage() {
             <div className="flex items-center gap-2">
               <TrendingUp className="size-5 text-primary" />
               <div>
-                <CardTitle>Buổi tập lái theo {currentData.label}</CardTitle>
+                <CardTitle>Buổi tập lái</CardTitle>
                 <CardDescription>
                   Số liệu hoàn thành, dời lịch và hủy theo{" "}
-                  {timeRange === "year"
-                    ? "12 tháng trong năm hiện tại"
-                    : currentData.label}
+                  {getTimeRangeDescription()}
                 </CardDescription>
               </div>
             </div>
@@ -660,9 +982,10 @@ export default function InstructorOverviewPage() {
       <section>
         <Card>
           <CardHeader>
-            <CardTitle>Doanh thu theo {currentData.label}</CardTitle>
+            <CardTitle>Doanh thu</CardTitle>
             <CardDescription>
-              Thực nhận sau khi trừ hoa hồng hệ thống trong {currentData.label}
+              Thực nhận sau khi trừ hoa hồng hệ thống trong{" "}
+              {getTimeRangeDescription()}
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-3">
@@ -693,11 +1016,11 @@ export default function InstructorOverviewPage() {
       <section className="space-y-4">
         <div>
           <h2 className="text-lg font-semibold text-foreground">
-            Danh sách khách hàng theo {currentData.label}
+            Danh sách khách hàng
           </h2>
           <p className="text-sm text-muted-foreground">
             Theo dõi tiến độ từng học viên để tối ưu lịch tập lái theo{" "}
-            {currentData.label}.
+            {getTimeRangeDescription()}
           </p>
         </div>
         <Card>

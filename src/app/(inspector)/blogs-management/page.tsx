@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   ChevronLeft,
@@ -33,17 +32,10 @@ import {
 import blogsData from "@/data/mock-blogs.json";
 import { getPreviewFromContent } from "@/lib/text-utils";
 
-type BlogPost = (typeof blogsData.blogs)[number] & {
-  status?: "published" | "draft" | "scheduled";
-};
+type BlogPost = (typeof blogsData.blogs)[number];
 
 export default function BlogsInstructorManagementPage() {
-  const [posts, setPosts] = useState<BlogPost[]>(() =>
-    blogsData.blogs.map((post) => ({
-      ...post,
-      status: "published" as const,
-    }))
-  );
+  const [posts, setPosts] = useState<BlogPost[]>(() => blogsData.blogs);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(6);
@@ -81,18 +73,8 @@ export default function BlogsInstructorManagementPage() {
   }, [searchTerm, itemsPerPage]);
 
   const stats = useMemo(() => {
-    const published = posts.filter(
-      (post) => post.status === "published"
-    ).length;
-    const drafts = posts.filter((post) => post.status === "draft").length;
-    const scheduled = posts.filter(
-      (post) => post.status === "scheduled"
-    ).length;
     return {
       total: posts.length,
-      published,
-      drafts,
-      scheduled,
     };
   }, [posts]);
 
@@ -121,26 +103,6 @@ export default function BlogsInstructorManagementPage() {
             </button>
           </Link>
         </CardHeader>
-        <CardContent className="p-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard label="Tổng bài viết" value={stats.total} />
-            <StatCard
-              label="Đã xuất bản"
-              value={stats.published}
-              accent="text-emerald-600"
-            />
-            <StatCard
-              label="Lên lịch"
-              value={stats.scheduled}
-              accent="text-blue-600"
-            />
-            <StatCard
-              label="Bản nháp"
-              value={stats.drafts}
-              accent="text-amber-600"
-            />
-          </div>
-        </CardContent>
       </section>
 
       <section className="rounded-3xl border bg-card p-6 shadow-sm">
@@ -292,21 +254,6 @@ function BlogCardItem({
           {contentPreview}
         </CardDescription>
       </CardHeader>
-      <CardContent className="mt-auto space-y-2 text-sm text-muted-foreground">
-        <div className="flex items-center gap-3">
-          <Image
-            src={post.author.avatar || "/placeholder.svg"}
-            alt={post.author.name}
-            width={40}
-            height={40}
-            className="rounded-full object-cover"
-          />
-          <div>
-            <p className="font-medium text-foreground">{post.author.name}</p>
-            <p className="text-xs">{post.author.role}</p>
-          </div>
-        </div>
-      </CardContent>
       <CardFooter className="flex items-center justify-end gap-2 border-t bg-muted/30">
         <Button
           variant="outline"

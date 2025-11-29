@@ -74,11 +74,6 @@ const data = {
       icon: IconUserCog,
     },
     {
-      title: "Vai trò & Quyền",
-      url: "/management-role",
-      icon: IconUsers,
-    },
-    {
       title: "Quản lý gói dịch vụ",
       url: "/management-package",
       icon: IconPackage,
@@ -87,11 +82,6 @@ const data = {
       title: "Quản lý tài liệu",
       url: "/management-document",
       icon: IconArticle,
-    },
-    {
-      title: "Quản lý xe tập lái",
-      url: "/management-car",
-      icon: IconCar,
     },
     {
       title: "Quản lý điều khoản dịch vụ",

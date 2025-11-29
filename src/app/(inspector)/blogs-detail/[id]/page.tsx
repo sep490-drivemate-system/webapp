@@ -71,10 +71,6 @@ export default function BlogDetailPage() {
               {post.title}
             </h1>
             <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
-              <span className="font-medium text-foreground">
-                {post.author.name}
-              </span>
-              <span>•</span>
               <span>
                 {new Date(post.createdAt).toLocaleDateString("vi-VN", {
                   year: "numeric",

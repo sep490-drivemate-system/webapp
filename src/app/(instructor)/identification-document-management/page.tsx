@@ -30,30 +30,10 @@ interface DocumentRecord {
   files: DocumentFile[];
 }
 
-enum OverallStatus {
-  Pending = 1,
-  Approved = 2,
-  Rejected = 3,
-}
-
-const overallStatusToString = (status: OverallStatus) => {
-  switch (status) {
-    case OverallStatus.Pending:
-      return "Chờ duyệt";
-    case OverallStatus.Approved:
-      return "Đã duyệt";
-    case OverallStatus.Rejected:
-      return "Bị từ chối";
-    default:
-      return "Chưa xác định";
-  }
-};
-
 const userProfile = {
   fullName: "Nguyễn Văn An",
   email: "an.nguyen@example.com",
   phone: "0901 234 567",
-  overallStatus: OverallStatus.Pending,
   emergencyContact: {
     name: "Trần Thị Bình",
     phone: "0912 345 678",
@@ -79,10 +59,7 @@ const mockDocumentRecords: DocumentRecord[] = [
     title: "Lý Lịch Tư Pháp",
     description: "Giấy xác nhận không có tiền án tiền sự trong vòng 06 tháng.",
     updatedAt: "18/10/2024 - 09:10",
-    fields: [
-      { label: "Ngày cấp", value: "15/09/2024" },
-      { label: "Số hồ sơ", value: "LLTP-45879" },
-    ],
+    fields: [],
     files: [
       {
         label: "Ảnh lý lịch tư pháp",
@@ -95,10 +72,7 @@ const mockDocumentRecords: DocumentRecord[] = [
     title: "Giấy Khám Sức Khỏe",
     description: "Bản khám sức khỏe tổng quát đủ điều kiện lái xe.",
     updatedAt: "05/11/2024 - 16:48",
-    fields: [
-      { label: "Ngày cấp", value: "01/11/2024" },
-      { label: "Cơ sở y tế", value: "Bệnh viện Đa khoa Quốc tế" },
-    ],
+    fields: [],
     files: [
       {
         label: "Ảnh giấy khám sức khỏe",
@@ -157,13 +131,6 @@ export default function IdentificationDocumentManagementPage() {
                   Xem lại toàn bộ tài liệu đã tải lên và trạng thái xét duyệt
                 </CardDescription>
               </div>
-              <button
-                onClick={() => router.push("/identification-document-upload")}
-                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-green-400 to-green-500 text-white rounded-full font-medium shadow-lg hover:shadow-xl hover:from-green-500 hover:to-green-600 transition-all active:scale-95"
-              >
-                <Plus size={18} />
-                <span>Tải tài liệu cá nhân</span>
-              </button>
             </div>
           </CardHeader>
         </Card>
@@ -182,10 +149,6 @@ export default function IdentificationDocumentManagementPage() {
             <InfoItem label="Họ và tên" value={userProfile.fullName} />
             <InfoItem label="Email" value={userProfile.email} />
             <InfoItem label="Số điện thoại" value={userProfile.phone} />
-            <InfoItem
-              label="Trạng thái giấy tờ"
-              value={overallStatusToString(userProfile.overallStatus)}
-            />
           </CardContent>
         </Card>
 

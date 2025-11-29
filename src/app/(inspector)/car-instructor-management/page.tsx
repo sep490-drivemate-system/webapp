@@ -4,10 +4,15 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   CheckCircle,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
   Clock,
   Eye,
   FileText,
   Mail,
+  MoreHorizontal,
   Phone,
   Plus,
   Search,
@@ -32,6 +37,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -50,12 +62,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -746,38 +752,37 @@ function DocumentRow({
           {statusLabel}
         </Badge>
       </td>
-      <td className="px-4 py-3">
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            aria-label="Xem tài liệu"
-            onClick={onView}
-          >
-            <Eye className="size-4" />
-          </Button>
-          {document.status === "pending" && (
-            <>
-              <Button
-                variant="outline"
-                size="icon"
-                className="border-emerald-200 text-emerald-700 hover:bg-emerald-50"
-                aria-label="Duyệt tài liệu"
-                onClick={onApprove}
-              >
-                <CheckCircle className="size-4" />
+      <td className="px-4 py-3 text-center">
+        <div className="flex justify-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon" aria-label="Thao tác">
+                <MoreHorizontal className="size-4" />
               </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="border-red-200 text-red-600 hover:bg-red-50"
-                aria-label="Từ chối tài liệu"
-                onClick={onReject}
-              >
-                <XCircle className="size-4" />
-              </Button>
-            </>
-          )}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={onView}>
+                <Eye className="mr-2 size-4" />
+                Xem chi tiết
+              </DropdownMenuItem>
+              {document.status === "pending" && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={onApprove}
+                    className="text-emerald-600"
+                  >
+                    <CheckCircle className="mr-2 size-4" />
+                    Duyệt tài liệu
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onReject} className="text-red-600">
+                    <XCircle className="mr-2 size-4" />
+                    Từ chối tài liệu
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </td>
     </tr>
@@ -984,7 +989,7 @@ export default function ReviewerCarDocumentsPage() {
                 <TableHead className="px-4 py-3 font-semibold">
                   Trạng thái
                 </TableHead>
-                <TableHead className="px-4 py-3 font-semibold">
+                <TableHead className="px-4 py-3 font-semibold text-center">
                   Thao tác
                 </TableHead>
               </TableRow>

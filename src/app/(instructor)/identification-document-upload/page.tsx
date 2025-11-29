@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import PersonalDocumentForm from "@/components/commons/identification-document-upload/personal-document-form";
+import PersonalDocumentForm from "@/components/identification-document-upload/personal-document-form";
 
 export default function Home() {
   const router = useRouter();

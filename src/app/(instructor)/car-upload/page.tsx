@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import DocumentForm from "@/components/commons/car-upload/document-form";
+import DocumentForm from "@/components/car-upload/document-form";
 
 export default function CarUploadPage() {
   const router = useRouter();

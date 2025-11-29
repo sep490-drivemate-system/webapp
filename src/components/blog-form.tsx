@@ -50,8 +50,7 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
   );
 
   const handleChange =
-    (field: keyof BlogFormValues) =>
-    (event: ChangeEvent<HTMLInputElement>) => {
+    (field: keyof BlogFormValues) => (event: ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value;
       setValues((prev) => ({
         ...prev,
@@ -91,7 +90,9 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
   const handleGalleryRemove = (index: number) => {
     setValues((prev) => ({
       ...prev,
-      galleryImages: prev.galleryImages.filter((_, itemIndex) => itemIndex !== index),
+      galleryImages: prev.galleryImages.filter(
+        (_, itemIndex) => itemIndex !== index
+      ),
     }));
   };
 
@@ -146,7 +147,7 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="thumbnail">Ảnh đại diện</Label>
+            <Label htmlFor="thumbnail">Ảnh đại diện bài viết</Label>
             <Input
               id="thumbnail"
               placeholder="https://example.com/image.jpg"
@@ -175,10 +176,15 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
             {values.galleryImages.length > 0 ? (
               <div className="space-y-2">
                 {values.galleryImages.map((image, index) => (
-                  <div key={`${image}-${index}`} className="flex items-center gap-2">
+                  <div
+                    key={`${image}-${index}`}
+                    className="flex items-center gap-2"
+                  >
                     <Input
                       value={image}
-                      onChange={(event) => handleGalleryChange(index, event.target.value)}
+                      onChange={(event) =>
+                        handleGalleryChange(index, event.target.value)
+                      }
                       placeholder={`Ảnh #${index + 1}`}
                     />
                     <Button
@@ -195,14 +201,19 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">
-                Chưa có ảnh bổ sung nào. Bạn có thể thêm nhiều ảnh để hiển thị cuối bài viết.
+                Chưa có ảnh bổ sung nào. Bạn có thể thêm nhiều ảnh để hiển thị
+                cuối bài viết.
               </p>
             )}
           </div>
         </CardContent>
       </Card>
       <div className="flex justify-end">
-        <Button type="submit" className="gap-2" disabled={isSubmitting || isContentEmpty}>
+        <Button
+          type="submit"
+          className="gap-2"
+          disabled={isSubmitting || isContentEmpty}
+        >
           {mode === "edit" ? "Lưu thay đổi" : "Tạo bài viết"}
         </Button>
       </div>
