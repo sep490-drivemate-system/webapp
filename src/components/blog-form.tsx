@@ -1,7 +1,14 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
-import { Trash2 } from "lucide-react";
+import {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from "react";
+import { Trash2, Plus, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +31,95 @@ type BlogFormProps = {
   onSubmit?: (values: BlogFormValues) => void;
 };
 
+// Square image upload component for blog form
+function SquareImageUpload({
+  label,
+  onUpload,
+  preview,
+}: {
+  label: string;
+  onUpload: (base64: string) => void;
+  preview?: string;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleFileChange = (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      alert("Vui lòng chọn file ảnh (JPG, PNG, SVG, ...)");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      onUpload(base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileChange(file);
+  };
+
+  return (
+    <div className="space-y-2">
+      {label && <Label className="text-foreground">{label}</Label>}
+      {preview ? (
+        <div className="aspect-square w-full max-w-xs rounded-lg border-2 border-border bg-secondary">
+          <img
+            src={preview || "/placeholder.svg"}
+            alt={label || "Preview"}
+            className="w-full h-full object-contain"
+          />
+        </div>
+      ) : (
+        <div
+          onClick={() => fileInputRef.current?.click()}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={`aspect-square w-full max-w-xs border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors flex flex-col items-center justify-center ${
+            isDragging
+              ? "border-accent bg-accent/10"
+              : "border-border hover:bg-secondary"
+          }`}
+        >
+          <Upload className="w-8 h-8 mb-2 text-muted-foreground" />
+          <p className="text-sm font-medium text-foreground">
+            Nhấp để tải lên hoặc kéo và thả
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            JPG, PNG, SVG lên đến 5MB
+          </p>
+        </div>
+      )}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/jpg,image/png,image/svg+xml,image/gif,image/webp"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleFileChange(file);
+        }}
+        className="hidden"
+      />
+    </div>
+  );
+}
+
 export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
   const [values, setValues] = useState<BlogFormValues>(() => ({
     title: initialPost?.title ?? "",
@@ -31,7 +127,6 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
     thumbnail: initialPost?.thumbnail ?? "",
     galleryImages: initialPost?.galleryImages ?? [],
   }));
-  const [galleryInput, setGalleryInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -41,7 +136,6 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
       thumbnail: initialPost?.thumbnail ?? "",
       galleryImages: initialPost?.galleryImages ?? [],
     });
-    setGalleryInput("");
   }, [initialPost]);
 
   const isContentEmpty = useMemo(
@@ -65,21 +159,24 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
     }));
   };
 
-  const handleGalleryAdd = () => {
-    if (!galleryInput.trim()) {
-      return;
-    }
+  const handleThumbnailUpload = (base64: string) => {
     setValues((prev) => ({
       ...prev,
-      galleryImages: [...prev.galleryImages, galleryInput.trim()],
+      thumbnail: base64,
     }));
-    setGalleryInput("");
   };
 
-  const handleGalleryChange = (index: number, value: string) => {
+  const handleGalleryAdd = (base64: string) => {
+    setValues((prev) => ({
+      ...prev,
+      galleryImages: [...prev.galleryImages, base64],
+    }));
+  };
+
+  const handleGalleryChange = (index: number, base64: string) => {
     setValues((prev) => {
       const updated = [...prev.galleryImages];
-      updated[index] = value;
+      updated[index] = base64;
       return {
         ...prev,
         galleryImages: updated,
@@ -147,64 +244,62 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="thumbnail">Ảnh đại diện bài viết</Label>
-            <Input
-              id="thumbnail"
-              placeholder="https://example.com/image.jpg"
-              value={values.thumbnail}
-              onChange={handleChange("thumbnail")}
-              type="url"
-            />
+            <div className="flex items-center gap-25">
+              <Label className="text-sm">Ảnh đại diện bài viết</Label>
+              {values.thumbnail && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleThumbnailUpload("")}
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+              )}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <SquareImageUpload
+                label=""
+                onUpload={handleThumbnailUpload}
+                preview={values.thumbnail}
+              />
+            </div>
           </div>
           <div className="space-y-3">
             <Label>Danh sách ảnh bổ sung</Label>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <Input
-                placeholder="https://example.com/gallery-image.jpg"
-                value={galleryInput}
-                onChange={(event) => setGalleryInput(event.target.value)}
-              />
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleGalleryAdd}
-                disabled={!galleryInput.trim()}
-              >
-                Thêm ảnh
-              </Button>
-            </div>
-            {values.galleryImages.length > 0 ? (
-              <div className="space-y-2">
-                {values.galleryImages.map((image, index) => (
-                  <div
-                    key={`${image}-${index}`}
-                    className="flex items-center gap-2"
-                  >
-                    <Input
-                      value={image}
-                      onChange={(event) =>
-                        handleGalleryChange(index, event.target.value)
-                      }
-                      placeholder={`Ảnh #${index + 1}`}
-                    />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {values.galleryImages.map((image, index) => (
+                <div key={`gallery-${index}`} className="h-fit">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm text-muted-foreground">
+                      Ảnh #{index + 1}
+                    </Label>
                     <Button
                       type="button"
                       variant="ghost"
-                      size="icon"
+                      size="sm"
                       onClick={() => handleGalleryRemove(index)}
+                      className="text-destructive hover:text-destructive"
                     >
                       <Trash2 className="size-4" />
                       <span className="sr-only">Xóa ảnh</span>
                     </Button>
                   </div>
-                ))}
+                  <SquareImageUpload
+                    label=""
+                    onUpload={(base64) => handleGalleryChange(index, base64)}
+                    preview={image}
+                  />
+                </div>
+              ))}
+              <div className="pt-8">
+                <SquareImageUpload
+                  label=""
+                  onUpload={(base64) => handleGalleryAdd(base64)}
+                />
               </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Chưa có ảnh bổ sung nào. Bạn có thể thêm nhiều ảnh để hiển thị
-                cuối bài viết.
-              </p>
-            )}
+            </div>
           </div>
         </CardContent>
       </Card>
