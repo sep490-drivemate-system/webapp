@@ -28,6 +28,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import PageHeader from "@/components/commons/Header/header";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -365,75 +366,77 @@ export default function CarManagementPage() {
     <div className="space-y-8">
       {/* Header */}
       <section className="space-y-4">
-        <Card className="rounded-2xl border bg-white p-6 shadow-sm">
-          <CardHeader>
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="space-y-2">
-                <CardTitle className="text-2xl">Quản Lý Xe Học Lái</CardTitle>
-                <CardDescription>
-                  Quản lý danh sách xe và theo dõi tình trạng kiểm duyệt
-                </CardDescription>
-              </div>
-              <button
-                onClick={() => router.push("/car-upload")}
-                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-green-400 to-green-500 text-white rounded-full font-medium shadow-lg hover:shadow-xl hover:from-green-500 hover:to-green-600 transition-all active:scale-95"
-              >
-                <Plus size={18} />
-                <span>Thêm Xe Mới</span>
-              </button>
-            </div>
-          </CardHeader>
-        </Card>
+        <PageHeader
+          title="Quản Lý Xe Học Lái"
+          description="Quản lý danh sách xe và theo dõi tình trạng kiểm duyệt"
+          actionButton={{
+            label: "Thêm Xe Mới",
+            onClick: () => router.push("/car-upload"),
+            icon: Plus,
+          }}
+        />
 
         {/* Stats Cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Tổng Xe</CardTitle>
-              <Car className="size-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{vehicles.length}</div>
-            </CardContent>
-          </Card>
-          <Card className="border-emerald-200 bg-emerald-50/50">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-emerald-700">
-                Đã Duyệt
-              </CardTitle>
-              <Car className="size-4 text-emerald-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-emerald-700">
-                {approvedCount}
+            <CardHeader className="flex flex-row items-start justify-between gap-4">
+              <div className="space-y-1">
+                <CardDescription className="text-sm font-medium">
+                  Tổng Xe
+                </CardDescription>
+                <CardTitle className="text-3xl font-semibold">
+                  {vehicles.length}
+                </CardTitle>
               </div>
-            </CardContent>
-          </Card>
-          <Card className="border-amber-200 bg-amber-50/50">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-amber-700">
-                Chờ Duyệt
-              </CardTitle>
-              <Calendar className="size-4 text-amber-600" />
+              <span className="rounded-xl p-3 bg-blue-50 text-blue-600">
+                <Car className="size-5" />
+              </span>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-amber-700">
-                {pendingCount}
-              </div>
-            </CardContent>
           </Card>
-          <Card className="border-blue-200 bg-blue-50/50">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-blue-700">
-                Giá Trung Bình
-              </CardTitle>
-              <DollarSign className="size-4 text-blue-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-700">
-                {averagePrice.toLocaleString("vi-VN")} VNĐ
+          <Card>
+            <CardHeader className="flex flex-row items-start justify-between gap-4">
+              <div className="space-y-1">
+                <CardDescription className="text-sm font-medium">
+                  Đã Duyệt
+                </CardDescription>
+                <CardTitle className="text-3xl font-semibold">
+                  {approvedCount}
+                </CardTitle>
               </div>
-            </CardContent>
+              <span className="rounded-xl p-3 bg-emerald-50 text-emerald-600">
+                <Car className="size-5" />
+              </span>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-start justify-between gap-4">
+              <div className="space-y-1">
+                <CardDescription className="text-sm font-medium">
+                  Chờ Duyệt
+                </CardDescription>
+                <CardTitle className="text-3xl font-semibold">
+                  {pendingCount}
+                </CardTitle>
+              </div>
+              <span className="rounded-xl p-3 bg-amber-50 text-amber-600">
+                <Calendar className="size-5" />
+              </span>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-start justify-between gap-4">
+              <div className="space-y-1">
+                <CardDescription className="text-sm font-medium">
+                  Giá Trung Bình
+                </CardDescription>
+                <CardTitle className="text-3xl font-semibold">
+                  {averagePrice.toLocaleString("vi-VN")} VNĐ
+                </CardTitle>
+              </div>
+              <span className="rounded-xl p-3 bg-sky-50 text-sky-600">
+                <DollarSign className="size-5" />
+              </span>
+            </CardHeader>
           </Card>
         </div>
       </section>

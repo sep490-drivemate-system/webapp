@@ -15,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import PageHeader from "@/components/commons/Header/header";
 import {
   Popover,
   PopoverContent,
@@ -189,20 +190,10 @@ export default function TransactionsPage() {
     <main className="min-h-screen">
       {/* Header */}
       <div className="sticky top-0 z-50">
-        <div className="">
-          <Card className="w-full rounded-2xl border bg-white shadow-sm">
-            <CardHeader>
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="space-y-2">
-                  <CardTitle className="text-2xl">Lịch sử giao dịch</CardTitle>
-                  <CardDescription>
-                    Quản lý và theo dõi tất cả giao dịch của bạn
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
-        </div>
+        <PageHeader
+          title="Lịch sử giao dịch"
+          description="Quản lý và theo dõi tất cả giao dịch của bạn"
+        />
       </div>
       {/* Main Content */}
       <div className="min-h-screen mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8">

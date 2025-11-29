@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import PageHeader from "@/components/commons/Header/header";
 
 const DUMMY_PACKAGES = [
   {
@@ -165,33 +166,15 @@ export default function ServicePackageManagementPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Header */}
-      <section className="space-y-3">
-        <Card className="rounded-2xl border bg-white p-6 shadow-sm">
-          <CardHeader>
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="space-y-2">
-                <CardTitle className="text-2xl  text-foreground">
-                  Danh sách gói dịch vụ
-                </CardTitle>
-                <CardDescription className="text-sm text-muted-foreground">
-                  Quản lý các gói dịch vụ của bạn
-                </CardDescription>
-              </div>
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() =>
-                    router.push("/service-package-detail?create=true")
-                  }
-                  className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-green-400 to-green-500 text-white rounded-full font-medium shadow-lg hover:shadow-xl hover:from-green-500 hover:to-green-600 transition-all active:scale-95"
-                >
-                  <Plus size={18} />
-                  <span>Thêm gói mới</span>
-                </button>
-              </div>
-            </div>
-          </CardHeader>
-        </Card>
-      </section>
+      <PageHeader
+        title="Danh sách gói dịch vụ"
+        description="Quản lý các gói dịch vụ của bạn"
+        actionButton={{
+          label: "Thêm gói mới",
+          onClick: () => router.push("/service-package-detail?create=true"),
+          icon: Plus,
+        }}
+      />
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

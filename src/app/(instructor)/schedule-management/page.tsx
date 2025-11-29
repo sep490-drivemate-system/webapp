@@ -21,6 +21,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { BookingStatus, bookingStatusToText } from "@/types/booking";
+import PageHeader from "@/components/commons/Header/header";
 
 interface BookingItem {
   id: string;
@@ -424,7 +425,7 @@ function ScheduleCalendar({
 
             <div className="flex items-center justify-center gap-1 mt-0.5 h-1.5">
               {hasBookings && (
-                <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-text-[#10b981]"></div>
               )}
             </div>
           </button>
@@ -446,7 +447,7 @@ function ScheduleCalendar({
           onClick={handlePrevMonth}
           className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
         >
-          <ChevronLeft size={20} className="text-green-500" />
+          <ChevronLeft size={20} className="text-[#10b981]" />
         </button>
 
         <h2 className="text-lg font-semibold text-slate-900">
@@ -478,7 +479,9 @@ function ScheduleCalendar({
       <div className="mt-6 pt-6 border-t border-slate-200 space-y-3">
         <div className="flex items-center gap-3">
           <div className="w-3 h-3 rounded-full bg-green-400"></div>
-          <span className="text-sm text-slate-600">Ngày có buổi tập lái</span>
+          <span className="text-sm text-slate-600">
+            Ngày có buổi huấn luyện
+          </span>
         </div>
       </div>
     </div>
@@ -516,7 +519,7 @@ function ScheduleBookingList({
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <div className="flex items-center gap-3">
-          <Calendar size={24} className="text-green-500" />
+          <Calendar size={24} className="text-[#10b981]" />
 
           <h2 className="text-xl font-semibold text-slate-900">
             {formatDate(selectedDate)}
@@ -524,7 +527,7 @@ function ScheduleBookingList({
         </div>
 
         <p className="text-sm text-slate-600 mt-2">
-          {bookings.length} buổi tập lái
+          {bookings.length} buổi huấn luyện
         </p>
       </div>
 
@@ -541,7 +544,7 @@ function ScheduleBookingList({
               <Calendar size={48} className="text-slate-300 mb-4" />
 
               <p className="text-slate-600 font-medium">
-                Không có buổi tập lái nào trong ngày này
+                Không có buổi huấn luyện nào trong ngày này
               </p>
 
               <p className="text-slate-500 text-sm mt-2">
@@ -552,25 +555,6 @@ function ScheduleBookingList({
         )}
       </div>
     </div>
-  );
-}
-
-function UpdateScheduleButton() {
-  const router = useRouter();
-
-  const handleClick = () => {
-    router.push("/schedule-detail");
-  };
-
-  return (
-    <button
-      onClick={handleClick}
-      className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-green-400 to-green-500 text-white rounded-full font-medium shadow-lg hover:shadow-xl hover:from-green-500 hover:to-green-600 transition-all active:scale-95"
-    >
-      <SquarePen size={18} />
-
-      <span>Thiết lập lịch rảnh huấn luyện</span>
-    </button>
   );
 }
 
@@ -606,25 +590,27 @@ export default function SchedulePage() {
     });
   };
 
+  const router = useRouter();
+
+  const handleUpdateSchedule = () => {
+    router.push("/schedule-detail");
+  };
+
   return (
     <main className="min-h-screen">
       <div className="container mx-autopy-8">
         {/* Header with Update Button */}
-        <Card className="rounded-2xl border bg-white p-6 shadow-sm mb-8">
-          <CardHeader>
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="space-y-2">
-                <CardTitle className="text-2xl">Lịch Làm Việc</CardTitle>
-                <CardDescription>
-                  Quản lý lịch trình công việc của bạn
-                </CardDescription>
-              </div>
-              <UpdateScheduleButton />
-            </div>
-          </CardHeader>
-        </Card>
+        <PageHeader
+          title="Lịch Huấn Luyện"
+          description="Quản lý lịch trình huấn luyện của bạn"
+          actionButton={{
+            label: "Thiết lập lịch rảnh huấn luyện",
+            onClick: handleUpdateSchedule,
+            icon: SquarePen,
+          }}
+        />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-8">
           {/* Calendar Section */}
 
           <div className="lg:col-span-1">

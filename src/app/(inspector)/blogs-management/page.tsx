@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
   ChevronRight,
@@ -21,6 +22,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import PageHeader from "@/components/commons/Header/header";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -35,6 +37,7 @@ import { getPreviewFromContent } from "@/lib/text-utils";
 type BlogPost = (typeof blogsData.blogs)[number];
 
 export default function BlogsInstructorManagementPage() {
+  const router = useRouter();
   const [posts, setPosts] = useState<BlogPost[]>(() => blogsData.blogs);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -86,24 +89,16 @@ export default function BlogsInstructorManagementPage() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-3xl border bg-background shadow-sm">
-        <CardHeader className="flex flex-col gap-4 border-b bg-muted/20 p-6 md:flex-row md:items-center md:justify-between">
-          <div>
-            <CardTitle className="text-2xl font-semibold text-foreground">
-              Quản lý bài viết
-            </CardTitle>
-            <CardDescription>
-              Theo dõi, tìm kiếm và tạo mới các bài viết trên hệ thống.
-            </CardDescription>
-          </div>
-          <Link href="/blogs/new/form">
-            <button className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-green-400 to-green-500 text-white rounded-full font-medium shadow-lg hover:shadow-xl hover:from-green-500 hover:to-green-600 transition-all active:scale-95">
-              <Plus size={18} />
-              <span>Tạo bài viết</span>
-            </button>
-          </Link>
-        </CardHeader>
-      </section>
+      <PageHeader
+        title="Quản lý bài viết"
+        description="Theo dõi, tìm kiếm và tạo mới các bài viết trên hệ thống."
+        actionButton={{
+          label: "Tạo bài viết",
+          onClick: () => router.push("/blogs/new/form"),
+          icon: Plus,
+        }}
+        className="space-y-4"
+      />
 
       <section className="rounded-3xl border bg-card p-6 shadow-sm">
         <div className="relative">

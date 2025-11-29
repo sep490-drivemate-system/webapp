@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import PageHeader from "@/components/commons/Header/header";
 
 interface DocumentField {
   label: string;
@@ -119,22 +120,10 @@ export default function IdentificationDocumentManagementPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <section className="space-y-3">
-        <Card className="rounded-2xl border bg-white p-6 shadow-sm">
-          <CardHeader>
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="space-y-1">
-                <CardTitle className="text-2xl text-foreground">
-                  Quản Lý Tài Liệu Cá Nhân
-                </CardTitle>
-                <CardDescription className="text-sm text-muted-foreground">
-                  Xem lại toàn bộ tài liệu đã tải lên và trạng thái xét duyệt
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-        </Card>
-      </section>
+      <PageHeader
+        title="Quản Lý Tài Liệu Cá Nhân"
+        description="Xem lại toàn bộ tài liệu đã tải lên và trạng thái xét duyệt"
+      />
 
       {/* User profile & emergency contact */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">

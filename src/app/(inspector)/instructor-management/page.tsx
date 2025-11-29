@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import PageHeader from "@/components/commons/Header/header";
 import {
   Dialog,
   DialogContent,
@@ -306,45 +307,41 @@ export default function ManagementInstructorPage() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-3xl border bg-background shadow-sm">
-        <CardHeader className="space-y-4 border-b bg-muted/20 p-6">
-          <div>
-            <CardTitle className="text-2xl font-semibold text-foreground">
-              Quản lý người hướng dẫn
-            </CardTitle>
-            <CardDescription>
-              Theo dõi, duyệt hoặc yêu cầu bổ sung hồ sơ ứng viên giảng viên.
-            </CardDescription>
-          </div>
-        </CardHeader>
+      <PageHeader
+        title="Quản lý người hướng dẫn"
+        description="Theo dõi, duyệt hoặc yêu cầu bổ sung hồ sơ ứng viên giảng viên."
+        className="space-y-4"
+      />
+      <Card className="rounded-3xl border bg-background shadow-sm">
         <CardContent className="p-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <StatCard
               label="Tổng đơn đăng ký"
               value={stats.total}
-              icon={<FileText className="size-4 text-muted-foreground" />}
+              icon={<FileText className="size-5" />}
+              accent="bg-blue-50 text-blue-600"
             />
             <StatCard
               label="Chờ duyệt"
               value={stats.pending}
-              accent="text-amber-600"
-              icon={<Clock className="size-4 text-amber-500" />}
+              icon={<Clock className="size-5" />}
+              accent="bg-amber-50 text-amber-600"
             />
             <StatCard
               label="Đã duyệt"
               value={stats.approved}
-              accent="text-emerald-600"
-              icon={<CheckCircle className="size-4 text-emerald-500" />}
+              icon={<CheckCircle className="size-5" />}
+              accent="bg-emerald-50 text-emerald-600"
             />
             <StatCard
               label="Từ chối"
               value={stats.rejected}
-              accent="text-red-600"
-              icon={<XCircle className="size-4 text-red-500" />}
+              icon={<XCircle className="size-5" />}
+              accent="bg-rose-50 text-rose-600"
             />
           </div>
         </CardContent>
-      </section>
+      </Card>
 
       <section className="rounded-3xl border bg-card p-6 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-center">
@@ -369,7 +366,7 @@ export default function ManagementInstructorPage() {
               <SelectValue placeholder="Trạng thái" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tất cả</SelectItem>
+              <SelectItem value="all">Tất cả trạng thái</SelectItem>
               <SelectItem value="pending">Chờ duyệt</SelectItem>
               <SelectItem value="approved">Đã duyệt</SelectItem>
               <SelectItem value="rejected">Từ chối</SelectItem>
@@ -758,14 +755,22 @@ function StatCard({
   accent?: string;
 }) {
   return (
-    <Card className="border-none bg-white shadow-inner">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardDescription className="text-xs uppercase">{label}</CardDescription>
-        {icon}
+    <Card>
+      <CardHeader className="flex flex-row items-start justify-between gap-4">
+        <div className="space-y-1">
+          <CardDescription className="text-sm font-medium">
+            {label}
+          </CardDescription>
+          <CardTitle className="text-2xl font-semibold">{value}</CardTitle>
+        </div>
+        {icon && (
+          <span
+            className={`rounded-xl p-3 ${accent || "bg-blue-50 text-blue-600"}`}
+          >
+            {icon}
+          </span>
+        )}
       </CardHeader>
-      <CardContent>
-        <div className={`text-2xl font-semibold ${accent ?? ""}`}>{value}</div>
-      </CardContent>
     </Card>
   );
 }

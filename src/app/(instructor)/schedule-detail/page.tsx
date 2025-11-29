@@ -20,6 +20,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { BookingStatus, bookingStatusToText } from "@/types/booking";
+import PageHeader from "@/components/commons/Header/header";
 
 interface BookingItem {
   id: string;
@@ -254,8 +255,8 @@ function AvailabilityCalendar({
                   className="w-1.5 h-1.5 rounded-full bg-red-500"
                   title={
                     bookedStatusLabel
-                      ? `Ngày đã có khách (${bookedStatusLabel})`
-                      : "Ngày đã có khách hàng đặt lịch"
+                      ? `Ngày đã có buổi huấn luyện (${bookedStatusLabel})`
+                      : "Ngày đã có buổi huấn luyện"
                   }
                 ></div>
               )}
@@ -332,7 +333,7 @@ function AvailabilityCalendar({
         <div className="flex items-center gap-3">
           <div className="w-3 h-3 rounded-full bg-red-500"></div>
 
-          <span className="text-slate-600">Ngày đã có khách hàng đặt lịch</span>
+          <span className="text-slate-600">Ngày đã có buổi huấn luyện</span>
         </div>
 
         <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800">
@@ -342,8 +343,7 @@ function AvailabilityCalendar({
             <li>• Chỉ có thể thêm lịch rảnh từ ngày mai trở đi.</li>
 
             <li>
-              • Không thể xóa lịch rảnh cho những ngày đã có khách hàng đặt
-              lịch.
+              • Không thể xóa lịch rảnh cho những ngày đã có buổi huấn luyện.
             </li>
 
             <li>
@@ -630,32 +630,22 @@ export default function UpdateSchedulePage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4">
         {/* Header */}
-        <section className="space-y-3 mb-8">
-          <Card className="rounded-2xl border bg-white p-6 shadow-sm">
-            <CardHeader>
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={handleBack}
-                  className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <ArrowLeft className="w-5 h-5 text-gray-600" />
-                </button>
-                <div className="space-y-1">
-                  <CardTitle className="text-2xl text-foreground">
-                    Thiết Lập Lịch Rảnh Huấn Luyện
-                  </CardTitle>
-                  <CardDescription className="text-sm text-muted-foreground">
-                    Chọn những ngày bạn sẵn sàng huấn luyện cho khách hàng
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
-        </section>
+        <PageHeader
+          title="Thiết Lập Lịch Rảnh Huấn Luyện"
+          description="Chọn những ngày bạn sẵn sàng huấn luyện cho người lái mới"
+          leftAction={
+            <button
+              onClick={handleBack}
+              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </button>
+          }
+        />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-8">
           {/* Calendar Section */}
 
           <div className="lg:col-span-1">
@@ -700,7 +690,7 @@ export default function UpdateSchedulePage() {
               <button
                 onClick={handleUpdate}
                 disabled={isSaving || selectedDates.size === 0}
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-400 to-green-500 text-white rounded-lg font-medium shadow-lg hover:shadow-xl hover:from-green-500 hover:to-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-400 to-[#10b981] text-white rounded-lg font-medium shadow-lg hover:shadow-xl hover:from-green-500 hover:to-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
               >
                 {isSaving ? (
                   <>

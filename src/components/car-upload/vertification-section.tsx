@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import ImageUploadField from "../image-upload-field";
+import ImageUploadField from "../commons/image-upload-field";
 
 interface VerificationSectionProps {
   data: any;

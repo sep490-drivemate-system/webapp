@@ -37,9 +37,11 @@ import {
   Filter,
   Navigation,
   TrendingUp,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import PageHeader from "@/components/commons/Header/header";
 
 type TimeRange = "week" | "month" | "year";
 
@@ -83,7 +85,7 @@ const overviewDataByRange: Record<TimeRange, OverviewData> = {
       {
         id: 1,
         name: "Nguyễn Văn A",
-        phone: "090xxxxxxx",
+        phone: "0901234567",
         package: "Gói Đường Cao Tốc",
         sessions: 3,
         completed: 2,
@@ -93,7 +95,7 @@ const overviewDataByRange: Record<TimeRange, OverviewData> = {
       {
         id: 2,
         name: "Lê Thị B",
-        phone: "091xxxxxxx",
+        phone: "0912345678",
         package: "Gói Miền Tây",
         sessions: 2,
         completed: 2,
@@ -103,7 +105,7 @@ const overviewDataByRange: Record<TimeRange, OverviewData> = {
       {
         id: 3,
         name: "Phạm C",
-        phone: "092xxxxxxx",
+        phone: "0923456789",
         package: "Gói Sơ Cấp",
         sessions: 4,
         completed: 3,
@@ -125,7 +127,7 @@ const overviewDataByRange: Record<TimeRange, OverviewData> = {
       {
         id: 1,
         name: "Nguyễn Văn A",
-        phone: "090xxxxxxx",
+        phone: "0901234567",
         package: "Gói Đường Cao Tốc",
         sessions: 8,
         completed: 6,
@@ -135,7 +137,7 @@ const overviewDataByRange: Record<TimeRange, OverviewData> = {
       {
         id: 2,
         name: "Lê Thị B",
-        phone: "091xxxxxxx",
+        phone: "0912345678",
         package: "Gói Miền Tây",
         sessions: 5,
         completed: 5,
@@ -145,7 +147,7 @@ const overviewDataByRange: Record<TimeRange, OverviewData> = {
       {
         id: 3,
         name: "Phạm C",
-        phone: "092xxxxxxx",
+        phone: "0923456789",
         package: "Gói Sơ Cấp",
         sessions: 10,
         completed: 9,
@@ -172,7 +174,7 @@ const overviewDataByRange: Record<TimeRange, OverviewData> = {
       {
         id: 1,
         name: "Nguyễn Văn A",
-        phone: "090xxxxxxx",
+        phone: "0901234567",
         package: "Gói Đường Cao Tốc",
         sessions: 40,
         completed: 34,
@@ -182,7 +184,7 @@ const overviewDataByRange: Record<TimeRange, OverviewData> = {
       {
         id: 2,
         name: "Lê Thị B",
-        phone: "091xxxxxxx",
+        phone: "0912345678",
         package: "Gói Miền Tây",
         sessions: 26,
         completed: 25,
@@ -192,7 +194,7 @@ const overviewDataByRange: Record<TimeRange, OverviewData> = {
       {
         id: 3,
         name: "Phạm C",
-        phone: "092xxxxxxx",
+        phone: "0923456789",
         package: "Gói Sơ Cấp",
         sessions: 50,
         completed: 46,
@@ -500,15 +502,15 @@ export default function InstructorOverviewPage() {
       accent: "bg-blue-50 text-blue-600",
     },
     {
-      title: "Tổng số buổi tập lái",
+      title: "Tổng số buổi huấn luyện",
       value: `${totalSessions}`,
       sub: `${totalCancelled} hủy · ${totalRescheduled} dời `,
       icon: Navigation,
       accent: "bg-sky-50 text-sky-600",
     },
     {
-      title: "Doanh thu ròng",
-      value: `${(netRevenue / 1_000_000).toLocaleString("vi-VN")} triệu`,
+      title: "Doanh thu thực nhận",
+      value: `${netRevenue.toLocaleString("vi-VN")} VNĐ`,
       sub: `Hoa hồng ${commissionRate * 100}%`,
       icon: TrendingUp,
       accent: "bg-emerald-50 text-emerald-600",
@@ -584,21 +586,10 @@ export default function InstructorOverviewPage() {
 
   return (
     <div className="space-y-8">
-      <section className="space-y-3">
-        <div className="rounded-2xl border bg-white p-6 shadow-sm">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="space-y-2">
-              <h1 className="text-2xl font-medium text-foreground">
-                Quản lý doanh thu, khách hàng và gói dịch vụ
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Theo dõi hiệu suất buổi tập lái, doanh thu và danh sách khách
-                hàng.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PageHeader
+        title="Quản lý doanh thu, người lái mới và gói dịch vụ"
+        description="Theo dõi hiệu suất buổi huấn luyện, doanh thu và danh sách người lái mới."
+      />
       <div className="flex justify-end">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">
@@ -795,7 +786,7 @@ export default function InstructorOverviewPage() {
         </div>
       </div>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-4 grid-cols-3">
         {kpis.map((kpi) => {
           const Icon = kpi.icon;
           return (
@@ -819,15 +810,15 @@ export default function InstructorOverviewPage() {
         })}
       </section>
 
-      <section>
+      <section className="mt-8 rounded-3xl border bg-card p-6 shadow-sm">
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <CalendarDays className="size-5 text-primary" />
+              <CalendarDays className="h-5 w-5 text-primary" />
               <div>
                 <CardTitle>Gói dịch vụ được ưa chuộng</CardTitle>
                 <CardDescription>
-                  Top gói theo số lượng học viên đăng ký trong{" "}
+                  Top gói theo số lượng người lái mới đăng ký trong{" "}
                   {getTimeRangeDescription()}
                 </CardDescription>
               </div>
@@ -850,7 +841,7 @@ export default function InstructorOverviewPage() {
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value: number) => `${value} học viên`}
+                    formatter={(value: number) => `${value} người lái mới`}
                     contentStyle={{ borderRadius: 12, borderColor: "#e5e7eb" }}
                   />
                   <Legend />
@@ -888,7 +879,7 @@ export default function InstructorOverviewPage() {
                           {pkg.name}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {pkg.buyers} khách hàng · {pkg.sessions} buổi
+                          {pkg.buyers} người lái mới · {pkg.sessions} buổi
                         </p>
                       </div>
                     </div>
@@ -903,13 +894,13 @@ export default function InstructorOverviewPage() {
         </Card>
       </section>
 
-      <section>
+      <section className="mt-8 rounded-3xl border bg-card p-6 shadow-sm">
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <TrendingUp className="size-5 text-primary" />
+              <TrendingUp className="h-5 w-5 text-primary" />
               <div>
-                <CardTitle>Buổi tập lái</CardTitle>
+                <CardTitle>Buổi huấn luyện</CardTitle>
                 <CardDescription>
                   Số liệu hoàn thành, dời lịch và hủy theo{" "}
                   {getTimeRangeDescription()}
@@ -979,20 +970,25 @@ export default function InstructorOverviewPage() {
         </Card>
       </section>
 
-      <section>
+      <section className="mt-8 rounded-3xl border bg-card p-6 shadow-sm">
         <Card>
           <CardHeader>
-            <CardTitle>Doanh thu</CardTitle>
-            <CardDescription>
-              Thực nhận sau khi trừ hoa hồng hệ thống trong{" "}
-              {getTimeRangeDescription()}
-            </CardDescription>
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              <div>
+                <CardTitle>Doanh thu</CardTitle>
+                <CardDescription>
+                  Thực nhận sau khi trừ hoa hồng hệ thống trong{" "}
+                  {getTimeRangeDescription()}
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-3">
             <div className="rounded-xl border bg-muted/20 p-4">
               <p className="text-sm text-muted-foreground">Tổng doanh thu</p>
               <p className="text-2xl font-semibold text-foreground">
-                {formatCurrency(grossRevenue)}
+                {grossRevenue.toLocaleString("vi-VN")} VNĐ
               </p>
             </div>
             <div className="rounded-xl border bg-rose-50 p-4">
@@ -1000,85 +996,95 @@ export default function InstructorOverviewPage() {
                 Hoa hồng ({commissionRate * 100}%)
               </p>
               <p className="text-2xl font-semibold text-rose-600">
-                {formatCurrency(commission)}
+                {commission.toLocaleString("vi-VN")} VNĐ
               </p>
             </div>
             <div className="rounded-xl border bg-emerald-50 p-4">
-              <p className="text-sm text-emerald-600">Doanh thu ròng</p>
+              <p className="text-sm text-emerald-600">Doanh thu thực nhận</p>
               <p className="text-2xl font-semibold text-emerald-600">
-                {formatCurrency(netRevenue)}
+                {netRevenue.toLocaleString("vi-VN")} VNĐ
               </p>
             </div>
           </CardContent>
         </Card>
       </section>
 
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">
-            Danh sách khách hàng
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Theo dõi tiến độ từng học viên để tối ưu lịch tập lái theo{" "}
-            {getTimeRangeDescription()}
-          </p>
-        </div>
+      <section className="mt-8 rounded-3xl border bg-card p-6 shadow-sm">
         <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-primary" />
+              <div>
+                <CardTitle>Danh sách người lái mới</CardTitle>
+                <CardDescription>
+                  Theo dõi tiến độ từng người lái mới để tối ưu lịch tập lái
+                  theo {getTimeRangeDescription()}
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
           <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Khách hàng</TableHead>
-                  <TableHead>Gói dịch vụ</TableHead>
-                  <TableHead className="text-center">Buổi tập lái</TableHead>
-                  <TableHead className="text-center">Hoàn thành</TableHead>
-                  <TableHead className="text-center">Đã dời</TableHead>
-                  <TableHead className="text-center">Đã hủy</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {students.map((student) => (
-                  <TableRow key={student.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="grid size-10 place-items-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                          {student.name
-                            .split(" ")
-                            .map((part) => part.charAt(0))
-                            .slice(0, 2)
-                            .join("")}
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground">
-                            {student.name}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {student.phone}
-                          </p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {student.package}
-                    </TableCell>
-                    <TableCell className="text-center font-semibold text-foreground">
-                      {student.sessions}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Badge className="bg-emerald-50 text-emerald-700">
-                        {student.completed}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-center text-amber-600">
-                      {student.rescheduled > 0 ? student.rescheduled : "-"}
-                    </TableCell>
-                    <TableCell className="text-center text-rose-600">
-                      {student.cancelled > 0 ? student.cancelled : "-"}
-                    </TableCell>
+            <div className="overflow-x-auto rounded-2xl border">
+              <Table>
+                <TableHeader className="bg-muted/60 text-xs uppercase text-muted-foreground">
+                  <TableRow>
+                    <TableHead className="text-center font-semibold">
+                      STT
+                    </TableHead>
+                    <TableHead>Họ và tên</TableHead>
+                    <TableHead>Số điện thoại</TableHead>
+                    <TableHead>Gói dịch vụ</TableHead>
+                    <TableHead className="text-center">Buổi tập lái</TableHead>
+                    <TableHead className="text-center">Hoàn thành</TableHead>
+                    <TableHead className="text-center">Đã dời</TableHead>
+                    <TableHead className="text-center">Đã hủy</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {students.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={8}
+                        className="py-8 text-center text-sm text-muted-foreground"
+                      >
+                        Không tìm thấy người lái mới nào.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    students.map((student, index) => (
+                      <TableRow key={student.id} className="hover:bg-muted/30">
+                        <TableCell className="text-center text-sm font-semibold text-muted-foreground">
+                          {index + 1}
+                        </TableCell>
+                        <TableCell className="text-sm font-medium text-foreground">
+                          {student.name}
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {student.phone}
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {student.package}
+                        </TableCell>
+                        <TableCell className="text-center font-semibold text-foreground">
+                          {student.sessions}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Badge className="bg-emerald-50 text-emerald-700">
+                            {student.completed}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-center text-amber-600">
+                          {student.rescheduled > 0 ? student.rescheduled : "-"}
+                        </TableCell>
+                        <TableCell className="text-center text-rose-600">
+                          {student.cancelled > 0 ? student.cancelled : "-"}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       </section>

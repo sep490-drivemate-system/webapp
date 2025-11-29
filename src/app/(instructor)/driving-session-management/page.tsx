@@ -26,6 +26,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import PageHeader from "@/components/commons/Header/header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Select,
@@ -286,23 +287,11 @@ export default function DrivingSessionManagementPage() {
   return (
     <div className="space-y-8">
       {/* Header Section */}
-      <section className="space-y-4">
-        <Card className="rounded-2xl border bg-white p-6 shadow-sm">
-          <CardHeader>
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="space-y-2">
-                <CardTitle className="text-2xl">
-                  Buổi huấn luyện của tôi
-                </CardTitle>
-                <CardDescription>
-                  Quản lý lịch trình huấn luyện và theo dõi tiến trình của học
-                  viên
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-        </Card>
-      </section>
+      <PageHeader
+        title="Buổi huấn luyện của tôi"
+        description="Quản lý lịch trình huấn luyện và theo dõi tiến trình của học viên"
+        className="space-y-4"
+      />
 
       {/* Filter Section */}
       <section>
@@ -485,19 +474,6 @@ export default function DrivingSessionManagementPage() {
                           Xe: {session.vehicleName || "Xe của khách hàng"}
                         </span>
                       </div>
-                    </div>
-
-                    <div className="pt-4 border-t">
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() =>
-                          handlePlanRoute(session.id, session.location)
-                        }
-                      >
-                        <Eye className="size-4" />
-                        Xem chi tiết
-                      </Button>
                     </div>
                   </CardContent>
                 </Card>

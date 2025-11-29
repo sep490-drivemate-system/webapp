@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import ImageUploadField from "../image-upload-field";
+import ImageUploadField from "../commons/image-upload-field";
 
 interface InsuranceSectionProps {
   data: any;

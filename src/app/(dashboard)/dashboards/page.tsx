@@ -27,14 +27,54 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, Users, Zap, Star, StarIcon, Car, MapPin, Calendar, XCircle, Filter, ChevronDown, CreditCard } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  TrendingUp,
+  Users,
+  Zap,
+  Star,
+  StarIcon,
+  Car,
+  MapPin,
+  Calendar,
+  XCircle,
+  Filter,
+  ChevronDown,
+  CreditCard,
+  UserCheck,
+  UserCog,
+  DollarSign,
+  Wallet,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  GraduationCap,
+  UserPlus,
+} from "lucide-react";
 import { useRequireAuth } from "@/hooks/auth/useRequireAuth";
 import { UserRole } from "@/types/auth/user-role.enum";
+import PageHeader from "@/components/commons/Header/header";
 
 const userStats = [
-  { label: "Tay lái mới", value: 2543, change: "+12.5%" },
-  { label: "Người hướng dẫn", value: 892, change: "+8.2%" },
+  { label: "Tổng người dùng", value: 2543, change: "+12.5%" },
   { label: "Người kiểm duyệt", value: 34, change: "+2.1%" },
+  { label: "Người hướng dẫn", value: 892, change: "+8.2%" },
+  { label: "Người lái mới", value: 1617, change: "+15.3%" },
 ];
 
 const financialStats = [
@@ -116,29 +156,29 @@ const sessionStatusData = [
 
 // Mock data for cancel & refund statistics (Pie Chart format)
 const cancelRefundData = [
-  { 
-    name: "Hủy >=12h (Hoàn 100%)", 
+  {
+    name: "Hủy >=12h (Hoàn 100%)",
     value: 68, // 45 + 23
     color: "#10b981",
-    details: "Novice: 45, Instructor: 23"
+    details: "Novice: 45, Instructor: 23",
   },
-  { 
-    name: "Hủy <12h (Không hoàn)", 
+  {
+    name: "Hủy <12h (Không hoàn)",
     value: 40, // 28 + 12
     color: "#ef4444",
-    details: "Novice: 28, Instructor: 12"
+    details: "Novice: 28, Instructor: 12",
   },
-  { 
-    name: "Instructor hủy <12h (+50%)", 
+  {
+    name: "Instructor hủy <12h (+50%)",
     value: 15,
     color: "#f59e0b",
-    details: "Đền bù 150% cho Novice"
+    details: "Đền bù 150% cho Novice",
   },
-  { 
-    name: "Đổi lịch >24h (Miễn phí)", 
+  {
+    name: "Đổi lịch >24h (Miễn phí)",
     value: 101, // 67 + 34
     color: "#8b5cf6",
-    details: "Novice: 67, Instructor: 34"
+    details: "Novice: 67, Instructor: 34",
   },
 ];
 
@@ -180,7 +220,7 @@ const transactionHistoryData = [
     amount: 2500000,
     commission: 750000,
     status: "Hoàn thành",
-    method: "VNPay"
+    method: "VNPay",
   },
   {
     id: "TXN002",
@@ -191,7 +231,7 @@ const transactionHistoryData = [
     amount: -1200000,
     commission: 0,
     status: "Đã hoàn",
-    method: "Chuyển khoản"
+    method: "Chuyển khoản",
   },
   {
     id: "TXN003",
@@ -202,7 +242,7 @@ const transactionHistoryData = [
     amount: 600000,
     commission: 0,
     status: "Đang xử lý",
-    method: "Ví DriveMate"
+    method: "Ví DriveMate",
   },
   {
     id: "TXN004",
@@ -213,7 +253,7 @@ const transactionHistoryData = [
     amount: 500000,
     commission: 150000,
     status: "Hoàn thành",
-    method: "Momo"
+    method: "Momo",
   },
   {
     id: "TXN005",
@@ -224,7 +264,7 @@ const transactionHistoryData = [
     amount: 3500000,
     commission: 1050000,
     status: "Hoàn thành",
-    method: "VNPay"
+    method: "VNPay",
   },
   {
     id: "TXN006",
@@ -235,7 +275,7 @@ const transactionHistoryData = [
     amount: -2000000,
     commission: -50000,
     status: "Đã chuyển",
-    method: "Ngân hàng"
+    method: "Ngân hàng",
   },
   {
     id: "TXN007",
@@ -246,7 +286,7 @@ const transactionHistoryData = [
     amount: 200000,
     commission: 200000,
     status: "Hoàn thành",
-    method: "Tự động"
+    method: "Tự động",
   },
   {
     id: "TXN008",
@@ -257,11 +297,9 @@ const transactionHistoryData = [
     amount: 1800000,
     commission: 540000,
     status: "Hoàn thành",
-    method: "ZaloPay"
-  }
+    method: "ZaloPay",
+  },
 ];
-
-
 
 type TimeRange = "week" | "month" | "year";
 
@@ -284,25 +322,29 @@ function AdminDashboard() {
   const [viewMode, setViewMode] = useState<"year" | "month" | "week">("month");
   const [timeRange, setTimeRange] = useState("month");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   // Get current date dynamically
   const now = new Date();
   const [selectedYear, setSelectedYear] = useState(now.getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
-  
+
   // Calculate current week of the month dynamically
   const getCurrentWeekOfMonth = (year: number, month: number, day?: number) => {
     const targetDate = day ? new Date(year, month - 1, day) : new Date();
     const firstDayOfMonth = new Date(year, month - 1, 1);
     const firstWeekday = firstDayOfMonth.getDay(); // 0 = Sunday, 1 = Monday, etc.
     const currentDay = targetDate.getDate();
-    
+
     // Calculate which week of the month this day falls into
     return Math.ceil((currentDay + firstWeekday) / 7);
   };
-  
-  const [selectedWeek, setSelectedWeek] = useState(getCurrentWeekOfMonth(now.getFullYear(), now.getMonth() + 1, now.getDate()));
-  
+
+  const [selectedWeek, setSelectedWeek] = useState(
+    getCurrentWeekOfMonth(now.getFullYear(), now.getMonth() + 1, now.getDate())
+  );
+
   // Calculate available years (current year and previous years)
   const getAvailableYears = () => {
     const currentYear = new Date().getFullYear();
@@ -312,13 +354,13 @@ function AdminDashboard() {
     }
     return years;
   };
-  
+
   // Calculate available months for selected year
   const getAvailableMonths = (year: number) => {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth() + 1;
-    
+
     if (year === currentYear) {
       // For current year, only show months up to current month
       return Array.from({ length: currentMonth }, (_, i) => i + 1);
@@ -330,26 +372,33 @@ function AdminDashboard() {
       return [];
     }
   };
-  
+
   // Calculate available weeks for selected month/year
   const getAvailableWeeks = (year: number, month: number) => {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth() + 1;
-    
+
     // Get the last day of the selected month
     const lastDayOfMonth = new Date(year, month, 0).getDate();
     const firstDayOfMonth = new Date(year, month - 1, 1);
     const firstWeekday = firstDayOfMonth.getDay();
-    
+
     // Calculate total weeks in this month
     const totalWeeks = Math.ceil((lastDayOfMonth + firstWeekday) / 7);
-    
+
     if (year === currentYear && month === currentMonth) {
       // For current month, only show weeks up to current week
-      const currentWeek = getCurrentWeekOfMonth(year, month, currentDate.getDate());
+      const currentWeek = getCurrentWeekOfMonth(
+        year,
+        month,
+        currentDate.getDate()
+      );
       return Array.from({ length: currentWeek }, (_, i) => i + 1);
-    } else if (year < currentYear || (year === currentYear && month < currentMonth)) {
+    } else if (
+      year < currentYear ||
+      (year === currentYear && month < currentMonth)
+    ) {
       // For past months, show all weeks
       return Array.from({ length: totalWeeks }, (_, i) => i + 1);
     } else {
@@ -398,7 +447,10 @@ function AdminDashboard() {
         return Array.from({ length: 12 }, (_, i) => {
           const monthIndex = i;
           // Use existing revenueData if available for current year, otherwise generate
-          if (selectedYear === new Date().getFullYear() && i < revenueData.length) {
+          if (
+            selectedYear === new Date().getFullYear() &&
+            i < revenueData.length
+          ) {
             return revenueData[i];
           }
           const baseRevenue = 50000 + (monthIndex % 6) * 5000;
@@ -418,19 +470,41 @@ function AdminDashboard() {
   // Filter user stats based on timeRange
   const filteredUserStats = useMemo(() => {
     const baseValue =
-      currentTimeRange === "week" ? 50 : currentTimeRange === "month" ? 200 : 3000;
+      currentTimeRange === "week"
+        ? 50
+        : currentTimeRange === "month"
+        ? 200
+        : 3000;
     const multiplier =
       currentTimeRange === "week" ? 7 : currentTimeRange === "month" ? 30 : 365;
 
     return userStats.map((stat, index) => {
-      const variation = (index % 3) * 0.1;
+      const variation = (index % 4) * 0.1;
       const value = Math.round(baseValue * (1 + variation));
       const change =
-        currentTimeRange === "week"
-          ? "+8.2%"
+        index === 0
+          ? currentTimeRange === "week"
+            ? "+8.2%"
+            : currentTimeRange === "month"
+            ? "+12.5%"
+            : "+18.3%"
+          : index === 1
+          ? currentTimeRange === "week"
+            ? "+1.5%"
+            : currentTimeRange === "month"
+            ? "+2.1%"
+            : "+3.2%"
+          : index === 2
+          ? currentTimeRange === "week"
+            ? "+6.5%"
+            : currentTimeRange === "month"
+            ? "+8.2%"
+            : "+12.1%"
+          : currentTimeRange === "week"
+          ? "+10.2%"
           : currentTimeRange === "month"
-          ? "+12.5%"
-          : "+18.3%";
+          ? "+15.3%"
+          : "+20.5%";
       const color = getChangeColor(change);
       return {
         ...stat,
@@ -444,7 +518,11 @@ function AdminDashboard() {
   // Filter financial stats based on timeRange
   const filteredFinancialStats = useMemo(() => {
     const baseMultiplier =
-      currentTimeRange === "week" ? 0.25 : currentTimeRange === "month" ? 1 : 12;
+      currentTimeRange === "week"
+        ? 0.25
+        : currentTimeRange === "month"
+        ? 1
+        : 12;
 
     return financialStats.map((stat) => {
       const baseValue =
@@ -523,6 +601,31 @@ function AdminDashboard() {
     }));
   }, [viewMode]);
 
+  // Pagination logic for transaction history
+  const totalPages = useMemo(
+    () => Math.ceil(transactionHistoryData.length / itemsPerPage),
+    [itemsPerPage]
+  );
+  const startIndex = useMemo(
+    () => (currentPage - 1) * itemsPerPage,
+    [currentPage, itemsPerPage]
+  );
+  const endIndex = useMemo(
+    () => startIndex + itemsPerPage,
+    [startIndex, itemsPerPage]
+  );
+  const paginatedTransactions = useMemo(
+    () => transactionHistoryData.slice(startIndex, endIndex),
+    [startIndex, endIndex]
+  );
+  const goToFirstPage = () => setCurrentPage(1);
+  const goToLastPage = () => setCurrentPage(totalPages);
+  const goToPreviousPage = () =>
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  const goToNextPage = () =>
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  const canGoPrevious = currentPage > 1;
+  const canGoNext = currentPage < totalPages;
 
   const getTimeRangeDescription = () => {
     switch (currentTimeRange) {
@@ -539,37 +642,54 @@ function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="px-8 py-6">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">
-                Tổng Quan Hệ Thống
-              </h1>
-            </div>
+      <div className="space-y-8">
+        <PageHeader
+          title="Tổng Quan Hệ Thống"
+          description="Theo dõi và quản lý toàn bộ hoạt động của hệ thống."
+        />
+        <div className="flex justify-end">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              Đang xem theo:{" "}
+              <span className="font-medium text-foreground">
+                {getTimeRangeDescription()}
+              </span>
+            </span>
             <div className="relative">
               {/* Filter Button */}
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  console.log("Filter button clicked, current state:", isFilterOpen);
+                  console.log(
+                    "Filter button clicked, current state:",
+                    isFilterOpen
+                  );
                   setIsFilterOpen(!isFilterOpen);
                 }}
                 className="flex items-center gap-2"
               >
                 <Filter className="h-4 w-4" />
-                <span>Bộ lọc {isFilterOpen ? '(Mở)' : '(Đóng)'}</span>
-                <ChevronDown className={`h-4 w-4 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+                <span>Bộ lọc {isFilterOpen ? "(Mở)" : "(Đóng)"}</span>
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform ${
+                    isFilterOpen ? "rotate-180" : ""
+                  }`}
+                />
               </Button>
 
               {/* Filter Dropdown */}
               {isFilterOpen && (
-                <div className="absolute top-full right-0 mt-2 w-80 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-4" style={{backgroundColor: 'white', border: '1px solid #ccc'}}>
+                <div
+                  className="absolute top-full right-0 mt-2 w-80 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-4"
+                  style={{ backgroundColor: "white", border: "1px solid #ccc" }}
+                >
                   <div className="space-y-4">
                     {/* View Mode Selection */}
                     <div>
-                      <label className="text-sm font-medium text-black mb-2 block">Xem theo:</label>
+                      <label className="text-sm font-medium text-black mb-2 block">
+                        Xem theo:
+                      </label>
                       <div className="flex gap-2">
                         {(["year", "month", "week"] as const).map((mode) => (
                           <Button
@@ -579,7 +699,11 @@ function AdminDashboard() {
                             onClick={() => setViewMode(mode)}
                             className="flex-1"
                           >
-                            {mode === "year" ? "Năm" : mode === "month" ? "Tháng" : "Tuần"}
+                            {mode === "year"
+                              ? "Năm"
+                              : mode === "month"
+                              ? "Tháng"
+                              : "Tuần"}
                           </Button>
                         ))}
                       </div>
@@ -589,23 +713,33 @@ function AdminDashboard() {
                     <div className="space-y-3">
                       {/* Year Selector - Always visible */}
                       <div>
-                        <label className="text-sm font-medium text-foreground mb-1 block">Năm:</label>
-                        <select 
-                          value={selectedYear} 
+                        <label className="text-sm font-medium text-foreground mb-1 block">
+                          Năm:
+                        </label>
+                        <select
+                          value={selectedYear}
                           onChange={(e) => {
                             const newYear = Number(e.target.value);
                             setSelectedYear(newYear);
-                            
+
                             // Reset month to latest available month for the selected year
                             if (viewMode !== "year") {
-                              const availableMonths = getAvailableMonths(newYear);
-                              const latestMonth = availableMonths[availableMonths.length - 1] || 1;
+                              const availableMonths =
+                                getAvailableMonths(newYear);
+                              const latestMonth =
+                                availableMonths[availableMonths.length - 1] ||
+                                1;
                               setSelectedMonth(latestMonth);
-                              
+
                               // Reset week to latest available week for the selected month
                               if (viewMode === "week") {
-                                const availableWeeks = getAvailableWeeks(newYear, latestMonth);
-                                const latestWeek = availableWeeks[availableWeeks.length - 1] || 1;
+                                const availableWeeks = getAvailableWeeks(
+                                  newYear,
+                                  latestMonth
+                                );
+                                const latestWeek =
+                                  availableWeeks[availableWeeks.length - 1] ||
+                                  1;
                                 setSelectedWeek(latestWeek);
                               }
                             }
@@ -613,7 +747,9 @@ function AdminDashboard() {
                           className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background"
                         >
                           {getAvailableYears().map((year) => (
-                            <option key={year} value={year}>{year}</option>
+                            <option key={year} value={year}>
+                              {year}
+                            </option>
                           ))}
                         </select>
                       </div>
@@ -621,24 +757,33 @@ function AdminDashboard() {
                       {/* Month Selector - Show only if viewMode is month or week */}
                       {(viewMode === "month" || viewMode === "week") && (
                         <div>
-                          <label className="text-sm font-medium text-foreground mb-1 block">Tháng:</label>
-                          <select 
-                            value={selectedMonth} 
+                          <label className="text-sm font-medium text-foreground mb-1 block">
+                            Tháng:
+                          </label>
+                          <select
+                            value={selectedMonth}
                             onChange={(e) => {
                               const newMonth = Number(e.target.value);
                               setSelectedMonth(newMonth);
-                              
+
                               // Reset week to latest available week for the selected month
                               if (viewMode === "week") {
-                                const availableWeeks = getAvailableWeeks(selectedYear, newMonth);
-                                const latestWeek = availableWeeks[availableWeeks.length - 1] || 1;
+                                const availableWeeks = getAvailableWeeks(
+                                  selectedYear,
+                                  newMonth
+                                );
+                                const latestWeek =
+                                  availableWeeks[availableWeeks.length - 1] ||
+                                  1;
                                 setSelectedWeek(latestWeek);
                               }
                             }}
                             className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background"
                           >
                             {getAvailableMonths(selectedYear).map((month) => (
-                              <option key={month} value={month}>{month}</option>
+                              <option key={month} value={month}>
+                                {month}
+                              </option>
                             ))}
                           </select>
                         </div>
@@ -647,15 +792,23 @@ function AdminDashboard() {
                       {/* Week Selector - Show only if viewMode is week */}
                       {viewMode === "week" && (
                         <div>
-                          <label className="text-sm font-medium text-foreground mb-1 block">Tuần:</label>
-                          <select 
-                            value={selectedWeek} 
-                            onChange={(e) => setSelectedWeek(Number(e.target.value))}
+                          <label className="text-sm font-medium text-foreground mb-1 block">
+                            Tuần:
+                          </label>
+                          <select
+                            value={selectedWeek}
+                            onChange={(e) =>
+                              setSelectedWeek(Number(e.target.value))
+                            }
                             className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background"
                           >
-                            {getAvailableWeeks(selectedYear, selectedMonth).map((week) => (
-                              <option key={week} value={week}>{week}</option>
-                            ))}
+                            {getAvailableWeeks(selectedYear, selectedMonth).map(
+                              (week) => (
+                                <option key={week} value={week}>
+                                  {week}
+                                </option>
+                              )
+                            )}
                           </select>
                         </div>
                       )}
@@ -685,662 +838,942 @@ function AdminDashboard() {
 
               {/* Click outside to close */}
               {isFilterOpen && (
-                <div 
-                  className="fixed inset-0 z-40" 
+                <div
+                  className="fixed inset-0 z-40"
                   onClick={() => setIsFilterOpen(false)}
                 />
               )}
             </div>
           </div>
         </div>
-      </header>
 
-      <main className="px-8 py-8">
-        <section className="mb-8">
-          <h2 className="mb-4 text-xl font-semibold text-foreground">
-            Thống Kê Người Dùng
-          </h2>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            {filteredUserStats.map((stat) => (
-              <Card key={stat.label} className="bg-card">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {stat.label}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-foreground">
-                    {stat.value}
+        <main className="px-8">
+          <section className="mb-8">
+            <Card className="bg-card">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-primary" />
+                  <div>
+                    <CardTitle>Thống Kê Người Dùng</CardTitle>
+                    <CardDescription>
+                      Tổng quan về số lượng người dùng trong hệ thống
+                    </CardDescription>
                   </div>
-                  <p className={`mt-2 text-sm ${changeClassMap[stat.color]}`}>
-                    {stat.change}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  {filteredUserStats.map((stat, index) => {
+                    const icons = [Users, UserCheck, UserCog, UserPlus];
+                    const accents = [
+                      "bg-blue-50 text-blue-600",
+                      "bg-purple-50 text-purple-600",
+                      "bg-sky-50 text-sky-600",
+                      "bg-emerald-50 text-emerald-600",
+                    ];
+                    const Icon = icons[index % icons.length];
+                    const accent = accents[index % accents.length];
+                    return (
+                      <Card key={stat.label} className="bg-card">
+                        <CardHeader className="flex flex-row items-start justify-between gap-4">
+                          <div className="space-y-1">
+                            <CardDescription className="text-sm font-medium text-muted-foreground">
+                              {stat.label}
+                            </CardDescription>
+                            <CardTitle className="text-2xl font-semibold">
+                              {stat.value}
+                            </CardTitle>
+                            <p
+                              className={`text-sm ${
+                                changeClassMap[stat.color]
+                              }`}
+                            >
+                              {stat.change}
+                            </p>
+                          </div>
+                          <span className={`rounded-xl p-3 ${accent}`}>
+                            <Icon className="size-5" />
+                          </span>
+                        </CardHeader>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </section>
 
-        <section className="mb-8">
-          <h2 className="mb-4 text-xl font-semibold text-foreground">
-            Thống Kê Tài Chính
-          </h2>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {filteredFinancialStats.map((stat) => (
-              <Card key={stat.label} className="flex h-full flex-col bg-card">
-                <CardHeader className="flex min-h-[72px] flex-col justify-center pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {stat.label}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="mt-auto">
-                  <div className="text-2xl font-bold text-foreground">
-                    {stat.value}
+          <section className="mb-8">
+            <Card className="bg-card">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-primary" />
+                  <div>
+                    <CardTitle>Thống Kê Tài Chính</CardTitle>
+                    <CardDescription>
+                      Tổng quan về doanh thu và chi phí của hệ thống
+                    </CardDescription>
                   </div>
-                  <p className={`mt-2 text-sm ${changeClassMap[stat.color]}`}>
-                    {stat.change}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
+                  {filteredFinancialStats.map((stat, index) => {
+                    const icons = [TrendingUp, DollarSign, Wallet, CreditCard];
+                    const accents = [
+                      "bg-emerald-50 text-emerald-600",
+                      "bg-blue-50 text-blue-600",
+                      "bg-amber-50 text-amber-600",
+                      "bg-rose-50 text-rose-600",
+                    ];
+                    const Icon = icons[index % icons.length];
+                    const accent = accents[index % accents.length];
+                    return (
+                      <Card
+                        key={stat.label}
+                        className="flex h-full flex-col bg-card"
+                      >
+                        <CardHeader className="flex flex-row items-start justify-between gap-4">
+                          <div className="space-y-1">
+                            <CardDescription className="text-sm font-medium text-muted-foreground">
+                              {stat.label}
+                            </CardDescription>
+                            <CardTitle className="text-2xl font-semibold">
+                              {stat.value}
+                            </CardTitle>
+                            <p
+                              className={`text-sm ${
+                                changeClassMap[stat.color]
+                              }`}
+                            >
+                              {stat.change}
+                            </p>
+                          </div>
+                          <span className={`rounded-xl p-3 ${accent}`}>
+                            <Icon className="size-5" />
+                          </span>
+                        </CardHeader>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </section>
 
-        {/* Dòng Tiền & Doanh Thu - Full Width */}
-        <Card className="bg-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-primary" />
-              Dòng Tiền & Doanh Thu
-            </CardTitle>
-            <CardDescription>{getTimeRangeDescription()}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="w-full overflow-x-auto">
-              <div
-                style={{
-                  minWidth: Math.max(600, filteredRevenueData.length * 60),
-                }}
-              >
-                <ResponsiveContainer width="100%" height={400}>
-                  <AreaChart data={filteredRevenueData}>
-                    <defs>
-                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
-                      </linearGradient>
-                      <linearGradient id="colorCommission" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="hsl(var(--border))"
-                    />
-                    <XAxis
-                      dataKey="month"
-                      stroke="hsl(var(--muted-foreground))"
-                      angle={-45}
-                      textAnchor="end"
-                      height={80}
-                    />
-                    <YAxis stroke="hsl(var(--muted-foreground))" />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        border: "1px solid hsl(var(--border))",
-                        color: "hsl(var(--foreground))",
-                      }}
-                    />
-                    <Legend />
-                    <Area
-                      type="monotone"
-                      dataKey="revenue"
-                      stroke="#10b981"
-                      fillOpacity={1}
-                      fill="url(#colorRevenue)"
-                      strokeWidth={2}
-                      name="Doanh Thu"
-                      dot={{ 
-                        fill: "#10b981", 
-                        strokeWidth: 2, 
-                        stroke: "#ffffff",
-                        r: 4 
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="commission"
-                      stroke="#3b82f6"
-                      fillOpacity={1}
-                      fill="url(#colorCommission)"
-                      strokeWidth={2}
-                      name="Lợi Nhuận"
-                      dot={{ 
-                        fill: "#3b82f6", 
-                        strokeWidth: 2, 
-                        stroke: "#ffffff",
-                        r: 4 
-                      }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 3 Cards Row */}
-        <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* Dòng Tiền & Doanh Thu - Full Width */}
           <Card className="bg-card">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-primary" />
-                Tình Trạng Hoạt Động
-              </CardTitle>
-              <CardDescription>Tỷ lệ buổi tập lái</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={filteredActivityData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={2}
-                    dataKey="value"
-                  >
-                    {filteredActivityData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      color: "hsl(var(--foreground))",
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="mt-4 space-y-2">
-                {filteredActivityData.map((item) => (
-                  <div
-                    key={item.name}
-                    className="flex items-center justify-between text-sm"
-                  >
-                    <span className="flex items-center gap-2 text-muted-foreground">
-                      <span
-                        className="h-2 w-2 rounded-full"
-                        style={{ backgroundColor: item.color }}
-                      />
-                      {item.name}
-                    </span>
-                    <span className="font-medium text-foreground">
-                      {item.value}%
-                    </span>
-                  </div>
-                ))}
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                <div>
+                  <CardTitle>Dòng Tiền & Doanh Thu</CardTitle>
+                  <CardDescription>{getTimeRangeDescription()}</CardDescription>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-primary" />
-                Thống Kê Trạng Thái Session
-              </CardTitle>
-              <CardDescription>Tình trạng các buổi học</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={sessionStatusData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={2}
-                    dataKey="value"
-                  >
-                    {sessionStatusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      color: "hsl(var(--foreground))",
-                    }}
-                    formatter={(value, name) => [
-                      `${value} buổi`,
-                      name
-                    ]}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="mt-4 space-y-2">
-                {sessionStatusData.map((item) => (
-                  <div
-                    key={item.name}
-                    className="flex items-center justify-between text-sm"
-                  >
-                    <span className="flex items-center gap-2 text-muted-foreground">
-                      <span
-                        className="h-2 w-2 rounded-full"
-                        style={{ backgroundColor: item.color }}
-                      />
-                      {item.name}
-                    </span>
-                    <span className="font-medium text-foreground">
-                      {item.value} buổi
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <XCircle className="h-5 w-5 text-primary" />
-                Thống Kê Cancel & Refund
-              </CardTitle>
-              <CardDescription>Phân tích hủy lịch và hoàn tiền</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={cancelRefundData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={2}
-                    dataKey="value"
-                  >
-                    {cancelRefundData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      color: "hsl(var(--foreground))",
-                    }}
-                    formatter={(value, name) => [
-                      `${value} trường hợp`,
-                      name
-                    ]}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="mt-4 space-y-2">
-                {cancelRefundData.map((item) => (
-                  <div
-                    key={item.name}
-                    className="flex items-center justify-between text-sm"
-                  >
-                    <span className="flex items-center gap-2 text-muted-foreground">
-                      <span
-                        className="h-2 w-2 rounded-full"
-                        style={{ backgroundColor: item.color }}
-                      />
-                      {item.name}
-                    </span>
-                    <span className="font-medium text-foreground">
-                      {item.value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* 2 Charts Row */}
-        <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <Card className="bg-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-primary" />
-                Thời Gian Đặt Lịch Session
-              </CardTitle>
-              <CardDescription>Số lượng booking theo tháng</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="w-full overflow-x-auto">
+                <div
+                  style={{
+                    minWidth: Math.max(600, filteredRevenueData.length * 60),
+                  }}
+                >
+                  <ResponsiveContainer width="100%" height={400}>
+                    <AreaChart data={filteredRevenueData}>
+                      <defs>
+                        <linearGradient
+                          id="colorRevenue"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#10b981"
+                            stopOpacity={0.8}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="#10b981"
+                            stopOpacity={0.1}
+                          />
+                        </linearGradient>
+                        <linearGradient
+                          id="colorCommission"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#3b82f6"
+                            stopOpacity={0.8}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="#3b82f6"
+                            stopOpacity={0.1}
+                          />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="hsl(var(--border))"
+                      />
+                      <XAxis
+                        dataKey="month"
+                        stroke="hsl(var(--muted-foreground))"
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
+                      />
+                      <YAxis stroke="hsl(var(--muted-foreground))" />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--card))",
+                          border: "1px solid hsl(var(--border))",
+                          color: "hsl(var(--foreground))",
+                        }}
+                      />
+                      <Legend />
+                      <Area
+                        type="monotone"
+                        dataKey="revenue"
+                        stroke="#10b981"
+                        fillOpacity={1}
+                        fill="url(#colorRevenue)"
+                        strokeWidth={2}
+                        name="Doanh Thu"
+                        dot={{
+                          fill: "#10b981",
+                          strokeWidth: 2,
+                          stroke: "#ffffff",
+                          r: 4,
+                        }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="commission"
+                        stroke="#3b82f6"
+                        fillOpacity={1}
+                        fill="url(#colorCommission)"
+                        strokeWidth={2}
+                        name="Lợi Nhuận"
+                        dot={{
+                          fill: "#3b82f6",
+                          strokeWidth: 2,
+                          stroke: "#ffffff",
+                          r: 4,
+                        }}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 3 Cards Row */}
+          <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <Card className="bg-card">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-primary" />
+                  <div>
+                    <CardTitle>Tình Trạng Hoạt Động Buổi Huấn Luyện</CardTitle>
+                    <CardDescription>Tỷ lệ buổi huấn luyện</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={bookingTimeData}>
-                    <defs>
-                      <linearGradient id="colorBooking" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="hsl(var(--border))"
-                      horizontal={true}
-                      vertical={true}
-                    />
-                    <XAxis
-                      dataKey="month"
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                      axisLine={true}
-                      tickLine={true}
-                    />
-                    <YAxis 
-                      stroke="hsl(var(--muted-foreground))" 
-                      fontSize={12}
-                      axisLine={true}
-                      tickLine={true}
-                    />
+                  <PieChart>
+                    <Pie
+                      data={filteredActivityData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {filteredActivityData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
                     <Tooltip
                       contentStyle={{
                         backgroundColor: "hsl(var(--card))",
                         border: "1px solid hsl(var(--border))",
                         color: "hsl(var(--foreground))",
                       }}
-                      formatter={(value) => [`${value} booking`, "Số lượng đặt lịch"]}
                     />
-                    <Legend />
-                    <Area
-                      type="monotone"
-                      dataKey="bookingCount"
-                      stroke="#3b82f6"
-                      fillOpacity={1}
-                      fill="url(#colorBooking)"
-                      strokeWidth={3}
-                      name="Số lượng booking"
-                      dot={{ 
-                        fill: "#3b82f6", 
-                        strokeWidth: 2, 
-                        stroke: "#ffffff",
-                        r: 5 
-                      }}
-                      activeDot={{ 
-                        r: 7, 
-                        stroke: "#3b82f6", 
-                        strokeWidth: 2,
-                        fill: "#ffffff"
-                      }}
-                    />
-                  </AreaChart>
+                  </PieChart>
                 </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-primary" />
-                Thời Gian Thực Thi Session
-              </CardTitle>
-              <CardDescription>Thời gian thực tế thực hiện session theo ngày</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="w-full overflow-x-auto">
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={sessionExecutionData}>
-                    <defs>
-                      <linearGradient id="colorExecution" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="hsl(var(--border))"
-                    />
-                    <XAxis
-                      dataKey="day"
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                    />
-                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        border: "1px solid hsl(var(--border))",
-                        color: "hsl(var(--foreground))",
-                      }}
-                      formatter={(value) => [`${value} giờ`, "Thời gian trung bình"]}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="avgExecutionTime"
-                      stroke="#10b981"
-                      fillOpacity={1}
-                      fill="url(#colorExecution)"
-                      strokeWidth={2}
-                      dot={{ 
-                        fill: "#10b981", 
-                        strokeWidth: 2, 
-                        stroke: "#ffffff",
-                        r: 4 
-                      }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
-          <Card className="bg-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-primary" />
-                Gói Dịch Vụ Hàng Đầu
-              </CardTitle>
-              <CardDescription>Được mua nhiều nhất</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {filteredTopPackages.map((pkg, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-start justify-between border-b border-border pb-3 last:border-0"
-                  >
-                    <div className="flex-1">
-                      <p className="font-medium text-foreground">{pkg.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {pkg.purchases} lần mua
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <div className="flex items-center gap-1 text-sm font-semibold">
-                        <Star
-                          fill="#FDCC0D"
-                          className="h-4 w-4"
-                          style={{ color: "#FDCC0D" }}
+                <div className="mt-4 space-y-2">
+                  {filteredActivityData.map((item) => (
+                    <div
+                      key={item.name}
+                      className="flex items-center justify-between text-sm"
+                    >
+                      <span className="flex items-center gap-2 text-muted-foreground">
+                        <span
+                          className="h-2 w-2 rounded-full"
+                          style={{ backgroundColor: item.color }}
                         />
-                        <span style={{ color: "#DC0A21" }}>{pkg.rating}</span>
-                      </div>
+                        {item.name}
+                      </span>
+                      <span className="font-medium text-foreground">
+                        {item.value}%
+                      </span>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-primary" />
-                Người Hướng Dẫn Hàng Đầu
-              </CardTitle>
-              <CardDescription>Đánh giá cao nhất</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {filteredTopInstructors.map((instructor, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-start justify-between border-b border-border pb-3 last:border-0"
-                  >
-                    <div className="flex-1">
-                      <p className="font-medium text-foreground">
-                        {instructor.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {instructor.sessions} buổi dạy
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <div className="flex items-center gap-1 text-sm font-semibold">
-                        <Star
-                          fill="#FDCC0D"
-                          className="h-4 w-4"
-                          style={{ color: "#FDCC0D" }}
-                        />
-                        <span style={{ color: "#DC0A21" }}>
-                          {instructor.rating}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-primary" />
-                Xe Hàng Đầu
-              </CardTitle>
-              <CardDescription>Được thuê nhiều nhất</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {filteredTopVehicles.map((vehicle, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-start justify-between border-b border-border pb-3 last:border-0"
-                  >
-                    <div className="flex-1">
-                      <p className="font-medium text-foreground">
-                        {vehicle.model}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {vehicle.rentals} lần thuê
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <div className="flex items-center gap-1 text-sm font-semibold">
-                        <StarIcon
-                          fill="#FDCC0D"
-                          className="h-4 w-4"
-                          style={{ color: "#FDCC0D" }}
-                        />
-                        <span style={{ color: "#DC0A21" }}>
-                          {vehicle.rating}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Lịch Sử Giao Dịch Hệ Thống */}
-        <Card className="mt-8 bg-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5 text-primary" />
-              Lịch Sử Giao Dịch Hệ Thống
-            </CardTitle>
-            <CardDescription>Các giao dịch gần đây trong hệ thống</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Mã GD</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Thời gian</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Loại</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Novice</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Instructor</th>
-                    <th className="text-right py-3 px-4 font-medium text-muted-foreground">Số tiền</th>
-                    <th className="text-right py-3 px-4 font-medium text-muted-foreground">Hoa hồng</th>
-                    <th className="text-center py-3 px-4 font-medium text-muted-foreground">Trạng thái</th>
-                    <th className="text-center py-3 px-4 font-medium text-muted-foreground">Phương thức</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transactionHistoryData.map((transaction, index) => (
-                    <tr key={transaction.id} className="border-b border-border hover:bg-muted/50">
-                      <td className="py-3 px-4 font-mono text-sm">{transaction.id}</td>
-                      <td className="py-3 px-4 text-sm text-muted-foreground">{transaction.date}</td>
-                      <td className="py-3 px-4 text-sm">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          transaction.type === 'Thanh toán gói' ? 'bg-blue-100 text-blue-800' :
-                          transaction.type === 'Hoàn tiền' ? 'bg-red-100 text-red-800' :
-                          transaction.type === 'Đền bù hủy muộn' ? 'bg-orange-100 text-orange-800' :
-                          transaction.type === 'Thanh toán session' ? 'bg-green-100 text-green-800' :
-                          transaction.type === 'Rút tiền' ? 'bg-purple-100 text-purple-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {transaction.type}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-sm">{transaction.novice}</td>
-                      <td className="py-3 px-4 text-sm">{transaction.instructor}</td>
-                      <td className={`py-3 px-4 text-sm text-right font-medium ${
-                        transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {transaction.amount >= 0 ? '+' : ''}{transaction.amount.toLocaleString('vi-VN')} VNĐ
-                      </td>
-                      <td className={`py-3 px-4 text-sm text-right font-medium ${
-                        transaction.commission >= 0 ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {transaction.commission >= 0 ? '+' : ''}{transaction.commission.toLocaleString('vi-VN')} VNĐ
-                      </td>
-                      <td className="py-3 px-4 text-center">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          transaction.status === 'Hoàn thành' ? 'bg-green-100 text-green-800' :
-                          transaction.status === 'Đã hoàn' ? 'bg-blue-100 text-blue-800' :
-                          transaction.status === 'Đang xử lý' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {transaction.status}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-sm text-center text-muted-foreground">{transaction.method}</td>
-                    </tr>
                   ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="mt-4 flex justify-between items-center">
-              <p className="text-sm text-muted-foreground">
-                Hiển thị {transactionHistoryData.length} giao dịch gần đây
-              </p>
-              <Button variant="outline" size="sm">
-                Xem tất cả
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </main>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-primary" />
+                  <div>
+                    <CardTitle>Thống Kê Trạng Thái Buổi Huấn Luyện</CardTitle>
+                    <CardDescription>
+                      Tình trạng các buổi huấn luyện
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={sessionStatusData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {sessionStatusData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        color: "hsl(var(--foreground))",
+                      }}
+                      formatter={(value, name) => [`${value} buổi`, name]}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="mt-4 space-y-2">
+                  {sessionStatusData.map((item) => (
+                    <div
+                      key={item.name}
+                      className="flex items-center justify-between text-sm"
+                    >
+                      <span className="flex items-center gap-2 text-muted-foreground">
+                        <span
+                          className="h-2 w-2 rounded-full"
+                          style={{ backgroundColor: item.color }}
+                        />
+                        {item.name}
+                      </span>
+                      <span className="font-medium text-foreground">
+                        {item.value} buổi
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <XCircle className="h-5 w-5 text-primary" />
+                  <div>
+                    <CardTitle>
+                      Thống Kê Hủy & Hoàn Lại Buổi Huấn Luyện
+                    </CardTitle>
+                    <CardDescription>
+                      Phân tích hủy lịch và hoàn thời gian huấn luyện
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={cancelRefundData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {cancelRefundData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        color: "hsl(var(--foreground))",
+                      }}
+                      formatter={(value, name) => [`${value} trường hợp`, name]}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="mt-4 space-y-2">
+                  {cancelRefundData.map((item) => (
+                    <div
+                      key={item.name}
+                      className="flex items-center justify-between text-sm"
+                    >
+                      <span className="flex items-center gap-2 text-muted-foreground">
+                        <span
+                          className="h-2 w-2 rounded-full"
+                          style={{ backgroundColor: item.color }}
+                        />
+                        {item.name}
+                      </span>
+                      <span className="font-medium text-foreground">
+                        {item.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* 2 Charts Row */}
+          <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
+            <Card className="bg-card">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-primary" />
+                  <div>
+                    <CardTitle>Đặt Lịch Buổi Huấn Luyện </CardTitle>
+                    <CardDescription>
+                      Số lượng đặt lịch buổi huấn luyện theo tháng
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="w-full overflow-x-auto">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <AreaChart data={bookingTimeData}>
+                      <defs>
+                        <linearGradient
+                          id="colorBooking"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#3b82f6"
+                            stopOpacity={0.8}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="#3b82f6"
+                            stopOpacity={0.1}
+                          />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="hsl(var(--border))"
+                        horizontal={true}
+                        vertical={true}
+                      />
+                      <XAxis
+                        dataKey="month"
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                        axisLine={true}
+                        tickLine={true}
+                      />
+                      <YAxis
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                        axisLine={true}
+                        tickLine={true}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--card))",
+                          border: "1px solid hsl(var(--border))",
+                          color: "hsl(var(--foreground))",
+                        }}
+                        formatter={(value) => [
+                          `${value} booking`,
+                          "Số lượng đặt lịch",
+                        ]}
+                      />
+                      <Legend />
+                      <Area
+                        type="monotone"
+                        dataKey="bookingCount"
+                        stroke="#3b82f6"
+                        fillOpacity={1}
+                        fill="url(#colorBooking)"
+                        strokeWidth={3}
+                        name="Số lượng đặt lịch"
+                        dot={{
+                          fill: "#3b82f6",
+                          strokeWidth: 2,
+                          stroke: "#ffffff",
+                          r: 5,
+                        }}
+                        activeDot={{
+                          r: 7,
+                          stroke: "#3b82f6",
+                          strokeWidth: 2,
+                          fill: "#ffffff",
+                        }}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-primary" />
+                  <div>
+                    <CardTitle>Thực Thi Buổi Huấn Luyện</CardTitle>
+                    <CardDescription>
+                      Thời gian thực tế thực hiện buổi huấn luyện theo ngày
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="w-full overflow-x-auto">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <AreaChart data={sessionExecutionData}>
+                      <defs>
+                        <linearGradient
+                          id="colorExecution"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#10b981"
+                            stopOpacity={0.8}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="#10b981"
+                            stopOpacity={0.1}
+                          />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="hsl(var(--border))"
+                      />
+                      <XAxis
+                        dataKey="day"
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                      />
+                      <YAxis
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--card))",
+                          border: "1px solid hsl(var(--border))",
+                          color: "hsl(var(--foreground))",
+                        }}
+                        formatter={(value) => [
+                          `${value} giờ`,
+                          "Thời gian trung bình",
+                        ]}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="avgExecutionTime"
+                        stroke="#10b981"
+                        fillOpacity={1}
+                        fill="url(#colorExecution)"
+                        strokeWidth={2}
+                        dot={{
+                          fill: "#10b981",
+                          strokeWidth: 2,
+                          stroke: "#ffffff",
+                          r: 4,
+                        }}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <Card className="bg-card">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  <div>
+                    <CardTitle>Gói Dịch Vụ Hàng Đầu</CardTitle>
+                    <CardDescription>Được mua nhiều nhất</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {filteredTopPackages.map((pkg, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-start justify-between border-b border-border pb-3 last:border-0"
+                    >
+                      <div className="flex-1">
+                        <p className="font-medium text-foreground">
+                          {pkg.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {pkg.purchases} lần mua
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="flex items-center gap-1 text-sm font-semibold">
+                          <Star
+                            fill="#FDCC0D"
+                            className="h-4 w-4"
+                            style={{ color: "#FDCC0D" }}
+                          />
+                          <span style={{ color: "#DC0A21" }}>{pkg.rating}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-primary" />
+                  <div>
+                    <CardTitle>Người Hướng Dẫn Hàng Đầu</CardTitle>
+                    <CardDescription>Đánh giá cao nhất</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {filteredTopInstructors.map((instructor, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-start justify-between border-b border-border pb-3 last:border-0"
+                    >
+                      <div className="flex-1">
+                        <p className="font-medium text-foreground">
+                          {instructor.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {instructor.sessions} buổi huấn luyện
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="flex items-center gap-1 text-sm font-semibold">
+                          <Star
+                            fill="#FDCC0D"
+                            className="h-4 w-4"
+                            style={{ color: "#FDCC0D" }}
+                          />
+                          <span style={{ color: "#DC0A21" }}>
+                            {instructor.rating}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  <div>
+                    <CardTitle>Xe Hàng Đầu</CardTitle>
+                    <CardDescription>Được thuê nhiều nhất</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {filteredTopVehicles.map((vehicle, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-start justify-between border-b border-border pb-3 last:border-0"
+                    >
+                      <div className="flex-1">
+                        <p className="font-medium text-foreground">
+                          {vehicle.model}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {vehicle.rentals} lần thuê
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="flex items-center gap-1 text-sm font-semibold">
+                          <StarIcon
+                            fill="#FDCC0D"
+                            className="h-4 w-4"
+                            style={{ color: "#FDCC0D" }}
+                          />
+                          <span style={{ color: "#DC0A21" }}>
+                            {vehicle.rating}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Lịch Sử Giao Dịch Hệ Thống */}
+          <section className="mt-8 rounded-3xl border bg-card p-6 shadow-sm">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5 text-primary" />
+                  <div>
+                    <CardTitle>Lịch Sử Giao Dịch Hệ Thống</CardTitle>
+                    <CardDescription>
+                      Các giao dịch gần đây trong hệ thống
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto rounded-2xl border">
+                  <Table>
+                    <TableHeader className="bg-muted/60 text-xs uppercase text-muted-foreground">
+                      <TableRow>
+                        <TableHead className="text-center font-semibold">
+                          STT
+                        </TableHead>
+                        <TableHead>Mã giao dịch</TableHead>
+                        <TableHead>Thời gian</TableHead>
+                        <TableHead>Loại</TableHead>
+                        <TableHead>Người lái mới</TableHead>
+                        <TableHead>Người huấn luyện</TableHead>
+                        <TableHead className="text-right">Số tiền</TableHead>
+                        <TableHead className="text-right">Hoa hồng</TableHead>
+                        <TableHead className="text-center">
+                          Trạng thái
+                        </TableHead>
+                        <TableHead className="text-center">
+                          Phương thức
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {paginatedTransactions.length === 0 ? (
+                        <TableRow>
+                          <TableCell
+                            colSpan={10}
+                            className="py-8 text-center text-sm text-muted-foreground"
+                          >
+                            Không tìm thấy giao dịch nào.
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        paginatedTransactions.map((transaction, index) => (
+                          <TableRow
+                            key={transaction.id}
+                            className="hover:bg-muted/30"
+                          >
+                            <TableCell className="text-center text-sm font-semibold text-muted-foreground">
+                              {startIndex + index + 1}
+                            </TableCell>
+                            <TableCell className="font-mono text-sm">
+                              {transaction.id}
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground">
+                              {transaction.date}
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  transaction.type === "Thanh toán gói"
+                                    ? "bg-blue-100 text-blue-800"
+                                    : transaction.type === "Hoàn tiền"
+                                    ? "bg-red-100 text-red-800"
+                                    : transaction.type === "Đền bù hủy muộn"
+                                    ? "bg-orange-100 text-orange-800"
+                                    : transaction.type === "Thanh toán session"
+                                    ? "bg-green-100 text-green-800"
+                                    : transaction.type === "Rút tiền"
+                                    ? "bg-purple-100 text-purple-800"
+                                    : "bg-gray-100 text-gray-800"
+                                }`}
+                              >
+                                {transaction.type}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {transaction.novice}
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {transaction.instructor}
+                            </TableCell>
+                            <TableCell
+                              className={`text-sm text-right font-medium ${
+                                transaction.amount >= 0
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
+                            >
+                              {transaction.amount >= 0 ? "+" : ""}
+                              {transaction.amount.toLocaleString("vi-VN")} VNĐ
+                            </TableCell>
+                            <TableCell
+                              className={`text-sm text-right font-medium ${
+                                transaction.commission >= 0
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
+                            >
+                              {transaction.commission >= 0 ? "+" : ""}
+                              {transaction.commission.toLocaleString(
+                                "vi-VN"
+                              )}{" "}
+                              VNĐ
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  transaction.status === "Hoàn thành"
+                                    ? "bg-green-100 text-green-800"
+                                    : transaction.status === "Đã hoàn"
+                                    ? "bg-blue-100 text-blue-800"
+                                    : transaction.status === "Đang xử lý"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-gray-100 text-gray-800"
+                                }`}
+                              >
+                                {transaction.status}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-sm text-center text-muted-foreground">
+                              {transaction.method}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                <div className="mt-6 flex flex-col gap-4 rounded-2xl bg-muted/20 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="text-xs text-muted-foreground sm:text-sm">
+                    Hiển thị {paginatedTransactions.length}/
+                    {transactionHistoryData.length} giao dịch.
+                  </div>
+                  <div className="flex flex-col items-center gap-4 sm:flex-row">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">
+                        Số hàng
+                      </span>
+                      <Select
+                        value={`${itemsPerPage}`}
+                        onValueChange={(value) => {
+                          setItemsPerPage(Number(value));
+                          setCurrentPage(1);
+                        }}
+                      >
+                        <SelectTrigger className="h-8 w-20 text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent side="top">
+                          {[5, 10, 20, 30, 50].map((size) => (
+                            <SelectItem key={size} value={`${size}`}>
+                              {size}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="hidden sm:flex"
+                        onClick={goToFirstPage}
+                        disabled={!canGoPrevious}
+                      >
+                        <ChevronsLeft className="size-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={goToPreviousPage}
+                        disabled={!canGoPrevious}
+                      >
+                        <ChevronLeft className="size-4" />
+                      </Button>
+                      <span className="text-sm font-medium">
+                        Trang {currentPage}/{totalPages || 1}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={goToNextPage}
+                        disabled={!canGoNext}
+                      >
+                        <ChevronRight className="size-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="hidden sm:flex"
+                        onClick={goToLastPage}
+                        disabled={!canGoNext}
+                      >
+                        <ChevronsRight className="size-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+        </main>
+      </div>
     </div>
   );
 }

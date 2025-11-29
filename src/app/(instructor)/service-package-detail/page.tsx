@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import PageHeader from "@/components/commons/Header/header";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -149,32 +150,24 @@ export default function ServicePackageDetailPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Header */}
-      <section className="space-y-3">
-        <Card className="rounded-2xl border bg-white p-6 shadow-sm">
-          <CardHeader>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => router.back()}
-                className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-              </button>
-              <div className="space-y-1">
-                <CardTitle className="text-2xl text-foreground">
-                  {isCreate
-                    ? "Tạo chi tiết gói dịch vụ"
-                    : "Xem chi tiết gói dịch vụ"}
-                </CardTitle>
-                <CardDescription className="text-sm text-muted-foreground">
-                  {isCreate
-                    ? "Tạo gói dịch vụ mới cho khách hàng"
-                    : "Xem và chỉnh sửa thông tin gói dịch vụ"}
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-        </Card>
-      </section>
+      <PageHeader
+        title={
+          isCreate ? "Tạo chi tiết gói dịch vụ" : "Xem chi tiết gói dịch vụ"
+        }
+        description={
+          isCreate
+            ? "Tạo gói dịch vụ mới cho khách hàng"
+            : "Xem và chỉnh sửa thông tin gói dịch vụ"
+        }
+        leftAction={
+          <button
+            onClick={() => router.back()}
+            className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5 text-gray-600" />
+          </button>
+        }
+      />
 
       {/* Content */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   IconChevronLeft,
   IconChevronRight,
@@ -9,7 +9,8 @@ import {
   IconPencil,
   IconPlus,
   IconTrash,
-} from "@tabler/icons-react"
+} from "@tabler/icons-react";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -24,21 +25,21 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
-} from "@tanstack/react-table"
-import * as yup from "yup"
+} from "@tanstack/react-table";
+import * as yup from "yup";
 
-import { Badge } from "@/components/ui/badge"
-import { IUserManagement } from "@/types/user/manage-user.type"
-import { UserRole } from "@/types/auth/user-role.enum"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
+import { Badge } from "@/components/ui/badge";
+import { IUserManagement } from "@/types/user/manage-user.type";
+import { UserRole } from "@/types/auth/user-role.enum";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -46,16 +47,23 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Using IUserManagement interface from types
-export type User = IUserManagement
+export type User = IUserManagement;
 
 interface UserDataTableProps {
-  data: User[]
-  onEdit?: (user: User) => void
-  onDelete?: (userId: string) => void
-  onAdd?: () => void
+  data: User[];
+  onEdit?: (user: User) => void;
+  onDelete?: (userId: string) => void;
+  onAdd?: () => void;
 }
 
 // STT column component
@@ -64,49 +72,107 @@ function STTCell({ index }: { index: number }) {
     <div className="flex items-center justify-center font-medium">
       {index + 1}
     </div>
-  )
+  );
 }
 
-// Get status badge variant
+// Get status badge variant and className
 const getStatusVariant = (status: User["status"]) => {
   switch (status) {
     case "Active":
-      return "default"
+      return "default";
     case "Inactive":
-      return "secondary"
+      return "secondary";
     case "Suspended":
-      return "destructive"
+      return "destructive";
     default:
-      return "secondary"
+      return "secondary";
   }
-}
+};
 
-// Get role badge variant
+const getStatusClassName = (status: User["status"]): string => {
+  switch (status) {
+    case "Active":
+      return "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200";
+    case "Inactive":
+      return "bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200";
+    case "Suspended":
+      return "bg-red-50 text-red-700 hover:bg-red-100 border-red-200";
+    default:
+      return "";
+  }
+};
+
+// Get role badge variant and className
 const getRoleVariant = (role: UserRole) => {
   switch (role) {
     case UserRole.Admin:
-      return "destructive"
+      return "destructive";
     case UserRole.Inspector:
-      return "default"
+      return "default";
     case UserRole.Instructor:
-      return "secondary"
+      return "secondary";
     case UserRole.NoviceDriver:
-      return "outline"
+      return "outline";
     default:
-      return "outline"
+      return "outline";
   }
-}
+};
 
-function UserTableRow({ 
-  row, 
+const getRoleClassName = (role: UserRole): string => {
+  switch (role) {
+    case UserRole.Admin:
+      return "bg-amber-50 text-amber-700 hover:bg-amber-100 border-amber-200";
+    case UserRole.Inspector:
+      return "bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200";
+    case UserRole.Instructor:
+      return "bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200";
+    case UserRole.NoviceDriver:
+      return "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200";
+    default:
+      return "";
+  }
+};
+
+// Convert role to Vietnamese
+const getRoleLabel = (role: UserRole): string => {
+  switch (role) {
+    case UserRole.Admin:
+      return "Quản trị viên";
+    case UserRole.Inspector:
+      return "Người kiểm duyệt";
+    case UserRole.Instructor:
+      return "Người hướng dẫn";
+    case UserRole.NoviceDriver:
+      return "Người lái mới";
+    default:
+      return UserRole[role] || "Không xác định";
+  }
+};
+
+// Convert status to Vietnamese
+const getStatusLabel = (status: User["status"]): string => {
+  switch (status) {
+    case "Active":
+      return "Hoạt động";
+    case "Inactive":
+      return "Ngừng hoạt động";
+    case "Suspended":
+      return "Bị đình chỉ";
+    default:
+      return status;
+  }
+};
+
+function UserTableRow({
+  row,
   index,
-  onEdit, 
-  onDelete 
-}: { 
-  row: Row<User>
-  index: number
-  onEdit?: (user: User) => void
-  onDelete?: (userId: string) => void
+  onEdit,
+  onDelete,
+}: {
+  row: Row<User>;
+  index: number;
+  onEdit?: (user: User) => void;
+  onDelete?: (userId: string) => void;
 }) {
   return (
     <TableRow data-state={row.getIsSelected() && "selected"}>
@@ -116,120 +182,140 @@ function UserTableRow({
             <TableCell key={cell.id}>
               <STTCell index={index} />
             </TableCell>
-          )
+          );
         }
         if (cell.column.id === "actions") {
           return (
             <TableCell key={cell.id} className="text-right">
-              <div className="flex justify-end space-x-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onEdit?.(row.original)}
-                  className="h-8 w-8 p-0"
-                >
-                  <IconPencil className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onDelete?.(row.original.id)}
-                  className="h-8 w-8 p-0"
-                >
-                  <IconTrash className="h-4 w-4" />
-                </Button>
+              <div className="flex justify-center">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="icon" aria-label="Thao tác">
+                      <MoreHorizontal className="size-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onSelect={() => onEdit?.(row.original)}>
+                      <Pencil className="mr-2 size-4" />
+                      Chỉnh sửa
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onSelect={() => onDelete?.(row.original.id)}
+                      className="text-red-600"
+                    >
+                      <Trash2 className="mr-2 size-4" />
+                      Xóa
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </TableCell>
-          )
+          );
         }
         return (
           <TableCell key={cell.id}>
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
           </TableCell>
-        )
+        );
       })}
     </TableRow>
-  )
+  );
 }
 
-export function UserDataTable({ data: initialData, onEdit, onDelete, onAdd }: UserDataTableProps) {
-  const [data, setData] = React.useState(() => initialData)
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [sorting, setSorting] = React.useState<SortingState>([])
+export function UserDataTable({
+  data: initialData,
+  onEdit,
+  onDelete,
+  onAdd,
+}: UserDataTableProps) {
+  const [data, setData] = React.useState(() => initialData);
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
-  })
+  });
 
   // Update data when initialData changes
   React.useEffect(() => {
-    setData(initialData)
-  }, [initialData])
+    setData(initialData);
+  }, [initialData]);
 
-  const columns: ColumnDef<User>[] = React.useMemo(() => [
-    {
-      id: "stt",
-      header: () => <div className="text-center">STT</div>,
-      cell: () => null, // This will be handled in UserTableRow
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      accessorKey: "userName",
-      header: "Họ tên",
-      cell: ({ row }) => (
-        <div className="font-medium">{row.original.userName}</div>
-      ),
-      enableHiding: false,
-    },
-    {
-      accessorKey: "email",
-      header: "Email",
-      cell: ({ row }) => (
-        <div className="text-muted-foreground">{row.original.email}</div>
-      ),
-    },
-    {
-      accessorKey: "phone",
-      header: "Số điện thoại",
-      cell: ({ row }) => (
-        <div>{row.original.phone}</div>
-      ),
-    },
-    {
-      accessorKey: "role",
-      header: "Vai trò",
-      cell: ({ row }) => (
-        <Badge variant={getRoleVariant(row.original.role)}>
-          {UserRole[row.original.role]}
-        </Badge>
-      ),
-    },
-    {
-      accessorKey: "status",
-      header: "Trạng thái",
-      cell: ({ row }) => (
-        <Badge variant={getStatusVariant(row.original.status)}>
-          {row.original.status}
-        </Badge>
-      ),
-    },
-    {
-      accessorKey: "createdAt",
-      header: "Ngày tạo",
-      cell: ({ row }) => (
-        <div>{row.original.createdAt.toLocaleDateString('vi-VN')}</div>
-      ),
-    },
-    {
-      id: "actions",
-      header: () => <div className="text-right">Thao tác</div>,
-      cell: () => null, // This will be handled in DraggableRow
-      enableSorting: false,
-      enableHiding: false,
-    },
-  ], [])
+  const columns: ColumnDef<User>[] = React.useMemo(
+    () => [
+      {
+        id: "stt",
+        header: () => <div className="text-center">STT</div>,
+        cell: () => null, // This will be handled in UserTableRow
+        enableSorting: false,
+        enableHiding: false,
+      },
+      {
+        accessorKey: "userName",
+        header: "Họ tên",
+        cell: ({ row }) => (
+          <div className="font-medium">{row.original.userName}</div>
+        ),
+        enableHiding: false,
+      },
+      {
+        accessorKey: "email",
+        header: "Email",
+        cell: ({ row }) => (
+          <div className="text-muted-foreground">{row.original.email}</div>
+        ),
+      },
+      {
+        accessorKey: "phone",
+        header: "Số điện thoại",
+        cell: ({ row }) => <div>{row.original.phone}</div>,
+      },
+      {
+        accessorKey: "role",
+        header: "Vai trò",
+        cell: ({ row }) => (
+          <Badge
+            variant={getRoleVariant(row.original.role)}
+            className={getRoleClassName(row.original.role)}
+          >
+            {getRoleLabel(row.original.role)}
+          </Badge>
+        ),
+      },
+      {
+        accessorKey: "status",
+        header: "Trạng thái",
+        cell: ({ row }) => (
+          <Badge
+            variant={getStatusVariant(row.original.status)}
+            className={getStatusClassName(row.original.status)}
+          >
+            {getStatusLabel(row.original.status)}
+          </Badge>
+        ),
+      },
+      {
+        accessorKey: "createdAt",
+        header: "Ngày tạo",
+        cell: ({ row }) => (
+          <div>{row.original.createdAt.toLocaleDateString("vi-VN")}</div>
+        ),
+      },
+      {
+        id: "actions",
+        header: () => <div className="text-center">Thao tác</div>,
+        cell: () => null, // This will be handled in UserTableRow
+        enableSorting: false,
+        enableHiding: false,
+      },
+    ],
+    []
+  );
 
   const table = useReactTable({
     data,
@@ -251,11 +337,10 @@ export function UserDataTable({ data: initialData, onEdit, onDelete, onAdd }: Us
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-  })
+  });
 
   return (
     <div className="w-full flex-col justify-start gap-6">
-      
       <div className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
         <div className="overflow-x-auto rounded-lg border">
           <Table>
@@ -272,22 +357,24 @@ export function UserDataTable({ data: initialData, onEdit, onDelete, onAdd }: Us
                               header.getContext()
                             )}
                       </TableHead>
-                    )
+                    );
                   })}
                 </TableRow>
               ))}
             </TableHeader>
             <TableBody>
               {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row, index) => (
-                  <UserTableRow 
-                    key={row.id} 
-                    row={row}
-                    index={index}
-                    onEdit={onEdit}
-                    onDelete={onDelete}
-                  />
-                ))
+                table
+                  .getRowModel()
+                  .rows.map((row, index) => (
+                    <UserTableRow
+                      key={row.id}
+                      row={row}
+                      index={index}
+                      onEdit={onEdit}
+                      onDelete={onDelete}
+                    />
+                  ))
               ) : (
                 <TableRow>
                   <TableCell
@@ -301,7 +388,7 @@ export function UserDataTable({ data: initialData, onEdit, onDelete, onAdd }: Us
             </TableBody>
           </Table>
         </div>
-        
+
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4">
           <div className="text-muted-foreground hidden flex-1 text-xs sm:text-sm lg:flex">
             Hiển thị {table.getRowModel().rows.length} trong{" "}
@@ -315,7 +402,7 @@ export function UserDataTable({ data: initialData, onEdit, onDelete, onAdd }: Us
               <Select
                 value={`${table.getState().pagination.pageSize}`}
                 onValueChange={(value) => {
-                  table.setPageSize(Number(value))
+                  table.setPageSize(Number(value));
                 }}
               >
                 <SelectTrigger size="sm" className="w-20" id="rows-per-page">
@@ -381,5 +468,5 @@ export function UserDataTable({ data: initialData, onEdit, onDelete, onAdd }: Us
         </div>
       </div>
     </div>
-  )
+  );
 }

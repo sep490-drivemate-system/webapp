@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import DocumentForm from "@/components/car-upload/document-form";
+import PageHeader from "@/components/commons/Header/header";
 
 export default function CarUploadPage() {
   const router = useRouter();
@@ -35,29 +36,18 @@ export default function CarUploadPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <section className="space-y-3">
-        <Card className="rounded-2xl border bg-white p-6 shadow-sm">
-          <CardHeader>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => router.back()}
-                className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-              </button>
-              <div className="space-y-1">
-                <CardTitle className="text-2xl text-foreground">
-                  Tải Lên Tài Liệu Xe
-                </CardTitle>
-                <CardDescription className="text-sm text-muted-foreground">
-                  Tải lên giấy đăng kiểm xe, bảo hiểm, giấy đăng ký và ảnh xác
-                  thực xe của bạn
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-        </Card>
-      </section>
+      <PageHeader
+        title="Tải Lên Tài Liệu Xe"
+        description="Tải lên giấy đăng kiểm xe, bảo hiểm, giấy đăng ký và ảnh xác thực xe của bạn"
+        leftAction={
+          <button
+            onClick={() => router.back()}
+            className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5 text-gray-600" />
+          </button>
+        }
+      />
 
       {/* Status Messages */}
       {uploadStatus !== "idle" && (
