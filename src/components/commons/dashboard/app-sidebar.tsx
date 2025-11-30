@@ -85,7 +85,7 @@ const data = {
     },
     {
       title: "Quản lý điều khoản dịch vụ",
-      url: "/dashboard/documents/word-assistant",
+      url: "/terms-and-services",
       icon: IconKey,
     },
   ],
