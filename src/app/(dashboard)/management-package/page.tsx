@@ -255,7 +255,7 @@ export default function ManagementPackagePage() {
     <div className="space-y-6">
       {/* Header */}
       <PageHeader
-        title="Quản lý gói dịch vụ"
+        title="Quản Lý Gói Dịch Vụ"
         description="Quản lý và theo dõi tất cả các gói dịch vụ trong hệ thống."
         actionButton={{
           label: "Tạo gói học mới",

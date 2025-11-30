@@ -120,7 +120,7 @@ export default function AdminTermsPage() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4">
         <PageHeader
-          title="Quản lý Điều khoản & Dịch vụ"
+          title="Quản Lý Điều khoản & Dịch vụ"
           description="Tạo, chỉnh sửa và quản lý các điều khoản dịch vụ"
           actionButton={{
             label: "Tạo điều khoản mới",

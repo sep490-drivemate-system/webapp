@@ -90,7 +90,7 @@ export default function BlogsInstructorManagementPage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        title="Quản lý bài viết"
+        title="Quản Lý Bài Viết"
         description="Theo dõi, tìm kiếm và tạo mới các bài viết trên hệ thống."
         actionButton={{
           label: "Tạo bài viết",

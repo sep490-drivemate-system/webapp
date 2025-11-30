@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 import { Input } from "@/components/ui/input";
 
-import { Plus, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, ChevronDown, ChevronUp, Save } from "lucide-react";
 
 import type { DocumentType, DocumentField } from "@/lib/types";
 
@@ -189,9 +189,14 @@ export function DocumentTypeForm({
         <Button type="button" variant="outline" onClick={onCancel}>
           Hủy
         </Button>
-        <Button type="submit">
-          {initialData ? "Cập nhật" : "Tạo"} loại giấy tờ
-        </Button>
+        {initialData ? (
+          <Button type="submit" className="gap-2">
+            <Save className="h-4 w-4" />
+            Lưu cấu hình
+          </Button>
+        ) : (
+          <Button type="submit">Thêm giấy tờ</Button>
+        )}
       </div>
     </form>
   );

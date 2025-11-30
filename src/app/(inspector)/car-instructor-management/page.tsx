@@ -899,7 +899,7 @@ export default function ReviewerCarDocumentsPage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        title="Duyệt tài liệu xe"
+        title="Duyệt Tài Liệu Xe"
         description="Kiểm tra, duyệt hoặc từ chối tài liệu xe do giảng viên gửi lên."
         className="space-y-4"
       />

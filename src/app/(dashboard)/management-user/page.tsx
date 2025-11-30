@@ -304,7 +304,7 @@ export default function ManagementUserPage() {
     <div className="flex flex-1 flex-col space-y-6">
       {/* Header */}
       <PageHeader
-        title="Quản lý người dùng"
+        title="Quản Lý Người Dùng"
         description="Quản lý và theo dõi tất cả người dùng trong hệ thống."
         actionButton={{
           label: "Thêm người dùng",

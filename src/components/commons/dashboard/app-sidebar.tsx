@@ -168,7 +168,7 @@ const data = {
     },
 
     {
-      name: "Lịch làm việc",
+      name: "Lịch huấn luyện",
       url: "/schedule-management",
       icon: IconCalendar,
     },

@@ -308,7 +308,7 @@ export default function ManagementInstructorPage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        title="Quản lý người hướng dẫn"
+        title="Quản Lý Người Hướng Dẫn"
         description="Theo dõi, duyệt hoặc yêu cầu bổ sung hồ sơ ứng viên giảng viên."
         className="space-y-4"
       />

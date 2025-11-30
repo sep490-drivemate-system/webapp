@@ -191,7 +191,7 @@ export default function TransactionsPage() {
       {/* Header */}
       <div className="sticky top-0 z-50">
         <PageHeader
-          title="Lịch sử giao dịch"
+          title="Lịch Sử Giao Dịch"
           description="Quản lý và theo dõi tất cả giao dịch của bạn"
         />
       </div>

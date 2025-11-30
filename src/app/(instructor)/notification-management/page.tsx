@@ -197,9 +197,9 @@ export default function NotificationsPage() {
 
   return (
     <div className="min-h-screen ">
-      <div className="w-full px-4 py-8 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <PageHeader
-          title="Trung tâm thông báo"
+          title="Thông Báo"
           description="Quản lý và theo dõi hoạt động mới nhất từ hệ thống và khách hàng"
           className="space-y-4"
         />

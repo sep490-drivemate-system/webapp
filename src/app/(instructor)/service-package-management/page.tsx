@@ -167,7 +167,7 @@ export default function ServicePackageManagementPage() {
     <main className="min-h-screen bg-white">
       {/* Header */}
       <PageHeader
-        title="Danh sách gói dịch vụ"
+        title="Quản Lý Gói Dịch Vụ"
         description="Quản lý các gói dịch vụ của bạn"
         actionButton={{
           label: "Thêm gói mới",

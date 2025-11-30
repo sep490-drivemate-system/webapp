@@ -587,7 +587,7 @@ export default function InstructorOverviewPage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        title="Quản lý doanh thu, người lái mới và gói dịch vụ"
+        title="Quản Lý Doanh Thu, Người Lái Mới & Gói Dịch Vụ"
         description="Theo dõi hiệu suất buổi huấn luyện, doanh thu và danh sách người lái mới."
       />
       <div className="flex justify-end">

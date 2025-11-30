@@ -288,8 +288,8 @@ export default function DrivingSessionManagementPage() {
     <div className="space-y-8">
       {/* Header Section */}
       <PageHeader
-        title="Buổi huấn luyện của tôi"
-        description="Quản lý lịch trình huấn luyện và theo dõi tiến trình của học viên"
+        title="Quản Lý Buổi Huấn Luyện"
+        description="Quản lý lịch trình huấn luyện và theo dõi tiến trình của người lái mới"
         className="space-y-4"
       />
 
