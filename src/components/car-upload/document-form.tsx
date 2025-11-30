@@ -52,17 +52,54 @@ export default function DocumentForm({
     setIsSubmitting(true);
 
     try {
-      if (!formData.registration?.ownerName) {
-        throw new Error("Vui lòng điền phần giấy đăng kiểm");
+      // Validate Inspection Section
+      if (!formData.inspection?.frontImage || !formData.inspection?.backImage) {
+        throw new Error(
+          "Vui lòng tải lên đầy đủ ảnh giấy đăng kiểm (mặt trước và mặt sau)"
+        );
       }
-      if (!formData.inspection?.frontImage) {
-        throw new Error("Vui lòng điền phần bảo hiểm xe");
+
+      // Validate Insurance Section
+      if (!formData.insurance?.frontImage || !formData.insurance?.backImage) {
+        throw new Error(
+          "Vui lòng tải lên đầy đủ ảnh bảo hiểm xe (mặt trước và mặt sau)"
+        );
       }
-      if (!formData.insurance?.frontImage) {
-        throw new Error("Vui lòng điền phần giấy đăng ký xe");
+      if (!formData.insurance?.expiryDate) {
+        throw new Error("Vui lòng nhập ngày hết hạn bảo hiểm xe");
       }
-      if (!formData.verification?.frontImage) {
-        throw new Error("Vui lòng điền phần ảnh xác thực xe");
+
+      // Validate Registration Section
+      if (!formData.registration?.licensePlate) {
+        throw new Error("Vui lòng nhập biển số xe");
+      }
+      if (!formData.registration?.brand) {
+        throw new Error("Vui lòng chọn hãng xe");
+      }
+      if (!formData.registration?.color) {
+        throw new Error("Vui lòng nhập màu xe");
+      }
+      if (!formData.registration?.seats || formData.registration?.seats <= 0) {
+        throw new Error("Vui lòng nhập số chỗ ngồi");
+      }
+      if (!formData.registration?.fuelType) {
+        throw new Error("Vui lòng chọn loại nhiên liệu");
+      }
+      if (!formData.rentalPrice || parseFloat(formData.rentalPrice) <= 0) {
+        throw new Error("Vui lòng nhập giá thuê theo giờ");
+      }
+
+      // Validate Verification Section
+      if (
+        !formData.verification?.frontImage ||
+        !formData.verification?.backImage ||
+        !formData.verification?.leftSideImage ||
+        !formData.verification?.rightSideImage ||
+        !formData.verification?.interiorImage
+      ) {
+        throw new Error(
+          "Vui lòng tải lên đầy đủ 5 ảnh xác thực xe (trước, sau, hông trái, hông phải, nội thất)"
+        );
       }
 
       const response = await fetch("/api/upload-vehicle-data", {
@@ -83,7 +120,7 @@ export default function DocumentForm({
         verification: {},
         rentalPrice: "",
       });
-      setCurrentTab("registration");
+      setCurrentTab("inspection");
     } catch (error) {
       onError(error instanceof Error ? error.message : "Tải lên thất bại");
     } finally {

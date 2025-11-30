@@ -37,43 +37,29 @@ export default function InsuranceSection({
         {/* Images */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <ImageUploadField
-            label="Mặt Trước"
+            label="Ảnh Mặt Trước"
             onUpload={(base64) => handleImageUpload("frontImage", base64)}
             preview={data.frontImage}
           />
           <ImageUploadField
-            label="Mặt Sau"
+            label="Ảnh Mặt Sau"
             onUpload={(base64) => handleImageUpload("backImage", base64)}
             preview={data.backImage}
           />
         </div>
 
-        {/* Dates */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <Label htmlFor="inspIssuedDate" className="text-foreground pb-2">
-              Ngày Cấp
-            </Label>
-            <Input
-              id="inspIssuedDate"
-              type="date"
-              value={data.issuedDate || ""}
-              onChange={(e) => handleInputChange("issuedDate", e.target.value)}
-              className="bg-input text-foreground border-border"
-            />
-          </div>
-          <div>
-            <Label htmlFor="inspExpiryDate" className="text-foreground pb-2">
-              Ngày Hết Hạn
-            </Label>
-            <Input
-              id="inspExpiryDate"
-              type="date"
-              value={data.expiryDate || ""}
-              onChange={(e) => handleInputChange("expiryDate", e.target.value)}
-              className="bg-input text-foreground border-border"
-            />
-          </div>
+        {/* Expiry Date */}
+        <div>
+          <Label htmlFor="inspExpiryDate" className="text-foreground pb-2">
+            Ngày Hết Hạn
+          </Label>
+          <Input
+            id="inspExpiryDate"
+            type="date"
+            value={data.expiryDate || ""}
+            onChange={(e) => handleInputChange("expiryDate", e.target.value)}
+            className="bg-input text-foreground border-border"
+          />
         </div>
       </CardContent>
     </Card>

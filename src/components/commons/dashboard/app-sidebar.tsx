@@ -85,8 +85,13 @@ const data = {
     },
     {
       title: "Quản lý điều khoản dịch vụ",
-      url: "/terms-and-services",
+      url: "/management-terms-and-services",
       icon: IconKey,
+    },
+    {
+      title: "Quản lý chính sách",
+      url: "/management-policy",
+      icon: IconSettings,
     },
   ],
   navClouds: [

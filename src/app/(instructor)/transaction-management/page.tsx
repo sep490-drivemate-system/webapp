@@ -253,12 +253,12 @@ export default function TransactionsPage() {
           >
             <Card className="w-full rounded-none border-x-0 border-b border-t bg-white shadow-sm sm:rounded-2xl sm:border">
               <CardHeader className="space-y-6">
-                <TabsList className="w-full">
+                <TabsList className="grid w-full grid-cols-4 bg-secondary">
                   {TRANSACTION_TABS.map((tab) => (
                     <TabsTrigger
                       key={tab.value}
                       value={tab.value}
-                      className="text-sm flex-1"
+                      className="text-sm text-foreground data-[state=active]:bg-emerald-600 data-[state=active]:text-primary-foreground"
                     >
                       {tab.label}
                     </TabsTrigger>

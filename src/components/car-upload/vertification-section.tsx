@@ -32,14 +32,19 @@ export default function VerificationSection({
             preview={data.frontImage}
           />
           <ImageUploadField
-            label="Ảnh Bên Hông"
-            onUpload={(base64) => handleImageUpload("sideImage", base64)}
-            preview={data.sideImage}
-          />
-          <ImageUploadField
             label="Ảnh Phía Sau"
             onUpload={(base64) => handleImageUpload("backImage", base64)}
             preview={data.backImage}
+          />
+          <ImageUploadField
+            label="Ảnh Bên Hông Trái"
+            onUpload={(base64) => handleImageUpload("leftSideImage", base64)}
+            preview={data.leftSideImage}
+          />
+          <ImageUploadField
+            label="Ảnh Bên Hông Phải"
+            onUpload={(base64) => handleImageUpload("rightSideImage", base64)}
+            preview={data.rightSideImage}
           />
           <ImageUploadField
             label="Ảnh Nội Thất"
