@@ -7,46 +7,39 @@ const links = {
     "Hotline: 1900-xxxx",
     "Email: contact@drivemate.vn",
     "Địa chỉ: TP.HCM",
-    "Giờ làm việc: 8:00 - 20:00"
+    "Giờ làm việc: 8:00 - 20:00",
   ],
   "Trợ giúp": [
     "Câu hỏi thường gặp",
     "Hướng dẫn đặt lịch",
     "Hướng dẫn thanh toán",
-    "Liên hệ hỗ trợ"
+    "Liên hệ hỗ trợ",
   ],
   "Chính sách": [
     "Chính sách bảo mật",
     "Điều khoản sử dụng",
     "Chính sách hoàn tiền",
-    "Quy định chung"
+    "Quy định chung",
   ],
 };
 
 export default function Footer() {
   return (
-    <footer
-      id="footer"
-      className="container mx-auto sm:px-6 lg:px-8 space-y-4 p-4 sm:p-5"
-    >
-      <div className="bg-background/60 rounded-2xl border p-4 sm:p-5 lg:p-6">
+    <footer id="footer" className="w-full bg-emerald-100">
+      <div className="container mx-auto sm:px-6 lg:px-8 space-y-4 p-4 sm:p-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-12">
           {/* Brand */}
           <div className="col-span-full lg:col-span-1 space-y-4">
             <div className="flex flex-col">
               <Link href="/" className="flex items-center gap-3 mb-3">
-                <Image
-                  src="/logo.png"
-                  alt="DriveMate Logo"
-                  width={48}
-                  height={48}
-                  priority
-                  className="h-12 w-12 object-contain"
-                />               
+                <span className="text-2xl font-extrabold tracking-[0.2em] text-emerald-700">
+                  DRIVEMATE
+                </span>
               </Link>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Nền tảng kết nối những người lái mới với người hướng dẫn lái xe chuyên nghiệp
+              Nền tảng kết nối những người lái mới với người hướng dẫn lái xe
+              chuyên nghiệp
             </p>
           </div>
 
@@ -56,9 +49,7 @@ export default function Footer() {
               <h3 className="mb-2 text-base sm:text-lg font-bold">{section}</h3>
               {items.map((item) => (
                 <div key={item}>
-                  <span className="opacity-60 text-sm block">
-                    {item}
-                  </span>
+                  <span className="opacity-60 text-sm block">{item}</span>
                 </div>
               ))}
             </div>

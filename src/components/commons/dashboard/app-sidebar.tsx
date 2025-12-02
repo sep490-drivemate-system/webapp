@@ -90,7 +90,7 @@ const data = {
     },
     {
       title: "Quản lý cài đặt hệ thống",
-      url: "/management-policy",
+      url: "/management-setting",
       icon: IconSettings,
     },
   ],
