@@ -19,7 +19,7 @@ const MAIN_MENU = [
   { path: "/cars", label: "Xe tập" },
   { path: "/blogs", label: "Bài viết" },
   { path: "/terms-and-sersvices", label: "Điều khoản và dịch vụ" },
-  { path: "/", label: "Về chúng tôi" },
+  { path: "/about-us", label: "Về chúng tôi" },
 ];
 
 function Logo({ sizeClass = "h-16 w-16" }: { sizeClass?: string }) {
