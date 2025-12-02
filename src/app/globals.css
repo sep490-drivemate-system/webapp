@@ -231,3 +231,53 @@ div[class*="nextjs"],
 div[id*="__next"] > div[style*="position: fixed"]:last-child {
   display: none !important;
 }
+
+/* Gradient background animation */
+.gradient-background {
+  background: linear-gradient(300deg, #10b981, #0a3828, #02170f);
+  background-size: 180% 180%;
+  animation: gradient-animation 18s ease infinite;
+}
+
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Override browser autofill background for login inputs */
+input[data-slot="input"]:-webkit-autofill,
+input[data-slot="input"]:-webkit-autofill:hover,
+input[data-slot="input"]:-webkit-autofill:focus,
+input[data-slot="input"]:-webkit-autofill:active,
+input[data-slot="input"]:autofill,
+input[data-slot="input"]:autofill:hover,
+input[data-slot="input"]:autofill:focus,
+input[data-slot="input"]:autofill:active {
+  -webkit-box-shadow: 0 0 0 30px rgba(16, 185, 129, 0.1) inset !important;
+  box-shadow: 0 0 0 30px rgba(16, 185, 129, 0.1) inset !important;
+  -webkit-text-fill-color: #10b981 !important;
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* Override background when autocomplete suggestions are selected */
+input[data-slot="input"]:focus:-webkit-autofill,
+input[data-slot="input"]:focus:autofill {
+  -webkit-box-shadow: 0 0 0 30px rgba(16, 185, 129, 0.1) inset !important;
+  box-shadow: 0 0 0 30px rgba(16, 185, 129, 0.1) inset !important;
+  -webkit-text-fill-color: #10b981 !important;
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Ensure background stays green when input has value from autocomplete */
+input[data-slot="input"][value]:not([value=""]),
+input[data-slot="input"]:not(:placeholder-shown) {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}

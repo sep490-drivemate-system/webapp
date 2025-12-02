@@ -9,12 +9,16 @@ interface ImageUploadFieldProps {
   label: string;
   onUpload: (base64: string) => void;
   preview?: string;
+  labelClassName?: string;
+  uploadAreaClassName?: string;
 }
 
 export default function ImageUploadField({
   label,
   onUpload,
   preview,
+  labelClassName,
+  uploadAreaClassName,
 }: ImageUploadFieldProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -51,7 +55,7 @@ export default function ImageUploadField({
 
   return (
     <div className="space-y-2">
-      <Label className="text-foreground">{label}</Label>
+      <Label className={labelClassName || "text-foreground"}>{label}</Label>
       {preview ? (
         <div className="relative rounded-lg overflow-hidden border-2 border-border bg-secondary p-2">
           <img
@@ -64,9 +68,9 @@ export default function ImageUploadField({
             variant="ghost"
             size="sm"
             onClick={() => onUpload("")}
-            className="absolute top-2 right-2 bg-destructive hover:bg-destructive text-destructive-foreground rounded-full p-1"
+            className="absolute top-2 right-2 bg-transparent hover:bg-white/10 text-white rounded-full p-1"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4 text-white" />
           </Button>
         </div>
       ) : (
@@ -75,17 +79,21 @@ export default function ImageUploadField({
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-            isDragging
-              ? "border-accent bg-accent/10"
-              : "border-border hover:bg-secondary"
-          }`}
+          className={
+            uploadAreaClassName
+              ? `${uploadAreaClassName} ${isDragging ? "!bg-[#10b981]/30" : ""}`
+              : `border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                  isDragging
+                    ? "border-accent bg-accent/10"
+                    : "border-border hover:bg-secondary"
+                }`
+          }
         >
-          <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-          <p className="text-sm font-medium text-foreground">
+          <Upload className="w-8 h-8 mx-auto mb-2 text-[#10b981]" />
+          <p className="text-sm font-medium text-white">
             Nhấp để tải lên hoặc kéo và thả
           </p>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-gray-300 mt-1">
             PNG, JPG, GIF lên đến 5MB
           </p>
         </div>

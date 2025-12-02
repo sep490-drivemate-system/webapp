@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
 import Image from "next/image";
-import bgLogin from "@/../public/bg-login.jpg";
 import { useSignIn } from "@/hooks/auth/useSignIn";
+import { useEffect, useRef } from "react";
 
 export function LoginForm({
   className,
@@ -22,6 +22,93 @@ export function LoginForm({
     updatePassword,
   } = useSignIn();
 
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch((error) => {
+        console.error("Error playing video:", error);
+      });
+    }
+  }, []);
+
+  // Keep background green when autocomplete is selected
+  useEffect(() => {
+    const emailInput = emailInputRef.current;
+    const passwordInput = passwordInputRef.current;
+
+    const maintainBackground = (input: HTMLInputElement | null) => {
+      if (!input) return;
+
+      const setGreenBackground = () => {
+        // Force background color - use both methods to ensure it works
+        input.style.backgroundColor = "rgba(16, 185, 129, 0.1)";
+        input.style.setProperty(
+          "background-color",
+          "rgba(16, 185, 129, 0.1)",
+          "important"
+        );
+      };
+
+      // Set background on various events
+      const events = [
+        "input",
+        "change",
+        "focus",
+        "blur",
+        "click",
+        "keydown",
+        "keyup",
+      ];
+      events.forEach((event) => {
+        input.addEventListener(event, setGreenBackground);
+      });
+
+      // Use MutationObserver to catch autocomplete changes
+      const observer = new MutationObserver(() => {
+        setGreenBackground();
+      });
+
+      observer.observe(input, {
+        attributes: true,
+        attributeFilter: ["value", "style", "class"],
+        childList: false,
+        subtree: false,
+      });
+
+      // Use interval to periodically check and reset background
+      const intervalId = setInterval(() => {
+        const currentBg = window.getComputedStyle(input).backgroundColor;
+        const expectedBg = "rgba(16, 185, 129, 0.1)";
+        // Check if background has been changed (not exact match due to browser differences)
+        if (currentBg && !currentBg.includes("16, 185, 129")) {
+          setGreenBackground();
+        }
+      }, 100);
+
+      // Set initial background
+      setGreenBackground();
+
+      return () => {
+        events.forEach((event) => {
+          input.removeEventListener(event, setGreenBackground);
+        });
+        observer.disconnect();
+        clearInterval(intervalId);
+      };
+    };
+
+    const cleanupEmail = maintainBackground(emailInput);
+    const cleanupPassword = maintainBackground(passwordInput);
+
+    return () => {
+      cleanupEmail?.();
+      cleanupPassword?.();
+    };
+  }, []);
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await handleSignIn();
@@ -29,9 +116,22 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="overflow-hidden p-0 bg-white/10 backdrop-blur-md border-none shadow-lg rounded-2xl">
+      <Card className="overflow-hidden p-0 bg-white/10 backdrop-blur-md border-none shadow-lg rounded-2xl w-full max-w-4xl mx-auto">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8" onSubmit={onSubmit}>
+          <div className="bg-muted relative hidden md:block overflow-hidden order-1">
+            <video
+              ref={videoRef}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              className="absolute inset-0 w-full h-full object-cover dark:brightness-[0.2] dark:grayscale"
+            >
+              <source src="/drivemate_video.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <form className="p-6 md:p-8 order-2" onSubmit={onSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <Link
@@ -40,33 +140,39 @@ export function LoginForm({
                 >
                   <Image
                     src="/logo.png"
-                    alt="Logo"
-                    width={48}
-                    height={48}
-                    priority
-                    className="h-12 w-12 object-contain"
+                    alt="DRIVEMATE Logo"
+                    width={150}
+                    height={150}
+                    className="object-contain"
                   />
                 </Link>
-                <p>Đăng nhập vào tài khoản của bạn</p>
+                <p className="text-[#10b981]">
+                  Đăng nhập vào tài khoản của bạn
+                </p>
               </div>
               <div className="grid gap-3">
                 <Input
+                  ref={emailInputRef}
                   id="email"
-                  className="text-white placeholder:text-gray-400"
+                  className="text-[#10b981] placeholder:text-gray-400 border-[#10b981]/50 focus:border-[#10b981] focus:ring-[#10b981] !bg-[#10b981]/10 focus:!bg-[#10b981]/10 hover:!bg-[#10b981]/10 dark:!bg-[#10b981]/10"
                   type="text"
                   placeholder="Email hoặc số điện thoại"
                   value={signInData.emailOrPhone}
                   onChange={(e) => updateEmailOrPhone(e.target.value)}
+                  style={{ backgroundColor: "rgba(16, 185, 129, 0.1)" }}
                   required
                 />
               </div>
               <div className="grid gap-3">
                 <Input
+                  ref={passwordInputRef}
                   id="password"
+                  className="text-[#10b981] placeholder:text-gray-400 border-[#10b981]/50 focus:border-[#10b981] focus:ring-[#10b981] !bg-[#10b981]/10 focus:!bg-[#10b981]/10 hover:!bg-[#10b981]/10 dark:!bg-[#10b981]/10"
                   type="password"
                   placeholder="Mật khẩu"
                   value={signInData.password}
                   onChange={(e) => updatePassword(e.target.value)}
+                  style={{ backgroundColor: "rgba(16, 185, 129, 0.1)" }}
                   required
                 />
                 <div className="flex items-center text-white">
@@ -85,7 +191,7 @@ export function LoginForm({
               )} */}
               <Button
                 type="submit"
-                className="w-full bg-[#0074c2] hover:bg-[#00598a]"
+                className="w-full bg-gradient-to-r from-[#10b981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white"
                 disabled={isLoading}
               >
                 {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
@@ -116,15 +222,6 @@ export function LoginForm({
               </div>
             </div>
           </form>
-          <div className="bg-muted relative hidden md:block">
-            <Image
-              src={bgLogin}
-              alt="Image"
-              fill
-              priority
-              className="object-cover dark:brightness-[0.2] dark:grayscale"
-            />
-          </div>
         </CardContent>
       </Card>
     </div>

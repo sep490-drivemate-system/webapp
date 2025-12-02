@@ -33,6 +33,7 @@ import {
   IconNavigation,
   IconNews,
   IconPackage,
+  IconSettings,
   IconUserCog,
   IconUsers,
   IconUsersGroup,
