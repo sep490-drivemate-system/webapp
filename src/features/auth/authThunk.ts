@@ -23,21 +23,6 @@ export const signIn = createThunk<ISignInResponse, ISignInRequest>(
   }
 );
 
-export const signOut = createThunk<void, { refreshToken: string }>(
-  HttpMethod.POST,
-  `signout`,
-  `${AUTH_PATH}/signout`,
-  {
-    onSuccess: () => {
-      // Clear tokens from localStorage after successful logout
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-      }
-    },
-  }
-);
-
 export const signUp = createThunk<ISignUpResponse, ISignUpRequest>(
   HttpMethod.POST,
   `signup`,

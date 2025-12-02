@@ -3,12 +3,16 @@
 import { ReactNode } from "react";
 import { AppSidebar } from "@/components/commons/dashboard/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { useRequireAuth } from "@/hooks/auth/useRequireAuth";
+import { UserRole } from "@/types/auth/user-role.enum";
 
 interface InstructorLayoutProps {
   children: ReactNode;
 }
 
 export default function InstructorLayout({ children }: InstructorLayoutProps) {
+  useRequireAuth([UserRole.Instructor]);
+
   return (
     <SidebarProvider
       style={

@@ -1,60 +1,44 @@
 "use client";
 
-import * as React from "react";
-import {
-  IconBell,
-  IconCalendar,
-  IconCamera,
-  IconChartBar,
-  IconDashboard,
-  IconDatabase,
-  IconFile,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconFolder,
-  IconHelp,
-  IconHistory,
-  IconHotelService,
-  IconInnerShadowTop,
-  IconKey,
-  IconListDetails,
-  IconNavigation,
-  IconNews,
-  IconReport,
-  IconRulerMeasure,
-  IconRulerOff,
-  IconSearch,
-  IconServicemark,
-  IconSettings,
-  IconShieldLock,
-  IconStar,
-  IconStarFilled,
-  IconUsers,
-} from "@tabler/icons-react";
-import { IconUserCog } from "@tabler/icons-react";
-import { IconPackage } from "@tabler/icons-react";
-import { IconArticle } from "@tabler/icons-react";
-import { IconBook } from "@tabler/icons-react";
-import { IconUsersGroup } from "@tabler/icons-react";
-import { IconCar } from "@tabler/icons-react";
 import { NavDocuments } from "@/components/commons/dashboard/nav-documents";
-import { NavMain } from "@/components/commons/dashboard/nav-main";
 import { NavInstructor } from "@/components/commons/dashboard/nav-instructor";
+import { NavMain } from "@/components/commons/dashboard/nav-main";
 import { NavUser } from "@/components/commons/dashboard/nav-user";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useAppSelector } from "@/lib/redux/useAppDispatch";
+import { UserRole } from "@/types/auth/user-role.enum";
+import {
+  IconArticle,
+  IconBell,
+  IconCalendar,
+  IconCamera,
+  IconCar,
+  IconChartBar,
+  IconDashboard,
+  IconFile,
+  IconFileAi,
+  IconFileDescription,
+  IconHistory,
+  IconKey,
+  IconNavigation,
+  IconNews,
+  IconPackage,
+  IconUserCog,
+  IconUsers,
+  IconUsersGroup,
+} from "@tabler/icons-react";
 import Link from "next/link";
+import * as React from "react";
 
 const data = {
   user: {
@@ -206,6 +190,8 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { role } = useAppSelector((state) => state.auth);
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -226,23 +212,27 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <NavMain items={data.navMain} />
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <NavDocuments items={data.documents} />
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <NavInstructor items={data.navInstructor} />
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {role === UserRole.Admin && (
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <NavMain items={data.navMain} />
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+        {role === UserRole.Inspector && (
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <NavDocuments items={data.documents} />
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+        {role === UserRole.Instructor && (
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <NavInstructor items={data.navInstructor} />
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
