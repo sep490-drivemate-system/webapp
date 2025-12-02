@@ -186,7 +186,7 @@ export default function ManagementPolicyPage() {
     <div className="flex flex-1 flex-col space-y-6">
       {/* Header */}
       <PageHeader
-        title="Quản Lý Chính sách"
+        title="Quản Lý Cài Đặt Hệ Thống"
         description="Quản lý các chính sách và điều khoản với các tham số có thể điều chỉnh"
       />
 

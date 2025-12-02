@@ -22,6 +22,9 @@ import Link from "next/link";
 import Image from "next/image";
 import blogsData from "@/data/mock-blogs.json";
 import { getPreviewFromContent, stripHtmlTags } from "@/lib/text-utils";
+import { PageSectionHeader } from "@/components/commons/page-section-header";
+import { SearchBar } from "@/components/commons/search-bar";
+import { PaginationControls } from "@/components/commons/pagination-controls";
 
 interface Blog {
   id: string;
@@ -99,28 +102,19 @@ export default function BlogsPage() {
     <div className="pt-24 pb-12 lg:pt-32 lg:pb-16 bg-gradient-to-br from-blue-50 via-white to-blue-50 min-h-screen">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">Bài viết</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Tìm kiếm cẩm nang học lái xe mới nhất từ đội ngũ huấn luyện viên của
-            DriveMate.
-          </p>
-        </div>
+        <PageSectionHeader
+          title="Bài viết"
+          description="Tìm kiếm cẩm nang học lái xe mới nhất từ đội ngũ huấn luyện viên của DriveMate."
+        />
         {/* Search */}
-        <div className="mb-10">
-          <div className="relative mx-auto max-w-2xl">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
-            <Input
-              value={searchQuery}
-              onChange={(event) => {
-                setSearchQuery(event.target.value);
-                setCurrentPage(1);
-              }}
-              placeholder="Tìm bài viết theo tiêu đề hoặc nội dung…"
-              className="pl-10 h-11 bg-white/80 backdrop-blur-sm"
-            />
-          </div>
-        </div>
+        <SearchBar
+          value={searchQuery}
+          onChange={(value) => {
+            setSearchQuery(value);
+            setCurrentPage(1);
+          }}
+          placeholder="Tìm bài viết theo tiêu đề hoặc nội dung…"
+        />
 
         {/* Blog Grid */}
         <div className="mb-8">
@@ -224,45 +218,11 @@ export default function BlogsPage() {
 
         {/* Pagination */}
         {filteredBlogs.length > ITEMS_PER_PAGE && (
-          <div className="flex justify-center gap-2 flex-wrap">
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Trước
-            </Button>
-            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-              let page;
-              if (totalPages <= 5) {
-                page = i + 1;
-              } else if (currentPage <= 3) {
-                page = i + 1;
-              } else if (currentPage >= totalPages - 2) {
-                page = totalPages - 4 + i;
-              } else {
-                page = currentPage - 2 + i;
-              }
-              return (
-                <Button
-                  key={page}
-                  variant={currentPage === page ? "outline" : "ghost"}
-                  onClick={() => setCurrentPage(page)}
-                >
-                  {page}
-                </Button>
-              );
-            })}
-            <Button
-              variant="outline"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-            >
-              Sau
-            </Button>
-          </div>
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
         )}
       </div>
     </div>

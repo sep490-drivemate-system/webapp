@@ -1,10 +1,16 @@
 "use client";
 
-import Link from "next/link";
-import { useState, useRef, useEffect } from "react";
-import { usePathname } from "next/navigation";
-import { User } from "lucide-react";
+import {
+  CalendarClock,
+  CircleUser,
+  LogIn,
+  UserRound,
+  UserRoundPlus,
+} from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 const MAIN_MENU = [
   { path: "/", label: "Trang chủ" },
@@ -12,22 +18,22 @@ const MAIN_MENU = [
   { path: "/instructors", label: "Người hướng dẫn" },
   { path: "/cars", label: "Xe tập" },
   { path: "/blogs", label: "Bài viết" },
+  { path: "/terms-and-sersvices", label: "Điều khoản và dịch vụ" },
+  { path: "/", label: "Về chúng tôi" },
 ];
 
-function Logo({
-  sizeClass = "h-12 w-12 sm:h-14 sm:w-14",
-}: {
-  sizeClass?: string;
-}) {
+function Logo({ sizeClass = "h-16 w-16" }: { sizeClass?: string }) {
   return (
-    <Link href="/" className="flex items-center shrink-0">
-      <div className={`relative ${sizeClass}`}>
+    <Link href="/" className={`flex items-center shrink-0`}>
+      <div className={`relative left-10 ${sizeClass}`}>
         <Image
           src="/logo.png"
           alt="DriveMate Logo"
-          fill
+          objectFit="cover"
+          width={200}
+          height={200}
           priority
-          className="object-contain"
+          className="scale-200"
         />
       </div>
     </Link>
@@ -55,10 +61,10 @@ function NavMenu({
             <li key={item.path} className="relative">
               <Link
                 href={item.path}
-                className={`group inline-flex h-9 w-max items-center justify-center rounded-md px-3 sm:px-4 py-2 text-sm font-medium transition-colors ${
+                className={`group inline-flex h-9 w-max items-center justify-center rounded-md px-3 sm:px-4 py-2 text-sm font-medium transition-all ${
                   activePath === item.path
-                    ? "bg-[#1AD562] text-white dark:bg-[#1AD562]"
-                    : "hover:bg-[#1AD562] hover:text-white dark:hover:bg-[#1AD562]"
+                    ? "bg-gradient-to-r from-[#10b981] to-[#059669] text-white shadow-lg hover:shadow-xl hover:from-[#059669] hover:to-[#047857] active:scale-95"
+                    : "hover:bg-gradient-to-r hover:from-[#10b981] hover:to-[#059669] hover:text-white hover:shadow-lg active:scale-95"
                 }`}
               >
                 {item.label}
@@ -92,45 +98,53 @@ function UserDropdown() {
   }, [open]);
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative right-5" ref={ref}>
       <button
-        className="h-8 sm:h-10 rounded-md flex items-center justify-center hover:bg-gray-100 transition-colors"
+        className={`h-10 w-10 rounded-full flex items-center justify-center transition-all duration-150 ${
+          open
+            ? "bg-gradient-to-r from-[#10b981] to-[#059669] text-white shadow-lg hover:shadow-xl hover:from-[#059669] hover:to-[#047857] active:scale-95"
+            : "hover:bg-gradient-to-r hover:from-[#10b981] hover:to-[#059669] hover:text-white hover:shadow-lg active:scale-95"
+        }`}
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="true"
         aria-expanded={open}
       >
-        <User className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 hover:text-shadow-black transition-colors" />
+        <CircleUser className="w-5 h-5 sm:w-6 sm:h-6 transition-colors duration-50" />
       </button>
       {open && (
         <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border">
           <Link
             href="/profile"
-            className="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
+            className="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
             onClick={() => setOpen(false)}
           >
-            Hồ sơ cá nhân
+            <UserRound className="h-4 w-4 text-gray-500" />
+            <span className="flex-1 text-left">Hồ sơ cá nhân</span>
           </Link>
           <Link
             href="/bookings"
-            className="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
+            className="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
             onClick={() => setOpen(false)}
           >
-            Lịch sử đặt
+            <CalendarClock className="h-4 w-4 text-gray-500" />
+            <span className="flex-1 text-left">Lịch sử đặt</span>
           </Link>
           <div className="border-t my-1"></div>
           <Link
             href="/signin"
-            className="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
+            className="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
             onClick={() => setOpen(false)}
           >
-            Đăng nhập
+            <LogIn className="h-4 w-4 text-gray-500" />
+            <span className="flex-1 text-left">Đăng nhập</span>
           </Link>
           <Link
             href="/signup"
-            className="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
+            className="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
             onClick={() => setOpen(false)}
           >
-            Đăng ký
+            <UserRoundPlus className="h-4 w-4 text-gray-500" />
+            <span className="flex-1 text-left">Đăng ký</span>
           </Link>
         </div>
       )}

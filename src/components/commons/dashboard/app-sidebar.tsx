@@ -89,7 +89,7 @@ const data = {
       icon: IconKey,
     },
     {
-      title: "Quản lý chính sách",
+      title: "Quản lý cài đặt hệ thống",
       url: "/management-policy",
       icon: IconSettings,
     },
