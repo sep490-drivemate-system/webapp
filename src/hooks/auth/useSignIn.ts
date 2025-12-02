@@ -27,7 +27,7 @@ export const useSignIn = () => {
         if (res.ok) {
             dispatch(resetSignInData());
             const role = getUserRole();
-            if (role === UserRole.Admin) router.push("/dashboard");
+            if (role === UserRole.Admin) router.push("/dashboards");
             else if (role === UserRole.Inspector) router.push("/instructor-management");
             else router.push("/");
         }

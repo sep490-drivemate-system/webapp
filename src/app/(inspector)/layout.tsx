@@ -4,12 +4,16 @@ import { CSSProperties, ReactNode } from "react";
 
 import { AppSidebar } from "@/components/commons/dashboard/app-sidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { UserRole } from "@/types/auth/user-role.enum";
+import { useRequireAuth } from "@/hooks/auth/useRequireAuth";
 
 interface InspectorLayoutProps {
   children: ReactNode;
 }
 
 export default function InspectorLayout({ children }: InspectorLayoutProps) {
+  useRequireAuth([UserRole.Inspector]);
+
   return (
     <SidebarProvider
       style={
