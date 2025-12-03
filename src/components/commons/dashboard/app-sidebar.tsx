@@ -35,7 +35,6 @@ import {
   IconPackage,
   IconSettings,
   IconUserCog,
-  IconUsers,
   IconUsersGroup,
 } from "@tabler/icons-react";
 import Link from "next/link";

@@ -1,24 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import {
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-} from "recharts";
+import PageHeader from "@/components/commons/Header/header";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -26,15 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
@@ -43,86 +19,58 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  TrendingUp,
-  Users,
-  Zap,
-  Star,
-  StarIcon,
-  Car,
-  MapPin,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useStatistic } from "@/hooks/admin/useStatistic";
+import {
+  IBookingStatistic,
+  ITransactionStatistic,
+  IUserStatistic,
+} from "@/types/statistic/statistic.type";
+import {
   Calendar,
-  XCircle,
-  Filter,
   ChevronDown,
-  CreditCard,
-  UserCheck,
-  UserCog,
-  DollarSign,
-  Wallet,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  GraduationCap,
+  CreditCard,
+  DollarSign,
+  Filter,
+  Star,
+  StarIcon,
+  TrendingUp,
+  UserCheck,
+  UserCog,
   UserPlus,
+  Users,
+  Wallet,
+  XCircle,
+  Zap,
 } from "lucide-react";
-import { useRequireAuth } from "@/hooks/auth/useRequireAuth";
-import { UserRole } from "@/types/auth/user-role.enum";
-import PageHeader from "@/components/commons/Header/header";
-
-const userStats = [
-  { label: "Tổng người dùng", value: 2543, change: "+12.5%" },
-  { label: "Người kiểm duyệt", value: 34, change: "+2.1%" },
-  { label: "Người hướng dẫn", value: 892, change: "+8.2%" },
-  { label: "Người lái mới", value: 1617, change: "+15.3%" },
-];
-
-const financialStats = [
-  {
-    label: "Tổng doanh thu",
-    value: "542,350 VNĐ",
-    change: "+15.3%",
-    color: "up",
-  },
-  {
-    label: "Tổng chi trả người hướng dẫn",
-    value: "$387,240",
-    change: "+12.8%",
-    color: "up",
-  },
-  {
-    label: "Tổng hoa hồng của hệ thống",
-    value: "$155,110",
-    change: "+18.2%",
-    color: "neutral",
-  },
-  {
-    label: "Tổng tiền tạm giữ",
-    value: "$48,920",
-    change: "-5.2%",
-    color: "down",
-  },
-] as const;
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 const activityData = [
   { name: "Hoàn thành", value: 68, color: "#10b981" },
   { name: "Hủy bỏ", value: 18, color: "#ef4444" },
   { name: "Dời lịch", value: 14, color: "#f59e0b" },
-];
-
-const revenueData = [
-  { month: "Th1", revenue: 45000, commission: 13500 },
-  { month: "Th2", revenue: 52000, commission: 15600 },
-  { month: "Th3", revenue: 48000, commission: 14400 },
-  { month: "Th4", revenue: 61000, commission: 18300 },
-  { month: "Th5", revenue: 55000, commission: 16500 },
-  { month: "Th6", revenue: 71000, commission: 21300 },
-  { month: "Th7", revenue: 68000, commission: 20400 },
-  { month: "Th8", revenue: 75000, commission: 22500 },
-  { month: "Th9", revenue: 72000, commission: 21600 },
-  { month: "Th10", revenue: 80000, commission: 24000 },
-  { month: "Th11", revenue: 78000, commission: 23400 },
-  { month: "Th12", revenue: 85000, commission: 25500 },
 ];
 
 const topPackages = [
@@ -182,21 +130,6 @@ const cancelRefundData = [
   },
 ];
 
-// Mock data for booking time (when sessions are booked)
-const bookingTimeData = [
-  { month: "Th1", bookingCount: 145 },
-  { month: "Th2", bookingCount: 167 },
-  { month: "Th3", bookingCount: 189 },
-  { month: "Th4", bookingCount: 201 },
-  { month: "Th5", bookingCount: 234 },
-  { month: "Th6", bookingCount: 298 },
-  { month: "Th7", bookingCount: 267 },
-  { month: "Th8", bookingCount: 312 },
-  { month: "Th9", bookingCount: 289 },
-  { month: "Th10", bookingCount: 334 },
-  { month: "Th11", bookingCount: 298 },
-  { month: "Th12", bookingCount: 356 },
-];
 
 // Mock data for session execution time (actual session duration)
 const sessionExecutionData = [
@@ -301,30 +234,25 @@ const transactionHistoryData = [
   },
 ];
 
-type TimeRange = "week" | "month" | "year";
-
-const changeClassMap: Record<(typeof financialStats)[number]["color"], string> =
-  {
-    up: "text-emerald-500",
-    neutral: "text-blue-500",
-    down: "text-destructive",
-  };
-
-// Helper function to determine color based on change percentage
-const getChangeColor = (change: string): "up" | "down" | "neutral" => {
-  const changeValue = parseFloat(change.replace(/[+%]/g, ""));
-  if (changeValue > 0) return "up";
-  if (changeValue < 0) return "down";
-  return "neutral";
-};
-
 function AdminDashboard() {
   const [viewMode, setViewMode] = useState<"year" | "month" | "week">("month");
-  const [timeRange, setTimeRange] = useState("month");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-
+  const {
+    getUserStatisticData,
+    getUserStatisticLoading,
+    getTransactionStatisticData,
+    getTransactionStatisticLoading,
+    getBookingStatisticData,
+    getBookingStatisticLoading,
+  } = useStatistic();
+  const [userStatisticData, setUserStatisticData] =
+    useState<IUserStatistic | null>(null);
+  const [transactionStatisticData, setTransactionStatisticData] =
+    useState<ITransactionStatistic | null>(null);
+  const [bookingStatisticData, setBookingStatisticData] =
+    useState<IBookingStatistic | null>(null);
   // Get current date dynamically
   const now = new Date();
   const [selectedYear, setSelectedYear] = useState(now.getFullYear());
@@ -342,6 +270,18 @@ function AdminDashboard() {
   };
 
   const [selectedWeek, setSelectedWeek] = useState(
+    getCurrentWeekOfMonth(now.getFullYear(), now.getMonth() + 1, now.getDate())
+  );
+
+  // Temporary states for filter (only applied when user clicks "Áp dụng")
+  const [tempViewMode, setTempViewMode] = useState<"year" | "month" | "week">(
+    "month"
+  );
+  const [tempSelectedYear, setTempSelectedYear] = useState(now.getFullYear());
+  const [tempSelectedMonth, setTempSelectedMonth] = useState(
+    now.getMonth() + 1
+  );
+  const [tempSelectedWeek, setTempSelectedWeek] = useState(
     getCurrentWeekOfMonth(now.getFullYear(), now.getMonth() + 1, now.getDate())
   );
 
@@ -410,149 +350,143 @@ function AdminDashboard() {
   // Use viewMode as the current time range
   const currentTimeRange = viewMode;
 
-  // Generate filtered data based on timeRange
+  // Generate filtered data based on timeRange and API data
   const filteredRevenueData = useMemo(() => {
+    // Get API data
+    const earningGraph = transactionStatisticData?.earning_graph ?? {};
+    const profitGraph = transactionStatisticData?.profit_graph ?? {};
+
+    // Helper function to get value from graph, default to 0 if not found
+    const getValue = (graph: { [key: string]: number }, key: string): number => {
+      const value = graph[key];
+      if (
+        value !== undefined &&
+        value !== null &&
+        typeof value === "number" &&
+        !isNaN(value)
+      ) {
+        return value;
+      }
+      return 0;
+    };
+
+    // Generate all keys based on currentTimeRange
+    let allKeys: string[] = [];
+    let labelFormatter: (key: string) => string = (key) => key;
+
     switch (currentTimeRange) {
       case "week": {
-        // Show 7 days of the selected week
-        return Array.from({ length: 7 }, (_, i) => {
-          const day = i + 1;
-          const baseRevenue = 8000 + (day % 3) * 2000;
-          const revenue = baseRevenue + Math.random() * 3000;
-          const commission = revenue * 0.3;
-          return {
-            month: `T${day + 1}`,
-            revenue: Math.round(revenue),
-            commission: Math.round(commission),
-          };
-        });
+        // Show 7 days of the week (keys: "1", "2", ..., "7")
+        allKeys = Array.from({ length: 7 }, (_, i) => String(i + 1));
+        labelFormatter = (key) => {
+          const numKey = parseInt(key);
+          return !isNaN(numKey) ? `T${numKey + 1}` : key;
+        };
+        break;
       }
       case "month": {
-        // Show days in selected month
+        // Show all days in selected month (keys: "1", "2", ..., "31")
         const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
-        return Array.from({ length: Math.min(daysInMonth, 30) }, (_, i) => {
-          const day = i + 1;
-          const baseRevenue = 2000 + (day % 7) * 500;
-          const revenue = baseRevenue * (15 + Math.random() * 10);
-          const commission = revenue * 0.3;
-          return {
-            month: `${day}`,
-            revenue: Math.round(revenue),
-            commission: Math.round(commission),
-          };
-        });
+        allKeys = Array.from({ length: daysInMonth }, (_, i) => String(i + 1));
+        labelFormatter = (key) => key; // Just show the day number
+        break;
       }
       case "year": {
-        // Show 12 months of selected year
-        return Array.from({ length: 12 }, (_, i) => {
-          const monthIndex = i;
-          // Use existing revenueData if available for current year, otherwise generate
-          if (
-            selectedYear === new Date().getFullYear() &&
-            i < revenueData.length
-          ) {
-            return revenueData[i];
-          }
-          const baseRevenue = 50000 + (monthIndex % 6) * 5000;
-          const revenue = baseRevenue + Math.random() * 15000;
-          return {
-            month: `T${monthIndex + 1}`,
-            revenue: Math.round(revenue),
-            commission: Math.round(revenue * 0.3),
-          };
-        });
+        // Show 12 months (keys: "1", "2", ..., "12")
+        allKeys = Array.from({ length: 12 }, (_, i) => String(i + 1));
+        labelFormatter = (key) => {
+          const numKey = parseInt(key);
+          return !isNaN(numKey) ? `Th${numKey}` : key;
+        };
+        break;
       }
-      default:
-        return revenueData;
+      default: {
+        // Fallback: use keys from API if available, otherwise empty
+        allKeys = Array.from(
+          new Set([...Object.keys(earningGraph), ...Object.keys(profitGraph)])
+        ).sort((a, b) => {
+          const numA = parseInt(a);
+          const numB = parseInt(b);
+          if (!isNaN(numA) && !isNaN(numB)) {
+            return numA - numB;
+          }
+          return a.localeCompare(b);
+        });
+        labelFormatter = (key) => key;
+      }
     }
-  }, [viewMode, selectedYear, selectedMonth, selectedWeek]);
 
-  // Filter user stats based on timeRange
+    // Map all keys to chart data, using API data if available, otherwise 0
+    return allKeys.map((key) => ({
+      month: labelFormatter(key),
+      revenue: getValue(earningGraph, key),
+      commission: getValue(profitGraph, key),
+    }));
+  }, [
+    viewMode,
+    selectedYear,
+    selectedMonth,
+    selectedWeek,
+    transactionStatisticData,
+    currentTimeRange,
+  ]);
+
+  // Filter user stats based on timeRange and API data
   const filteredUserStats = useMemo(() => {
-    const baseValue =
-      currentTimeRange === "week"
-        ? 50
-        : currentTimeRange === "month"
-        ? 200
-        : 3000;
-    const multiplier =
-      currentTimeRange === "week" ? 7 : currentTimeRange === "month" ? 30 : 365;
+    const stats = [
+      {
+        label: "Tổng người dùng",
+        value:
+          (userStatisticData?.totalInspectorCount ?? 0) +
+          (userStatisticData?.totalInstructorCount ?? 0) +
+          (userStatisticData?.totalDriverCount ?? 0),
+      },
+      {
+        label: "Người kiểm duyệt",
+        value: userStatisticData?.totalInspectorCount ?? 0,
+      },
+      {
+        label: "Người hướng dẫn",
+        value: userStatisticData?.totalInstructorCount ?? 0,
+      },
+      {
+        label: "Người lái mới",
+        value: userStatisticData?.totalDriverCount ?? 0,
+      },
+    ];
 
-    return userStats.map((stat, index) => {
-      const variation = (index % 4) * 0.1;
-      const value = Math.round(baseValue * (1 + variation));
-      const change =
-        index === 0
-          ? currentTimeRange === "week"
-            ? "+8.2%"
-            : currentTimeRange === "month"
-            ? "+12.5%"
-            : "+18.3%"
-          : index === 1
-          ? currentTimeRange === "week"
-            ? "+1.5%"
-            : currentTimeRange === "month"
-            ? "+2.1%"
-            : "+3.2%"
-          : index === 2
-          ? currentTimeRange === "week"
-            ? "+6.5%"
-            : currentTimeRange === "month"
-            ? "+8.2%"
-            : "+12.1%"
-          : currentTimeRange === "week"
-          ? "+10.2%"
-          : currentTimeRange === "month"
-          ? "+15.3%"
-          : "+20.5%";
-      const color = getChangeColor(change);
-      return {
-        ...stat,
-        value,
-        change,
-        color,
-      };
-    });
-  }, [timeRange]);
+    return stats;
+  }, [userStatisticData, currentTimeRange]);
 
-  // Filter financial stats based on timeRange
+  // Filter financial stats based on API data
   const filteredFinancialStats = useMemo(() => {
-    const baseMultiplier =
-      currentTimeRange === "week"
-        ? 0.25
-        : currentTimeRange === "month"
-        ? 1
-        : 12;
+    const stats = [
+      {
+        label: "Tổng doanh thu",
+        value: transactionStatisticData?.earning ?? 0,
+      },
+      {
+        label: "Tổng chi trả người hướng dẫn",
+        value: transactionStatisticData?.instructors_payment ?? 0,
+      },
+      {
+        label: "Tổng hoa hồng của hệ thống",
+        value: transactionStatisticData?.profit ?? 0,
+      },
+      {
+        label: "Tổng tiền tạm giữ",
+        value: transactionStatisticData?.holding ?? 0,
+      },
+    ];
 
-    return financialStats.map((stat) => {
-      const baseValue =
-        stat.label === "Tổng doanh thu"
-          ? 542350
-          : stat.label === "Tổng chi trả người hướng dẫn"
-          ? 387240
-          : stat.label === "Tổng hoa hồng của hệ thống"
-          ? 155110
-          : 48920;
-      const multiplier =
-        baseMultiplier *
-        (stat.label === "Tổng doanh thu"
-          ? 1
-          : stat.label === "Tổng chi trả người hướng dẫn"
-          ? 0.7
-          : stat.label === "Tổng hoa hồng của hệ thống"
-          ? 0.3
-          : 0.1);
-      const value = Math.round(baseValue * multiplier);
-      const formattedValue = value.toLocaleString("vi-VN") + " VNĐ";
-      const color = getChangeColor(stat.change);
-
+    return stats.map((stat) => {
+      const formattedValue = stat.value.toLocaleString("vi-VN") + " VNĐ";
       return {
         ...stat,
         value: formattedValue,
-        color,
       };
     });
-  }, [viewMode]);
+  }, [transactionStatisticData]);
 
   // Filter activity data based on timeRange (percentages remain the same)
   const filteredActivityData = useMemo(() => {
@@ -640,6 +574,251 @@ function AdminDashboard() {
     }
   };
 
+  // Fetch user statistic data when filters change
+  useEffect(() => {
+    const fetchUserStatisticData = async () => {
+      let params: {
+        type: number;
+        year?: number;
+        month?: number;
+        week?: number;
+      } = {
+        type: 0,
+      };
+
+      // Map viewMode to type: week = 0, month = 1, year = 2
+      if (viewMode === "week") {
+        params = {
+          type: 0,
+          year: selectedYear,
+          month: selectedMonth,
+          week: selectedWeek,
+        };
+      } else if (viewMode === "month") {
+        params = {
+          type: 1,
+          year: selectedYear,
+          month: selectedMonth,
+        };
+      } else if (viewMode === "year") {
+        params = {
+          type: 2,
+          year: selectedYear,
+        };
+      }
+
+      console.log("[Dashboard] Fetching user statistic with params:", params);
+      console.log("[Dashboard] Current state:", {
+        viewMode,
+        selectedYear,
+        selectedMonth,
+        selectedWeek,
+      });
+
+      const data = await getUserStatisticData(params);
+      console.log("[Dashboard] API response:", data);
+
+      if (data) {
+        console.log("[Dashboard] Setting user statistic data:", data);
+        setUserStatisticData(data);
+      } else {
+        console.warn("[Dashboard] No data returned from API");
+      }
+    };
+
+    fetchUserStatisticData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewMode, selectedYear, selectedMonth, selectedWeek]);
+
+  useEffect(() => {
+    const fetchTransactionStatisticData = async () => {
+      let params: {
+        type: number;
+        year?: number;
+        month?: number;
+        week?: number;
+      } = {
+        type: 0,
+      };
+
+      if (viewMode === "week") {
+        params = {
+          type: 0,
+          year: selectedYear,
+          month: selectedMonth,
+          week: selectedWeek,
+        };
+      } else if (viewMode === "month") {
+        params = {
+          type: 1,
+          year: selectedYear,
+          month: selectedMonth,
+        };
+      } else if (viewMode === "year") {
+        params = {
+          type: 2,
+          year: selectedYear,
+        };
+      }
+
+      console.log(
+        "[Dashboard] Fetching transaction statistic with params:",
+        params
+      );
+      console.log("[Dashboard] Current state:", {
+        viewMode,
+        selectedYear,
+        selectedMonth,
+        selectedWeek,
+      });
+
+      const data = await getTransactionStatisticData(params);
+      console.log("[Dashboard] API response:", data);
+
+      if (data) {
+        console.log("[Dashboard] Setting transaction statistic data:", data);
+        setTransactionStatisticData(data);
+      } else {
+        console.warn("[Dashboard] No data returned from API");
+      }
+    };
+
+    fetchTransactionStatisticData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewMode, selectedYear, selectedMonth, selectedWeek]);
+
+  useEffect(() => {
+    const fetchBookingStatisticData = async () => {
+      let params: {
+        type: number;
+        year?: number;
+        month?: number;
+        week?: number;
+      } = {
+        type: 0,
+      };
+
+      if (viewMode === "week") {
+        params = {
+          type: 0,
+          year: selectedYear,
+          month: selectedMonth,
+          week: selectedWeek,
+        };
+      } else if (viewMode === "month") {
+        params = {
+          type: 1,
+          year: selectedYear,
+          month: selectedMonth,
+        };
+      } else if (viewMode === "year") {
+        params = {
+          type: 2,
+          year: selectedYear,
+        };
+      }
+
+      console.log(
+        "[Dashboard] Fetching booking statistic with params:",
+        params
+      );
+      console.log("[Dashboard] Current state:", {
+        viewMode,
+        selectedYear,
+        selectedMonth,
+        selectedWeek,
+      });
+
+      const data = await getBookingStatisticData(params);
+      console.log("[Dashboard] API response:", data);
+
+      if (data) {
+        console.log("[Dashboard] Setting booking statistic data:", data);
+        setBookingStatisticData(data);
+      } else {
+        console.warn("[Dashboard] No data returned from API");
+      }
+    };
+
+    fetchBookingStatisticData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewMode, selectedYear, selectedMonth, selectedWeek]);
+
+  // Generate booking time data from API
+  const bookingTimeData = useMemo(() => {
+    const bookingCountByDay = bookingStatisticData?.booking_count_by_day ?? {};
+
+    // Helper function to get value from graph, default to 0 if not found
+    const getValue = (graph: { [key: string]: number }, key: string): number => {
+      const value = graph[key];
+      if (
+        value !== undefined &&
+        value !== null &&
+        typeof value === "number" &&
+        !isNaN(value)
+      ) {
+        return value;
+      }
+      return 0;
+    };
+
+    // Generate all keys based on currentTimeRange
+    let allKeys: string[] = [];
+    let labelFormatter: (key: string) => string = (key) => key;
+
+    switch (currentTimeRange) {
+      case "week": {
+        // Show 7 days of the week (keys: "1", "2", ..., "7")
+        allKeys = Array.from({ length: 7 }, (_, i) => String(i + 1));
+        labelFormatter = (key) => {
+          const numKey = parseInt(key);
+          return !isNaN(numKey) ? `T${numKey + 1}` : key;
+        };
+        break;
+      }
+      case "month": {
+        // Show all days in selected month (keys: "1", "2", ..., "31")
+        const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
+        allKeys = Array.from({ length: daysInMonth }, (_, i) => String(i + 1));
+        labelFormatter = (key) => key; // Just show the day number
+        break;
+      }
+      case "year": {
+        // Show 12 months (keys: "1", "2", ..., "12")
+        allKeys = Array.from({ length: 12 }, (_, i) => String(i + 1));
+        labelFormatter = (key) => {
+          const numKey = parseInt(key);
+          return !isNaN(numKey) ? `Th${numKey}` : key;
+        };
+        break;
+      }
+      default: {
+        // Fallback: use keys from API if available, otherwise empty
+        allKeys = Object.keys(bookingCountByDay).sort((a, b) => {
+          const numA = parseInt(a);
+          const numB = parseInt(b);
+          if (!isNaN(numA) && !isNaN(numB)) {
+            return numA - numB;
+          }
+          return a.localeCompare(b);
+        });
+        labelFormatter = (key) => key;
+      }
+    }
+
+    // Map all keys to chart data, using API data if available, otherwise 0
+    return allKeys.map((key) => ({
+      month: labelFormatter(key),
+      bookingCount: getValue(bookingCountByDay, key),
+    }));
+  }, [
+    bookingStatisticData,
+    currentTimeRange,
+    selectedYear,
+    selectedMonth,
+    selectedWeek,
+  ]);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="space-y-8">
@@ -661,10 +840,13 @@ function AdminDashboard() {
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  console.log(
-                    "Filter button clicked, current state:",
-                    isFilterOpen
-                  );
+                  // When opening filter, sync temp states with current states
+                  if (!isFilterOpen) {
+                    setTempViewMode(viewMode);
+                    setTempSelectedYear(selectedYear);
+                    setTempSelectedMonth(selectedMonth);
+                    setTempSelectedWeek(selectedWeek);
+                  }
                   setIsFilterOpen(!isFilterOpen);
                 }}
                 className="flex items-center gap-2"
@@ -694,9 +876,41 @@ function AdminDashboard() {
                         {(["year", "month", "week"] as const).map((mode) => (
                           <Button
                             key={mode}
-                            variant={viewMode === mode ? "default" : "outline"}
+                            variant={
+                              tempViewMode === mode ? "default" : "outline"
+                            }
                             size="sm"
-                            onClick={() => setViewMode(mode)}
+                            onClick={() => {
+                              setTempViewMode(mode);
+                              // Reset month/week when changing view mode
+                              if (mode === "year") {
+                                // No need to reset for year mode
+                              } else if (mode === "month") {
+                                // Reset week when switching to month mode
+                                const availableMonths =
+                                  getAvailableMonths(tempSelectedYear);
+                                const latestMonth =
+                                  availableMonths[availableMonths.length - 1] ||
+                                  1;
+                                setTempSelectedMonth(latestMonth);
+                              } else if (mode === "week") {
+                                // Reset week when switching to week mode
+                                const availableMonths =
+                                  getAvailableMonths(tempSelectedYear);
+                                const latestMonth =
+                                  availableMonths[availableMonths.length - 1] ||
+                                  1;
+                                setTempSelectedMonth(latestMonth);
+                                const availableWeeks = getAvailableWeeks(
+                                  tempSelectedYear,
+                                  latestMonth
+                                );
+                                const latestWeek =
+                                  availableWeeks[availableWeeks.length - 1] ||
+                                  1;
+                                setTempSelectedWeek(latestWeek);
+                              }
+                            }}
                             className="flex-1"
                           >
                             {mode === "year"
@@ -717,22 +931,22 @@ function AdminDashboard() {
                           Năm:
                         </label>
                         <select
-                          value={selectedYear}
+                          value={tempSelectedYear}
                           onChange={(e) => {
                             const newYear = Number(e.target.value);
-                            setSelectedYear(newYear);
+                            setTempSelectedYear(newYear);
 
                             // Reset month to latest available month for the selected year
-                            if (viewMode !== "year") {
+                            if (tempViewMode !== "year") {
                               const availableMonths =
                                 getAvailableMonths(newYear);
                               const latestMonth =
                                 availableMonths[availableMonths.length - 1] ||
                                 1;
-                              setSelectedMonth(latestMonth);
+                              setTempSelectedMonth(latestMonth);
 
                               // Reset week to latest available week for the selected month
-                              if (viewMode === "week") {
+                              if (tempViewMode === "week") {
                                 const availableWeeks = getAvailableWeeks(
                                   newYear,
                                   latestMonth
@@ -740,7 +954,7 @@ function AdminDashboard() {
                                 const latestWeek =
                                   availableWeeks[availableWeeks.length - 1] ||
                                   1;
-                                setSelectedWeek(latestWeek);
+                                setTempSelectedWeek(latestWeek);
                               }
                             }
                           }}
@@ -755,60 +969,64 @@ function AdminDashboard() {
                       </div>
 
                       {/* Month Selector - Show only if viewMode is month or week */}
-                      {(viewMode === "month" || viewMode === "week") && (
+                      {(tempViewMode === "month" ||
+                        tempViewMode === "week") && (
                         <div>
                           <label className="text-sm font-medium text-foreground mb-1 block">
                             Tháng:
                           </label>
                           <select
-                            value={selectedMonth}
+                            value={tempSelectedMonth}
                             onChange={(e) => {
                               const newMonth = Number(e.target.value);
-                              setSelectedMonth(newMonth);
+                              setTempSelectedMonth(newMonth);
 
                               // Reset week to latest available week for the selected month
-                              if (viewMode === "week") {
+                              if (tempViewMode === "week") {
                                 const availableWeeks = getAvailableWeeks(
-                                  selectedYear,
+                                  tempSelectedYear,
                                   newMonth
                                 );
                                 const latestWeek =
                                   availableWeeks[availableWeeks.length - 1] ||
                                   1;
-                                setSelectedWeek(latestWeek);
+                                setTempSelectedWeek(latestWeek);
                               }
                             }}
                             className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background"
                           >
-                            {getAvailableMonths(selectedYear).map((month) => (
-                              <option key={month} value={month}>
-                                {month}
-                              </option>
-                            ))}
+                            {getAvailableMonths(tempSelectedYear).map(
+                              (month) => (
+                                <option key={month} value={month}>
+                                  {month}
+                                </option>
+                              )
+                            )}
                           </select>
                         </div>
                       )}
 
                       {/* Week Selector - Show only if viewMode is week */}
-                      {viewMode === "week" && (
+                      {tempViewMode === "week" && (
                         <div>
                           <label className="text-sm font-medium text-foreground mb-1 block">
                             Tuần:
                           </label>
                           <select
-                            value={selectedWeek}
+                            value={tempSelectedWeek}
                             onChange={(e) =>
-                              setSelectedWeek(Number(e.target.value))
+                              setTempSelectedWeek(Number(e.target.value))
                             }
                             className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background"
                           >
-                            {getAvailableWeeks(selectedYear, selectedMonth).map(
-                              (week) => (
-                                <option key={week} value={week}>
-                                  {week}
-                                </option>
-                              )
-                            )}
+                            {getAvailableWeeks(
+                              tempSelectedYear,
+                              tempSelectedMonth
+                            ).map((week) => (
+                              <option key={week} value={week}>
+                                {week}
+                              </option>
+                            ))}
                           </select>
                         </div>
                       )}
@@ -819,14 +1037,29 @@ function AdminDashboard() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setIsFilterOpen(false)}
+                        onClick={() => {
+                          // Reset temp states to current states when closing
+                          setTempViewMode(viewMode);
+                          setTempSelectedYear(selectedYear);
+                          setTempSelectedMonth(selectedMonth);
+                          setTempSelectedWeek(selectedWeek);
+                          setIsFilterOpen(false);
+                        }}
                         className="flex-1"
                       >
                         Đóng
                       </Button>
                       <Button
                         size="sm"
-                        onClick={() => setIsFilterOpen(false)}
+                        onClick={() => {
+                          // Apply temp states to actual states
+                          setViewMode(tempViewMode);
+                          setSelectedYear(tempSelectedYear);
+                          setSelectedMonth(tempSelectedMonth);
+                          setSelectedWeek(tempSelectedWeek);
+                          setIsFilterOpen(false);
+                          // API will be called automatically via useEffect when states change
+                        }}
                         className="flex-1"
                       >
                         Áp dụng
@@ -862,43 +1095,44 @@ function AdminDashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                  {filteredUserStats.map((stat, index) => {
-                    const icons = [Users, UserCheck, UserCog, UserPlus];
-                    const accents = [
-                      "bg-blue-50 text-blue-600",
-                      "bg-purple-50 text-purple-600",
-                      "bg-sky-50 text-sky-600",
-                      "bg-emerald-50 text-emerald-600",
-                    ];
-                    const Icon = icons[index % icons.length];
-                    const accent = accents[index % accents.length];
-                    return (
-                      <Card key={stat.label} className="bg-card">
-                        <CardHeader className="flex flex-row items-start justify-between gap-4">
-                          <div className="space-y-1">
-                            <CardDescription className="text-sm font-medium text-muted-foreground">
-                              {stat.label}
-                            </CardDescription>
-                            <CardTitle className="text-2xl font-semibold">
-                              {stat.value}
-                            </CardTitle>
-                            <p
-                              className={`text-sm ${
-                                changeClassMap[stat.color]
-                              }`}
-                            >
-                              {stat.change}
-                            </p>
-                          </div>
-                          <span className={`rounded-xl p-3 ${accent}`}>
-                            <Icon className="size-5" />
-                          </span>
-                        </CardHeader>
-                      </Card>
-                    );
-                  })}
-                </div>
+                {getUserStatisticLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <p className="text-sm text-muted-foreground">
+                      Đang tải dữ liệu...
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    {filteredUserStats.map((stat, index) => {
+                      const icons = [Users, UserCheck, UserCog, UserPlus];
+                      const accents = [
+                        "bg-blue-50 text-blue-600",
+                        "bg-purple-50 text-purple-600",
+                        "bg-sky-50 text-sky-600",
+                        "bg-emerald-50 text-emerald-600",
+                      ];
+                      const Icon = icons[index % icons.length];
+                      const accent = accents[index % accents.length];
+                      return (
+                        <Card key={stat.label} className="bg-card">
+                          <CardHeader className="flex flex-row items-start justify-between gap-4">
+                            <div className="space-y-1">
+                              <CardDescription className="text-sm font-medium text-muted-foreground">
+                                {stat.label}
+                              </CardDescription>
+                              <CardTitle className="text-2xl font-semibold">
+                                {stat.value}
+                              </CardTitle>
+                            </div>
+                            <span className={`rounded-xl p-3 ${accent}`}>
+                              <Icon className="size-5" />
+                            </span>
+                          </CardHeader>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </section>
@@ -917,46 +1151,47 @@ function AdminDashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
-                  {filteredFinancialStats.map((stat, index) => {
-                    const icons = [TrendingUp, DollarSign, Wallet, CreditCard];
-                    const accents = [
-                      "bg-emerald-50 text-emerald-600",
-                      "bg-blue-50 text-blue-600",
-                      "bg-amber-50 text-amber-600",
-                      "bg-rose-50 text-rose-600",
-                    ];
-                    const Icon = icons[index % icons.length];
-                    const accent = accents[index % accents.length];
-                    return (
-                      <Card
-                        key={stat.label}
-                        className="flex h-full flex-col bg-card"
-                      >
-                        <CardHeader className="flex flex-row items-start justify-between gap-4">
-                          <div className="space-y-1">
-                            <CardDescription className="text-sm font-medium text-muted-foreground">
-                              {stat.label}
-                            </CardDescription>
-                            <CardTitle className="text-2xl font-semibold">
-                              {stat.value}
-                            </CardTitle>
-                            <p
-                              className={`text-sm ${
-                                changeClassMap[stat.color]
-                              }`}
-                            >
-                              {stat.change}
-                            </p>
-                          </div>
-                          <span className={`rounded-xl p-3 ${accent}`}>
-                            <Icon className="size-5" />
-                          </span>
-                        </CardHeader>
-                      </Card>
-                    );
-                  })}
-                </div>
+                {getTransactionStatisticLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <p className="text-sm text-muted-foreground">
+                      Đang tải dữ liệu...
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
+                    {filteredFinancialStats.map((stat, index) => {
+                      const icons = [TrendingUp, DollarSign, Wallet, CreditCard];
+                      const accents = [
+                        "bg-emerald-50 text-emerald-600",
+                        "bg-blue-50 text-blue-600",
+                        "bg-amber-50 text-amber-600",
+                        "bg-rose-50 text-rose-600",
+                      ];
+                      const Icon = icons[index % icons.length];
+                      const accent = accents[index % accents.length];
+                      return (
+                        <Card
+                          key={stat.label}
+                          className="flex h-full flex-col bg-card"
+                        >
+                          <CardHeader className="flex flex-row items-start justify-between gap-4">
+                            <div className="space-y-1">
+                              <CardDescription className="text-sm font-medium text-muted-foreground">
+                                {stat.label}
+                              </CardDescription>
+                              <CardTitle className="text-2xl font-semibold">
+                                {stat.value}
+                              </CardTitle>
+                            </div>
+                            <span className={`rounded-xl p-3 ${accent}`}>
+                              <Icon className="size-5" />
+                            </span>
+                          </CardHeader>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </section>
@@ -973,111 +1208,131 @@ function AdminDashboard() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="w-full overflow-x-auto">
-                <div
-                  style={{
-                    minWidth: Math.max(600, filteredRevenueData.length * 60),
-                  }}
-                >
-                  <ResponsiveContainer width="100%" height={400}>
-                    <AreaChart data={filteredRevenueData}>
-                      <defs>
-                        <linearGradient
-                          id="colorRevenue"
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
-                          <stop
-                            offset="5%"
-                            stopColor="#10b981"
-                            stopOpacity={0.8}
-                          />
-                          <stop
-                            offset="95%"
-                            stopColor="#10b981"
-                            stopOpacity={0.1}
-                          />
-                        </linearGradient>
-                        <linearGradient
-                          id="colorCommission"
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
-                          <stop
-                            offset="5%"
-                            stopColor="#3b82f6"
-                            stopOpacity={0.8}
-                          />
-                          <stop
-                            offset="95%"
-                            stopColor="#3b82f6"
-                            stopOpacity={0.1}
-                          />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        stroke="hsl(var(--border))"
-                      />
-                      <XAxis
-                        dataKey="month"
-                        stroke="hsl(var(--muted-foreground))"
-                        angle={-45}
-                        textAnchor="end"
-                        height={80}
-                      />
-                      <YAxis stroke="hsl(var(--muted-foreground))" />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "hsl(var(--card))",
-                          border: "1px solid hsl(var(--border))",
-                          color: "hsl(var(--foreground))",
-                        }}
-                      />
-                      <Legend />
-                      <Area
-                        type="monotone"
-                        dataKey="revenue"
-                        stroke="#10b981"
-                        fillOpacity={1}
-                        fill="url(#colorRevenue)"
-                        strokeWidth={2}
-                        name="Doanh Thu"
-                        dot={{
-                          fill: "#10b981",
-                          strokeWidth: 2,
-                          stroke: "#ffffff",
-                          r: 4,
-                        }}
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="commission"
-                        stroke="#3b82f6"
-                        fillOpacity={1}
-                        fill="url(#colorCommission)"
-                        strokeWidth={2}
-                        name="Lợi Nhuận"
-                        dot={{
-                          fill: "#3b82f6",
-                          strokeWidth: 2,
-                          stroke: "#ffffff",
-                          r: 4,
-                        }}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
+              {getTransactionStatisticLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <p className="text-sm text-muted-foreground">
+                    Đang tải dữ liệu...
+                  </p>
                 </div>
-              </div>
+              ) : (
+                <div className="w-full overflow-x-auto">
+                  <div
+                    style={{
+                      minWidth: Math.max(600, filteredRevenueData.length * 60),
+                    }}
+                  >
+                    <ResponsiveContainer width="100%" height={400}>
+                      <AreaChart data={filteredRevenueData}>
+                        <defs>
+                          <linearGradient
+                            id="colorRevenue"
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop
+                              offset="5%"
+                              stopColor="#10b981"
+                              stopOpacity={0.8}
+                            />
+                            <stop
+                              offset="95%"
+                              stopColor="#10b981"
+                              stopOpacity={0.1}
+                            />
+                          </linearGradient>
+                          <linearGradient
+                            id="colorCommission"
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop
+                              offset="5%"
+                              stopColor="#3b82f6"
+                              stopOpacity={0.8}
+                            />
+                            <stop
+                              offset="95%"
+                              stopColor="#3b82f6"
+                              stopOpacity={0.1}
+                            />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          stroke="hsl(var(--border))"
+                        />
+                        <XAxis
+                          dataKey="month"
+                          stroke="hsl(var(--muted-foreground))"
+                          angle={-45}
+                          textAnchor="end"
+                          height={80}
+                        />
+                        <YAxis stroke="hsl(var(--muted-foreground))" />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            color: "hsl(var(--foreground))",
+                          }}
+                          formatter={(value: number | string, name: string) => {
+                            const numValue =
+                              typeof value === "number"
+                                ? value
+                                : typeof value === "string"
+                                ? parseFloat(value)
+                                : 0;
+                            return [
+                              `${numValue.toLocaleString("vi-VN")} VNĐ`,
+                              name,
+                            ];
+                          }}
+                        />
+                        <Legend />
+                        <Area
+                          type="monotone"
+                          dataKey="revenue"
+                          stroke="#10b981"
+                          fillOpacity={1}
+                          fill="url(#colorRevenue)"
+                          strokeWidth={2}
+                          name="Doanh Thu"
+                          dot={{
+                            fill: "#10b981",
+                            strokeWidth: 2,
+                            stroke: "#ffffff",
+                            r: 4,
+                          }}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="commission"
+                          stroke="#3b82f6"
+                          fillOpacity={1}
+                          fill="url(#colorCommission)"
+                          strokeWidth={2}
+                          name="Lợi Nhuận"
+                          dot={{
+                            fill: "#3b82f6",
+                            strokeWidth: 2,
+                            stroke: "#ffffff",
+                            r: 4,
+                          }}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
           {/* 3 Cards Row */}
-          <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
             <Card className="bg-card">
               <CardHeader>
                 <div className="flex items-center gap-2">
@@ -1256,10 +1511,10 @@ function AdminDashboard() {
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </div> */}
 
           {/* 2 Charts Row */}
-          <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
+          {/* <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
             <Card className="bg-card">
               <CardHeader>
                 <div className="flex items-center gap-2">
@@ -1273,9 +1528,16 @@ function AdminDashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="w-full overflow-x-auto">
-                  <ResponsiveContainer width="100%" height={300}>
-                    <AreaChart data={bookingTimeData}>
+                {getBookingStatisticLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <p className="text-sm text-muted-foreground">
+                      Đang tải dữ liệu...
+                    </p>
+                  </div>
+                ) : (
+                  <div className="w-full overflow-x-auto">
+                    <ResponsiveContainer width="100%" height={300}>
+                      <AreaChart data={bookingTimeData}>
                       <defs>
                         <linearGradient
                           id="colorBooking"
@@ -1351,6 +1613,7 @@ function AdminDashboard() {
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
+                )}
               </CardContent>
             </Card>
 
@@ -1433,9 +1696,9 @@ function AdminDashboard() {
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </div> */}
 
-          <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
             <Card className="bg-card">
               <CardHeader>
                 <div className="flex items-center gap-2">
@@ -1562,10 +1825,10 @@ function AdminDashboard() {
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </div> */}
 
           {/* Lịch Sử Giao Dịch Hệ Thống */}
-          <section className="mt-8 rounded-3xl border bg-card p-6 shadow-sm">
+          {/* <section className="mt-8 rounded-3xl border bg-card p-6 shadow-sm">
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
@@ -1771,7 +2034,7 @@ function AdminDashboard() {
                 </div>
               </CardContent>
             </Card>
-          </section>
+          </section> */}
         </main>
       </div>
     </div>
