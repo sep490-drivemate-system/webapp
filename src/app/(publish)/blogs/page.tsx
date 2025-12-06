@@ -1,27 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import {
-  Search,
-  Clock,
-  Calendar,
-  User,
-  BookOpen,
-  ArrowRight,
-} from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
+import { BookOpen } from "lucide-react";
 import blogsData from "@/data/mock-blogs.json";
-import { getPreviewFromContent, stripHtmlTags } from "@/lib/text-utils";
+import { stripHtmlTags } from "@/lib/text-utils";
+import { BlogCard } from "@/components/blogs/blog-card";
 import { PageSectionHeader } from "@/components/commons/page-section-header";
 import { SearchBar } from "@/components/commons/search-bar";
 import { PaginationControls } from "@/components/commons/pagination-controls";
@@ -81,23 +66,6 @@ export default function BlogsPage() {
     startIndex + ITEMS_PER_PAGE
   );
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("vi-VN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
-  };
-
   return (
     <div className="pt-24 pb-12 lg:pt-32 lg:pb-16 bg-gradient-to-br from-blue-50 via-white to-blue-50 min-h-screen">
       <div className="container mx-auto px-4">
@@ -147,70 +115,18 @@ export default function BlogsPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {paginatedBlogs.map((blog) => (
-                <Card
+                <BlogCard
                   key={blog.id}
-                  className="overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full group p-0 gap-0"
-                >
-                  <div className="relative h-48 overflow-hidden">
-                    <Image
-                      src={blog.image}
-                      alt={blog.title}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-300"
-                      unoptimized
-                    />
-                  </div>
-
-                  <CardHeader className="flex-shrink-0">
-                    <h3 className="text-lg font-bold text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                      {blog.title}
-                    </h3>
-                  </CardHeader>
-
-                  <CardContent className="flex-1 flex flex-col space-y-4 pb-4">
-                    <p className="text-sm text-gray-600 line-clamp-3 flex-1">
-                      {getPreviewFromContent(blog.content, 120)}
-                    </p>
-                  </CardContent>
-
-                  <CardFooter className="pt-0 pb-4 px-6 flex items-center justify-between flex-shrink-0">
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={blog.author.avatar} />
-                        <AvatarFallback>
-                          {getInitials(blog.author.name)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="text-xs font-medium text-gray-900">
-                          {blog.author.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {formatDate(blog.publishedAt)}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 text-xs text-gray-500">
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5" />
-                        <span>{blog.readTime} phút đọc</span>
-                      </div>
-                      <div className="hidden md:flex items-center gap-1">
-                        <Calendar className="h-3.5 w-3.5" />
-                        <span>
-                          {new Date(blog.publishedAt).toLocaleDateString(
-                            "vi-VN"
-                          )}
-                        </span>
-                      </div>
-                    </div>
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link href={`/blogs/${blog.id}`}>
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
+                  id={blog.id}
+                  title={blog.title}
+                  content={blog.content}
+                  image={blog.image}
+                  publishedAt={blog.publishedAt}
+                  author={blog.author}
+                  readTime={blog.readTime}
+                  variant="publish"
+                  previewLength={120}
+                />
               ))}
             </div>
           )}

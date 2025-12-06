@@ -20,7 +20,7 @@ export default function BlogFormPage() {
       : null;
   const isEditMode = Boolean(post);
   const backHref =
-    isEditMode && post ? `/blogs-detail/${post.id}` : "/blogs-management";
+    isEditMode && post ? `/blogs-management/${post.id}` : "/blogs-management";
 
   if (postId && postId !== "new" && !post) {
     return (

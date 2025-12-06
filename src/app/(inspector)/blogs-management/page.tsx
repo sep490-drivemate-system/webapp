@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  Eye,
   Plus,
   Search,
 } from "lucide-react";
@@ -17,7 +15,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -32,7 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import blogsData from "@/data/mock-blogs.json";
-import { getPreviewFromContent } from "@/lib/text-utils";
+import { BlogCard } from "@/components/blogs/blog-card";
 
 type BlogPost = (typeof blogsData.blogs)[number];
 
@@ -116,7 +113,15 @@ export default function BlogsInstructorManagementPage() {
         {paginatedPosts.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {paginatedPosts.map((post) => (
-              <BlogCardItem key={post.id} post={post} onDelete={handleDelete} />
+              <BlogCard
+                key={post.id}
+                id={post.id}
+                title={post.title}
+                content={post.content}
+                image={post.image}
+                publishedAt={post.publishedAt}
+                variant="inspector"
+              />
             ))}
           </div>
         ) : (
@@ -215,53 +220,6 @@ function StatCard({
         <CardTitle className={`text-2xl ${accent ?? ""}`}>{value}</CardTitle>
       </CardHeader>
       <CardContent />
-    </Card>
-  );
-}
-
-function BlogCardItem({
-  post,
-  onDelete,
-}: {
-  post: BlogPost;
-  onDelete: (id: string) => void;
-}) {
-  const formattedDate = new Date(post.publishedAt).toLocaleDateString("vi-VN", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-  const contentPreview = getPreviewFromContent(post.content, 110);
-
-  return (
-    <Card className="flex h-full flex-col overflow-hidden">
-      <div className="aspect-video w-full overflow-hidden bg-muted">
-        <img
-          src={post.image}
-          alt={post.title}
-          className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
-        />
-      </div>
-      <CardHeader className="space-y-3">
-        <p className="text-xs text-muted-foreground">{formattedDate}</p>
-        <CardTitle className="line-clamp-2 text-lg">{post.title}</CardTitle>
-        <CardDescription className="line-clamp-3">
-          {contentPreview}
-        </CardDescription>
-      </CardHeader>
-      <CardFooter className="flex items-center justify-end gap-2 border-t bg-muted/30">
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-2 border border-border"
-          asChild
-        >
-          <Link href={`/blogs-detail/${post.id}`}>
-            <Eye className="size-4" />
-            Xem chi tiết
-          </Link>
-        </Button>
-      </CardFooter>
     </Card>
   );
 }
