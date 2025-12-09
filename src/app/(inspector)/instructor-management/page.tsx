@@ -50,7 +50,7 @@ import {
   DrivingLicenseTier,
   InstructorApplication,
   InstructorStatus,
-} from "@/types/instructor-management.types";
+} from "@/types/instructor/instructor-management.types";
 import {
   CheckCircle,
   ChevronLeft,

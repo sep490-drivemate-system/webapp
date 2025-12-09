@@ -1,4 +1,5 @@
 import { UserRole } from "../auth/user-role.enum";
+import { LicenseTier } from "../car/car.type";
 
 export interface IUserProfile {
   id: string;
@@ -76,4 +77,29 @@ export interface IUserSettings {
     showProfile: boolean;
     showBookingHistory: boolean;
   };
+}
+
+export interface IUserInfo {
+  userId: string;
+  avatarUrl: string;
+  phone: string;
+  email: string;
+  fullName: string;
+  licenseTier: LicenseTier;
+  birthDate: string;
+  role: UserRole;
+  instructor: InstructorDetailDTO | null;
+  noviceDriver: NoviceDriverDetailDTO | null;
+}
+
+export interface InstructorDetailDTO {
+  instructorId: string;
+  bio: string;
+  experienceYear: number;
+}
+
+export interface NoviceDriverDetailDTO {
+  noviceDriverId: string;
+  drivingLicense: string;
+  drivingLicenseExpirationDate: string;
 }

@@ -1,6 +1,7 @@
+import { ICar } from "@/types/car/car.type";
 import { createThunk } from "../genericCreateThunk";
 import { HttpMethod } from "@/types/constants/httpMethod";
-import { InstructorApplication } from "@/types/instructor-management.types";
+import { GetInstructorsParams, IInstructors, InstructorApplication, PaginatedInstructorsResponse } from "@/types/instructor/instructor-management.types";
 
 export const INSTRUCTOR_PATH = "instructors";
 
@@ -26,3 +27,36 @@ export const handleInstructorApplication = createThunk<
     buildBody: (payload) => ({ note: payload.note }),
   }
 );
+
+export const getListInstructors = createThunk<
+  PaginatedInstructorsResponse,
+  GetInstructorsParams
+>(HttpMethod.GET, "getListInstructors", `/${INSTRUCTOR_PATH}`, {
+  buildUrl: (payload) => {
+    const params = new URLSearchParams();
+    if (payload?.searchKey) params.append("SearchKey", payload.searchKey);
+    if (payload?.pageNumber)
+      params.append("PageNumber", payload.pageNumber.toString());
+    if (payload?.pageSize)
+      params.append("PageSize", payload.pageSize.toString());
+
+    const queryString = params.toString();
+    return `/${INSTRUCTOR_PATH}${queryString ? `?${queryString}` : ""}`;
+  },
+});
+
+export const getInstructorById = createThunk<IInstructors, { id: string }>(
+  HttpMethod.GET,
+  "getInstructorById",
+  `${INSTRUCTOR_PATH}/:id`,
+  {
+    buildUrl: (payload) => `${INSTRUCTOR_PATH}/${payload.id}`
+  }
+);
+
+export const getInstructorCars = createThunk<
+  ICar[],
+  { id: string }
+>(HttpMethod.GET, "getInstructorCars", `car/instructor/:id/cars`, {
+  buildUrl: (payload) => `car/instructor/${payload.id}/cars`,
+});

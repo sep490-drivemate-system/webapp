@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -9,15 +9,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Star, Clock, Car, Package } from "lucide-react";
+import { Clock, Car, Package as PackageIcon, Eye } from "lucide-react";
 import { PageSectionHeader } from "@/components/commons/page-section-header";
 import { SearchBar } from "@/components/commons/search-bar";
 import { PaginationControls } from "@/components/commons/pagination-controls";
@@ -25,70 +18,27 @@ import {
   PackageFilterSidebar,
   type FilterSection,
 } from "@/components/commons/package-filter-sidebar";
+import { useAppDispatch } from "@/lib/redux/useAppDispatch";
+import { getListPackages } from "@/features/package/packageThunk";
+import type { Package as DrivingPackage } from "@/types/package/package.type";
 import Link from "next/link";
-import instructorsData from "@/data/mock-instructors-enhanced.json";
 
-interface Instructor {
-  id: string;
-  name: string;
-  bio: string;
-  experience: number;
-  area: string;
-  rating: number;
-  reviewCount: number;
-  status: string;
-  avatar: string;
-  specialties: string[];
-  pricePerHour: number;
-  pricePerDay: number;
-  pricePerMonth: number;
-  phone: string;
-  email: string;
-}
-
-// Mock package data based on instructors
-interface PackageType {
-  id: string;
-  instructorId: string;
-  instructorName: string;
-  instructorAvatar: string;
-  instructorRating: number;
-  instructorReviews: number;
-  packageName: string;
-  description: string;
-  totalHours: number;
-  pricePerHour: number;
-  totalPrice: number;
-  hasVehicle: boolean;
-  vehicleType?: string;
-  skills: string[];
-  roadTypes: string[];
-  area: string;
-  discount?: number;
-  popular?: boolean;
-}
-
-const ITEMS_PER_PAGE = 9;
+const ITEMS_PER_PAGE = 12;
 
 interface PackageFilters {
-  area: string;
   roadType: string;
-  hasVehicle: string;
+  allowSelfCar: string;
   priceRange: string;
-  hours: string;
+  duration: string;
 }
 
-// Road type options
 const ROAD_TYPES = [
-  "Đường khu dân cư",
-  "Đường đô thị",
-  "Quốc lộ",
-  "Đường cao tốc",
-  "Đường đèo",
-  "Đường trường",
-  "Đường qua khu đông dân cư",
-  "Đường đang thi công",
-  "Đường trơn trượt",
+  "Đường nội thành/Đô thị",
+  "Đường trường/Cao tốc",
+  "Đường đồi núi/Địa hình phức tạp",
+  "Đường khu vực dân cư/Đường hẹp",
+  "Đường đang thi công/Mặt đường xấu",
+  "Đường đô thị (Trong thành phố))",
 ];
 
 const PACKAGE_FILTER_SECTIONS: FilterSection<PackageFilters>[] = [
@@ -102,19 +52,30 @@ const PACKAGE_FILTER_SECTIONS: FilterSection<PackageFilters>[] = [
     ],
   },
   {
-    key: "hasVehicle",
-    label: "Xe tập",
-    placeholder: "Có xe hay không",
+    key: "allowSelfCar",
+    label: "Hình thức xe",
+    placeholder: "Chọn tùy chọn",
     options: [
       { value: "all", label: "Tất cả" },
-      { value: "yes", label: "Có xe tập" },
-      { value: "no", label: "Không có xe" },
+      { value: "yes", label: "Tự mang xe" },
+      { value: "no", label: "Dùng xe của giáo viên" },
     ],
   },
   {
-    key: "hours",
-    label: "Số giờ",
-    placeholder: "Chọn số giờ",
+    key: "priceRange",
+    label: "Khoảng giá",
+    placeholder: "Chọn khoảng giá",
+    options: [
+      { value: "all", label: "Tất cả" },
+      { value: "low", label: "< 300.000đ" },
+      { value: "medium", label: "300.000 - 800.000đ" },
+      { value: "high", label: "> 800.000đ" },
+    ],
+  },
+  {
+    key: "duration",
+    label: "Thời lượng",
+    placeholder: "Chọn thời lượng",
     options: [
       { value: "all", label: "Tất cả" },
       { value: "short", label: "≤ 20 giờ" },
@@ -125,178 +86,89 @@ const PACKAGE_FILTER_SECTIONS: FilterSection<PackageFilters>[] = [
 ];
 
 export default function PackagesPage() {
+  const dispatch = useAppDispatch();
   const [filters, setFilters] = useState<PackageFilters>({
-    area: "all",
     roadType: "all",
-    hasVehicle: "all",
+    allowSelfCar: "all",
     priceRange: "all",
-    hours: "all",
+    duration: "all",
   });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState("popular");
   const [searchQuery, setSearchQuery] = useState("");
+  const [packages, setPackages] = useState<DrivingPackage[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const instructors: Instructor[] = instructorsData.instructors;
+  useEffect(() => {
+    const fetchPackages = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await dispatch(
+          getListPackages({
+            pageNumber: currentPage,
+            pageSize: ITEMS_PER_PAGE,
+            searchKey: searchQuery || undefined,
+            allowSelfCar:
+              filters.allowSelfCar === "yes"
+                ? true
+                : filters.allowSelfCar === "no"
+                ? false
+                : undefined,
+            roadTypes:
+              filters.roadType !== "all" ? [filters.roadType] : undefined,
+          })
+        ).unwrap();
 
-  // Generate mock packages from instructors
-  const packages: PackageType[] = useMemo(() => {
-    const mockPackages: PackageType[] = [];
-
-    instructors.forEach((instructor, idx) => {
-      // Basic package
-      mockPackages.push({
-        id: `pkg_${instructor.id}_basic`,
-        instructorId: instructor.id,
-        instructorName: instructor.name,
-        instructorAvatar: instructor.avatar,
-        instructorRating: instructor.rating,
-        instructorReviews: instructor.reviewCount,
-        packageName: "Gói luyện tập cơ bản",
-        description:
-          "Phù hợp cho người mới bắt đầu, tập trung vào kỹ năng cơ bản",
-        totalHours: 20,
-        pricePerHour: instructor.pricePerHour,
-        totalPrice: instructor.pricePerHour * 20,
-        hasVehicle: true,
-        vehicleType: "Toyota Vios 2023",
-        skills: instructor.specialties.slice(0, 2),
-        roadTypes: ["Đường khu dân cư", "Đường đô thị"],
-        area: instructor.area,
-        popular: idx % 3 === 0,
-      });
-
-      // Advanced package
-      if (instructor.experience > 5) {
-        mockPackages.push({
-          id: `pkg_${instructor.id}_advanced`,
-          instructorId: instructor.id,
-          instructorName: instructor.name,
-          instructorAvatar: instructor.avatar,
-          instructorRating: instructor.rating,
-          instructorReviews: instructor.reviewCount,
-          packageName: "Gói nâng cao",
-          description: "Luyện tập các kỹ năng nâng cao, đường phức tạp",
-          totalHours: 40,
-          pricePerHour: instructor.pricePerHour * 1.1,
-          totalPrice: instructor.pricePerHour * 1.1 * 40,
-          hasVehicle: true,
-          vehicleType: "Honda City 2023",
-          skills: instructor.specialties,
-          roadTypes: ["Quốc lộ", "Đường cao tốc", "Đường đô thị"],
-          area: instructor.area,
-          discount: 10,
-        });
+        const data = response.value;
+        setPackages(data?.pageContent ?? []);
+        setTotalCount(data?.totalCount ?? 0);
+      } catch (err) {
+        const message =
+          typeof err === "string" ? err : "Không thể tải danh sách gói dịch vụ";
+        setError(message);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      // Highway package
-      if (instructor.experience > 8) {
-        mockPackages.push({
-          id: `pkg_${instructor.id}_highway`,
-          instructorId: instructor.id,
-          instructorName: instructor.name,
-          instructorAvatar: instructor.avatar,
-          instructorRating: instructor.rating,
-          instructorReviews: instructor.reviewCount,
-          packageName: "Gói luyện cao tốc",
-          description: "Chuyên luyện kỹ năng lái xe trên đường cao tốc",
-          totalHours: 15,
-          pricePerHour: instructor.pricePerHour * 1.2,
-          totalPrice: instructor.pricePerHour * 1.2 * 15,
-          hasVehicle: false,
-          skills: ["Cao tốc", "Giữ làn", "Vượt xe"],
-          roadTypes: ["Đường cao tốc", "Quốc lộ"],
-          area: instructor.area,
-        });
-      }
-    });
+    fetchPackages();
+  }, [
+    currentPage,
+    searchQuery,
+    filters.allowSelfCar,
+    filters.roadType,
+    dispatch,
+  ]);
 
-    return mockPackages;
-  }, [instructors]);
-
-  // Get unique values for filters
-  const uniqueAreas = [...new Set(packages.map((pkg) => pkg.area))].sort();
-
-  // Filter and sort packages
   const filteredPackages = useMemo(() => {
-    let filtered = packages.filter((pkg) => {
-      const matchesSearch =
-        searchQuery === "" ||
-        pkg.packageName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        pkg.instructorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        pkg.skills.some((skill) =>
-          skill.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+    return packages
+      .filter((pkg) => {
+        const matchesPrice =
+          filters.priceRange === "all" ||
+          (filters.priceRange === "low" && pkg.price < 300000) ||
+          (filters.priceRange === "medium" &&
+            pkg.price >= 300000 &&
+            pkg.price <= 800000) ||
+          (filters.priceRange === "high" && pkg.price > 800000);
 
-      const matchesArea = filters.area === "all" || pkg.area === filters.area;
+        const matchesDuration =
+          filters.duration === "all" ||
+          (filters.duration === "short" && pkg.duration <= 20) ||
+          (filters.duration === "medium" &&
+            pkg.duration > 20 &&
+            pkg.duration <= 40) ||
+          (filters.duration === "long" && pkg.duration > 40);
 
-      const matchesRoadType =
-        filters.roadType === "all" || pkg.roadTypes.includes(filters.roadType);
+        return matchesPrice && matchesDuration;
+      })
+      .sort((a, b) => b.bookingCount - a.bookingCount);
+  }, [packages, filters.duration, filters.priceRange]);
 
-      const matchesVehicle =
-        filters.hasVehicle === "all" ||
-        (filters.hasVehicle === "yes" && pkg.hasVehicle) ||
-        (filters.hasVehicle === "no" && !pkg.hasVehicle);
-
-      const matchesPrice =
-        filters.priceRange === "all" ||
-        (filters.priceRange === "low" && pkg.pricePerHour < 200000) ||
-        (filters.priceRange === "medium" &&
-          pkg.pricePerHour >= 200000 &&
-          pkg.pricePerHour < 300000) ||
-        (filters.priceRange === "high" && pkg.pricePerHour >= 300000);
-
-      const matchesHours =
-        filters.hours === "all" ||
-        (filters.hours === "short" && pkg.totalHours <= 20) ||
-        (filters.hours === "medium" &&
-          pkg.totalHours > 20 &&
-          pkg.totalHours <= 40) ||
-        (filters.hours === "long" && pkg.totalHours > 40);
-
-      return (
-        matchesSearch &&
-        matchesArea &&
-        matchesRoadType &&
-        matchesVehicle &&
-        matchesPrice &&
-        matchesHours
-      );
-    });
-
-    // Sort packages
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "popular":
-          return (
-            (b.popular ? 1 : 0) - (a.popular ? 1 : 0) ||
-            b.instructorRating - a.instructorRating
-          );
-        case "price-low":
-          return a.totalPrice - b.totalPrice;
-        case "price-high":
-          return b.totalPrice - a.totalPrice;
-        case "rating":
-          return b.instructorRating - a.instructorRating;
-        case "hours-low":
-          return a.totalHours - b.totalHours;
-        case "hours-high":
-          return b.totalHours - a.totalHours;
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [packages, filters, sortBy, searchQuery]);
-
-  // Pagination
-  const totalPages = Math.ceil(filteredPackages.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedPackages = filteredPackages.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE
-  );
+  const totalPages =
+    totalCount > 0 ? Math.ceil(totalCount / ITEMS_PER_PAGE) : 0;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -307,11 +179,10 @@ export default function PackagesPage() {
 
   const resetFilters = () => {
     setFilters({
-      area: "all",
       roadType: "all",
-      hasVehicle: "all",
+      allowSelfCar: "all",
       priceRange: "all",
-      hours: "all",
+      duration: "all",
     });
     setSearchQuery("");
     setCurrentPage(1);
@@ -338,8 +209,11 @@ export default function PackagesPage() {
 
         <SearchBar
           value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Tìm kiếm gói thuê"
+          onChange={(value) => {
+            setSearchQuery(value);
+            setCurrentPage(1);
+          }}
+          placeholder="Tìm kiếm gói dịch vụ"
           className="!mb-6"
         />
 
@@ -355,9 +229,19 @@ export default function PackagesPage() {
 
           {/* Packages Grid */}
           <div className="lg:col-span-3">
-            {/* Packages Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {paginatedPackages.map((pkg) => (
+            {error && (
+              <div className="mb-4 rounded-md bg-red-50 p-4 text-red-700">
+                {error}
+              </div>
+            )}
+            {loading && (
+              <div className="mb-4 rounded-md bg-blue-50 p-4 text-blue-700">
+                Đang tải danh sách gói dịch vụ...
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
+              {filteredPackages.map((pkg) => (
                 <Card
                   key={pkg.id}
                   className="overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full"
@@ -365,7 +249,7 @@ export default function PackagesPage() {
                   <CardHeader className="flex-shrink-0">
                     <div className="flex items-start justify-between">
                       <h3 className="text-lg font-bold text-gray-900 line-clamp-2 flex-1">
-                        {pkg.packageName}
+                        {pkg.name}
                       </h3>
                     </div>
                   </CardHeader>
@@ -378,19 +262,17 @@ export default function PackagesPage() {
                           src={pkg.instructorAvatar}
                           alt={pkg.instructorName}
                         />
-                        <AvatarFallback>{pkg.instructorName[0]}</AvatarFallback>
+                        <AvatarFallback>
+                          {(pkg.instructorName || "U")[0]}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm truncate">
                           {pkg.instructorName}
                         </p>
-                        <div className="flex items-center gap-1 text-xs text-gray-600">
-                          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                          <span>{pkg.instructorRating}</span>
-                          <span className="text-gray-400">
-                            ({pkg.instructorReviews})
-                          </span>
-                        </div>
+                        <p className="text-xs text-gray-600">
+                          {pkg.bookingCount} lượt đặt • {pkg.carCount} xe
+                        </p>
                       </div>
                     </div>
 
@@ -398,22 +280,16 @@ export default function PackagesPage() {
                     <div className="space-y-2 flex-shrink-0">
                       <div className="flex items-center gap-2 text-sm">
                         <Clock className="h-4 w-4 text-gray-500 flex-shrink-0" />
-                        <span className="font-medium">
-                          {pkg.totalHours} giờ
-                        </span>
-                        <span className="text-gray-500">•</span>
+                        <span className="font-medium">{pkg.duration} giờ</span>
                       </div>
-                      {pkg.hasVehicle ? (
-                        <div className="flex items-center gap-2 text-sm">
-                          <span className="text-green-700 font-medium">
-                            Người hướng dẫn + Xe
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2 text-sm text-gray-500">
-                          <span>Chỉ người hướng dẫn</span>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2 text-sm text-gray-700">
+                        <Car className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                        <span>
+                          {pkg.allowSelfCar
+                            ? "Có thể thuê xe tập"
+                            : "Không thể thuê xe tập (tự túc xe)"}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Skills & Road Types */}
@@ -462,23 +338,30 @@ export default function PackagesPage() {
 
                     {/* Pricing */}
                     <div className="pt-3 border-t flex-shrink-0">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <div>
-                          <span className="text-2xl font-bold ">
-                            {formatPrice(pkg.totalPrice)}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex flex-col">
+                          <span className="text-xs uppercase tracking-wide text-gray-500">
+                            Giá gói
+                          </span>
+                          <span className="text-2xl font-extrabold text-emerald-600">
+                            {formatPrice(pkg.price)}
                           </span>
                         </div>
+                        <Badge
+                          variant="outline"
+                          className="text-xs font-semibold text-emerald-700 border-emerald-200 bg-emerald-50"
+                        >
+                          {pkg.bookingCount} lượt đặt
+                        </Badge>
                       </div>
                     </div>
                   </CardContent>
 
-                  <CardFooter className="pt-0 pb-4 px-6 flex gap-2 flex-shrink-0">
-                    <Button variant="green" className="flex-1" size="sm">
-                      Mua ngay
-                    </Button>
-                    <Button variant="outline" size="sm" asChild>
+                  <CardFooter className="p-4 pt-0">
+                    <Button asChild className="w-full gap-2" variant="green">
                       <Link href={`/instructors/${pkg.instructorId}`}>
-                        Chi tiết
+                        <Eye className="h-4 w-4" />
+                        Xem chi tiết
                       </Link>
                     </Button>
                   </CardFooter>
@@ -495,10 +378,10 @@ export default function PackagesPage() {
             )}
 
             {/* No Results */}
-            {filteredPackages.length === 0 && (
+            {!loading && filteredPackages.length === 0 && (
               <div className="text-center py-12">
                 <div className="text-gray-500 mb-4">
-                  <Package className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                  <PackageIcon className="h-16 w-16 mx-auto mb-4 opacity-50" />
                   <h3 className="text-lg font-medium mb-2">
                     Không tìm thấy gói phù hợp
                   </h3>
