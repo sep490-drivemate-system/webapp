@@ -1,0 +1,458 @@
+{
+  "posts": [
+    {
+      "id": "post_001",
+      "title": "10 Mẹo Lái Xe An Toàn Cho Người Mới Bắt Đầu",
+      "content": "<p>Lái xe là một kỹ năng quan trọng trong cuộc sống hiện đại. Để giúp bạn tự tin hơn khi cầm vô lăng, tôi sẽ chia sẻ 10 mẹo lái xe an toàn cơ bản nhất:</p><ol><li><strong>Điều chỉnh ghế và gương:</strong> Đảm bảo bạn có tư thế ngồi thoải mái và có thể nhìn thấy rõ ràng qua tất cả các gương.</li><li><strong>Luôn thắt dây an toàn:</strong> Đây là quy tắc bắt buộc và có thể cứu mạng bạn trong trường hợp tai nạn.</li><li><strong>Giữ khoảng cách an toàn:</strong> Duy trì khoảng cách ít nhất 3 giây với xe phía trước.</li><li><strong>Quan sát biển báo:</strong> Luôn chú ý đến các biển báo giao thông và tuân thủ nghiêm ngặt.</li><li><strong>Không sử dụng điện thoại:</strong> Tập trung hoàn toàn vào việc lái xe.</li><li><strong>Kiểm tra xe trước khi đi:</strong> Đảm bảo phanh, đèn, lốp xe đều hoạt động tốt.</li><li><strong>Lái xe phòng thủ:</strong> Luôn dự đoán và chuẩn bị cho các tình huống bất ngờ.</li><li><strong>Nghỉ ngơi khi mệt mỏi:</strong> Không lái xe khi bạn cảm thấy buồn ngủ hoặc mệt mỏi.</li><li><strong>Học cách đỗ xe:</strong> Thực hành đỗ xe song song và đỗ xe vuông góc thường xuyên.</li><li><strong>Giữ bình tĩnh:</strong> Đừng để cảm xúc ảnh hưởng đến khả năng lái xe của bạn.</li></ol><p>Những mẹo này sẽ giúp bạn trở thành một tài xế an toàn và tự tin hơn. Hãy thực hành thường xuyên và luôn tuân thủ luật giao thông!</p>",
+      "excerpt": "Khám phá những mẹo lái xe cơ bản và quan trọng nhất để bạn tự tin hơn khi cầm vô lăng. Từ cách điều chỉnh ghế đến kỹ thuật đỗ xe song song...",
+      "thumbnail": "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800",
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1493238792000-8113da705763?w=800",
+        "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?w=800"
+      ],
+      "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      "category": "Kỹ năng lái xe",
+      "tags": ["Lái xe an toàn", "Người mới", "Mẹo vặt"],
+      "author": {
+        "id": "user_001",
+        "name": "Nguyễn Văn An",
+        "email": "nguyenvanan@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=1",
+        "role": "INSTRUCTOR"
+      },
+      "status": "PUBLISHED",
+      "createdAt": "2024-11-15T08:00:00Z",
+      "updatedAt": "2024-11-15T10:00:00Z",
+      "publishedAt": "2024-11-15T10:00:00Z",
+      "readTime": 5,
+      "views": 1250,
+      "likes": 89,
+      "dislikes": 2,
+      "featured": true
+    },
+    {
+      "id": "post_002",
+      "title": "Hướng Dẫn Chi Tiết Thi Bằng Lái Xe B2",
+      "content": "<p>Thi bằng lái xe B2 là một trong những kỳ thi quan trọng nhất trong cuộc đời của một tài xế. Bài viết này sẽ hướng dẫn bạn từng bước một cách chi tiết:</p><h2>1. Điều kiện dự thi</h2><ul><li>Đủ 18 tuổi trở lên</li><li>Có đủ sức khỏe theo quy định</li><li>Hoàn thành khóa học lái xe tại trung tâm được cấp phép</li></ul><h2>2. Quy trình thi</h2><p>Kỳ thi bao gồm 2 phần:</p><ul><li><strong>Thi lý thuyết:</strong> 30 câu hỏi, thời gian 20 phút, cần đạt 26/30 điểm trở lên</li><li><strong>Thi thực hành:</strong> 11 bài thi sa hình, cần đạt 80/100 điểm trở lên</li></ul><h2>3. Mẹo thi lý thuyết</h2><p>Một số mẹo giúp bạn vượt qua phần thi lý thuyết dễ dàng hơn:</p><ul><li>Học thuộc các biển báo giao thông</li><li>Nắm vững quy tắc nhường đường</li><li>Làm nhiều đề thi thử</li></ul><p>Chúc bạn thi đỗ với kết quả cao nhất!</p>",
+      "excerpt": "Tất cả những gì bạn cần biết về kỳ thi bằng lái xe B2: quy trình, lệ phí, thời gian, và các mẹo để vượt qua kỳ thi một cách dễ dàng...",
+      "thumbnail": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800",
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?w=800",
+        "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800"
+      ],
+      "category": "Thi bằng lái",
+      "tags": ["Bằng B2", "Thi bằng lái", "Hướng dẫn"],
+      "author": {
+        "id": "user_002",
+        "name": "Trần Thị Mai",
+        "email": "tranthimai@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=3",
+        "role": "INSTRUCTOR"
+      },
+      "status": "PUBLISHED",
+      "createdAt": "2024-11-12T12:00:00Z",
+      "updatedAt": "2024-11-12T14:30:00Z",
+      "publishedAt": "2024-11-12T14:30:00Z",
+      "readTime": 8,
+      "views": 2100,
+      "likes": 156,
+      "dislikes": 5,
+      "featured": true
+    },
+    {
+      "id": "post_003",
+      "title": "Kỹ Thuật Lái Xe Trên Đường Cao Tốc",
+      "content": "<p>Lái xe trên đường cao tốc đòi hỏi kỹ năng đặc biệt và sự tập trung cao độ. Dưới đây là những kỹ thuật quan trọng:</p><h2>Giữ làn đường</h2><p>Luôn giữ xe trong làn đường của bạn, tránh di chuyển qua lại không cần thiết.</p><h2>Vượt xe an toàn</h2><p>Khi vượt xe, hãy:</p><ul><li>Bật xi-nhan trước ít nhất 3 giây</li><li>Kiểm tra gương và điểm mù</li><li>Vượt nhanh và quay lại làn đường cũ</li></ul><h2>Xử lý tình huống khẩn cấp</h2><p>Nếu gặp sự cố trên cao tốc, hãy:</p><ol><li>Bật đèn cảnh báo nguy hiểm</li><li>Di chuyển xe vào làn khẩn cấp</li><li>Đặt biển cảnh báo phía sau xe</li><li>Gọi cứu hộ</li></ol>",
+      "excerpt": "Lái xe trên đường cao tốc đòi hỏi kỹ năng đặc biệt. Học cách giữ làn, vượt xe an toàn, và xử lý các tình huống khẩn cấp...",
+      "thumbnail": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
+      "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      "category": "Kỹ năng lái xe",
+      "tags": ["Cao tốc", "Kỹ thuật", "An toàn"],
+      "author": {
+        "id": "user_003",
+        "name": "Phạm Minh Tuấn",
+        "email": "phamminhtuan@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=5",
+        "role": "INSTRUCTOR"
+      },
+      "status": "PUBLISHED",
+      "createdAt": "2024-11-10T07:00:00Z",
+      "updatedAt": "2024-11-10T09:15:00Z",
+      "publishedAt": "2024-11-10T09:15:00Z",
+      "readTime": 6,
+      "views": 980,
+      "likes": 72,
+      "dislikes": 1,
+      "featured": false
+    },
+    {
+      "id": "post_004",
+      "title": "Cách Xử Lý Khi Xe Bị Hỏng Giữa Đường",
+      "content": "<p>Xe bị hỏng giữa đường là tình huống không ai muốn gặp phải. Tuy nhiên, nếu biết cách xử lý, bạn sẽ giảm thiểu rủi ro và giải quyết vấn đề nhanh chóng.</p><h2>Bước 1: Dừng xe an toàn</h2><p>Khi phát hiện xe có vấn đề, hãy:</p><ul><li>Bật đèn cảnh báo nguy hiểm</li><li>Di chuyển xe vào lề đường hoặc làn khẩn cấp</li><li>Tắt động cơ và kéo phanh tay</li></ul><h2>Bước 2: Bảo vệ bản thân</h2><p>Đặt biển cảnh báo phía sau xe ít nhất 50m. Nếu có thể, hãy đứng xa đường giao thông.</p><h2>Bước 3: Gọi cứu hộ</h2><p>Liên hệ với dịch vụ cứu hộ hoặc garage gần nhất. Cung cấp vị trí chính xác của bạn.</p>",
+      "excerpt": "Những bước cần làm khi xe của bạn gặp sự cố giữa đường: từ việc dừng xe an toàn đến gọi cứu hộ và bảo vệ bản thân...",
+      "thumbnail": "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800",
+      "category": "Bảo dưỡng xe",
+      "tags": ["Sửa chữa", "Sự cố", "An toàn"],
+      "author": {
+        "id": "user_004",
+        "name": "Lê Văn Cường",
+        "email": "levancuong@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=7",
+        "role": "INSTRUCTOR"
+      },
+      "status": "PUBLISHED",
+      "createdAt": "2024-11-08T14:00:00Z",
+      "updatedAt": "2024-11-08T16:45:00Z",
+      "publishedAt": "2024-11-08T16:45:00Z",
+      "readTime": 4,
+      "views": 750,
+      "likes": 45,
+      "dislikes": 0,
+      "featured": false
+    },
+    {
+      "id": "post_005",
+      "title": "Kỹ Thuật Đỗ Xe Song Song - Hướng Dẫn Từng Bước",
+      "content": "<p>Đỗ xe song song là một trong những kỹ năng khó nhất khi học lái xe. Tuy nhiên, với hướng dẫn chi tiết này, bạn sẽ nắm vững kỹ thuật này.</p><h2>Bước 1: Tìm vị trí phù hợp</h2><p>Chọn vị trí có chiều dài ít nhất gấp 1.5 lần chiều dài xe của bạn.</p><h2>Bước 2: Căn chỉnh vị trí</h2><p>Dừng xe song song với xe phía trước, cách khoảng 50cm. Gương bên phải của bạn nên ngang với gương bên trái của xe phía trước.</p><h2>Bước 3: Lùi xe</h2><p>Đánh lái hết sang phải và lùi từ từ. Khi gương bên phải của bạn vượt qua đuôi xe phía trước, đánh lái thẳng.</p><h2>Bước 4: Hoàn thiện</h2><p>Tiếp tục lùi và đánh lái sang trái để xe vào vị trí. Điều chỉnh để xe nằm giữa hai xe.</p>",
+      "excerpt": "Đỗ xe song song là một trong những kỹ năng khó nhất. Học cách thực hiện từng bước một cách chính xác và an toàn...",
+      "thumbnail": "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800",
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1483721310020-03333e577078?w=800",
+        "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800"
+      ],
+      "category": "Kỹ năng lái xe",
+      "tags": ["Đỗ xe", "Kỹ thuật", "Hướng dẫn"],
+      "author": {
+        "id": "user_001",
+        "name": "Nguyễn Văn An",
+        "email": "nguyenvanan@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=1",
+        "role": "INSTRUCTOR"
+      },
+      "status": "PUBLISHED",
+      "createdAt": "2024-11-01T06:00:00Z",
+      "updatedAt": "2024-11-01T08:30:00Z",
+      "publishedAt": "2024-11-01T08:30:00Z",
+      "readTime": 5,
+      "views": 890,
+      "likes": 58,
+      "dislikes": 3,
+      "featured": false
+    },
+    {
+      "id": "post_006",
+      "title": "Thi Thử Lý Thuyết Bằng B2 - 600 Câu Hỏi",
+      "content": "<p>Chuẩn bị cho kỳ thi lý thuyết bằng B2 với bộ đề thi thử 600 câu hỏi chuẩn. Bài viết này sẽ giúp bạn:</p><ul><li>Làm quen với cấu trúc đề thi</li><li>Nắm vững các câu hỏi thường gặp</li><li>Rèn luyện kỹ năng làm bài nhanh</li></ul><h2>Cấu trúc đề thi</h2><p>Đề thi gồm 30 câu hỏi, thời gian làm bài 20 phút. Bạn cần đạt 26/30 điểm để đỗ.</p><h2>Mẹo làm bài</h2><ul><li>Đọc kỹ câu hỏi trước khi chọn đáp án</li><li>Chú ý các từ khóa như \"bắt buộc\", \"không được\", \"phải\"</li><li>Làm các câu dễ trước, câu khó để sau</li></ul>",
+      "excerpt": "Luyện thi lý thuyết bằng B2 với bộ đề 600 câu hỏi chuẩn. Làm quen với cấu trúc đề thi và nắm vững các câu hỏi thường gặp...",
+      "thumbnail": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800",
+      "category": "Thi bằng lái",
+      "tags": ["Bằng B2", "Thi thử", "Lý thuyết"],
+      "author": {
+        "id": "user_002",
+        "name": "Trần Thị Mai",
+        "email": "tranthimai@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=3",
+        "role": "INSTRUCTOR"
+      },
+      "status": "PENDING_REVIEW",
+      "createdAt": "2024-11-20T10:00:00Z",
+      "updatedAt": "2024-11-20T10:00:00Z",
+      "readTime": 6,
+      "views": 0,
+      "likes": 0,
+      "dislikes": 0,
+      "featured": false
+    },
+    {
+      "id": "post_007",
+      "title": "Thi Thử Lý Thuyết Bằng C - Hướng Dẫn Chi Tiết",
+      "content": "<p>Bằng lái xe hạng C cho phép bạn điều khiển xe tải có trọng tải trên 3.5 tấn. Đây là hướng dẫn chi tiết về kỳ thi:</p><h2>Điều kiện dự thi</h2><ul><li>Đủ 21 tuổi trở lên</li><li>Đã có bằng B2 ít nhất 1 năm</li><li>Có đủ sức khỏe theo quy định</li></ul><h2>Nội dung thi</h2><p>Kỳ thi bao gồm:</p><ul><li>Thi lý thuyết: 30 câu hỏi, cần đạt 28/30</li><li>Thi thực hành: 11 bài sa hình, cần đạt 85/100</li></ul>",
+      "excerpt": "Hướng dẫn chi tiết về kỳ thi bằng lái xe hạng C, từ điều kiện dự thi đến nội dung và mẹo làm bài...",
+      "thumbnail": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
+      "category": "Thi bằng lái",
+      "tags": ["Bằng C", "Thi thử", "Lý thuyết"],
+      "author": {
+        "id": "user_003",
+        "name": "Phạm Minh Tuấn",
+        "email": "phamminhtuan@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=5",
+        "role": "INSTRUCTOR"
+      },
+      "status": "PENDING_REVIEW",
+      "createdAt": "2024-11-20T11:00:00Z",
+      "updatedAt": "2024-11-20T11:00:00Z",
+      "readTime": 7,
+      "views": 0,
+      "likes": 0,
+      "dislikes": 0,
+      "featured": false
+    },
+    {
+      "id": "post_008",
+      "title": "Thi Thử Lý Thuyết Bằng D - Tài Liệu Ôn Tập",
+      "content": "<p>Bằng lái xe hạng D cho phép điều khiển xe chở khách từ 10-30 chỗ. Đây là tài liệu ôn tập đầy đủ:</p><h2>Yêu cầu</h2><ul><li>Đủ 24 tuổi trở lên</li><li>Đã có bằng C ít nhất 3 năm</li><li>Kinh nghiệm lái xe chuyên nghiệp</li></ul><h2>Tài liệu ôn tập</h2><p>Bộ đề thi gồm 600 câu hỏi, tập trung vào:</p><ul><li>Luật giao thông đường bộ</li><li>Kỹ thuật lái xe an toàn</li><li>Xử lý tình huống khẩn cấp</li></ul>",
+      "excerpt": "Tài liệu ôn tập đầy đủ cho kỳ thi bằng lái xe hạng D, bao gồm điều kiện dự thi và nội dung ôn tập...",
+      "thumbnail": "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800",
+      "category": "Thi bằng lái",
+      "tags": ["Bằng D", "Thi thử", "Lý thuyết"],
+      "author": {
+        "id": "user_004",
+        "name": "Lê Văn Cường",
+        "email": "levancuong@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=7",
+        "role": "INSTRUCTOR"
+      },
+      "status": "PENDING_REVIEW",
+      "createdAt": "2024-11-20T12:00:00Z",
+      "updatedAt": "2024-11-20T12:00:00Z",
+      "readTime": 8,
+      "views": 0,
+      "likes": 0,
+      "dislikes": 0,
+      "featured": false
+    },
+    {
+      "id": "post_009",
+      "title": "Video Hướng Dẫn Lái Xe Số Sàn - Bài 1",
+      "content": "<p>Video hướng dẫn chi tiết cách lái xe số sàn cho người mới bắt đầu. Nội dung bao gồm:</p><ul><li>Cách sử dụng côn, ga, phanh</li><li>Kỹ thuật sang số mượt mà</li><li>Xử lý khi xe bị chết máy</li></ul><p>Hãy xem video để hiểu rõ hơn về kỹ thuật lái xe số sàn.</p>",
+      "excerpt": "Video hướng dẫn chi tiết cách lái xe số sàn cho người mới bắt đầu, từ cơ bản đến nâng cao...",
+      "thumbnail": "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800",
+      "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      "category": "Kỹ năng lái xe",
+      "tags": ["Video", "Số sàn", "Hướng dẫn"],
+      "author": {
+        "id": "user_001",
+        "name": "Nguyễn Văn An",
+        "email": "nguyenvanan@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=1",
+        "role": "INSTRUCTOR"
+      },
+      "status": "REJECTED",
+      "createdAt": "2024-11-19T09:00:00Z",
+      "updatedAt": "2024-11-19T15:00:00Z",
+      "readTime": 3,
+      "views": 0,
+      "likes": 0,
+      "dislikes": 0,
+      "featured": false
+    }
+  ],
+  "moderations": [
+    {
+      "id": "mod_001",
+      "postId": "post_001",
+      "inspectorId": "user_inspector_001",
+      "inspector": {
+        "id": "user_inspector_001",
+        "name": "Hoàng Văn Đức",
+        "email": "hoangvanduc@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=12",
+        "role": "INSPECTOR"
+      },
+      "status": "APPROVED",
+      "reviewNote": "Bài viết chất lượng tốt, nội dung hữu ích cho người mới học lái xe.",
+      "reviewedAt": "2024-11-15T09:30:00Z",
+      "createdAt": "2024-11-15T08:00:00Z"
+    },
+    {
+      "id": "mod_002",
+      "postId": "post_002",
+      "inspectorId": "user_inspector_001",
+      "inspector": {
+        "id": "user_inspector_001",
+        "name": "Hoàng Văn Đức",
+        "email": "hoangvanduc@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=12",
+        "role": "INSPECTOR"
+      },
+      "status": "APPROVED",
+      "reviewNote": "Hướng dẫn chi tiết, đầy đủ thông tin. Đã được duyệt.",
+      "reviewedAt": "2024-11-12T13:00:00Z",
+      "createdAt": "2024-11-12T12:00:00Z"
+    },
+    {
+      "id": "mod_003",
+      "postId": "post_006",
+      "inspectorId": "user_inspector_001",
+      "inspector": {
+        "id": "user_inspector_001",
+        "name": "Hoàng Văn Đức",
+        "email": "hoangvanduc@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=12",
+        "role": "INSPECTOR"
+      },
+      "status": "WAITING",
+      "createdAt": "2024-11-20T10:00:00Z"
+    },
+    {
+      "id": "mod_004",
+      "postId": "post_007",
+      "inspectorId": "user_inspector_001",
+      "inspector": {
+        "id": "user_inspector_001",
+        "name": "Hoàng Văn Đức",
+        "email": "hoangvanduc@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=12",
+        "role": "INSPECTOR"
+      },
+      "status": "WAITING",
+      "createdAt": "2024-11-20T11:00:00Z"
+    },
+    {
+      "id": "mod_005",
+      "postId": "post_008",
+      "inspectorId": "user_inspector_001",
+      "inspector": {
+        "id": "user_inspector_001",
+        "name": "Hoàng Văn Đức",
+        "email": "hoangvanduc@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=12",
+        "role": "INSPECTOR"
+      },
+      "status": "WAITING",
+      "createdAt": "2024-11-20T12:00:00Z"
+    },
+    {
+      "id": "mod_006",
+      "postId": "post_009",
+      "inspectorId": "user_inspector_001",
+      "inspector": {
+        "id": "user_inspector_001",
+        "name": "Hoàng Văn Đức",
+        "email": "hoangvanduc@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=12",
+        "role": "INSPECTOR"
+      },
+      "status": "REJECTED",
+      "rejectionReason": "Video không phù hợp, chất lượng kém. Vui lòng cập nhật video chất lượng tốt hơn.",
+      "reviewedAt": "2024-11-19T14:00:00Z",
+      "createdAt": "2024-11-19T09:00:00Z"
+    }
+  ],
+  "comments": [
+    {
+      "id": "comment_001",
+      "postId": "post_001",
+      "userId": "user_novice_001",
+      "user": {
+        "id": "user_novice_001",
+        "name": "Trần Văn Nam",
+        "email": "tranvannam@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=20",
+        "role": "NOVICE_DRIVER"
+      },
+      "content": "Bài viết rất hữu ích! Tôi đã áp dụng các mẹo này và thấy tự tin hơn nhiều khi lái xe.",
+      "createdAt": "2024-11-15T11:00:00Z",
+      "updatedAt": "2024-11-15T11:00:00Z",
+      "likes": 12,
+      "dislikes": 0,
+      "replies": [
+        {
+          "id": "comment_002",
+          "postId": "post_001",
+          "userId": "user_001",
+          "user": {
+            "id": "user_001",
+            "name": "Nguyễn Văn An",
+            "email": "nguyenvanan@example.com",
+            "avatar": "https://i.pravatar.cc/150?img=1",
+            "role": "INSTRUCTOR"
+          },
+          "content": "Cảm ơn bạn! Chúc bạn lái xe an toàn.",
+          "parentId": "comment_001",
+          "createdAt": "2024-11-15T11:30:00Z",
+          "updatedAt": "2024-11-15T11:30:00Z",
+          "likes": 5,
+          "dislikes": 0
+        }
+      ]
+    },
+    {
+      "id": "comment_003",
+      "postId": "post_001",
+      "userId": "user_novice_002",
+      "user": {
+        "id": "user_novice_002",
+        "name": "Lê Thị Hoa",
+        "email": "lethihoa@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=21",
+        "role": "NOVICE_DRIVER"
+      },
+      "content": "Mình đang học lái xe, bài viết này giúp mình rất nhiều. Cảm ơn tác giả!",
+      "createdAt": "2024-11-15T12:00:00Z",
+      "updatedAt": "2024-11-15T12:00:00Z",
+      "likes": 8,
+      "dislikes": 0
+    },
+    {
+      "id": "comment_004",
+      "postId": "post_002",
+      "userId": "user_novice_003",
+      "user": {
+        "id": "user_novice_003",
+        "name": "Phạm Văn Long",
+        "email": "phamvanlong@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=22",
+        "role": "NOVICE_DRIVER"
+      },
+      "content": "Thi B2 có khó không ạ? Mình sắp thi rồi mà hơi lo.",
+      "createdAt": "2024-11-12T15:00:00Z",
+      "updatedAt": "2024-11-12T15:00:00Z",
+      "likes": 3,
+      "dislikes": 0
+    }
+  ],
+  "reactions": [
+    {
+      "id": "reaction_001",
+      "postId": "post_001",
+      "userId": "user_novice_001",
+      "user": {
+        "id": "user_novice_001",
+        "name": "Trần Văn Nam",
+        "email": "tranvannam@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=20",
+        "role": "NOVICE_DRIVER"
+      },
+      "type": "LIKE",
+      "createdAt": "2024-11-15T11:00:00Z"
+    },
+    {
+      "id": "reaction_002",
+      "postId": "post_001",
+      "userId": "user_novice_002",
+      "user": {
+        "id": "user_novice_002",
+        "name": "Lê Thị Hoa",
+        "email": "lethihoa@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=21",
+        "role": "NOVICE_DRIVER"
+      },
+      "type": "LIKE",
+      "createdAt": "2024-11-15T12:00:00Z"
+    },
+    {
+      "id": "reaction_003",
+      "commentId": "comment_001",
+      "userId": "user_novice_002",
+      "user": {
+        "id": "user_novice_002",
+        "name": "Lê Thị Hoa",
+        "email": "lethihoa@example.com",
+        "avatar": "https://i.pravatar.cc/150?img=21",
+        "role": "NOVICE_DRIVER"
+      },
+      "type": "LIKE",
+      "createdAt": "2024-11-15T12:30:00Z"
+    }
+  ],
+  "categories": [
+    "Tất cả",
+    "Kỹ năng lái xe",
+    "Thi bằng lái",
+    "Luật giao thông",
+    "Bảo dưỡng xe",
+    "Tư vấn xe"
+  ]
+}
+
