@@ -8,6 +8,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useSignUp } from "@/hooks/auth/useSignUp";
 
 export function OtpForm({ className, ...props }: React.ComponentProps<"div">) {
   const router = useRouter();
@@ -15,8 +16,15 @@ export function OtpForm({ className, ...props }: React.ComponentProps<"div">) {
   const email = searchParams.get("email") || "";
 
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [otpError, setOtpError] = useState("");
   const [isResending, setIsResending] = useState(false);
+  const {
+    handleInputCodeChange,
+    handleVerificationSubmitWithCode,
+    handleVerificationResend,
+    resendCooldown,
+    isLoading: authLoading,
+  } = useSignUp();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -44,21 +52,14 @@ export function OtpForm({ className, ...props }: React.ComponentProps<"div">) {
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
+    handleInputCodeChange(newOtp.join(""));
+    if (otpError) {
+      setOtpError("");
+    }
 
     // Auto-focus next input
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
-    }
-
-    // Auto-submit when all fields are filled
-    if (value && index === 5) {
-      const fullOtp = [...newOtp];
-      if (fullOtp.every((digit) => digit !== "")) {
-        // Small delay to ensure state is updated
-        setTimeout(() => {
-          handleVerifyOTP();
-        }, 100);
-      }
     }
   };
 
@@ -88,6 +89,10 @@ export function OtpForm({ className, ...props }: React.ComponentProps<"div">) {
         }
       });
       setOtp(newOtp);
+      handleInputCodeChange(newOtp.join(""));
+      if (otpError) {
+        setOtpError("");
+      }
 
       // Focus the next empty input or the last one
       const nextIndex = Math.min(digits.length, 5);
@@ -95,41 +100,48 @@ export function OtpForm({ className, ...props }: React.ComponentProps<"div">) {
     }
   };
 
-  const handleVerifyOTP = async () => {
-    const otpString = otp.join("");
+  const handleVerifyOTP = async (
+    e?: React.MouseEvent<HTMLButtonElement>,
+    otpValue?: string
+  ) => {
+    e?.preventDefault();
+    
+    const otpString = otpValue || otp.join("");
+    
+    // Validate OTP length
     if (otpString.length !== 6) {
+      setOtpError("Vui lòng nhập đầy đủ mã OTP");
       return;
     }
 
-    setIsLoading(true);
-    try {
-      // TODO: Implement OTP verification logic here
-      console.log("Verifying OTP:", otpString);
-      console.log("Email:", email);
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Navigate to check role page
-      router.push("/check-role");
-    } catch (error) {
-      console.error("OTP verification failed:", error);
-    } finally {
-      setIsLoading(false);
+    // Update Redux state with current OTP
+    handleInputCodeChange(otpString);
+    
+    // Small delay to ensure Redux state is updated
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    // Verify OTP
+    const isValid = handleVerificationSubmitWithCode();
+    
+    if (!isValid) {
+      setOtpError("Mã OTP không chính xác. Vui lòng thử lại.");
+      return;
     }
+
+    // OTP is valid, navigate to next page
+    router.push("/check-role");
   };
 
   const handleResendOTP = async () => {
+    if (resendCooldown > 0) return;
     setIsResending(true);
     try {
-      // TODO: Implement resend OTP logic here
-      console.log("Resending OTP to:", email);
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await handleVerificationResend();
 
       // Reset OTP fields
       setOtp(["", "", "", "", "", ""]);
+      handleInputCodeChange("");
+      setOtpError("");
       if (inputRefs.current[0]) {
         inputRefs.current[0].focus();
       }
@@ -212,6 +224,11 @@ export function OtpForm({ className, ...props }: React.ComponentProps<"div">) {
                   />
                 ))}
               </div>
+              {otpError && (
+                <p className="text-red-400 text-sm text-center -mt-1">
+                  {otpError}
+                </p>
+              )}
 
               {/* Resend Code */}
               <div className="flex items-center justify-center gap-2 text-sm">
@@ -219,10 +236,14 @@ export function OtpForm({ className, ...props }: React.ComponentProps<"div">) {
                 <button
                   type="button"
                   onClick={handleResendOTP}
-                  disabled={isResending}
+                  disabled={isResending || resendCooldown > 0}
                   className="text-[#10b981] hover:text-[#059669] underline underline-offset-4 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isResending ? "Đang gửi..." : "Gửi lại mã"}
+                  {isResending
+                    ? "Đang gửi..."
+                    : resendCooldown > 0
+                      ? `Gửi lại mã (${resendCooldown}s)`
+                      : "Gửi lại mã"}
                 </button>
               </div>
 
@@ -231,9 +252,11 @@ export function OtpForm({ className, ...props }: React.ComponentProps<"div">) {
                 type="button"
                 onClick={handleVerifyOTP}
                 className="w-full bg-gradient-to-r from-[#10b981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white"
-                disabled={isLoading || otp.some((digit) => digit === "")}
+                disabled={
+                  authLoading || otp.some((digit) => digit === "")
+                }
               >
-                {isLoading ? "Đang xác minh..." : "Xác minh"}
+                {authLoading ? "Đang xác minh..." : "Xác minh"}
               </Button>
             </div>
           </div>

@@ -5,6 +5,7 @@ import { handleTokenStorage } from "@/lib/jwt/jwt.utils";
 import type { ISignUpRequest, ISignUpResponse } from "@/types/auth/signup.type";
 
 export const AUTH_PATH = "auth";
+export const NOVICE_DRIVER_PATH = "novice-driver";
 
 export const signIn = createThunk<ISignInResponse, ISignInRequest>(
   HttpMethod.POST,
@@ -19,21 +20,20 @@ export const signIn = createThunk<ISignInResponse, ISignInRequest>(
     },
     onError: (error) => {
       console.log("[auth thunk] error in signIn", error);
-    }
+    },
   }
 );
 
 export const signUp = createThunk<ISignUpResponse, ISignUpRequest>(
   HttpMethod.POST,
   `signup`,
-  `${AUTH_PATH}/signup`
+  `${NOVICE_DRIVER_PATH}/registration`
 );
 
-export const sendEmailCode = createThunk<string, { email: string }>(
-  HttpMethod.POST,
-  `verify-email`,
-  `${AUTH_PATH}/verify-email`
-);
+export const sendEmailCode = createThunk<
+  string,
+  { email: string; phoneNumber: string }
+>(HttpMethod.POST, `verify`, `${AUTH_PATH}/verify`);
 
 import type {
   InstructorSignupResponse,

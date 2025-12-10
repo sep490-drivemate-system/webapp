@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/select";
 import Link from "next/link";
 import Image from "next/image";
+import { useSignUp } from "@/hooks/auth/useSignUp";
+import { useAppSelector } from "@/lib/redux/useAppDispatch";
 
 type Role = {
   id: string;
@@ -36,12 +38,20 @@ const roles: Role[] = [
 export default function CheckRolePage() {
   const router = useRouter();
   const [selectedRole, setSelectedRole] = useState<string>("");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const { handleRegisterNoviceDriver } = useSignUp();
+  const auth = useAppSelector((state) => state.auth);
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!selectedRole) return;
 
     if (selectedRole === "new-driver") {
-      router.push("/");
+      console.log(auth.signupData);
+      const result = await handleRegisterNoviceDriver(auth.signupData);
+      if (result.ok) {
+        setShowSuccess(true);
+        setTimeout(() => router.push("/signin"), 1500);
+      }
     } else if (selectedRole === "instructor") {
       router.push("/indentification-document");
     }
@@ -119,6 +129,22 @@ export default function CheckRolePage() {
           </CardContent>
         </Card>
       </div>
+
+      {showSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white text-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="h-12 w-12 flex items-center justify-center rounded-full bg-emerald-100 text-emerald-600 text-2xl">
+                ✓
+              </div>
+              <p className="text-lg font-semibold">Đăng ký thành công</p>
+              <p className="text-sm text-gray-600">
+                Vui lòng đăng nhập để tiếp tục.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

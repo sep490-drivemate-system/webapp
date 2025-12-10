@@ -9,12 +9,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSignUp } from "@/hooks/auth/useSignUp";
 
 export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -26,6 +26,8 @@ export function RegisterForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const videoRef = useRef<HTMLVideoElement>(null);
+  const router = useRouter();
+  const { handleSendEmailCode, isLoading: authLoading } = useSignUp();
 
   useEffect(() => {
     const video = videoRef.current;
@@ -94,7 +96,7 @@ export function RegisterForm({
     // Validate phone
     if (!formData.phone) {
       newErrors.phone = "Số điện thoại là bắt buộc";
-    } else if (!/^[0-9]{10,11}$/.test(formData.phone.replace(/\s/g, ""))) {
+    } else if (!/^[0-9]{10}$/.test(formData.phone.replace(/\s/g, ""))) {
       newErrors.phone = "Số điện thoại không hợp lệ";
     }
 
@@ -113,28 +115,34 @@ export function RegisterForm({
       setIsLoading(true);
       setErrors({});
       try {
-        // TODO: Implement signup logic here (send OTP to email)
-        console.log("Form data:", formData);
+        const result = await handleSendEmailCode({
+          email: formData.email,
+          phoneNumber: formData.phone,
+          password: formData.password,
+        });
 
-        // Simulate API call to send OTP
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Navigate to OTP page with email in query params
-        router.push(`/otp?email=${encodeURIComponent(formData.email)}`);
-        // Note: setIsLoading(false) is not needed here as component will unmount on navigation
+        if (result.ok) {
+          // Điều hướng sang trang nhập OTP kèm email để hiển thị
+          router.push(`/otp?email=${encodeURIComponent(formData.email)}`);
+        } else {
+          setErrors({
+            submit:
+              "Không thể gửi mã OTP. Vui lòng kiểm tra lại thông tin và thử lại.",
+          });
+        }
       } catch (error) {
         console.error("Signup failed:", error);
-        setIsLoading(false);
         setErrors({
           submit: "Đã xảy ra lỗi. Vui lòng thử lại sau.",
         });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -307,7 +315,7 @@ export function RegisterForm({
               <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-[#10b981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white"
-                disabled={isLoading}
+            disabled={isLoading || authLoading}
               >
                 {isLoading ? "Đang lưu thông tin..." : "Tiếp theo"}
               </Button>

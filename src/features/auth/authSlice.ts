@@ -7,20 +7,10 @@ import {
 } from "@/lib/jwt/jwt.utils";
 import { BaseState } from "@/types/generic/baseState";
 import {
-  SignupMethod,
-  SignupStep,
   ISignUpRequest,
 } from "@/types/auth/signup.type";
 import { ISignInRequest } from "@/types/auth/signin.type";
 
-interface SignupData {
-  method: SignupMethod;
-  contact: string;
-  basicInfo: {
-    signUpRequest: ISignUpRequest;
-    confirmPassword: string;
-  };
-}
 export interface AuthState extends BaseState {
   // Authentication state
   signInData: ISignInRequest;
@@ -28,10 +18,9 @@ export interface AuthState extends BaseState {
   role: number | null;
 
   // Signup flow state
-  currentStep: SignupStep;
   inputCode: string;
   verificationCode: string;
-  signupData: SignupData;
+  signupData: ISignUpRequest;
 }
 
 const isClient = typeof window !== "undefined";
@@ -58,20 +47,12 @@ const initialState: AuthState = {
   role: isClient && !tokenExpired ? getUserRole() ?? null : null,
 
   // Signup flow state
-  currentStep: 1,
   inputCode: "",
   verificationCode: "",
   signupData: {
-    method: SignupMethod.EMAIL,
-    contact: "",
-    basicInfo: {
-      signUpRequest: {
-        userName: "",
-        password: "",
-        emailOrPhone: "",
-      },
-      confirmPassword: "",
-    },
+    phoneNumber: "",
+    email: "",
+    password: "",
   },
 };
 
@@ -94,43 +75,23 @@ const authSlice = createSlice({
         localStorage.removeItem("refresh_token");
       }
     },
-    setCurrentStep(state, action) {
-      state.currentStep = action.payload;
-    },
-    setSignupMethod(state, action) {
-      state.signupData.method = action.payload;
-    },
-    setSignupContact(state, action) {
-      state.signupData.contact = action.payload;
-      state.signupData.basicInfo.signUpRequest.emailOrPhone = action.payload;
-    },
     setSignupVerificationCode(state, action) {
       state.verificationCode = action.payload;
-    },
-    setUserNameChange(state, action) {
-      state.signupData.basicInfo.signUpRequest.userName = action.payload;
-    },
-    setPasswordChange(state, action) {
-      state.signupData.basicInfo.signUpRequest.password = action.payload;
-    },
-    setConfirmPasswordChange(state, action) {
-      state.signupData.basicInfo.confirmPassword = action.payload;
     },
     setInputCode(state, action) {
       state.inputCode = action.payload;
     },
     resetSignupFlow(state) {
-      state.currentStep = 1;
       state.inputCode = "";
       state.verificationCode = "";
       state.signupData = {
-        method: SignupMethod.EMAIL,
-        contact: "",
-        basicInfo: {
-          signUpRequest: { userName: "", password: "", emailOrPhone: "" },
-          confirmPassword: "",
-        },
+        phoneNumber: "",
+        email: "",
+        password: "",
       };
+    },
+    setSignupData(state, action) {
+      state.signupData = action.payload;
     },
     setSignInEmailOrPhone(state, action) {
       state.signInData.emailOrPhone = action.payload;
@@ -170,16 +131,12 @@ const authSlice = createSlice({
       .addCase(signUp.fulfilled, (state) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.currentStep = 1;
         state.inputCode = "";
         state.verificationCode = "";
         state.signupData = {
-          method: SignupMethod.EMAIL,
-          contact: "",
-          basicInfo: {
-            signUpRequest: { userName: "", password: "", emailOrPhone: "" },
-            confirmPassword: "",
-          },
+          phoneNumber: "",
+          email: "",
+          password: "",
         };
       })
       .addCase(signUp.rejected, (state) => {
@@ -204,15 +161,10 @@ const authSlice = createSlice({
 
 export const {
   signOutLocal,
-  setCurrentStep,
-  setSignupMethod,
-  setSignupContact,
   setSignupVerificationCode,
   setInputCode,
-  setUserNameChange,
-  setPasswordChange,
-  setConfirmPasswordChange,
   resetSignupFlow,
+  setSignupData,
   setSignInEmailOrPhone,
   setSignInPassword,
   resetSignInData,
