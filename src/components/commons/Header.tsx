@@ -18,8 +18,9 @@ const MAIN_MENU = [
   { path: "/instructors", label: "Người hướng dẫn" },
   { path: "/cars", label: "Xe tập" },
   { path: "/blogs", label: "Bài viết" },
-  { path: "/terms-and-sersvices", label: "Điều khoản và dịch vụ" },
+  // { path: "/terms-and-sersvices", label: "Điều khoản và dịch vụ" },
   { path: "/about-us", label: "Về chúng tôi" },
+  { path: "/forum", label: "Diễn đàn" },
 ];
 
 function Logo({ sizeClass = "h-16 w-16" }: { sizeClass?: string }) {
@@ -61,11 +62,10 @@ function NavMenu({
             <li key={item.path} className="relative">
               <Link
                 href={item.path}
-                className={`group inline-flex h-9 w-max items-center justify-center rounded-md px-3 sm:px-4 py-2 text-sm font-medium transition-all ${
-                  activePath === item.path
-                    ? "bg-gradient-to-r from-[#10b981] to-[#059669] text-white shadow-lg hover:shadow-xl hover:from-[#059669] hover:to-[#047857] active:scale-95"
-                    : "hover:bg-gradient-to-r hover:from-[#10b981] hover:to-[#059669] hover:text-white hover:shadow-lg active:scale-95"
-                }`}
+                className={`group inline-flex h-9 w-max items-center justify-center rounded-md px-3 sm:px-4 py-2 text-sm font-medium transition-all ${activePath === item.path
+                  ? "bg-gradient-to-r from-[#10b981] to-[#059669] text-white shadow-lg hover:shadow-xl hover:from-[#059669] hover:to-[#047857] active:scale-95"
+                  : "hover:bg-gradient-to-r hover:from-[#10b981] hover:to-[#059669] hover:text-white hover:shadow-lg active:scale-95"
+                  }`}
               >
                 {item.label}
               </Link>
@@ -100,11 +100,10 @@ function UserDropdown() {
   return (
     <div className="relative right-5" ref={ref}>
       <button
-        className={`h-10 w-10 rounded-full flex items-center justify-center transition-all duration-150 ${
-          open
-            ? "bg-gradient-to-r from-[#10b981] to-[#059669] text-white shadow-lg hover:shadow-xl hover:from-[#059669] hover:to-[#047857] active:scale-95"
-            : "hover:bg-gradient-to-r hover:from-[#10b981] hover:to-[#059669] hover:text-white hover:shadow-lg active:scale-95"
-        }`}
+        className={`h-10 w-10 rounded-full flex items-center justify-center transition-all duration-150 ${open
+          ? "bg-gradient-to-r from-[#10b981] to-[#059669] text-white shadow-lg hover:shadow-xl hover:from-[#059669] hover:to-[#047857] active:scale-95"
+          : "hover:bg-gradient-to-r hover:from-[#10b981] hover:to-[#059669] hover:text-white hover:shadow-lg active:scale-95"
+          }`}
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="true"
         aria-expanded={open}
@@ -171,11 +170,10 @@ function MobileMenu({
           <Link
             key={item.path}
             href={item.path}
-            className={`block w-full max-w-sm px-6 py-3 rounded-md text-lg font-medium text-center transition-colors ${
-              activePath === item.path
-                ? "bg-accent text-accent-foreground"
-                : "text-white hover:bg-accent hover:text-accent-foreground"
-            }`}
+            className={`block w-full max-w-sm px-6 py-3 rounded-md text-lg font-medium text-center transition-colors ${activePath === item.path
+              ? "bg-accent text-accent-foreground"
+              : "text-white hover:bg-accent hover:text-accent-foreground"
+              }`}
             onClick={onClose}
           >
             {item.label}

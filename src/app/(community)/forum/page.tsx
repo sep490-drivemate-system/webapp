@@ -11,11 +11,6 @@ import {
     ThumbsUp,
     ThumbsDown,
     Share2,
-    Bookmark,
-    MoreHorizontal,
-    Search,
-    Plus,
-    Users,
     MessageCircle,
     Eye,
     Clock,
@@ -28,6 +23,12 @@ import {
     Video,
     Play,
     ImageIcon,
+    HelpCircle,
+    Bell,
+    Settings,
+    LogOut,
+    Plus,
+    Search,
 } from "lucide-react";
 import { Post, PostStatus, Comment, ReactionType, UserRole, User } from "@/types/post/post.type";
 import postsData from "@/data/mock-posts.json";
@@ -41,6 +42,23 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 // Mock current user
 const currentUser: User = {
@@ -51,12 +69,36 @@ const currentUser: User = {
     role: UserRole.NOVICE_DRIVER,
 };
 
+function Logo({ sizeClass = "h-16 w-16" }: { sizeClass?: string }) {
+    return (
+        <Link href="/" className={`flex items-center shrink-0`}>
+            <div className={`relative left-10 ${sizeClass}`}>
+                <Image
+                    src="/logo.png"
+                    alt="DriveMate Logo"
+                    objectFit="cover"
+                    width={200}
+                    height={200}
+                    priority
+                    className="scale-200"
+                />
+            </div>
+        </Link>
+    );
+}
 export default function ForumPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
     const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
     const [replyInputs, setReplyInputs] = useState<Record<string, string>>({});
+    const [showCreatePostDialog, setShowCreatePostDialog] = useState(false);
+    const [postTitle, setPostTitle] = useState("");
+    const [postContent, setPostContent] = useState("");
+    const [postCategory, setPostCategory] = useState("");
+    const [postTags, setPostTags] = useState("");
+    const [postThumbnail, setPostThumbnail] = useState("");
+    const [postVideoUrl, setPostVideoUrl] = useState("");
 
     // Get only published posts
     const publishedPosts = useMemo(() => {
@@ -274,34 +316,6 @@ export default function ForumPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <div className="sticky top-0 z-50 bg-white border-b shadow-sm">
-                <div className="container mx-auto px-4 py-3">
-                    <div className="flex items-center justify-between">
-                        <Link href="/forum" className="text-2xl font-bold text-primary">
-                            DriveMate Forum
-                        </Link>
-                        <div className="flex-1 max-w-md mx-4">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                                <Input
-                                    placeholder="Tìm kiếm bài viết..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-10"
-                                />
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Avatar>
-                                <AvatarImage src={currentUser.avatar} />
-                                <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div className="container mx-auto px-4 py-6 max-w-6xl">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                     {/* Sidebar Left - Categories */}
@@ -319,7 +333,7 @@ export default function ForumPage() {
                                         onClick={() => setSelectedCategory(null)}
                                         className={`w-full text-left p-3 rounded-lg transition-all ${selectedCategory === null
                                             ? "bg-primary text-primary-foreground shadow-md"
-                                            : "hover:bg-gray-100"
+                                            : ""
                                             }`}
                                     >
                                         <div className="flex items-center justify-between">
@@ -343,7 +357,7 @@ export default function ForumPage() {
                                                 }
                                                 className={`w-full text-left p-3 rounded-lg transition-all group ${isSelected
                                                     ? `bg-gradient-to-r ${cat.color} text-white shadow-lg`
-                                                    : "hover:bg-gray-100 border border-transparent hover:border-gray-200"
+                                                    : " border border-transparent "
                                                     }`}
                                             >
                                                 <div className="flex items-start gap-3">
@@ -405,102 +419,157 @@ export default function ForumPage() {
                                 </div>
                             </CardContent>
                         </Card>
-
-                        {/* Video Section */}
-                        {categories.some((cat) => cat.hasVideo) && (
-                            <Card className="overflow-hidden">
-                                <CardContent className="p-0">
-                                    <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/5 border-b">
-                                        <h3 className="font-bold text-lg flex items-center gap-2">
-                                            <Video className="size-5 text-purple-600" />
-                                            Video nổi bật
-                                        </h3>
-                                    </div>
-                                    <div className="p-4 space-y-3">
-                                        {categories
-                                            .filter((cat) => cat.hasVideo && cat.latestPost)
-                                            .slice(0, 3)
-                                            .map((cat) => (
-                                                <Link
-                                                    key={cat.name}
-                                                    href={`/forum/${cat.latestPost?.id}`}
-                                                    className="block group"
-                                                >
-                                                    <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-200 mb-2">
-                                                        {cat.latestPost?.thumbnail && (
-                                                            <Image
-                                                                src={cat.latestPost.thumbnail}
-                                                                alt={cat.latestPost.title}
-                                                                fill
-                                                                className="object-cover group-hover:scale-105 transition-transform duration-300"
-                                                            />
-                                                        )}
-                                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/50 transition-colors">
-                                                            <div className="bg-white/90 rounded-full p-3 group-hover:scale-110 transition-transform">
-                                                                <Play className="size-6 text-primary ml-1" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="absolute bottom-2 left-2 right-2">
-                                                            <Badge className="bg-black/70 text-white text-xs">
-                                                                {cat.name}
-                                                            </Badge>
-                                                        </div>
-                                                    </div>
-                                                    <p className="text-sm font-medium line-clamp-2 group-hover:text-primary transition-colors">
-                                                        {cat.latestPost?.title}
-                                                    </p>
-                                                    <p className="text-xs text-muted-foreground mt-1">
-                                                        {formatDate(
-                                                            cat.latestPost?.publishedAt ||
-                                                            cat.latestPost?.createdAt ||
-                                                            ""
-                                                        )}
-                                                    </p>
-                                                </Link>
-                                            ))}
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
                     </div>
 
                     {/* Main Feed */}
                     <div className="lg:col-span-3 space-y-4">
                         {/* Create Post Card */}
-                        <Card className="border-2 border-dashed hover:border-primary/50 transition-colors">
-                            <CardContent className="pt-6">
-                                <div className="flex items-start gap-3">
-                                    <Avatar className="h-12 w-12 ring-2 ring-primary/20">
+                        <Card>
+                            <CardContent className="p-5">
+                                <div className="flex items-center gap-4">
+                                    <Avatar className="h-12 w-12 ring-3 ring-primary/10 shadow-md shrink-0">
                                         <AvatarImage src={currentUser.avatar} />
-                                        <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                                        <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-white font-bold">
                                             {currentUser.name.charAt(0)}
                                         </AvatarFallback>
                                     </Avatar>
-                                    <div className="flex-1">
+                                    <div className="flex-1 relative">
                                         <Input
-                                            placeholder="Chia sẻ kiến thức, kinh nghiệm lái xe của bạn..."
-                                            onClick={() => toast.info("Tính năng đang phát triển")}
-                                            className="cursor-pointer h-12 text-base"
+                                            placeholder="Tìm kiếm bài viết, câu hỏi, hoặc chủ đề..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+
                                         />
-                                        <div className="flex items-center gap-2 mt-3">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="text-muted-foreground hover:text-primary"
-                                            >
-                                                <Video className="size-4 mr-2" />
-                                                Video
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="text-muted-foreground hover:text-primary"
-                                            >
-                                                <ImageIcon className="size-4 mr-2" />
-                                                Ảnh
-                                            </Button>
-                                        </div>
                                     </div>
+                                    <Dialog open={showCreatePostDialog} onOpenChange={setShowCreatePostDialog}>
+                                        <DialogTrigger asChild>
+                                            <Button variant="default">
+                                                <Plus className="size-5 mr-2" />
+                                                <span className="font-semibold">Đăng bài</span>
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                                            <DialogHeader>
+                                                <DialogTitle>Tạo bài viết mới</DialogTitle>
+                                                <DialogDescription>
+                                                    Chia sẻ kiến thức và kinh nghiệm lái xe của bạn với cộng đồng
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <div className="space-y-4 py-4">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="title">Tiêu đề bài viết *</Label>
+                                                    <Input
+                                                        id="title"
+                                                        placeholder="Nhập tiêu đề bài viết..."
+                                                        value={postTitle}
+                                                        onChange={(e) => setPostTitle(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="category">Danh mục *</Label>
+                                                    <Select value={postCategory} onValueChange={setPostCategory}>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Chọn danh mục" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {categories.map((cat) => {
+                                                                const Icon = cat.icon;
+                                                                return (
+                                                                    <SelectItem key={cat.name} value={cat.name}>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <Icon className="size-4" />
+                                                                            <span>{cat.name}</span>
+                                                                        </div>
+                                                                    </SelectItem>
+                                                                );
+                                                            })}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="content">Nội dung bài viết *</Label>
+                                                    <Textarea
+                                                        id="content"
+                                                        placeholder="Viết nội dung bài viết của bạn... (Hỗ trợ markdown cơ bản)"
+                                                        value={postContent}
+                                                        onChange={(e) => setPostContent(e.target.value)}
+                                                        rows={12}
+                                                        className="resize-none"
+                                                    />
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Bạn có thể sử dụng markdown để định dạng văn bản
+                                                    </p>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label htmlFor="tags">Thẻ (Tags)</Label>
+                                                        <Input
+                                                            id="tags"
+                                                            placeholder="Ví dụ: lái xe, an toàn, kỹ năng"
+                                                            value={postTags}
+                                                            onChange={(e) => setPostTags(e.target.value)}
+                                                        />
+                                                        <p className="text-xs text-muted-foreground">
+                                                            Phân cách bằng dấu phẩy
+                                                        </p>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label htmlFor="thumbnail">URL Ảnh đại diện</Label>
+                                                        <Input
+                                                            id="thumbnail"
+                                                            placeholder="https://example.com/image.jpg"
+                                                            value={postThumbnail}
+                                                            onChange={(e) => setPostThumbnail(e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="video">URL Video (YouTube, Vimeo...)</Label>
+                                                    <Input
+                                                        id="video"
+                                                        placeholder="https://youtube.com/watch?v=..."
+                                                        value={postVideoUrl}
+                                                        onChange={(e) => setPostVideoUrl(e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <DialogFooter>
+                                                <Button
+                                                    variant="outline"
+                                                    onClick={() => {
+                                                        setShowCreatePostDialog(false);
+                                                        setPostTitle("");
+                                                        setPostContent("");
+                                                        setPostCategory("");
+                                                        setPostTags("");
+                                                        setPostThumbnail("");
+                                                        setPostVideoUrl("");
+                                                    }}
+                                                >
+                                                    Hủy
+                                                </Button>
+                                                <Button
+                                                    onClick={() => {
+                                                        if (!postTitle || !postContent || !postCategory) {
+                                                            toast.error("Vui lòng điền đầy đủ các trường bắt buộc!");
+                                                            return;
+                                                        }
+                                                        // TODO: Implement actual post creation
+                                                        toast.success("Bài viết đã được tạo thành công!");
+                                                        setShowCreatePostDialog(false);
+                                                        setPostTitle("");
+                                                        setPostContent("");
+                                                        setPostCategory("");
+                                                        setPostTags("");
+                                                        setPostThumbnail("");
+                                                        setPostVideoUrl("");
+                                                    }}
+                                                >
+                                                    Đăng bài
+                                                </Button>
+                                            </DialogFooter>
+                                        </DialogContent>
+                                    </Dialog>
                                 </div>
                             </CardContent>
                         </Card>
@@ -528,13 +597,10 @@ export default function ForumPage() {
                                 const likeCount = reactions.filter(
                                     (r) => r.type === ReactionType.LIKE
                                 ).length;
-                                const dislikeCount = reactions.filter(
-                                    (r) => r.type === ReactionType.DISLIKE
-                                ).length;
                                 const showComments = expandedComments.has(post.id);
 
                                 return (
-                                    <Card key={post.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 border-l-4 border-l-transparent hover:border-l-primary">
+                                    <Card key={post.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 border-l-4 border-l-transparent ">
                                         {/* Post Header */}
                                         <CardContent className="pt-6">
                                             <div className="flex items-start justify-between mb-4">
@@ -548,12 +614,6 @@ export default function ForumPage() {
                                                     <div className="flex-1">
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <span className="font-bold text-base">{post.author.name}</span>
-                                                            {post.author.role === "INSTRUCTOR" && (
-                                                                <Badge className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0">
-                                                                    <GraduationCap className="size-3 mr-1" />
-                                                                    Giáo viên
-                                                                </Badge>
-                                                            )}
                                                         </div>
                                                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                             <Clock className="size-3" />
@@ -565,22 +625,11 @@ export default function ForumPage() {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="hover:bg-gray-100">
-                                                            <MoreHorizontal className="size-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem>Lưu bài viết</DropdownMenuItem>
-                                                        <DropdownMenuItem>Báo cáo</DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
                                             </div>
 
                                             {/* Post Content */}
                                             <Link href={`/forum/${post.id}`}>
-                                                <h2 className="text-2xl font-bold mb-3 hover:text-primary transition-colors cursor-pointer leading-tight">
+                                                <h2 className="text-2xl font-bold mb-3  transition-colors cursor-pointer leading-tight">
                                                     {post.title}
                                                 </h2>
                                             </Link>
@@ -588,41 +637,34 @@ export default function ForumPage() {
                                                 {stripHtml(post.content)}
                                             </p>
 
-                                            {/* Post Media */}
                                             {post.thumbnail && (
-                                                <Link href={`/forum/${post.id}`} className="block mb-4 group">
-                                                    <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-muted shadow-md group-hover:shadow-xl transition-shadow">
-                                                        <Image
-                                                            src={post.thumbnail}
-                                                            alt={post.title}
-                                                            fill
-                                                            className="object-cover group-hover:scale-105 transition-transform duration-300"
-                                                        />
-                                                        {post.videoUrl && (
-                                                            <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition-colors">
-                                                                <div className="bg-white/90 rounded-full p-4 group-hover:scale-110 transition-transform">
-                                                                    <Play className="size-8 text-primary ml-1" />
-                                                                </div>
+                                                <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-muted shadow-md ">
+                                                    <Image
+                                                        src={post.thumbnail}
+                                                        alt={post.title}
+                                                        fill
+                                                        className="object-cover "
+                                                    />
+                                                    {post.videoUrl && (
+                                                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center ">
+                                                            <div className="bg-white/90 rounded-full p-4 ">
+                                                                <Play className="size-8 text-primary ml-1" />
                                                             </div>
-                                                        )}
-                                                    </div>
-                                                </Link>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             )}
 
                                             {/* Post Stats */}
                                             <div className="flex items-center justify-between text-sm text-muted-foreground mb-4 pb-4 border-b border-gray-200">
                                                 <div className="flex items-center gap-6">
-                                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer">
+                                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 ">
                                                         <ThumbsUp className="size-4" />
                                                         <span className="font-medium">{likeCount}</span>
                                                     </div>
-                                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer">
+                                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 ">
                                                         <MessageCircle className="size-4" />
                                                         <span className="font-medium">{comments.length}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100">
-                                                        <Eye className="size-4" />
-                                                        <span className="font-medium">{post.views}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -631,7 +673,7 @@ export default function ForumPage() {
                                             <div className="flex items-center gap-2 border-t border-gray-100 pt-3">
                                                 <Button
                                                     variant="ghost"
-                                                    className="flex-1 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                                                    className="flex-1 "
                                                     onClick={() => handleReaction(post.id, ReactionType.LIKE)}
                                                 >
                                                     <ThumbsUp
@@ -644,19 +686,15 @@ export default function ForumPage() {
                                                 </Button>
                                                 <Button
                                                     variant="ghost"
-                                                    className="flex-1 hover:bg-green-50 hover:text-green-600 transition-colors"
+                                                    className="flex-1 "
                                                     onClick={() => toggleComments(post.id)}
                                                 >
                                                     <MessageSquare className="mr-2 size-5" />
                                                     <span className="font-medium">Bình luận</span>
                                                 </Button>
-                                                <Button variant="ghost" className="flex-1 hover:bg-purple-50 hover:text-purple-600 transition-colors">
+                                                <Button variant="ghost" className="flex-1 ">
                                                     <Share2 className="mr-2 size-5" />
                                                     <span className="font-medium">Chia sẻ</span>
-                                                </Button>
-                                                <Button variant="ghost" className="flex-1 hover:bg-orange-50 hover:text-orange-600 transition-colors">
-                                                    <Bookmark className="mr-2 size-5" />
-                                                    <span className="font-medium">Lưu</span>
                                                 </Button>
                                             </div>
 
@@ -693,7 +731,6 @@ export default function ForumPage() {
                                                         </div>
                                                     </div>
 
-                                                    {/* Comments List */}
                                                     {comments.length > 0 && (
                                                         <div className="space-y-4">
                                                             {comments.map((comment) => (

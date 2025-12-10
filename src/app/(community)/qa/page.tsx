@@ -18,6 +18,11 @@ import {
     Tag,
     User,
     GraduationCap,
+    HelpCircle,
+    Bell,
+    Settings,
+    LogOut,
+    Users,
 } from "lucide-react";
 import { Question, Answer } from "@/types/post/qa.type";
 import qaData from "@/data/mock-qa.json";
@@ -41,6 +46,12 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { UserRole } from "@/types/post/post.type";
 
 const currentUser = {
@@ -172,90 +183,12 @@ export default function QAPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <div className="sticky top-0 z-50 bg-white border-b shadow-sm">
-                <div className="container mx-auto px-4 py-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-bold text-primary">Hỏi & Đáp</h1>
-                            <p className="text-sm text-muted-foreground">
-                                Đặt câu hỏi và nhận câu trả lời từ cộng đồng
-                            </p>
-                        </div>
-                        <Dialog open={showAskDialog} onOpenChange={setShowAskDialog}>
-                            <DialogTrigger asChild>
-                                <Button className="gap-2">
-                                    <Plus className="size-4" />
-                                    Đặt câu hỏi
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-2xl">
-                                <DialogHeader>
-                                    <DialogTitle>Đặt câu hỏi mới</DialogTitle>
-                                    <DialogDescription>
-                                        Chia sẻ câu hỏi của bạn để nhận được sự giúp đỡ từ cộng đồng
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="space-y-4 py-4">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium">Tiêu đề câu hỏi</label>
-                                        <Input
-                                            placeholder="Ví dụ: Làm thế nào để đỗ xe song song?"
-                                            value={questionTitle}
-                                            onChange={(e) => setQuestionTitle(e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium">Danh mục</label>
-                                        <Select
-                                            value={questionCategory}
-                                            onValueChange={setQuestionCategory}
-                                        >
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Chọn danh mục" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {categories.map((cat) => (
-                                                    <SelectItem key={cat} value={cat}>
-                                                        {cat}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium">Nội dung chi tiết</label>
-                                        <Textarea
-                                            placeholder="Mô tả chi tiết câu hỏi của bạn..."
-                                            value={questionContent}
-                                            onChange={(e) => setQuestionContent(e.target.value)}
-                                            rows={6}
-                                        />
-                                    </div>
-                                </div>
-                                <DialogFooter>
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => setShowAskDialog(false)}
-                                    >
-                                        Hủy
-                                    </Button>
-                                    <Button onClick={handleAskQuestion}>Đăng câu hỏi</Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-                    </div>
-                </div>
-            </div>
 
             <div className="container mx-auto px-4 py-6 max-w-7xl">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                     {/* Sidebar */}
                     <div className="lg:col-span-1 space-y-4">
                         <Card>
-                            <CardHeader>
-                                <CardTitle className="text-lg">Lọc theo</CardTitle>
-                            </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Danh mục</label>
@@ -281,55 +214,94 @@ export default function QAPage() {
                                         ))}
                                     </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Sắp xếp</label>
-                                    <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
-                                        <SelectTrigger>
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="newest">Mới nhất</SelectItem>
-                                            <SelectItem value="popular">Phổ biến</SelectItem>
-                                            <SelectItem value="unanswered">Chưa trả lời</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardContent className="pt-6">
-                                <div className="text-center space-y-2">
-                                    <div className="text-3xl font-bold text-primary">
-                                        {questions.length}
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">
-                                        Câu hỏi
-                                    </div>
-                                    <div className="text-3xl font-bold text-green-600 mt-4">
-                                        {questions.filter((q) => q.isSolved).length}
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">
-                                        Đã giải đáp
-                                    </div>
-                                </div>
                             </CardContent>
                         </Card>
                     </div>
 
                     {/* Main Content */}
                     <div className="lg:col-span-3 space-y-4">
-                        {/* Search */}
+                        {/* Search & Ask Question Card */}
                         <Card>
-                            <CardContent className="pt-6">
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                                    <Input
-                                        placeholder="Tìm kiếm câu hỏi..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="pl-10"
-                                    />
+                            <CardContent className="p-5">
+                                <div className="flex items-center gap-4">
+                                    <Avatar className="h-12 w-12 ring-3 ring-primary/10 shadow-md shrink-0">
+                                        <AvatarImage src={currentUser.avatar} />
+                                        <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-white font-bold">
+                                            {currentUser.name.charAt(0)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex-1 relative">
+                                        <Input
+                                            placeholder="Tìm kiếm câu hỏi, chủ đề..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                        />
+                                    </div>
+                                    <Dialog open={showAskDialog} onOpenChange={setShowAskDialog}>
+                                        <DialogTrigger asChild>
+                                            <Button
+                                                variant="default"
+                                                className="shrink-0"
+                                            >
+                                                <Plus className="size-4 mr-2" />
+                                                Đặt câu hỏi
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="max-w-2xl">
+                                            <DialogHeader>
+                                                <DialogTitle>Đặt câu hỏi mới</DialogTitle>
+                                                <DialogDescription>
+                                                    Chia sẻ câu hỏi của bạn để nhận được sự giúp đỡ từ cộng đồng
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <div className="space-y-4 py-4">
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium">Tiêu đề câu hỏi</label>
+                                                    <Input
+                                                        placeholder="Ví dụ: Làm thế nào để đỗ xe song song?"
+                                                        value={questionTitle}
+                                                        onChange={(e) => setQuestionTitle(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium">Danh mục</label>
+                                                    <Select
+                                                        value={questionCategory}
+                                                        onValueChange={setQuestionCategory}
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Chọn danh mục" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {categories.map((cat) => (
+                                                                <SelectItem key={cat} value={cat}>
+                                                                    {cat}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium">Nội dung chi tiết</label>
+                                                    <Textarea
+                                                        placeholder="Mô tả chi tiết câu hỏi của bạn..."
+                                                        value={questionContent}
+                                                        onChange={(e) => setQuestionContent(e.target.value)}
+                                                        rows={6}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <DialogFooter>
+                                                <Button
+                                                    variant="outline"
+                                                    onClick={() => setShowAskDialog(false)}
+                                                >
+                                                    Hủy
+                                                </Button>
+                                                <Button onClick={handleAskQuestion}>Đăng câu hỏi</Button>
+                                            </DialogFooter>
+                                        </DialogContent>
+                                    </Dialog>
                                 </div>
                             </CardContent>
                         </Card>
@@ -437,10 +409,6 @@ export default function QAPage() {
                                                                 <MessageCircle className="size-4" />
                                                                 <span>{questionAnswers.length} trả lời</span>
                                                             </div>
-                                                            <div className="flex items-center gap-1">
-                                                                <Eye className="size-4" />
-                                                                <span>{question.views} lượt xem</span>
-                                                            </div>
                                                         </div>
                                                     </div>
 
@@ -492,4 +460,5 @@ export default function QAPage() {
         </div>
     );
 }
+
 

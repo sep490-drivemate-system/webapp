@@ -1,0 +1,135 @@
+{
+  "questions": [
+    {
+      "id": "q1",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe trên đường cao tốc, tốc độ tối đa cho phép là bao nhiêu?",
+      "options": [
+        "80 km/h",
+        "100 km/h",
+        "120 km/h",
+        "140 km/h"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Tốc độ tối đa cho phép trên đường cao tốc là 120 km/h đối với xe ô tô con."
+    },
+    {
+      "id": "q2",
+      "licenseType": "B",
+      "question": "Khoảng cách an toàn tối thiểu giữa hai xe khi đi trên đường cao tốc là bao nhiêu?",
+      "options": [
+        "30 mét",
+        "50 mét",
+        "70 mét",
+        "100 mét"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Khoảng cách an toàn tối thiểu giữa hai xe trên đường cao tốc là 70 mét."
+    },
+    {
+      "id": "q3",
+      "licenseType": "B",
+      "question": "Khi gặp biển báo cấm rẽ trái, người lái xe được phép:",
+      "options": [
+        "Rẽ trái bình thường",
+        "Rẽ phải hoặc đi thẳng",
+        "Quay đầu xe",
+        "Dừng xe tại chỗ"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi gặp biển báo cấm rẽ trái, người lái xe chỉ được phép rẽ phải hoặc đi thẳng."
+    },
+    {
+      "id": "q4",
+      "licenseType": "C",
+      "question": "Xe tải có trọng tải từ 3.5 tấn trở lên thuộc loại bằng lái nào?",
+      "options": [
+        "Bằng B",
+        "Bằng C",
+        "Bằng D",
+        "Bằng E"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Xe tải có trọng tải từ 3.5 tấn trở lên cần bằng lái loại C."
+    },
+    {
+      "id": "q5",
+      "licenseType": "C",
+      "question": "Khi lái xe tải, khoảng cách an toàn tối thiểu với xe phía trước là:",
+      "options": [
+        "50 mét",
+        "70 mét",
+        "90 mét",
+        "110 mét"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Xe tải cần giữ khoảng cách an toàn tối thiểu 90 mét với xe phía trước."
+    },
+    {
+      "id": "q6",
+      "licenseType": "D",
+      "question": "Xe chở khách từ 16 chỗ ngồi trở lên cần bằng lái loại:",
+      "options": [
+        "Bằng B",
+        "Bằng C",
+        "Bằng D",
+        "Bằng E"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Xe chở khách từ 16 chỗ ngồi trở lên cần bằng lái loại D."
+    },
+    {
+      "id": "q7",
+      "licenseType": "D",
+      "question": "Khi lái xe chở khách, tốc độ tối đa trong khu vực đông dân cư là:",
+      "options": [
+        "40 km/h",
+        "50 km/h",
+        "60 km/h",
+        "70 km/h"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Tốc độ tối đa cho xe chở khách trong khu vực đông dân cư là 40 km/h."
+    },
+    {
+      "id": "q8",
+      "licenseType": "B",
+      "question": "Khi gặp đèn vàng nhấp nháy, người lái xe phải:",
+      "options": [
+        "Tăng tốc độ để vượt qua",
+        "Dừng lại hoàn toàn",
+        "Giảm tốc độ và chú ý quan sát",
+        "Tiếp tục đi với tốc độ bình thường"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Khi gặp đèn vàng nhấp nháy, người lái xe phải giảm tốc độ và chú ý quan sát."
+    },
+    {
+      "id": "q9",
+      "licenseType": "C",
+      "question": "Khi lái xe tải trên đường dốc, cần chú ý:",
+      "options": [
+        "Tăng tốc độ để vượt dốc nhanh",
+        "Sử dụng số thấp và giữ tốc độ ổn định",
+        "Đi với số cao để tiết kiệm nhiên liệu",
+        "Dừng xe giữa dốc để nghỉ"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi lái xe tải trên đường dốc, cần sử dụng số thấp và giữ tốc độ ổn định để đảm bảo an toàn."
+    },
+    {
+      "id": "q10",
+      "licenseType": "D",
+      "question": "Trước khi xuất phát, tài xế xe khách phải kiểm tra:",
+      "options": [
+        "Chỉ kiểm tra nhiên liệu",
+        "Kiểm tra hệ thống phanh, đèn, và số lượng hành khách",
+        "Chỉ kiểm tra đèn",
+        "Không cần kiểm tra gì"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Tài xế xe khách phải kiểm tra hệ thống phanh, đèn, và số lượng hành khách trước khi xuất phát."
+    }
+  ]
+}
+

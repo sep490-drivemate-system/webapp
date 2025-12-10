@@ -125,12 +125,10 @@ export default function QADetailPage() {
             return;
         }
 
-        // Unaccept previous answer
         answers.forEach((a) => {
             a.isAccepted = false;
         });
 
-        // Accept new answer
         const answer = answers.find((a) => a.id === answerId);
         if (answer) {
             answer.isAccepted = true;
@@ -143,9 +141,8 @@ export default function QADetailPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-24 pb-12">
-            <div className="container mx-auto px-4 max-w-5xl">
-                {/* Back Button */}
+        <div className="min-h-screen bg-gray-50 pt-5 pb-5">
+            <div className="container mx-auto px-2 max-w-6xl">
                 <Button
                     variant="ghost"
                     onClick={() => router.back()}
@@ -155,11 +152,9 @@ export default function QADetailPage() {
                     Quay lại
                 </Button>
 
-                {/* Question */}
                 <Card className="mb-6">
                     <CardContent className="pt-6">
                         <div className="flex gap-4">
-                            {/* Vote Section */}
                             <div className="flex flex-col items-center gap-2">
                                 <Button
                                     variant="ghost"
@@ -183,7 +178,6 @@ export default function QADetailPage() {
                                 )}
                             </div>
 
-                            {/* Question Content */}
                             <div className="flex-1">
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex-1">
@@ -192,10 +186,6 @@ export default function QADetailPage() {
                                             <div className="flex items-center gap-2">
                                                 <Clock className="size-4" />
                                                 <span>{formatDate(question.createdAt)}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Eye className="size-4" />
-                                                <span>{question.views} lượt xem</span>
                                             </div>
                                         </div>
                                     </div>
@@ -236,7 +226,6 @@ export default function QADetailPage() {
                     </CardContent>
                 </Card>
 
-                {/* Answers Section */}
                 <div className="mb-6">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-2xl font-bold">
@@ -262,7 +251,6 @@ export default function QADetailPage() {
                                 >
                                     <CardContent className="pt-6">
                                         <div className="flex gap-4">
-                                            {/* Vote Section */}
                                             <div className="flex flex-col items-center gap-2">
                                                 <Button
                                                     variant="ghost"
@@ -286,18 +274,7 @@ export default function QADetailPage() {
                                                 )}
                                             </div>
 
-                                            {/* Answer Content */}
                                             <div className="flex-1">
-                                                {answer.isAccepted && (
-                                                    <div className="mb-3 p-2 bg-green-50 border border-green-200 rounded-lg">
-                                                        <div className="flex items-center gap-2 text-sm text-green-800">
-                                                            <CheckCircle2 className="size-4" />
-                                                            <span className="font-semibold">
-                                                                Câu trả lời được chấp nhận
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                )}
 
                                                 <div className="prose max-w-none mb-4">
                                                     <p className="text-base leading-relaxed whitespace-pre-wrap">
@@ -352,7 +329,6 @@ export default function QADetailPage() {
                     </div>
                 </div>
 
-                {/* Answer Form */}
                 <Card>
                     <CardHeader>
                         <CardTitle>Trả lời câu hỏi</CardTitle>
@@ -378,4 +354,5 @@ export default function QADetailPage() {
         </div>
     );
 }
+
 
