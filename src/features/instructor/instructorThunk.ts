@@ -60,3 +60,8 @@ export const getInstructorCars = createThunk<
 >(HttpMethod.GET, "getInstructorCars", `car/instructor/:id/cars`, {
   buildUrl: (payload) => `car/instructor/${payload.id}/cars`,
 });
+
+export const getRecommendedInstructors = createThunk<
+  IInstructors[],
+  void
+>(HttpMethod.GET, "getRecommendedInstructors", `/${INSTRUCTOR_PATH}/recommended`);

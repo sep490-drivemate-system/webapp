@@ -1,85 +1,110 @@
 "use client";
 
-import { ArrowRight, Users, Car, Award, MapPin, Star, Clock, Package, ChevronRight } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
-import Image from "next/image";
-import instructorsData from "@/data/mock-instructors-enhanced.json";
-import carsData from "@/data/mock-cars.json";
+import { useAppDispatch } from "@/lib/redux/useAppDispatch";
+import { getRecommendedPackages } from "@/features/package/packageThunk";
+import { getRecommendedInstructors } from "@/features/instructor/instructorThunk";
+import { getRecommendedCars } from "@/features/car/carThunk";
+import type { Package as DrivingPackage } from "@/types/package/package.type";
+import { PackageServiceCard } from "@/components/package/package-service-card";
+import type { IInstructors } from "@/types/instructor/instructor-management.types";
+import { InstructorCard } from "@/components/instructor/instructor-card";
+import { CarCard } from "@/components/car/car-card";
+import { ICar } from "@/types/car/car.type";
 
 export default function HomePage() {
-  const instructors = instructorsData.instructors.filter(i => i.status === "approved").slice(0, 4);
-  const cars = carsData.cars.filter(c => c.status === "available").slice(0, 4);
+  const dispatch = useAppDispatch();
+  const [recommendedPackages, setRecommendedPackages] = useState<
+    DrivingPackage[]
+  >([]);
+  const [loadingRecommended, setLoadingRecommended] = useState(false);
+  const [recommendedError, setRecommendedError] = useState<string | null>(null);
+  const [recommendedInstructors, setRecommendedInstructors] = useState<
+    IInstructors[]
+  >([]);
+  const [loadingInstructors, setLoadingInstructors] = useState(false);
+  const [instructorsError, setInstructorsError] = useState<string | null>(null);
+  const [recommendedCars, setRecommendedCars] = useState<ICar[]>([]);
+  const [loadingCars, setLoadingCars] = useState(false);
+  const [carsError, setCarsError] = useState<string | null>(null);
 
-  // Mock packages data
-  const featuredPackages = [
-    {
-      id: "pkg_001",
-      name: "Gói luyện tập cơ bản",
-      description: "Phù hợp cho người mới bắt đầu",
-      hours: 20,
-      price: 4000000,
-      instructor: instructors[0],
-      roadTypes: ["Đường đô thị", "Khu dân cư"],
-      skills: ["Đỗ xe", "Lùi xe", "Vào cua"],
-      packageType: "instructor_vehicle", // Có người hướng dẫn + xe
-      vehicleInfo: "Toyota Vios 2023",
-      hasVehicle: true,
-      purchaseCount: 156
-    },
-    {
-      id: "pkg_002",
-      name: "Gói nâng cao",
-      description: "Luyện tập kỹ năng nâng cao",
-      hours: 40,
-      price: 8800000,
-      instructor: instructors[1],
-      roadTypes: ["Quốc lộ", "Cao tốc"],
-      skills: ["Vượt xe", "Chuyển làn", "Xử lý tình huống"],
-      packageType: "instructor_vehicle", // Có người hướng dẫn + xe
-      vehicleInfo: "Honda City 2022",
-      hasVehicle: true,
-      purchaseCount: 89
-    },
-    {
-      id: "pkg_003",
-      name: "Gói luyện cao tốc",
-      description: "Chuyên luyện đường cao tốc",
-      hours: 15,
-      price: 3750000,
-      instructor: instructors[2],
-      roadTypes: ["Cao tốc"],
-      skills: ["Vượt xe", "Giữ làn", "Tốc độ cao"],
-      packageType: "instructor_only", // Chỉ có người hướng dẫn
-      vehicleInfo: null,
-      hasVehicle: false,
-      purchaseCount: 67
-    },
-    {
-      id: "pkg_004",
-      name: "Gói luyện đường đèo",
-      description: "Luyện kỹ năng đường núi",
-      hours: 12,
-      price: 3600000,
-      instructor: instructors[3],
-      roadTypes: ["Đường đèo", "Đường núi"],
-      skills: ["Cua gấp", "Dốc cao", "Phanh an toàn", "Kiểm soát tốc độ"],
-      packageType: "instructor_vehicle", // Có người hướng dẫn + xe
-      vehicleInfo: "Mazda 3 2023",
-      hasVehicle: true,
-      purchaseCount: 43
-    }
-  ];
+  useEffect(() => {
+    const fetchRecommended = async () => {
+      setLoadingRecommended(true);
+      setRecommendedError(null);
+      try {
+        const response = await dispatch(getRecommendedPackages()).unwrap();
+        setRecommendedPackages(response?.value ?? []);
+      } catch (error) {
+        const message =
+          typeof error === "string"
+            ? error
+            : "Không thể tải danh sách gói dịch vụ nổi bật";
+        setRecommendedError(message);
+      } finally {
+        setLoadingRecommended(false);
+      }
+    };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(price);
-  };
+    fetchRecommended();
+  }, [dispatch]);
+
+  const topRecommended = useMemo(
+    () => recommendedPackages.slice(0, 3),
+    [recommendedPackages]
+  );
+
+  useEffect(() => {
+    const fetchRecommendedInstructors = async () => {
+      setLoadingInstructors(true);
+      setInstructorsError(null);
+      try {
+        const response = await dispatch(getRecommendedInstructors()).unwrap();
+        setRecommendedInstructors(response?.value ?? []);
+      } catch (error) {
+        const message =
+          typeof error === "string"
+            ? error
+            : "Không thể tải danh sách người hướng dẫn nổi bật";
+        setInstructorsError(message);
+      } finally {
+        setLoadingInstructors(false);
+      }
+    };
+
+    fetchRecommendedInstructors();
+  }, [dispatch]);
+
+  const topInstructors = useMemo(
+    () => recommendedInstructors.slice(0, 4),
+    [recommendedInstructors]
+  );
+
+  const topCars = useMemo(() => recommendedCars.slice(0, 4), [recommendedCars]);
+
+  useEffect(() => {
+    const fetchRecommendedCars = async () => {
+      setLoadingCars(true);
+      setCarsError(null);
+      try {
+        const response = await dispatch(getRecommendedCars()).unwrap();
+        setRecommendedCars(response?.value ?? []);
+      } catch (error) {
+        const message =
+          typeof error === "string"
+            ? error
+            : "Không thể tải danh sách xe nổi bật";
+        setCarsError(message);
+      } finally {
+        setLoadingCars(false);
+      }
+    };
+
+    fetchRecommendedCars();
+  }, [dispatch]);
 
   return (
     <div className="bg-gray-50">
@@ -93,8 +118,9 @@ export default function HomePage() {
                 Bổ túc lái xe an toàn cùng người hướng dẫn chuyên nghiệp
               </h1>
               <p className="text-lg text-gray-600 leading-relaxed">
-                DriveMate kết nối bạn với những giáo viên lái xe có kinh nghiệm nhất.
-                Học lái xe hiệu quả, an toàn với lịch trình linh hoạt theo nhu cầu của bạn.
+                DriveMate kết nối bạn với những giáo viên lái xe có kinh nghiệm
+                nhất. Học lái xe hiệu quả, an toàn với lịch trình linh hoạt theo
+                nhu cầu của bạn.
               </p>
             </div>
 
@@ -116,7 +142,9 @@ export default function HomePage() {
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Gói dịch vụ nổi bật</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                Gói dịch vụ nổi bật
+              </h2>
             </div>
             <Button variant="ghost" asChild className="hidden sm:flex">
               <Link href="/packages">
@@ -126,81 +154,33 @@ export default function HomePage() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredPackages.map((pkg) => (
-              <Card key={pkg.id} className="hover:shadow-lg transition-shadow flex flex-col relative overflow-hidden h-full">
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-bold text-lg flex-1">{pkg.name}</h3>
-                  </div>
-                  
-                  {/* Purchase Count */}
-                  <div className="flex items-center gap-1 text-sm text-gray-600">
-                    <Package className="h-4 w-4 text-orange-500" />
-                    <span className="font-medium text-orange-600">{pkg.purchaseCount}</span>
-                    <span>lượt mua</span>
-                  </div>
-                </CardHeader>
+          {recommendedError && (
+            <div className="mb-4 rounded-md bg-red-50 p-4 text-red-700">
+              {recommendedError}
+            </div>
+          )}
+          {loadingRecommended && (
+            <div className="mb-4 rounded-md bg-blue-50 p-4 text-blue-700">
+              Đang tải các gói dịch vụ nổi bật...
+            </div>
+          )}
+          {!loadingRecommended &&
+            topRecommended.length === 0 &&
+            !recommendedError && (
+              <div className="mb-4 rounded-md bg-gray-50 p-4 text-gray-700">
+                Chưa có gói dịch vụ nổi bật để hiển thị
+              </div>
+            )}
 
-                <CardContent className="flex-1 space-y-4">
-                  {/* Hours */}
-                  <div className="flex items-center gap-2 text-sm bg-gray-50 p-2 rounded">
-                    <Clock className="h-4 w-4 text-gray-600" />
-                    <span className="font-medium">{pkg.hours} giờ học</span>
-                  </div>
-
-                  {/* Road Types */}
-                  <div className="min-h-[60px]">
-                    <p className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1">
-                      <MapPin className="h-3 w-3" />
-                      Loại đường:
-                    </p>
-                    <div className="flex flex-wrap gap-1">
-                      {pkg.roadTypes.map((road, idx) => (
-                        <Badge key={idx} className="bg-green-100 text-green-700 hover:bg-green-200 text-xs border-green-300">
-                          {road}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Skills */}
-                  <div className="min-h-[80px]">
-                    <p className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1">
-                      <Award className="h-3 w-3" />
-                      Kỹ năng:
-                    </p>
-                    <div className="flex flex-wrap gap-1">
-                      {pkg.skills.map((skill, idx) => (
-                        <Badge key={idx} className="bg-purple-100 text-purple-700 hover:bg-purple-200 text-xs border-purple-300">
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Price */}
-                  <div className="flex items-center justify-between pt-3 border-t">
-                    <p className="text-2xl font-bold ">{formatPrice(pkg.price)}</p>
-                  </div>
-                </CardContent>
-
-                <CardFooter className="pt-0">
-                  <Button variant={"green"} className="w-full" size="sm" asChild>
-                    <Link href="/packages">Mua ngay</Link>
-                  </Button>
-                </CardFooter>
-              </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {topRecommended.map((pkg) => (
+              <PackageServiceCard
+                key={pkg.id}
+                pkg={pkg}
+                actionHref={`/instructors/${pkg.instructorId}`}
+                actionLabel="Xem chi tiết"
+              />
             ))}
-          </div>
-
-          <div className="text-center mt-6 sm:hidden">
-            <Button variant="outline" asChild>
-              <Link href="/packages">
-                Xem tất cả gói dịch vụ
-                <ChevronRight className="ml-1 h-4 w-4" />
-              </Link>
-            </Button>
           </div>
         </div>
       </section>
@@ -210,7 +190,9 @@ export default function HomePage() {
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Người hướng dẫn nổi bật</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                Người hướng dẫn nổi bật
+              </h2>
             </div>
             <Button variant="ghost" asChild className="hidden sm:flex">
               <Link href="/instructors">
@@ -220,42 +202,32 @@ export default function HomePage() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {instructors.map((instructor) => (
-              <Card key={instructor.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex flex-col items-center text-center space-y-4">
-                    <Avatar className="h-20 w-20">
-                      <AvatarImage src={instructor.avatar} alt={instructor.name} />
-                      <AvatarFallback>{instructor.name[0]}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="font-semibold text-lg mb-1">{instructor.name}</h3>
-                      <div className="flex items-center justify-center gap-1 text-sm text-gray-600 mb-2">
-                        <Award className="h-4 w-4" />
-                        <span>{instructor.experience} năm kinh nghiệm</span>
-                      </div>
-                      <div className="flex items-center justify-center gap-1 mb-3">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span className="font-medium">{instructor.rating}</span>
-                      </div>
-                    </div>
-                    <Button variant="green" className="w-full" size="sm" asChild>
-                      <Link href={`/instructors/${instructor.id}`}>Xem chi tiết</Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {instructorsError && (
+            <div className="mb-4 rounded-md bg-red-50 p-4 text-red-700">
+              {instructorsError}
+            </div>
+          )}
+          {loadingInstructors && (
+            <div className="mb-4 rounded-md bg-blue-50 p-4 text-blue-700">
+              Đang tải danh sách người hướng dẫn nổi bật...
+            </div>
+          )}
+          {!loadingInstructors &&
+            topInstructors.length === 0 &&
+            !instructorsError && (
+              <div className="mb-4 rounded-md bg-gray-50 p-4 text-gray-700">
+                Chưa có người hướng dẫn nổi bật để hiển thị
+              </div>
+            )}
 
-          <div className="text-center mt-6 sm:hidden">
-            <Button variant="outline" asChild>
-              <Link href="/instructors">
-                Xem tất cả người hướng dẫn
-                <ChevronRight className="ml-1 h-4 w-4" />
-              </Link>
-            </Button>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {topInstructors.map((instructor) => (
+              <InstructorCard
+                key={instructor.id}
+                instructor={instructor}
+                cardClassName="hover:shadow-lg transition-shadow"
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -265,7 +237,9 @@ export default function HomePage() {
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Xe tập nổi bật</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                Xe tập nổi bật
+              </h2>
             </div>
             <Button variant="ghost" asChild className="hidden sm:flex">
               <Link href="/cars">
@@ -275,50 +249,34 @@ export default function HomePage() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {cars.map((car) => (
-              <Card key={car.id} className="overflow-hidden hover:shadow-lg transition-shadow p-0">
-                <div className="relative h-[200px]">
-                  <Image
-                    src={car.image}
-                    alt={car.name}
-                    fill
-                    priority
-                    className="object-cover"
-                  />
-                </div>
-                <CardContent className="p-4 space-y-3">
-                  <div>
-                    <h3 className="font-bold text-lg mb-1">{car.name}</h3>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-600">
-                    <Badge variant="outline" className="text-xs">{car.transmission}</Badge>
-                    <Badge variant="outline" className="text-xs">{car.fuel}</Badge>
-                    <Badge variant="outline" className="text-xs">{car.seats} chỗ</Badge>
-                  </div>
-                </CardContent>
-                <CardFooter className="p-4 pt-0">
-                  <Button variant="green" className="w-full text-white" size="sm" asChild>
-                    <Link href={`/cars/${car.id}`}>Xem chi tiết</Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+          {carsError && (
+            <div className="mb-4 rounded-md bg-red-50 p-4 text-red-700">
+              {carsError}
+            </div>
+          )}
+          {loadingCars && (
+            <div className="mb-4 rounded-md bg-blue-50 p-4 text-blue-700">
+              Đang tải danh sách xe nổi bật...
+            </div>
+          )}
+          {!loadingCars && topCars.length === 0 && !carsError && (
+            <div className="mb-4 rounded-md bg-gray-50 p-4 text-gray-700">
+              Chưa có xe nổi bật để hiển thị
+            </div>
+          )}
 
-          <div className="text-center mt-6 sm:hidden">
-            <Button variant="outline" asChild>
-              <Link href="/cars">
-                Xem tất cả
-                <ChevronRight className="ml-1 h-4 w-4" />
-              </Link>
-            </Button>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {topCars.map((car) => (
+              <CarCard
+                key={car.id}
+                car={car}
+                actionHref={`/cars/${car.id}`}
+                className="h-full"
+              />
+            ))}
           </div>
         </div>
       </section>
-
     </div>
   );
-};
-
-
+}

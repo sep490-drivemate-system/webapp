@@ -90,3 +90,17 @@ export const getCars = createThunk<PaginatedCarsResponse, GetCarsParams>(
     },
   }
 );
+export const getRecommendedCars = createThunk<ICar[], { max_count?: number } | void>(
+  HttpMethod.GET,
+  "getRecommendedCars",
+  "/api/car/recommendation",
+  {
+    buildUrl: (payload) => {
+      const baseUrl = "car/recommendation";
+      const params = new URLSearchParams();
+      params.set("max_count", ((payload as { max_count?: number } | undefined)?.max_count ?? 10).toString());
+      const query = params.toString();
+      return query ? `${baseUrl}?${query}` : baseUrl;
+    },
+  }
+);
