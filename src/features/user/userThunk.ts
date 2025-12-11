@@ -1,4 +1,4 @@
-import { IUserInfo, InstructorDetailDTO } from "@/types/user/user-profile.type";
+import { EditUserPayload, IUserInfo, InstructorDetailDTO } from "@/types/user/user-profile.type";
 import { createThunk } from "../genericCreateThunk";
 import { HttpMethod } from "@/types/constants/httpMethod";
 import { createAsyncThunk } from "@reduxjs/toolkit";
@@ -107,3 +107,98 @@ export const updateInstructor = createAsyncThunk<
     }
 });
 
+export const editUser = createAsyncThunk<
+    GenericResponse<boolean>,
+    EditUserPayload,
+    { rejectValue: string }
+>("editUser", async (payload, { rejectWithValue }) => {
+    if (!payload.id || payload.id.trim() === "") {
+        return rejectWithValue("User ID is required");
+    }
+
+    const url = `/${USER_PATH}/${payload.id}`;
+    const formData = createEditUserFormData(payload);
+
+    try {
+        const response = await axiosInstance.patch<GenericResponse<boolean>>(
+            url,
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
+
+        console.log(`[Thunk] Response:`, response.data);
+        return response.data;
+    } catch (err) {
+        const error = err as unknown as {
+            response?: { data?: { message?: string } };
+            message?: string;
+        };
+
+        console.log(`[Thunk Error] PATCH ${url}:`, error);
+
+        let message = "";
+        if (error.response?.data?.message) {
+            message = error.response.data.message;
+        } else if (error.message) {
+            message = error.message;
+        } else {
+            message = "Đã xảy ra lỗi. Vui lòng thử lại.";
+        }
+
+        return rejectWithValue(message);
+    }
+});
+
+function createEditUserFormData(payload: EditUserPayload): FormData {
+    const formData = new FormData();
+    
+    if (payload.Email !== undefined) {
+        formData.append("Email", payload.Email);
+    }
+    if (payload.PhoneNumber !== undefined) {
+        formData.append("PhoneNumber", payload.PhoneNumber);
+    }
+    if (payload.Password !== undefined) {
+        formData.append("Password", payload.Password);
+    }
+    if (payload.Fullname !== undefined) {
+        formData.append("Fullname", payload.Fullname);
+    }
+    if (payload.EmergencyContactName !== undefined) {
+        formData.append("EmergencyContactName", payload.EmergencyContactName);
+    }
+    if (payload.EmergencyContactPhone !== undefined) {
+        formData.append("EmergencyContactPhone", payload.EmergencyContactPhone);
+    }
+    if (payload.ProfileAvatar !== undefined && payload.ProfileAvatar !== null) {
+        // Handle File objects from web inputs
+        if (typeof File !== "undefined" && payload.ProfileAvatar instanceof File) {
+            formData.append("ProfileAvatar", payload.ProfileAvatar);
+        }
+        // In React Native, if ProfileAvatar is a local file URI, format it correctly for FormData
+        else if (typeof payload.ProfileAvatar === "string" && (payload.ProfileAvatar.startsWith("file://") || payload.ProfileAvatar.startsWith("content://"))) {
+            // Extract file extension from URI to determine type
+            const uri = payload.ProfileAvatar;
+            const extension = uri.split('.').pop()?.toLowerCase() || 'jpg';
+            const mimeType = extension === 'png' ? 'image/png' : 
+                           extension === 'jpeg' || extension === 'jpg' ? 'image/jpeg' : 
+                           'image/jpeg';
+            
+            // Format for React Native FormData
+            formData.append("ProfileAvatar", {
+                uri: uri,
+                type: mimeType,
+                name: `avatar.${extension}`,
+            } as any);
+        } else {
+            // This might be a URL or base64 string - append as string
+            formData.append("ProfileAvatar", payload.ProfileAvatar);
+        }
+    }
+    
+    return formData;
+}
