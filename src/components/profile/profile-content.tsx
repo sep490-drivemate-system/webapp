@@ -10,7 +10,6 @@ import {
   CreditCard,
   Clock,
   Car,
-  BookOpen,
   Award,
   Bell,
   Lock,
@@ -39,13 +38,13 @@ import { Separator } from "@/components/ui/separator";
 import mockData from "@/data/mock-user-profile.json";
 import {
   IUserProfile,
-  IBookingHistory,
   IPackagePurchase,
   IUserWallet,
   IUserInfo,
   EditUserPayload,
 } from "@/types/user/user-profile.type";
 import ProfileContentPersonal from "./profile-content-personal";
+import ProfileContentTransaction from "./profile-content-transaction";
 import { useAppDispatch } from "@/lib/redux/useAppDispatch";
 import { editUser } from "@/features/user/userThunk";
 import { updateNoviceDriverLicense } from "@/features/document/documentThunk";
@@ -65,7 +64,6 @@ interface ProfileContentProps {
 }
 
 const profile = mockData.profile as IUserProfile;
-const bookingHistory = mockData.bookingHistory as IBookingHistory[];
 const packagePurchases = mockData.packagePurchases as IPackagePurchase[];
 const wallet = mockData.wallet as IUserWallet;
 const settings = mockData.settings;
@@ -271,46 +269,6 @@ export default function ProfileContent({
     });
   };
 
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, { label: string; className: string }> = {
-      completed: {
-        label: "Hoàn thành",
-        className: "bg-green-100 text-green-800 border-green-200",
-      },
-      ongoing: {
-        label: "Đang diễn ra",
-        className: "bg-blue-100 text-blue-800 border-blue-200",
-      },
-      cancelled: {
-        label: "Đã hủy",
-        className: "bg-red-100 text-red-800 border-red-200",
-      },
-      upcoming: {
-        label: "Sắp tới",
-        className: "bg-yellow-100 text-yellow-800 border-yellow-200",
-      },
-    };
-    const variant = variants[status] || variants.completed;
-    return (
-      <Badge className={`${variant.className} border`} variant="secondary">
-        {variant.label}
-      </Badge>
-    );
-  };
-
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case "package":
-        return <BookOpen className="w-5 h-5" />;
-      case "car":
-        return <Car className="w-5 h-5" />;
-      case "session":
-        return <Clock className="w-5 h-5" />;
-      default:
-        return <BookOpen className="w-5 h-5" />;
-    }
-  };
-
   return (
     <div className="lg:col-span-3 space-y-6">
       {/* Personal Information Tab */}
@@ -336,73 +294,12 @@ export default function ProfileContent({
         </div>
       )}
 
-      {/* Booking History Tab */}
+      {/* Transaction History Tab */}
       {activeTab === "history" && (
-        <Card className="border-none shadow-lg">
-          <CardHeader className="border-b">
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-[#1AD562]" />
-              Lịch sử đặt chỗ
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              {bookingHistory.map((booking) => (
-                <div
-                  key={booking.id}
-                  className="border rounded-xl p-5 hover:shadow-md transition-all bg-white"
-                >
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="flex items-start gap-4 flex-1">
-                      <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
-                        {getTypeIcon(booking.type)}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg mb-2 text-gray-900">
-                          {booking.title}
-                        </h3>
-                        <div className="flex flex-wrap gap-3 text-sm text-gray-600 mb-2">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3.5 h-3.5 text-[#1AD562]" />
-                            {formatDate(booking.date)}
-                          </span>
-                          {booking.duration && (
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-3.5 h-3.5 text-[#1AD562]" />
-                              {booking.duration}
-                            </span>
-                          )}
-                        </div>
-                        {booking.instructor && (
-                          <p className="text-sm text-gray-600 flex items-center gap-1">
-                            <User className="w-3.5 h-3.5" />
-                            Giảng viên:{" "}
-                            <span className="font-medium">
-                              {booking.instructor}
-                            </span>
-                          </p>
-                        )}
-                        {booking.car && (
-                          <p className="text-sm text-gray-600 flex items-center gap-1">
-                            <Car className="w-3.5 h-3.5" />
-                            Xe:{" "}
-                            <span className="font-medium">{booking.car}</span>
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end justify-between gap-2 sm:min-w-[140px]">
-                      {getStatusBadge(booking.status)}
-                      <p className="text-xl font-bold text-[#1AD562]">
-                        {formatPrice(booking.price)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <ProfileContentTransaction
+          formatDate={formatDate}
+          formatPrice={formatPrice}
+        />
       )}
 
       {/* Package Purchases Tab */}
