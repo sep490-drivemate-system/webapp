@@ -35,11 +35,10 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import mockData from "@/data/mock-user-profile.json";
 import {
-  IUserProfile,
   IPackagePurchase,
   IUserWallet,
+  IUserSettings,
   IUserInfo,
   EditUserPayload,
 } from "@/types/user/user-profile.type";
@@ -63,10 +62,12 @@ interface ProfileContentProps {
   userLoading?: boolean;
 }
 
-const profile = mockData.profile as IUserProfile;
-const packagePurchases = mockData.packagePurchases as IPackagePurchase[];
-const wallet = mockData.wallet as IUserWallet;
-const settings = mockData.settings;
+const packagePurchases: IPackagePurchase[] = [];
+const wallet: IUserWallet = { balance: 0, currency: "VND", transactions: [] };
+const settings: IUserSettings = {
+  notifications: { email: false, sms: false, push: false },
+  privacy: { showProfile: true, showBookingHistory: true },
+};
 
 export default function ProfileContent({
   activeTab,
@@ -224,13 +225,13 @@ export default function ProfileContent({
       const updated = { ...prev };
       switch (fieldName) {
         case "userName":
-          updated.userName = userInfo?.fullName ?? profile.userName;
+          updated.userName = userInfo?.fullName ?? "";
           break;
         case "email":
-          updated.email = userInfo?.email ?? profile.email;
+          updated.email = userInfo?.email ?? "";
           break;
         case "phone":
-          updated.phone = userInfo?.phone ?? profile.phone;
+          updated.phone = userInfo?.phone ?? "";
           break;
         case "password":
           updated.password = "";
