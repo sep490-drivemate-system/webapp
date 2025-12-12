@@ -19,14 +19,14 @@ export default function BlogDetailPage() {
   );
 
   const headerActions = (
-    <Link href="/blogs-management">
+    <Link href="/blog-management">
       <ArrowLeft className="size-6" />
     </Link>
   );
 
   const handleDelete = () => {
     if (window.confirm("Bạn có chắc muốn xóa bài viết này?")) {
-      router.push("/blogs-management");
+      router.push("/blog-management");
     }
   };
 
@@ -121,7 +121,7 @@ export default function BlogDetailPage() {
                 )}
               </div>
               <div className="flex flex-wrap gap-2 justify-end">
-                <Link href={`/blogs/${post.id}/form`}>
+                <Link href={`/blog-management/${post.id}/form`}>
                   <Button
                     variant="outline"
                     size="sm"

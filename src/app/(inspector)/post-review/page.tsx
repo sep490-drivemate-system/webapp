@@ -132,9 +132,7 @@ export default function PostReviewPage() {
                   variant="default"
                   size="sm"
                   className="flex-1"
-                  onClick={() =>
-                    router.push(`/inspector/post-review/${post.id}`)
-                  }
+                  onClick={() => router.push(`/post-review/${post.id}`)}
                 >
                   <Eye className="mr-2 size-4" />
                   Xem & Duyệt
@@ -147,4 +145,3 @@ export default function PostReviewPage() {
     </div>
   );
 }
-

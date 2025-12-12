@@ -59,7 +59,7 @@ export function BlogCard({
   const linkPath =
     detailLink ||
     (variant === "inspector"
-      ? `/blogs-management/${id}`
+      ? `/blog-management/${id}`
       : `/blogs-detail/${id}`);
 
   if (variant === "inspector") {
