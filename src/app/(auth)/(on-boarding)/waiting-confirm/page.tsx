@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { StepProgress, type Step } from "@/components/ui/step-progress";
 import Link from "next/link";
@@ -10,10 +11,19 @@ import { useThunkAction } from "@/lib/redux/useThunkAction";
 import { InstructorApplication } from "@/types/instructor/instructor-management.types";
 
 export default function WaitingConfirmPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { runSafe: runGetIntructorApplicationByInstructorId } = useThunkAction(getIntructorApplicationByInstructorId);
   const [application, setApplication] = useState<InstructorApplication | null>(null);
+  const contractSigned = searchParams.get("contractSigned") === "true";
 
-  // Tính toán steps dựa trên applicationStatus
+  const handleSignInClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    localStorage.removeItem("instructorId");
+    router.push("/signin");
+  }, [router]);
+
+  // Tính toán steps dựa trên applicationStatus và contractSigned flag
   const steps = useMemo<Step[]>(() => {
     const applicationStatus = application?.applicationStatus;
     
@@ -23,7 +33,13 @@ export default function WaitingConfirmPage() {
     let step3Status: Step["status"] = "inactive";
     let step4Status: Step["status"] = "inactive";
 
-    if (applicationStatus === 1) {
+    // Nếu contract đã được ký (từ contract page), step 3 và 4 completed
+    if (contractSigned) {
+      step1Status = "completed";
+      step2Status = "completed";
+      step3Status = "completed";
+      step4Status = "completed";
+    } else if (applicationStatus === 1) {
       // applicationStatus = 1: Step 1 completed, Step 2 pending
       step1Status = "completed";
       step2Status = "active";
@@ -35,6 +51,12 @@ export default function WaitingConfirmPage() {
       step2Status = "completed";
       step3Status = "active";
       step4Status = "inactive";
+    } else if (applicationStatus === 3) {
+      // applicationStatus = 3: Step 3 completed, Step 4 completed
+      step1Status = "completed";
+      step2Status = "completed";
+      step3Status = "completed";
+      step4Status = "completed";
     }
 
     return [
@@ -60,14 +82,19 @@ export default function WaitingConfirmPage() {
           step3Status === "active"
             ? "Vui lòng ký hợp đồng online để hoàn tất quá trình đăng ký."
             : undefined,
+        linkText: step3Status === "active" ? "Ký hợp đồng ngay" : undefined,
+        linkHref: step3Status === "active" ? "/contract" : undefined,
       },
       {
         id: 4,
         title: "Chào mừng bạn đã trở thành một phần của Drivemate",
         status: step4Status,
+        linkText: step4Status === "completed" ? "Đăng nhập ngay" : undefined,
+        linkHref: step4Status === "completed" ? "/signin" : undefined,
+        onLinkClick: step4Status === "completed" ? handleSignInClick : undefined,
       },
     ];
-  }, [application?.applicationStatus]);
+  }, [application?.applicationStatus, contractSigned, handleSignInClick]);
 
   useEffect(() => {
     const fetchIntructorApplication = async () => {

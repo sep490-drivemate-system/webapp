@@ -14,6 +14,7 @@ export interface Step {
   description?: string;
   linkText?: string;
   linkHref?: string;
+  onLinkClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
 interface StepProgressProps {
@@ -114,6 +115,7 @@ export function StepProgress({ steps, className }: StepProgressProps) {
               {step.linkText && step.linkHref && (
                 <Link
                   href={step.linkHref}
+                  onClick={step.onLinkClick}
                   className="text-[#10b981] text-sm mt-2 inline-block hover:underline"
                 >
                   {step.linkText}

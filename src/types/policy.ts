@@ -40,3 +40,10 @@ export interface PolicyFormData {
     rules: string[];
   }[];
 }
+
+export interface IPolicy {
+  id: string;
+  title: string;
+  detail: string;
+  type: number;
+}
