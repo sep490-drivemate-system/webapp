@@ -4,6 +4,7 @@ import {
   CalendarClock,
   CircleUser,
   LogIn,
+  LogOut,
   UserRound,
   UserRoundPlus,
 } from "lucide-react";
@@ -12,6 +13,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "@/lib/redux/useAppDispatch";
+import { useAuth } from "@/hooks/auth/useAuth";
 
 const MAIN_MENU = [
   { path: "/", label: "Trang chủ" },
@@ -83,6 +85,7 @@ function UserDropdown() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const auth = useAppSelector((state) => state.auth);
+  const { handleSignOut } = useAuth();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -126,14 +129,25 @@ function UserDropdown() {
                 <UserRound className="h-4 w-4 text-gray-500" />
                 <span className="flex-1 text-left">Hồ sơ cá nhân</span>
               </Link>
-              <Link
+              {/* <Link
                 href="/bookings"
                 className="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
                 onClick={() => setOpen(false)}
               >
                 <CalendarClock className="h-4 w-4 text-gray-500" />
                 <span className="flex-1 text-left">Lịch sử đặt</span>
-              </Link>
+              </Link> */}
+              <button
+                type="button"
+                className="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors w-full text-left"
+                onClick={() => {
+                  setOpen(false);
+                  handleSignOut();
+                }}
+              >
+                <LogOut className="h-4 w-4 text-gray-500" />
+                <span className="flex-1 text-left">Đăng xuất</span>
+              </button>
             </>
           )}
           {!auth.isAuthenticated && (

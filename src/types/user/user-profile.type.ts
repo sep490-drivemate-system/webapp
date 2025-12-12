@@ -114,3 +114,9 @@ export interface EditUserPayload {
   EmergencyContactName?: string;
   EmergencyContactPhone?: string;
 }
+
+export interface UpdateInstructorPayload {
+  id: string;
+  bio?: string;
+  experienceYear?: number;
+}
