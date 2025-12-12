@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 interface ImageUploadFieldProps {
   label: string;
-  onUpload: (base64: string) => void;
+  onUpload: (file: File | null) => void;
   preview?: string;
   labelClassName?: string;
   uploadAreaClassName?: string;
@@ -29,12 +29,8 @@ export default function ImageUploadField({
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64 = e.target?.result as string;
-      onUpload(base64);
-    };
-    reader.readAsDataURL(file);
+    // Return File directly instead of converting to base64
+    onUpload(file);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -67,7 +63,7 @@ export default function ImageUploadField({
             type="button"
             variant="ghost"
             size="sm"
-            onClick={() => onUpload("")}
+            onClick={() => onUpload(null)}
             className="absolute top-2 right-2 bg-transparent hover:bg-white/10 text-white rounded-full p-1"
           >
             <X className="w-4 h-4 text-white" />

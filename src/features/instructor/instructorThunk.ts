@@ -65,3 +65,10 @@ export const getRecommendedInstructors = createThunk<
   IInstructors[],
   void
 >(HttpMethod.GET, "getRecommendedInstructors", `/${INSTRUCTOR_PATH}/recommended`);
+
+export const getIntructorApplicationByInstructorId = createThunk<
+  InstructorApplication,
+  { instructorId: string }
+>(HttpMethod.GET, "getIntructorApplicationByInstructorId", `${INSTRUCTOR_PATH}/:instructorId/applicants`, {
+  buildUrl: (payload) => `${INSTRUCTOR_PATH}/${payload.instructorId}/applicants`
+});

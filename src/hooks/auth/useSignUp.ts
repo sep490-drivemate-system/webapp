@@ -1,16 +1,19 @@
 import { useAppSelector } from "@/lib/redux/useAppDispatch";
 import { useAppDispatch } from "@/lib/redux/useAppDispatch";
-import { signUp } from "@/features/auth/authThunk";
+import { signUp, registerInstructor } from "@/features/auth/authThunk";
 import { useThunkAction } from "@/lib/redux/useThunkAction";
 import { useEffect, useState } from "react";
 import { setInputCode, setSignupData } from "@/features/auth/authSlice";
 import { ISignUpRequest } from "@/types/auth/signup.type";
 import { sendEmailCode } from "@/features/auth/authThunk";
+import type { InstructorRegistrationRequest } from "@/types/auth/instructor-registration.type";
 
 export const useSignUp = () => {
   const { runSafe: runSignUp, loading: signUpLoading } = useThunkAction(signUp);
   const { runSafe: runSendEmailCode, loading: emailLoading } =
     useThunkAction(sendEmailCode);
+  const { runSafe: runRegisterInstructor, loading: instructorLoading } =
+    useThunkAction(registerInstructor);
   const dispatch = useAppDispatch();
   const auth = useAppSelector((state) => state.auth);
   const [resendCooldown, setResendCooldown] = useState(0);
@@ -69,13 +72,21 @@ export const useSignUp = () => {
     return auth.signupData.email.replace(/(.{2}).*(@.*)/, "$1***$2");
   };
 
+  const handleRegisterInstructor = async (
+    registrationData: InstructorRegistrationRequest
+  ) => {
+    return runRegisterInstructor(registrationData);
+  };
+
   return {
     ...auth,
-    isLoading: auth.isLoading || signUpLoading || emailLoading,
+    isLoading: auth.isLoading || signUpLoading || emailLoading || instructorLoading,
     signUpLoading,
+    instructorLoading,
     dispatch,
     handleSendEmailCode,
     handleRegisterNoviceDriver,
+    handleRegisterInstructor,
     resendCooldown,
     setResendCooldown,
     handleVerificationSubmitWithCode,

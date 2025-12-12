@@ -3,7 +3,7 @@ import { createThunk } from "../genericCreateThunk";
 import { HttpMethod } from "@/types/constants/httpMethod";
 import { handleTokenStorage } from "@/lib/jwt/jwt.utils";
 import type { ISignUpRequest, ISignUpResponse } from "@/types/auth/signup.type";
-
+import { INSTRUCTOR_PATH } from "../instructor/instructorThunk";
 export const AUTH_PATH = "auth";
 export const NOVICE_DRIVER_PATH = "novice-driver";
 
@@ -40,6 +40,10 @@ import type {
   InstructorSignupRequest,
 } from "@/types/auth/signup-instructor.types";
 import type { TestDto } from "@/types/test";
+import type {
+  InstructorRegistrationRequest,
+  InstructorRegistrationResponse,
+} from "@/types/auth/instructor-registration.type";
 
 export const signUpInstructor = createThunk<
   InstructorSignupResponse,
@@ -81,3 +85,51 @@ export const test = createThunk<any, TestDto>(
     },
   }
 );
+
+// Thunk đăng ký instructor với FormData
+export const registerInstructor = createThunk<
+  string, // instructorId
+  InstructorRegistrationRequest
+>(HttpMethod.POST, `register-instructor`, `${INSTRUCTOR_PATH}/register`, {
+  buildBody: (payload) => {
+    const form = new FormData();
+
+    // Text fields
+    form.append("Fullname", payload.Fullname);
+    form.append("RawPassword", payload.RawPassword);
+    form.append("Email", payload.Email);
+    form.append("PhoneNumber", payload.PhoneNumber);
+    form.append("BirthDate", payload.BirthDate);
+    form.append("Gender", payload.Gender);
+    form.append("DrivingLicenseTier", payload.DrivingLicenseTier);
+    form.append("TeachingTier", payload.TeachingTier);
+
+    // File fields
+    if (payload.Avatar) {
+      form.append("Avatar", payload.Avatar);
+    }
+    if (payload.DrivingLicenseFront) {
+      form.append("DrivingLicenseFront", payload.DrivingLicenseFront);
+    }
+    if (payload.DrivingLicenseBack) {
+      form.append("DrivingLicenseBack", payload.DrivingLicenseBack);
+    }
+    if (payload.TeachingLicenseFront) {
+      form.append("TeachingLicenseFront", payload.TeachingLicenseFront);
+    }
+    if (payload.HealthCheckup) {
+      form.append("HealthCheckup", payload.HealthCheckup);
+    }
+    if (payload.PersonalProfile) {
+      form.append("PersonalProfile", payload.PersonalProfile);
+    }
+
+    return form;
+  },
+  onSuccess: (res) => {
+    console.log("[auth thunk] Instructor registration successful", res);
+  },
+  onError: (error) => {
+    console.log("[auth thunk] error in registerInstructor", error);
+  },
+});

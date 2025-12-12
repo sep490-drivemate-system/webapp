@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,29 +24,54 @@ import {
 } from "@/components/ui/popover";
 import { format, parse } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useSignUp } from "@/hooks/auth/useSignUp";
+import type { InstructorRegistrationRequest } from "@/types/auth/instructor-registration.type";
 
 export default function IdentificationDocumentPage() {
   const router = useRouter();
+  const { handleRegisterInstructor, instructorLoading, signupData } =
+    useSignUp();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
     // Ảnh đại diện
-    avatar: "",
+    avatar: File | null;
     // Căn cước công dân
-    citizenIdFront: "",
-    citizenIdBack: "",
+    citizenIdFront: File | null;
+    citizenIdBack: File | null;
+    citizenIdFullName: string;
+    citizenIdDateOfBirth: string;
+    citizenIdGender: string;
+    // Giấy phép lái xe
+    driverLicenseFront: File | null;
+    driverLicenseBack: File | null;
+    driverLicenseClass: string;
+    // Chứng chỉ hành nghề
+    trainingCertificate: File | null;
+    trainingClass: string;
+    // Giấy khám sức khỏe
+    healthCertificate: File | null;
+    // Thông tin liên hệ khẩn cấp
+    emergencyContactName: string;
+    emergencyContactPhone: string;
+  }>({
+    // Ảnh đại diện
+    avatar: null,
+    // Căn cước công dân
+    citizenIdFront: null,
+    citizenIdBack: null,
     citizenIdFullName: "",
     citizenIdDateOfBirth: "",
     citizenIdGender: "",
     // Giấy phép lái xe
-    driverLicenseFront: "",
-    driverLicenseBack: "",
+    driverLicenseFront: null,
+    driverLicenseBack: null,
     driverLicenseClass: "",
     // Chứng chỉ hành nghề
-    trainingCertificate: "",
+    trainingCertificate: null,
     trainingClass: "",
     // Giấy khám sức khỏe
-    healthCertificate: "",
+    healthCertificate: null,
     // Thông tin liên hệ khẩn cấp
     emergencyContactName: "",
     emergencyContactPhone: "",
@@ -95,26 +120,137 @@ export default function IdentificationDocumentPage() {
     return dateStr;
   };
 
-  const handleImageUpload = (field: string, base64: string) => {
+  const handleImageUpload = (field: string, file: File | null) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: base64,
+      [field]: file,
     }));
   };
+
+  // Create preview URLs for File objects and cleanup old URLs
+  const [previewUrls, setPreviewUrls] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const urls: Record<string, string> = {};
+
+    if (formData.avatar) {
+      urls.avatar = URL.createObjectURL(formData.avatar);
+    }
+    if (formData.citizenIdFront) {
+      urls.citizenIdFront = URL.createObjectURL(formData.citizenIdFront);
+    }
+    if (formData.citizenIdBack) {
+      urls.citizenIdBack = URL.createObjectURL(formData.citizenIdBack);
+    }
+    if (formData.driverLicenseFront) {
+      urls.driverLicenseFront = URL.createObjectURL(
+        formData.driverLicenseFront
+      );
+    }
+    if (formData.driverLicenseBack) {
+      urls.driverLicenseBack = URL.createObjectURL(formData.driverLicenseBack);
+    }
+    if (formData.trainingCertificate) {
+      urls.trainingCertificate = URL.createObjectURL(
+        formData.trainingCertificate
+      );
+    }
+    if (formData.healthCertificate) {
+      urls.healthCertificate = URL.createObjectURL(formData.healthCertificate);
+    }
+
+    // Cleanup old URLs before setting new ones
+    setPreviewUrls((oldUrls) => {
+      Object.values(oldUrls).forEach((url) => {
+        if (url) URL.revokeObjectURL(url);
+      });
+      return urls;
+    });
+  }, [
+    formData.avatar,
+    formData.citizenIdFront,
+    formData.citizenIdBack,
+    formData.driverLicenseFront,
+    formData.driverLicenseBack,
+    formData.trainingCertificate,
+    formData.healthCertificate,
+  ]);
+
+  // Cleanup all URLs on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(previewUrls).forEach((url) => {
+        if (url) URL.revokeObjectURL(url);
+      });
+    };
+  }, [previewUrls]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      // TODO: Implement API call to submit form data
-      console.log("Submitting form data:", formData);
+      // Validate required fields
+      if (
+        !formData.citizenIdFullName ||
+        !formData.citizenIdDateOfBirth ||
+        !formData.citizenIdGender ||
+        !formData.driverLicenseClass ||
+        !formData.trainingClass ||
+        !formData.avatar ||
+        !formData.citizenIdFront ||
+        !formData.driverLicenseFront ||
+        !formData.driverLicenseBack ||
+        !formData.trainingCertificate ||
+        !formData.healthCertificate
+      ) {
+        alert("Vui lòng điền đầy đủ thông tin bắt buộc.");
+        setIsSubmitting(false);
+        return;
+      }
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Check if signup data exists
+      if (
+        !signupData.email ||
+        !signupData.password ||
+        !signupData.phoneNumber
+      ) {
+        alert(
+          "Thông tin đăng ký không hợp lệ. Vui lòng quay lại bước đăng ký."
+        );
+        setIsSubmitting(false);
+        return;
+      }
 
-      // Navigate to waiting confirm page
-      router.push("/waiting-confirm");
+      const registrationData: InstructorRegistrationRequest = {
+        Fullname: formData.citizenIdFullName,
+        RawPassword: signupData.password,
+        Email: signupData.email,
+        PhoneNumber: signupData.phoneNumber,
+        Avatar: formData.avatar,
+        BirthDate: formData.citizenIdDateOfBirth, // Already in yyyy-MM-dd format
+        Gender: formData.citizenIdGender,
+        DrivingLicenseFront: formData.driverLicenseFront,
+        DrivingLicenseBack: formData.driverLicenseBack,
+        DrivingLicenseTier: formData.driverLicenseClass,
+        TeachingLicenseFront: formData.trainingCertificate,
+        TeachingTier: formData.trainingClass,
+        HealthCheckup: formData.healthCertificate,
+        PersonalProfile: formData.citizenIdFront,
+      };
+
+      // Call API
+      const result = await handleRegisterInstructor(registrationData);
+      console.log(result);
+      if (result.ok) {
+        // Navigate to waiting confirm page
+        localStorage.setItem("instructorId", result.data.value!);
+        router.push("/waiting-confirm");
+      } else {
+        alert(
+          result.error || "Có lỗi xảy ra khi gửi tài liệu. Vui lòng thử lại."
+        );
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("Có lỗi xảy ra khi gửi tài liệu. Vui lòng thử lại.");
@@ -156,8 +292,8 @@ export default function IdentificationDocumentPage() {
                 <CardContent className="pt-4">
                   <ImageUploadField
                     label="Ảnh đại diện"
-                    onUpload={(base64) => handleImageUpload("avatar", base64)}
-                    preview={formData.avatar}
+                    onUpload={(file) => handleImageUpload("avatar", file)}
+                    preview={previewUrls.avatar}
                     labelClassName="text-white"
                     uploadAreaClassName="border-2 border-dashed border-[#10b981]/50 rounded-lg p-6 text-center cursor-pointer transition-colors bg-[#10b981]/10 hover:bg-[#10b981]/20"
                   />
@@ -175,19 +311,19 @@ export default function IdentificationDocumentPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <ImageUploadField
                       label="Ảnh Mặt Trước"
-                      onUpload={(base64) =>
-                        handleImageUpload("citizenIdFront", base64)
+                      onUpload={(file) =>
+                        handleImageUpload("citizenIdFront", file)
                       }
-                      preview={formData.citizenIdFront}
+                      preview={previewUrls.citizenIdFront}
                       labelClassName="text-white"
                       uploadAreaClassName="border-2 border-dashed border-[#10b981]/50 rounded-lg p-6 text-center cursor-pointer transition-colors bg-[#10b981]/10 hover:bg-[#10b981]/20"
                     />
                     <ImageUploadField
                       label="Ảnh Mặt Sau"
-                      onUpload={(base64) =>
-                        handleImageUpload("citizenIdBack", base64)
+                      onUpload={(file) =>
+                        handleImageUpload("citizenIdBack", file)
                       }
-                      preview={formData.citizenIdBack}
+                      preview={previewUrls.citizenIdBack}
                       labelClassName="text-white"
                       uploadAreaClassName="border-2 border-dashed border-[#10b981]/50 rounded-lg p-6 text-center cursor-pointer transition-colors bg-[#10b981]/10 hover:bg-[#10b981]/20"
                     />
@@ -329,13 +465,13 @@ export default function IdentificationDocumentPage() {
                         </SelectTrigger>
                         <SelectContent className="bg-[#10b981]/20 backdrop-blur-md border-[#10b981]/50">
                           <SelectItem
-                            value="male"
+                            value="Male"
                             className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
                           >
                             Nam
                           </SelectItem>
                           <SelectItem
-                            value="female"
+                            value="Female"
                             className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
                           >
                             Nữ
@@ -364,19 +500,19 @@ export default function IdentificationDocumentPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <ImageUploadField
                       label="Ảnh Mặt Trước"
-                      onUpload={(base64) =>
-                        handleImageUpload("driverLicenseFront", base64)
+                      onUpload={(file) =>
+                        handleImageUpload("driverLicenseFront", file)
                       }
-                      preview={formData.driverLicenseFront}
+                      preview={previewUrls.driverLicenseFront}
                       labelClassName="text-white"
                       uploadAreaClassName="border-2 border-dashed border-[#10b981]/50 rounded-lg p-6 text-center cursor-pointer transition-colors bg-[#10b981]/10 hover:bg-[#10b981]/20"
                     />
                     <ImageUploadField
                       label="Ảnh Mặt Sau"
-                      onUpload={(base64) =>
-                        handleImageUpload("driverLicenseBack", base64)
+                      onUpload={(file) =>
+                        handleImageUpload("driverLicenseBack", file)
                       }
-                      preview={formData.driverLicenseBack}
+                      preview={previewUrls.driverLicenseBack}
                       labelClassName="text-white"
                       uploadAreaClassName="border-2 border-dashed border-[#10b981]/50 rounded-lg p-6 text-center cursor-pointer transition-colors bg-[#10b981]/10 hover:bg-[#10b981]/20"
                     />
@@ -484,10 +620,10 @@ export default function IdentificationDocumentPage() {
                 <CardContent className="pt-4 space-y-4">
                   <ImageUploadField
                     label="Ảnh Chứng Chỉ Hành Nghề"
-                    onUpload={(base64) =>
-                      handleImageUpload("trainingCertificate", base64)
+                    onUpload={(file) =>
+                      handleImageUpload("trainingCertificate", file)
                     }
-                    preview={formData.trainingCertificate}
+                    preview={previewUrls.trainingCertificate}
                     labelClassName="text-white"
                     uploadAreaClassName="border-2 border-dashed border-[#10b981]/50 rounded-lg p-6 text-center cursor-pointer transition-colors bg-[#10b981]/10 hover:bg-[#10b981]/20"
                   />
@@ -594,64 +730,13 @@ export default function IdentificationDocumentPage() {
                 <CardContent className="pt-4">
                   <ImageUploadField
                     label="Ảnh Giấy Khám Sức Khỏe"
-                    onUpload={(base64) =>
-                      handleImageUpload("healthCertificate", base64)
+                    onUpload={(file) =>
+                      handleImageUpload("healthCertificate", file)
                     }
-                    preview={formData.healthCertificate}
+                    preview={previewUrls.healthCertificate}
                     labelClassName="text-white"
                     uploadAreaClassName="border-2 border-dashed border-[#10b981]/50 rounded-lg p-6 text-center cursor-pointer transition-colors bg-[#10b981]/10 hover:bg-[#10b981]/20"
                   />
-                </CardContent>
-              </Card>
-
-              {/* Thông tin liên hệ khẩn cấp */}
-              <Card className="border-[#10b981]/50 bg-white/5">
-                <CardHeader>
-                  <CardTitle className="text-[#10b981] text-lg">
-                    Thông Tin Liên Hệ Khẩn Cấp
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-white mb-2">
-                        Tên Người Liên Hệ Khẩn Cấp{" "}
-                        <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        placeholder="Nhập tên người liên hệ khẩn cấp"
-                        value={formData.emergencyContactName}
-                        onChange={(e) =>
-                          handleInputChange(
-                            "emergencyContactName",
-                            e.target.value
-                          )
-                        }
-                        className="text-[#10b981] placeholder:text-gray-400 border-[#10b981]/50 focus:border-[#10b981] focus:ring-[#10b981] !bg-[#10b981]/10 focus:!bg-[#10b981]/20 hover:!bg-[#10b981]/10"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-white mb-2">
-                        Số Điện Thoại Người Liên Hệ Khẩn Cấp{" "}
-                        <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="tel"
-                        placeholder="Nhập số điện thoại"
-                        value={formData.emergencyContactPhone}
-                        onChange={(e) =>
-                          handleInputChange(
-                            "emergencyContactPhone",
-                            e.target.value
-                          )
-                        }
-                        className="text-[#10b981] placeholder:text-gray-400 border-[#10b981]/50 focus:border-[#10b981] focus:ring-[#10b981] !bg-[#10b981]/10 focus:!bg-[#10b981]/20 hover:!bg-[#10b981]/10"
-                        required
-                      />
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
 
@@ -659,9 +744,9 @@ export default function IdentificationDocumentPage() {
               <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-[#10b981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white"
-                disabled={isSubmitting}
+                disabled={isSubmitting || instructorLoading}
               >
-                {isSubmitting ? "Đang gửi..." : "Gửi"}
+                {isSubmitting || instructorLoading ? "Đang gửi..." : "Gửi"}
               </Button>
             </form>
           </CardContent>

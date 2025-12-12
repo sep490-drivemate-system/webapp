@@ -11,6 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useAppSelector } from "@/lib/redux/useAppDispatch";
 
 const MAIN_MENU = [
   { path: "/", label: "Trang chủ" },
@@ -62,10 +63,11 @@ function NavMenu({
             <li key={item.path} className="relative">
               <Link
                 href={item.path}
-                className={`group inline-flex h-9 w-max items-center justify-center rounded-md px-3 sm:px-4 py-2 text-sm font-medium transition-all ${activePath === item.path
-                  ? "bg-gradient-to-r from-[#10b981] to-[#059669] text-white shadow-lg hover:shadow-xl hover:from-[#059669] hover:to-[#047857] active:scale-95"
-                  : "hover:bg-gradient-to-r hover:from-[#10b981] hover:to-[#059669] hover:text-white hover:shadow-lg active:scale-95"
-                  }`}
+                className={`group inline-flex h-9 w-max items-center justify-center rounded-md px-3 sm:px-4 py-2 text-sm font-medium transition-all ${
+                  activePath === item.path
+                    ? "bg-gradient-to-r from-[#10b981] to-[#059669] text-white shadow-lg hover:shadow-xl hover:from-[#059669] hover:to-[#047857] active:scale-95"
+                    : "hover:bg-gradient-to-r hover:from-[#10b981] hover:to-[#059669] hover:text-white hover:shadow-lg active:scale-95"
+                }`}
               >
                 {item.label}
               </Link>
@@ -80,6 +82,7 @@ function NavMenu({
 function UserDropdown() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const auth = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -100,10 +103,11 @@ function UserDropdown() {
   return (
     <div className="relative right-5" ref={ref}>
       <button
-        className={`h-10 w-10 rounded-full flex items-center justify-center transition-all duration-150 ${open
-          ? "bg-gradient-to-r from-[#10b981] to-[#059669] text-white shadow-lg hover:shadow-xl hover:from-[#059669] hover:to-[#047857] active:scale-95"
-          : "hover:bg-gradient-to-r hover:from-[#10b981] hover:to-[#059669] hover:text-white hover:shadow-lg active:scale-95"
-          }`}
+        className={`h-10 w-10 rounded-full flex items-center justify-center transition-all duration-150 ${
+          open
+            ? "bg-gradient-to-r from-[#10b981] to-[#059669] text-white shadow-lg hover:shadow-xl hover:from-[#059669] hover:to-[#047857] active:scale-95"
+            : "hover:bg-gradient-to-r hover:from-[#10b981] hover:to-[#059669] hover:text-white hover:shadow-lg active:scale-95"
+        }`}
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="true"
         aria-expanded={open}
@@ -112,39 +116,46 @@ function UserDropdown() {
       </button>
       {open && (
         <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border">
-          <Link
-            href="/profile"
-            className="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
-            onClick={() => setOpen(false)}
-          >
-            <UserRound className="h-4 w-4 text-gray-500" />
-            <span className="flex-1 text-left">Hồ sơ cá nhân</span>
-          </Link>
-          <Link
-            href="/bookings"
-            className="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
-            onClick={() => setOpen(false)}
-          >
-            <CalendarClock className="h-4 w-4 text-gray-500" />
-            <span className="flex-1 text-left">Lịch sử đặt</span>
-          </Link>
-          <div className="border-t my-1"></div>
-          <Link
-            href="/signin"
-            className="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
-            onClick={() => setOpen(false)}
-          >
-            <LogIn className="h-4 w-4 text-gray-500" />
-            <span className="flex-1 text-left">Đăng nhập</span>
-          </Link>
-          <Link
-            href="/signup"
-            className="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
-            onClick={() => setOpen(false)}
-          >
-            <UserRoundPlus className="h-4 w-4 text-gray-500" />
-            <span className="flex-1 text-left">Đăng ký</span>
-          </Link>
+          {auth.isAuthenticated && (
+            <>
+              <Link
+                href="/profile"
+                className="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                <UserRound className="h-4 w-4 text-gray-500" />
+                <span className="flex-1 text-left">Hồ sơ cá nhân</span>
+              </Link>
+              <Link
+                href="/bookings"
+                className="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                <CalendarClock className="h-4 w-4 text-gray-500" />
+                <span className="flex-1 text-left">Lịch sử đặt</span>
+              </Link>
+            </>
+          )}
+          {!auth.isAuthenticated && (
+            <>
+              <Link
+                href="/signin"
+                className="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                <LogIn className="h-4 w-4 text-gray-500" />
+                <span className="flex-1 text-left">Đăng nhập</span>
+              </Link>
+              <Link
+                href="/signup"
+                className="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                <UserRoundPlus className="h-4 w-4 text-gray-500" />
+                <span className="flex-1 text-left">Đăng ký</span>
+              </Link>
+            </>
+          )}
         </div>
       )}
     </div>
@@ -170,10 +181,11 @@ function MobileMenu({
           <Link
             key={item.path}
             href={item.path}
-            className={`block w-full max-w-sm px-6 py-3 rounded-md text-lg font-medium text-center transition-colors ${activePath === item.path
-              ? "bg-accent text-accent-foreground"
-              : "text-white hover:bg-accent hover:text-accent-foreground"
-              }`}
+            className={`block w-full max-w-sm px-6 py-3 rounded-md text-lg font-medium text-center transition-colors ${
+              activePath === item.path
+                ? "bg-accent text-accent-foreground"
+                : "text-white hover:bg-accent hover:text-accent-foreground"
+            }`}
             onClick={onClose}
           >
             {item.label}
