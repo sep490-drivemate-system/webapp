@@ -61,7 +61,7 @@ export interface CreatePackageForm {
   roadTypes: string[];
   drivingSkills: string[];
   price: number;
-  allowNoviceCar: boolean;
+  isRentalCar: boolean;
   packageCars: string[];
 }
 
