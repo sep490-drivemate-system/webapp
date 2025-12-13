@@ -17,7 +17,7 @@ export const registerCar = createThunk<void, FormData>(
   {
     config: () => ({
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
     }),
   }
@@ -28,7 +28,7 @@ export const getCarsForInstructor = createThunk<ICar[], { id: string }>(
   "getCarsForInstructor",
   `/${CAR_PATH}/instructor/:id/cars`,
   {
-    buildUrl: (payload) => `/${CAR_PATH}/instructor/${payload.id}/cars`,
+    buildUrl: (payload) => `/${CAR_PATH}/instructors/${payload.id}/cars`,
   }
 );
 

@@ -1,19 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import RegistrationSection from "./registration-section";
 import InsuranceSection from "./insurance-section";
 import InspectionSection from "./inspection-section";
 import VerificationSection from "./vertification-section";
+import { useAppDispatch } from "@/lib/redux/useAppDispatch";
+import { registerCar } from "@/features/car/carThunk";
+import { getUserInfo } from "@/lib/jwt/jwt.utils";
+import { ICarRegistrationRequest } from "@/types/car/car.type";
+import { getManufacturers } from "@/features/car/carThunk";
 
 interface FormData {
   registration: any;
@@ -30,7 +29,8 @@ export default function DocumentForm({
   onSuccess: (msg: string) => void;
   onError: (msg: string) => void;
 }) {
-  const [currentTab, setCurrentTab] = useState("inspection");
+  const dispatch = useAppDispatch();
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     registration: {},
@@ -39,6 +39,22 @@ export default function DocumentForm({
     verification: {},
     rentalPrice: "",
   });
+  const [manufacturers, setManufacturers] = useState<{ id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    // Fetch manufacturers on mount
+    const fetchManufacturers = async () => {
+      try {
+        const result = await dispatch(getManufacturers());
+        if (getManufacturers.fulfilled.match(result)) {
+          setManufacturers(result.payload.value || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch manufacturers:", error);
+      }
+    };
+    fetchManufacturers();
+  }, [dispatch]);
 
   const handleSectionUpdate = (section: string, data: any) => {
     setFormData((prev) => ({
@@ -76,6 +92,15 @@ export default function DocumentForm({
       if (!formData.registration?.brand) {
         throw new Error("Vui lòng chọn hãng xe");
       }
+      if (!formData.registration?.model) {
+        throw new Error("Vui lòng nhập model xe");
+      }
+      if (!formData.registration?.carType) {
+        throw new Error("Vui lòng chọn loại xe");
+      }
+      if (!formData.registration?.year || formData.registration?.year <= 0) {
+        throw new Error("Vui lòng nhập năm sản xuất");
+      }
       if (!formData.registration?.color) {
         throw new Error("Vui lòng nhập màu xe");
       }
@@ -84,6 +109,12 @@ export default function DocumentForm({
       }
       if (!formData.registration?.fuelType) {
         throw new Error("Vui lòng chọn loại nhiên liệu");
+      }
+      if (!formData.registration?.licenseTier) {
+        throw new Error("Vui lòng chọn hạng bằng lái");
+      }
+      if (!formData.registration?.description || formData.registration.description.trim() === "") {
+        throw new Error("Vui lòng nhập mô tả về xe");
       }
       if (!formData.rentalPrice || parseFloat(formData.rentalPrice) <= 0) {
         throw new Error("Vui lòng nhập giá thuê theo giờ");
@@ -102,25 +133,148 @@ export default function DocumentForm({
         );
       }
 
-      const response = await fetch("/api/upload-vehicle-data", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      // Validate manufacturers are loaded
+      if (manufacturers.length === 0) {
+        throw new Error("Đang tải danh sách hãng xe. Vui lòng đợi một chút và thử lại.");
+      }
 
-      if (!response.ok) {
-        throw new Error("Tải lên dữ liệu xe thất bại");
+      // Get instructor ID
+      const userInfo = getUserInfo();
+      if (!userInfo?.id) {
+        throw new Error("Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.");
+      }
+
+      // Find brand ID from manufacturers list - must be from the list
+      const selectedBrand = manufacturers.find(
+        (m) => m.id === formData.registration.brandId || m.name === formData.registration.brand
+      );
+      
+      if (!selectedBrand) {
+        throw new Error("Vui lòng chọn hãng xe từ danh sách.");
+      }
+
+      const brandId = selectedBrand.id;
+
+      // Map fuel type to API format (if needed)
+      const fuelTypeMap: Record<string, string> = {
+        "Xăng": "Gasoline",
+        "Dầu": "Diesel",
+        "Điện": "Electric",
+        "Hybrid": "Hybrid",
+      };
+      const fuelType = fuelTypeMap[formData.registration.fuelType] || formData.registration.fuelType;
+
+      // Prepare registration request data
+      const registrationData: ICarRegistrationRequest = {
+        InstructorId: userInfo.id,
+        Description: formData.registration.description || "",
+        HourlyPrice: parseFloat(formData.rentalPrice),
+        ThumbnailImage: formData.verification.frontImage || null,
+        CarFrontImage: formData.verification.frontImage || null,
+        CarBackImage: formData.verification.backImage || null,
+        CarLeftImage: formData.verification.leftSideImage || null,
+        CarRightImage: formData.verification.rightSideImage || null,
+        InteriorImage: formData.verification.interiorImage || null,
+        RegistrationFront: formData.inspection.frontImage || null,
+        RegistrationBack: formData.inspection.backImage || null,
+        LicenseTier: formData.registration.licenseTier,
+        LicensePlate: formData.registration.licensePlate,
+        BrandId: brandId,
+        Model: formData.registration.model,
+        CarType: formData.registration.carType,
+        Year: formData.registration.year,
+        Color: formData.registration.color,
+        Seats: formData.registration.seats,
+        FuelType: fuelType,
+        InsuranceFront: formData.insurance.frontImage || null,
+        InsuranceBack: formData.insurance.backImage || null,
+        InsuranceEndTime: formData.insurance.expiryDate || undefined,
+      };
+
+      // Convert to FormData
+      const formDataToSend = new FormData();
+      
+      // Add non-file fields
+      formDataToSend.append("InstructorId", registrationData.InstructorId);
+      formDataToSend.append("Description", registrationData.Description || "");
+      formDataToSend.append("HourlyPrice", registrationData.HourlyPrice.toString());
+      formDataToSend.append("LicenseTier", registrationData.LicenseTier);
+      formDataToSend.append("LicensePlate", registrationData.LicensePlate);
+      if (registrationData.BrandId) {
+        formDataToSend.append("BrandId", registrationData.BrandId);
+      }
+      formDataToSend.append("Model", registrationData.Model);
+      formDataToSend.append("CarType", registrationData.CarType);
+      formDataToSend.append("Year", registrationData.Year.toString());
+      formDataToSend.append("Color", registrationData.Color);
+      formDataToSend.append("Seats", registrationData.Seats.toString());
+      formDataToSend.append("FuelType", registrationData.FuelType);
+      if (registrationData.InsuranceEndTime) {
+        formDataToSend.append("InsuranceEndTime", registrationData.InsuranceEndTime);
+      }
+
+      // Add file fields
+      if (registrationData.ThumbnailImage) {
+        formDataToSend.append("ThumbnailImage", registrationData.ThumbnailImage);
+      }
+      if (registrationData.CarFrontImage) {
+        formDataToSend.append("CarFrontImage", registrationData.CarFrontImage);
+      }
+      if (registrationData.CarBackImage) {
+        formDataToSend.append("CarBackImage", registrationData.CarBackImage);
+      }
+      if (registrationData.CarLeftImage) {
+        formDataToSend.append("CarLeftImage", registrationData.CarLeftImage);
+      }
+      if (registrationData.CarRightImage) {
+        formDataToSend.append("CarRightImage", registrationData.CarRightImage);
+      }
+      if (registrationData.InteriorImage) {
+        formDataToSend.append("InteriorImage", registrationData.InteriorImage);
+      }
+      if (registrationData.RegistrationFront) {
+        formDataToSend.append("RegistrationFront", registrationData.RegistrationFront);
+      }
+      if (registrationData.RegistrationBack) {
+        formDataToSend.append("RegistrationBack", registrationData.RegistrationBack);
+      }
+      if (registrationData.InsuranceFront) {
+        formDataToSend.append("InsuranceFront", registrationData.InsuranceFront);
+      }
+      if (registrationData.InsuranceBack) {
+        formDataToSend.append("InsuranceBack", registrationData.InsuranceBack);
+      }
+
+      // Log FormData fields for debugging
+      console.log("=== FormData Fields ===");
+      console.log("Registration Data:", registrationData);
+      console.log("\n--- FormData Entries ---");
+      for (const [key, value] of formDataToSend.entries()) {
+        if (value instanceof File) {
+          console.log(`${key}:`, {
+            name: value.name,
+            size: value.size,
+            type: value.type,
+          });
+        } else {
+          console.log(`${key}:`, value);
+        }
+      }
+      console.log("======================\n");
+
+      // Call API using thunk
+      const result = await dispatch(registerCar(formDataToSend));
+
+      if (registerCar.rejected.match(result)) {
+        throw new Error(result.payload || "Tải lên dữ liệu xe thất bại");
       }
 
       onSuccess("Tải lên dữ liệu xe thành công!");
-      setFormData({
-        inspection: {},
-        insurance: {},
-        registration: {},
-        verification: {},
-        rentalPrice: "",
-      });
-      setCurrentTab("inspection");
+      
+      // Redirect to car-management page after a short delay
+      setTimeout(() => {
+        router.push("/car-management");
+      }, 1000);
     } catch (error) {
       onError(error instanceof Error ? error.message : "Tải lên thất bại");
     } finally {
@@ -175,6 +329,7 @@ export default function DocumentForm({
           <RegistrationSection
             data={formData.registration}
             rentalPrice={formData.rentalPrice}
+            manufacturers={manufacturers}
             onUpdate={(data) => handleSectionUpdate("registration", data)}
             onPriceUpdate={(price: string) =>
               setFormData((prev) => ({ ...prev, rentalPrice: price }))
@@ -194,7 +349,15 @@ export default function DocumentForm({
         <Button
           type="button"
           variant="outline"
-          onClick={() => setCurrentTab("registration")}
+          onClick={() => {
+            setFormData({
+              inspection: {},
+              insurance: {},
+              registration: {},
+              verification: {},
+              rentalPrice: "",
+            });
+          }}
           className="border-border text-foreground hover:bg-muted"
         >
           Đặt Lại

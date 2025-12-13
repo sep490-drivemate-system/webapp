@@ -1,33 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import {
-  Plus,
-  MapPin,
-  Trash2,
-  Eye,
-  Car,
   Calendar,
+  Car,
   DollarSign,
+  Eye,
+  Loader2,
+  MapPin,
+  Plus,
+  Trash2,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import PageHeader from "@/components/commons/Header/header";
 import {
   AlertDialog,
@@ -39,118 +24,44 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { getCarsForInstructor } from "@/features/car/carThunk";
+import { getUserInfo } from "@/lib/jwt/jwt.utils";
+import { useThunkAction } from "@/lib/redux/useThunkAction";
+import { ICar } from "@/types/car/car.type";
+import { CarStatus } from "@/types/constants/enum";
 
-enum VehicleStatus {
-  Pending = 1,
-  Approved,
-}
-
-const getVehicleStatusLabel = (status: VehicleStatus) => {
+const getVehicleStatusLabel = (status: CarStatus) => {
   switch (status) {
-    case VehicleStatus.Approved:
+    case CarStatus.Approved:
       return "Đã Duyệt";
-    case VehicleStatus.Pending:
+    case CarStatus.Pending:
       return "Chờ Duyệt";
+    case CarStatus.Rejected:
+      return "Bị từ chối";
     default:
       return "Không xác định";
   }
 };
 
-interface Vehicle {
-  id: number;
-  brand: string;
-  model: string;
-  licensePlate: string;
-  seats: number;
-  price: number;
-  image: string;
-  status: VehicleStatus;
-  approvedDate: string | null;
-  year: number;
-  fuelType: string;
-  transmission: string;
-  features: string[];
-}
-
-const mockVehicles: Vehicle[] = [
-  {
-    id: 1,
-    brand: "Toyota",
-    model: "Vios",
-    licensePlate: "51A-123.45",
-    seats: 5,
-    price: 150000,
-    image: "https://img1.oto.com.vn/2022/01/04/1OANJGk2/camry-4e90.jpg",
-    status: VehicleStatus.Approved,
-    approvedDate: "2025-01-15",
-    year: 2023,
-    fuelType: "Petrol",
-    transmission: "Manual",
-    features: ["Air Conditioning", "Power Steering", "ABS", "Airbags"],
-  },
-  {
-    id: 2,
-    brand: "Honda",
-    model: "Accord",
-    licensePlate: "51B-456.78",
-    seats: 5,
-    price: 250000,
-    image: "https://img1.oto.com.vn/2022/01/04/1OANJGk2/camry-4e90.jpg",
-    status: VehicleStatus.Approved,
-    approvedDate: "2025-01-10",
-    year: 2024,
-    fuelType: "Petrol",
-    transmission: "Automatic",
-    features: [
-      "Air Conditioning",
-      "Power Steering",
-      "ABS",
-      "Airbags",
-      "Cruise Control",
-    ],
-  },
-  {
-    id: 3,
-    brand: "BMW",
-    model: "3 Series",
-    licensePlate: "51C-789.01",
-    seats: 5,
-    price: 450000,
-    image: "https://img1.oto.com.vn/2022/01/04/1OANJGk2/camry-4e90.jpg",
-    status: VehicleStatus.Pending,
-    approvedDate: null,
-    year: 2024,
-    fuelType: "Diesel",
-    transmission: "Automatic",
-    features: [
-      "Air Conditioning",
-      "Power Steering",
-      "ABS",
-      "Airbags",
-      "Sunroof",
-      "Navigation",
-    ],
-  },
-  {
-    id: 4,
-    brand: "Kia",
-    model: "Cerato",
-    licensePlate: "51D-234.56",
-    seats: 5,
-    price: 180000,
-    image: "https://img1.oto.com.vn/2022/01/04/1OANJGk2/camry-4e90.jpg",
-    status: VehicleStatus.Approved,
-    approvedDate: "2025-01-20",
-    year: 2023,
-    fuelType: "Petrol",
-    transmission: "Manual",
-    features: ["Air Conditioning", "Power Steering", "ABS", "Airbags"],
-  },
-];
-
 interface VehicleCardProps {
-  vehicle: Vehicle;
+  vehicle: ICar;
   onDetail: () => void;
   onDelete: () => void;
 }
@@ -164,12 +75,12 @@ function VehicleCard({ vehicle, onDetail, onDelete }: VehicleCardProps) {
         <div className="absolute right-3 top-3 z-10">
           <Badge
             variant={
-              vehicle.status === VehicleStatus.Approved
+              vehicle.status === CarStatus.Approved
                 ? "default"
                 : "secondary"
             }
             className={
-              vehicle.status === VehicleStatus.Approved
+              vehicle.status === CarStatus.Approved
                 ? "bg-emerald-500 text-white hover:bg-emerald-600"
                 : "bg-amber-500 text-white hover:bg-amber-600"
             }
@@ -177,10 +88,10 @@ function VehicleCard({ vehicle, onDetail, onDelete }: VehicleCardProps) {
             {getVehicleStatusLabel(vehicle.status)}
           </Badge>
         </div>
-        {vehicle.image && !imageError ? (
+        {vehicle.thumbnailUrl && !imageError ? (
           <img
-            src={vehicle.image}
-            alt={`${vehicle.brand} ${vehicle.model}`}
+            src={vehicle.thumbnailUrl}
+            alt={`${vehicle.brand} ${vehicle.modelName}`}
             className="h-full w-full object-cover"
             onError={() => setImageError(true)}
           />
@@ -194,17 +105,17 @@ function VehicleCard({ vehicle, onDetail, onDelete }: VehicleCardProps) {
         <div className="space-y-1">
           <CardTitle className="text-lg">{vehicle.brand}</CardTitle>
           <CardDescription className="text-base font-medium">
-            {vehicle.model}
+            {vehicle.modelName}
           </CardDescription>
           <p className="text-sm text-muted-foreground">
-            {vehicle.licensePlate}
+            {vehicle.license_plate}
           </p>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">
-            {vehicle.seats} chỗ • {vehicle.year}
+            {vehicle.seatCounts} chỗ
           </span>
           <span className="font-semibold text-primary">
             {vehicle.price.toLocaleString("vi-VN")} VNĐ
@@ -230,7 +141,7 @@ function VehicleCard({ vehicle, onDetail, onDelete }: VehicleCardProps) {
 }
 
 interface VehicleModalProps {
-  vehicle: Vehicle | null;
+  vehicle: ICar | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -243,7 +154,7 @@ function VehicleModal({ vehicle, open, onOpenChange }: VehicleModalProps) {
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {vehicle.brand} {vehicle.model}
+            {vehicle.brand} {vehicle.modelName}
           </DialogTitle>
           <DialogDescription>Chi tiết thông tin xe</DialogDescription>
         </DialogHeader>
@@ -253,31 +164,31 @@ function VehicleModal({ vehicle, open, onOpenChange }: VehicleModalProps) {
               <Label className="text-sm font-semibold text-muted-foreground">
                 Biển số xe
               </Label>
-              <p className="text-base">{vehicle.licensePlate}</p>
+              <p className="text-base">{vehicle.license_plate}</p>
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-semibold text-muted-foreground">
                 Năm sản xuất
               </Label>
-              <p className="text-base">{vehicle.year}</p>
+              <p className="text-base">{vehicle.seatCounts}</p>
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-semibold text-muted-foreground">
                 Nhiên liệu
               </Label>
-              <p className="text-base">{vehicle.fuelType}</p>
+              <p className="text-base">{vehicle.fuel}</p>
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-semibold text-muted-foreground">
                 Hộp số
               </Label>
-              <p className="text-base">{vehicle.transmission}</p>
+              <p className="text-base">{vehicle.vehicleType}</p>
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-semibold text-muted-foreground">
                 Số chỗ ngồi
               </Label>
-              <p className="text-base">{vehicle.seats}</p>
+              <p className="text-base">{vehicle.seatCounts}</p>
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-semibold text-muted-foreground">
@@ -293,38 +204,18 @@ function VehicleModal({ vehicle, open, onOpenChange }: VehicleModalProps) {
               </Label>
               <Badge
                 variant={
-                  vehicle.status === VehicleStatus.Approved
+                  vehicle.status === CarStatus.Approved
                     ? "default"
                     : "secondary"
                 }
                 className={
-                  vehicle.status === VehicleStatus.Approved
+                  vehicle.status === CarStatus.Approved
                     ? "bg-emerald-500 text-white hover:bg-emerald-600"
                     : "bg-amber-500 text-white hover:bg-amber-600"
                 }
               >
                 {getVehicleStatusLabel(vehicle.status)}
               </Badge>
-            </div>
-            {vehicle.approvedDate && (
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold text-muted-foreground">
-                  Ngày duyệt
-                </Label>
-                <p className="text-base">{vehicle.approvedDate}</p>
-              </div>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-semibold text-muted-foreground">
-              Tính năng
-            </Label>
-            <div className="flex flex-wrap gap-2">
-              {vehicle.features.map((feature, index) => (
-                <Badge key={index} variant="outline">
-                  {feature}
-                </Badge>
-              ))}
             </div>
           </div>
         </div>
@@ -335,12 +226,14 @@ function VehicleModal({ vehicle, open, onOpenChange }: VehicleModalProps) {
 
 export default function CarManagementPage() {
   const router = useRouter();
-  const [vehicles, setVehicles] = useState<Vehicle[]>(mockVehicles);
-  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [vehicles, setVehicles] = useState<ICar[]>([]);
+  const [selectedVehicle, setSelectedVehicle] = useState<ICar | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
-  const [deleteVehicleId, setDeleteVehicleId] = useState<number | null>(null);
+  const [deleteVehicleId, setDeleteVehicleId] = useState<string | null>(null);
+  const { run: fetchCarsForInstructor, loading: fetchCarsLoading } =
+    useThunkAction(getCarsForInstructor);
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     setDeleteVehicleId(id);
   };
 
@@ -352,15 +245,69 @@ export default function CarManagementPage() {
   };
 
   const approvedCount = vehicles.filter(
-    (v) => v.status === VehicleStatus.Approved
+    (v) => v.status === CarStatus.Approved
   ).length;
   const pendingCount = vehicles.filter(
-    (v) => v.status === VehicleStatus.Pending
+    (v) => v.status === CarStatus.Pending
   ).length;
   const averagePrice =
     vehicles.length > 0
       ? Math.round(vehicles.reduce((s, v) => s + v.price, 0) / vehicles.length)
       : 0;
+
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      const userId = getUserInfo()?.id;
+      if (!userId) {
+        console.log("No user ID found");
+        return;
+      }
+      
+      fetchCarsForInstructor(
+        { id: userId },
+        {
+          onSuccess: (response) => {
+            console.log("Success response:", response);
+            console.log("Response.value:", response?.value);
+            console.log("Response.success:", response?.success);
+            setVehicles(response?.value ?? []);
+          },
+          onError: (error) => {
+            console.error("Error fetching vehicles:", error);
+            setVehicles([]);
+          },
+        }
+      );
+    };
+    fetchVehicles();
+  }, [fetchCarsForInstructor]);
+
+  // Reload when page becomes visible (e.g., when navigating back from car-upload)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        const userId = getUserInfo()?.id;
+        if (userId) {
+          fetchCarsForInstructor(
+            { id: userId },
+            {
+              onSuccess: (response) => {
+                setVehicles(response?.value ?? []);
+              },
+              onError: (error) => {
+                console.error("Error reloading vehicles:", error);
+              },
+            }
+          );
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [fetchCarsForInstructor]);
 
   return (
     <div className="space-y-8">
@@ -442,7 +389,17 @@ export default function CarManagementPage() {
       </section>
 
       {/* Vehicles Grid */}
-      {vehicles.length === 0 ? (
+      {fetchCarsLoading ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <Loader2 className="size-8 animate-spin text-primary mb-4" />
+            <CardTitle className="mb-2">Đang tải danh sách xe...</CardTitle>
+            <CardDescription className="text-center">
+              Vui lòng đợi trong giây lát
+            </CardDescription>
+          </CardContent>
+        </Card>
+      ) : vehicles.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="mb-4 rounded-full bg-muted p-4">

@@ -12,11 +12,17 @@ export default function VerificationSection({
   data,
   onUpdate,
 }: VerificationSectionProps) {
-  const handleImageUpload = (field: string, base64: string) => {
+  const handleImageUpload = (field: string, file: File | null) => {
     onUpdate({
       ...data,
-      [field]: base64,
+      [field]: file,
     });
+  };
+
+  const getPreviewUrl = (file: File | null | string | undefined): string | undefined => {
+    if (!file) return undefined;
+    if (typeof file === "string") return file; // Support legacy base64 strings
+    return URL.createObjectURL(file);
   };
 
   return (
@@ -28,28 +34,28 @@ export default function VerificationSection({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <ImageUploadField
             label="Ảnh Phía Trước"
-            onUpload={(base64) => handleImageUpload("frontImage", base64)}
-            preview={data.frontImage}
+            onUpload={(file) => handleImageUpload("frontImage", file)}
+            preview={getPreviewUrl(data.frontImage)}
           />
           <ImageUploadField
             label="Ảnh Phía Sau"
-            onUpload={(base64) => handleImageUpload("backImage", base64)}
-            preview={data.backImage}
+            onUpload={(file) => handleImageUpload("backImage", file)}
+            preview={getPreviewUrl(data.backImage)}
           />
           <ImageUploadField
             label="Ảnh Bên Hông Trái"
-            onUpload={(base64) => handleImageUpload("leftSideImage", base64)}
-            preview={data.leftSideImage}
+            onUpload={(file) => handleImageUpload("leftSideImage", file)}
+            preview={getPreviewUrl(data.leftSideImage)}
           />
           <ImageUploadField
             label="Ảnh Bên Hông Phải"
-            onUpload={(base64) => handleImageUpload("rightSideImage", base64)}
-            preview={data.rightSideImage}
+            onUpload={(file) => handleImageUpload("rightSideImage", file)}
+            preview={getPreviewUrl(data.rightSideImage)}
           />
           <ImageUploadField
             label="Ảnh Nội Thất"
-            onUpload={(base64) => handleImageUpload("interiorImage", base64)}
-            preview={data.interiorImage}
+            onUpload={(file) => handleImageUpload("interiorImage", file)}
+            preview={getPreviewUrl(data.interiorImage)}
           />
         </div>
       </CardContent>

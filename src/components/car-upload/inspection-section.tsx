@@ -12,11 +12,17 @@ export default function InspectionSection({
   data,
   onUpdate,
 }: InspectionSectionProps) {
-  const handleImageUpload = (field: string, base64: string) => {
+  const handleImageUpload = (field: string, file: File | null) => {
     onUpdate({
       ...data,
-      [field]: base64,
+      [field]: file,
     });
+  };
+
+  const getPreviewUrl = (file: File | null | string | undefined): string | undefined => {
+    if (!file) return undefined;
+    if (typeof file === "string") return file; // Support legacy base64 strings
+    return URL.createObjectURL(file);
   };
 
   return (
@@ -29,13 +35,13 @@ export default function InspectionSection({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <ImageUploadField
             label="Ảnh Mặt Trước"
-            onUpload={(base64) => handleImageUpload("frontImage", base64)}
-            preview={data.frontImage}
+            onUpload={(file) => handleImageUpload("frontImage", file)}
+            preview={getPreviewUrl(data.frontImage)}
           />
           <ImageUploadField
             label="Ảnh Mặt Sau"
-            onUpload={(base64) => handleImageUpload("backImage", base64)}
-            preview={data.backImage}
+            onUpload={(file) => handleImageUpload("backImage", file)}
+            preview={getPreviewUrl(data.backImage)}
           />
         </div>
       </CardContent>
