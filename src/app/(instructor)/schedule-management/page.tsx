@@ -1,27 +1,26 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
+import { Spinner } from "@/components/ui/shadcn-io/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Calendar,
+  Car,
   ChevronLeft,
   ChevronRight,
-  Route,
-  Car,
   Clock,
+  Route,
   SquarePen,
 } from "lucide-react";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { BookingStatus, bookingStatusToText } from "@/types/booking";
 import PageHeader from "@/components/commons/Header/header";
+import { getInstructorSchedule } from "@/features/schedule/scheduleThunk";
+import { getUserInfo } from "@/lib/jwt/jwt.utils";
+import { useThunkAction } from "@/lib/redux/useThunkAction";
+import { BookingStatus, bookingStatusToText } from "@/types/booking";
+import { IInstructorSchedule } from "@/features/booking/bookingThunk";
 
 interface BookingItem {
   id: string;
@@ -39,7 +38,7 @@ const BOOKINGS_DATA: BookingItem[] = [
   {
     id: "BKG001",
     studentName: "Nguyễn Văn B",
-    date: "2025-11-14",
+    date: "2025-11-25",
     startTime: "07:00",
     endTime: "09:00",
     totalHours: 2,
@@ -169,8 +168,6 @@ const BOOKINGS_DATA: BookingItem[] = [
     vehicle: "KIA Sorento",
   },
 ];
-
-const BUSY_DATES = ["2025-11-30", "2025-11-31"];
 
 const getStatusColor = (status: BookingStatus) => {
   switch (status) {
@@ -307,6 +304,7 @@ function ScheduleCalendar({
   onSelectedDateChange,
 
   bookings,
+  availableSchedules,
 }: {
   currentDate: Date;
 
@@ -317,7 +315,36 @@ function ScheduleCalendar({
   onSelectedDateChange: (date: string) => void;
 
   bookings: BookingItem[];
+  availableSchedules: IInstructorSchedule[];
 }) {
+  const isDateInAvailableRange = (dateString: string): boolean => {
+    if (availableSchedules.length === 0) return false;
+    const [year, month, day] = dateString.split("-").map(Number);
+    const checkDate = new Date(year, month - 1, day);
+    checkDate.setHours(0, 0, 0, 0);
+
+    return availableSchedules.some((schedule) => {
+      let startDate: Date;
+      if (schedule.startTime.includes("T")) {
+        startDate = new Date(schedule.startTime);
+      } else {
+        const [startYear, startMonth, startDay] = schedule.startTime.split("-").map(Number);
+        startDate = new Date(startYear, startMonth - 1, startDay);
+      }
+      startDate.setHours(0, 0, 0, 0);
+
+      let endDate: Date;
+      if (schedule.endTime.includes("T")) {
+        endDate = new Date(schedule.endTime);
+      } else {
+        const [endYear, endMonth, endDay] = schedule.endTime.split("-").map(Number);
+        endDate = new Date(endYear, endMonth - 1, endDay);
+      }
+      endDate.setHours(23, 59, 59, 999);
+
+      return checkDate >= startDate && checkDate <= endDate;
+    });
+  };
   const handlePrevMonth = () => {
     const newDate = new Date(currentDate);
 
@@ -341,8 +368,6 @@ function ScheduleCalendar({
 
     const firstDay = new Date(year, month, 1);
 
-    const lastDay = new Date(year, month + 1, 0);
-
     const startDate = new Date(firstDay);
 
     const dayOfWeek = firstDay.getDay();
@@ -361,8 +386,6 @@ function ScheduleCalendar({
       "CN",
     ];
 
-    // Day headers
-
     const headerDays = dayNames.map((day) => (
       <div
         key={day}
@@ -371,8 +394,6 @@ function ScheduleCalendar({
         {day}
       </div>
     ));
-
-    // Generate calendar days
 
     const calendarDays: React.ReactNode[] = [];
 
@@ -402,7 +423,7 @@ function ScheduleCalendar({
         const hasBookings = bookings.some(
           (booking) => booking.date === dateString
         );
-        const isBusyDay = BUSY_DATES.includes(dateString);
+        const isInAvailableRange = isDateInAvailableRange(dateString);
 
         calendarDays.push(
           <button
@@ -413,6 +434,8 @@ function ScheduleCalendar({
               ${
                 isSelected
                   ? "bg-gradient-to-br from-green-400 to-green-500 text-white shadow-lg scale-105"
+                  : isInAvailableRange && isCurrent
+                  ? "bg-emerald-100 text-emerald-900 hover:bg-emerald-200 border border-emerald-300"
                   : isCurrent
                   ? "bg-white text-slate-900 hover:bg-slate-50 border border-slate-200"
                   : "bg-slate-100 text-slate-400 border border-transparent"
@@ -560,8 +583,12 @@ function ScheduleBookingList({
 
 export default function SchedulePage() {
   const [currentDate, setCurrentDate] = useState(new Date());
-
   const [selectedDate, setSelectedDate] = useState("");
+  const [availableSchedules, setAvailableSchedules] = useState<IInstructorSchedule[]>([]);
+  const {
+    run: fetchInstructorSchedule,
+    loading: fetchInstructorScheduleLoading,
+  } = useThunkAction(getInstructorSchedule);
 
   useEffect(() => {
     const today = new Date();
@@ -596,6 +623,23 @@ export default function SchedulePage() {
     router.push("/schedule-detail");
   };
 
+  useEffect(() => {
+    const userId = getUserInfo()?.id;
+    if (!userId) return;
+    fetchInstructorSchedule(
+      { instructorId: userId },
+      {
+        onSuccess: (response) => {
+          console.log(response)
+          setAvailableSchedules(response?.value ?? []);
+        },
+        onError: (error) => {
+          console.error(error);
+        },
+      }
+    );
+  }, [fetchInstructorSchedule]);
+
   return (
     <main className="min-h-screen">
       <div className="container mx-autopy-8">
@@ -614,22 +658,68 @@ export default function SchedulePage() {
           {/* Calendar Section */}
 
           <div className="lg:col-span-1">
-            <ScheduleCalendar
-              currentDate={currentDate}
-              selectedDate={selectedDate}
-              onCurrentDateChange={setCurrentDate}
-              onSelectedDateChange={setSelectedDate}
-              bookings={BOOKINGS_DATA}
-            />
+            {fetchInstructorScheduleLoading ? (
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <div className="flex flex-col items-center justify-center py-12">
+                  <Spinner variant="circle" size={48} className="text-[#10b981] mb-4" />
+                  <p className="text-sm text-slate-600">Đang tải lịch...</p>
+                </div>
+              </div>
+            ) : (
+              <ScheduleCalendar
+                currentDate={currentDate}
+                selectedDate={selectedDate}
+                onCurrentDateChange={setCurrentDate}
+                onSelectedDateChange={setSelectedDate}
+                bookings={BOOKINGS_DATA}
+                availableSchedules={availableSchedules}
+              />
+            )}
           </div>
 
           {/* Bookings List Section */}
 
           <div className="lg:col-span-2">
-            <ScheduleBookingList
-              selectedDate={selectedDate}
-              bookings={getBookingsForSelectedDate()}
-            />
+            {fetchInstructorScheduleLoading ? (
+              <div className="space-y-6">
+                {/* Selected Date Header Skeleton */}
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                  <Skeleton className="h-8 w-64 mb-2" />
+                  <Skeleton className="h-4 w-48" />
+                </div>
+
+                {/* Booking Cards Skeleton */}
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <Skeleton className="h-6 w-48 mb-2" />
+                          <Skeleton className="h-4 w-32" />
+                        </div>
+                        <Skeleton className="h-6 w-24 rounded-full" />
+                      </div>
+                      <div className="space-y-3 mb-4">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-3/4" />
+                      </div>
+                      <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-4 w-16" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <ScheduleBookingList
+                selectedDate={selectedDate}
+                bookings={getBookingsForSelectedDate()}
+              />
+            )}
           </div>
         </div>
       </div>

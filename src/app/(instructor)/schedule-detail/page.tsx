@@ -4,23 +4,19 @@ import { useMemo, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+import PageHeader from "@/components/commons/Header/header";
+import { updateInstructorSchedule } from "@/features/schedule/scheduleThunk";
+import { useThunkAction } from "@/lib/redux/useThunkAction";
+import { BookingStatus, bookingStatusToText } from "@/types/booking";
+import { getUserInfo } from "@/lib/jwt/jwt.utils";
 import {
+  ArrowLeft,
+  Check,
   ChevronLeft,
   ChevronRight,
   Trash2,
-  X,
-  Check,
-  Calendar,
-  ArrowLeft,
+  X
 } from "lucide-react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { BookingStatus, bookingStatusToText } from "@/types/booking";
-import PageHeader from "@/components/commons/Header/header";
 
 interface BookingItem {
   id: string;
@@ -142,8 +138,6 @@ function AvailabilityCalendar({
     const month = currentDate.getMonth();
 
     const firstDay = new Date(year, month, 1);
-
-    const lastDay = new Date(year, month + 1, 0);
 
     const startDate = new Date(firstDay);
 
@@ -515,24 +509,19 @@ function AvailabilityList({
 
 export default function UpdateSchedulePage() {
   const router = useRouter();
-
   const [currentDate, setCurrentDate] = useState(new Date());
-
   const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
-
   const [savedAvailableDates, setSavedAvailableDates] = useState<string[]>(
     SAVED_AVAILABLE_DATES
   );
-
   const [isSaving, setIsSaving] = useState(false);
-
   const [today] = useState(() => {
     const t = new Date();
-
     t.setHours(0, 0, 0, 0);
-
     return t;
   });
+
+  const { run: updateInstructorScheduleAction } = useThunkAction(updateInstructorSchedule);
 
   const bookedDateStatusMap = useMemo(() => {
     return BOOKINGS_DATA.reduce<Map<string, Set<BookingStatus>>>(
@@ -602,23 +591,61 @@ export default function UpdateSchedulePage() {
   };
 
   const handleUpdate = async () => {
+    if (selectedDates.size === 0) return;
+
     setIsSaving(true);
 
     try {
-      // Simulate API call - in production, send instructor availability to backend
-      const allAvailableDates = [
-        ...new Set([...savedAvailableDates, ...selectedDates]),
-      ];
+      const userInfo = getUserInfo();
+      const instructorId = userInfo?.id;
 
-      setSavedAvailableDates(allAvailableDates);
+      if (!instructorId) {
+        console.error("Không tìm thấy thông tin người dùng");
+        return;
+      }
 
-      setSelectedDates(new Set());
+      // Get the earliest (start) and latest (end) dates from selected dates
+      const sortedDates = Array.from(selectedDates).sort();
+      const startDateString = sortedDates[0];
+      const endDateString = sortedDates[sortedDates.length - 1];
 
-      // Show success message and redirect
+      // Parse start date
+      const [startYear, startMonth, startDay] = startDateString.split("-").map(Number);
+      // Start of first day (00:00:00)
+      const startTime = new Date(startYear, startMonth - 1, startDay, 0, 0, 0, 0);
 
-      setTimeout(() => {
-        router.push("/schedule-management");
-      }, 1000);
+      // Parse end date
+      const [endYear, endMonth, endDay] = endDateString.split("-").map(Number);
+      // End of last day (23:59:59)
+      const endTime = new Date(endYear, endMonth - 1, endDay, 23, 59, 59, 999);
+
+      // Send single request with startTime and endTime
+      await updateInstructorScheduleAction(
+        {
+          instructorId,
+          startTime: startTime.toISOString().split("T")[0],
+          endTime: endTime.toISOString().split("T")[0],
+        },
+        {
+          onSuccess: () => {
+            // Update local state to reflect saved dates
+            const allAvailableDates = [
+              ...new Set([...savedAvailableDates, ...selectedDates]),
+            ];
+
+            setSavedAvailableDates(allAvailableDates);
+            setSelectedDates(new Set());
+
+            // Redirect to schedule management page
+            router.push("/schedule-management");
+          },
+          onError: (error) => {
+            console.error("Lỗi khi cập nhật lịch:", error);
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Lỗi khi cập nhật lịch:", error);
     } finally {
       setIsSaving(false);
     }
