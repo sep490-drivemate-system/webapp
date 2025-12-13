@@ -97,3 +97,18 @@ export interface GetPackagesParams {
   pageNumber?: number;
   pageSize?: number;
 }
+
+export interface IMyPackges {
+  id: string;
+  namePackage: string;
+  buyDate: string;
+  bookingStatus: BookingStatus;
+  duration: number;
+  price: number;
+  durationInUse: number;
+  precentInUse: number;
+  remainingTime: number;
+  instructorId: string;
+  roadTypes: string[];
+  drivingSkills: string[];
+}

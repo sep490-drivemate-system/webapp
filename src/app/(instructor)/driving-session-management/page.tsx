@@ -1,23 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useMemo } from "react";
 import {
   Calendar,
   Clock,
   MapPin,
   CheckCircle,
   AlertCircle,
-  Eye,
   X,
   FileText,
   Navigation,
   List,
   PlayCircle,
   RefreshCw,
+  Loader2,
 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -27,7 +25,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import PageHeader from "@/components/commons/Header/header";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Select,
   SelectContent,
@@ -36,124 +33,94 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/useAppDispatch";
+import { getAllSessions } from "@/features/booking/bookingThunk";
+import { IBookingSession, SessionStatus } from "@/types/booking/booking.type";
+import { useThunkAction } from "@/lib/redux/useThunkAction";
 
-// Extended driving session with route planning status
-interface IDrivingSessionExtended {
+// Map SessionStatus enum to UI status string
+const mapSessionStatusToString = (status: SessionStatus): string => {
+  switch (status) {
+    case SessionStatus.Planning:
+      return "planing";
+    case SessionStatus.Upcoming:
+      return "up_coming";
+    case SessionStatus.InProgress:
+      return "in_progress";
+    case SessionStatus.Completed:
+      return "completed";
+    case SessionStatus.Reschedule:
+      return "reschedule";
+    case SessionStatus.Cancelled:
+      return "cancelled";
+    default:
+      return "planing";
+  }
+};
+
+// Map UI status string to SessionStatus enum
+const mapStringToSessionStatus = (
+  status: string
+): SessionStatus | undefined => {
+  switch (status) {
+    case "planing":
+      return SessionStatus.Planning;
+    case "up_coming":
+      return SessionStatus.Upcoming;
+    case "in_progress":
+      return SessionStatus.InProgress;
+    case "completed":
+      return SessionStatus.Completed;
+    case "reschedule":
+      return SessionStatus.Reschedule;
+    case "cancelled":
+      return SessionStatus.Cancelled;
+    default:
+      return undefined;
+  }
+};
+
+// Type for UI session format
+type UISession = {
   id: string;
-  packageId: string;
-  instructorId: string;
-  instructorName: string;
+  packageName: string;
   date: string;
   startTime: string;
   endTime: string;
   duration: number;
   location: string;
-  vehicleId?: string;
-  vehicleName?: string;
-  status:
-    | "planing"
-    | "pending_confirmation"
-    | "up_coming"
-    | "in_progress"
-    | "completed"
-    | "reschedule"
-    | "cancelled";
+  vehicleName: string | null;
+  status: string;
   createdAt: string;
-  packageName?: string;
-  instructorAvatar?: string;
-  hasRoute?: boolean;
-}
+  displayStartLocationName: string;
+  displayEndLocationName: string;
+};
 
-// Mock driving sessions data
-const drivingSessions: IDrivingSessionExtended[] = [
-  {
-    id: "session-1",
-    packageId: "user-pkg-1",
-    instructorId: "1",
-    instructorName: "Nguyễn Văn An",
-    date: "2025-11-15",
-    startTime: "08:00",
-    endTime: "11:00",
-    duration: 3,
-    location: "123 Nguyễn Huệ, Q1, TP.HCM",
-    status: "planing",
-    createdAt: "2025-11-10T10:00:00Z",
-    packageName: "Gói Thành Phố Cơ Bản",
-    instructorAvatar: "https://i.pravatar.cc/150?img=1",
-    hasRoute: false,
-  },
-  {
-    id: "session-2",
-    packageId: "user-pkg-1",
-    instructorId: "1",
-    instructorName: "Nguyễn Văn An",
-    date: "2025-11-18",
-    startTime: "14:00",
-    endTime: "16:00",
-    duration: 2,
-    location: "456 Lê Lợi, Q1, TP.HCM",
-    status: "pending_confirmation",
-    createdAt: "2025-11-12T14:30:00Z",
-    packageName: "Gói Thành Phố Cơ Bản",
-    instructorAvatar: "https://i.pravatar.cc/150?img=1",
-    hasRoute: false,
-  },
-  {
-    id: "session-3",
-    packageId: "user-pkg-2",
-    instructorId: "2",
-    instructorName: "Trần Thị Bình",
-    date: "2025-11-12",
-    startTime: "09:00",
-    endTime: "12:00",
-    duration: 3,
-    location: "789 Điện Biên Phủ, Q.Bình Thạnh, TP.HCM",
-    status: "reschedule",
-    createdAt: "2025-11-08T09:15:00Z",
-    packageName: "Gói Cao Tốc + Xe",
-    instructorAvatar: "https://i.pravatar.cc/150?img=2",
-    vehicleId: "vehicle-1",
-    vehicleName: "Toyota Vios 2023",
-    hasRoute: true,
-  },
-  {
-    id: "session-4",
-    packageId: "user-pkg-1",
-    instructorId: "1",
-    instructorName: "Nguyễn Văn An",
-    date: "2025-11-05",
-    startTime: "08:00",
-    endTime: "11:00",
-    duration: 3,
-    location: "123 Nguyễn Huệ, Q1, TP.HCM",
-    status: "completed",
-    createdAt: "2025-10-25T10:00:00Z",
-    packageName: "Gói Thành Phố Cơ Bản",
-    instructorAvatar: "https://i.pravatar.cc/150?img=1",
-    vehicleId: "vehicle-1",
-    vehicleName: "Toyota Vios 2023",
-    hasRoute: true,
-  },
-  {
-    id: "session-5",
-    packageId: "user-pkg-2",
-    instructorId: "2",
-    instructorName: "Trần Thị Bình",
-    date: "2025-11-20",
-    startTime: "15:00",
-    endTime: "17:00",
-    duration: 2,
-    location: "321 Võ Văn Tần, Q3, TP.HCM",
-    status: "planing",
-    createdAt: "2025-11-15T11:20:00Z",
-    packageName: "Gói Cao Tốc + Xe",
-    instructorAvatar: "https://i.pravatar.cc/150?img=2",
-    hasRoute: false,
-  },
-];
+// Convert IBookingSession to UI format
+const convertSessionToUIFormat = (session: IBookingSession): UISession => {
+  return {
+    id: session.id,
+    packageName: session.packageName,
+    date: session.date,
+    startTime: session.startTime,
+    endTime: session.endTime,
+    duration: session.duration,
+    location: session.displayStartLocationName,
+    vehicleName: session.vehicleName,
+    status: mapSessionStatusToString(session.status),
+    createdAt: session.createdAt,
+    displayStartLocationName: session.displayStartLocationName,
+    displayEndLocationName: session.displayEndLocationName,
+  };
+};
 
 export default function DrivingSessionManagementPage() {
-  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { allSessions, isLoading, errorMessage } = useAppSelector(
+    (state) => state.booking
+  );
+  const { runSafe: runGetAllSessions } = useThunkAction(getAllSessions);
+
   const [selectedTab, setSelectedTab] = useState<
     | "all"
     | "planing"
@@ -165,12 +132,29 @@ export default function DrivingSessionManagementPage() {
     | "cancelled"
   >("all");
 
-  const getFilteredSessions = () => {
+  // Fetch sessions when component mounts or filter changes
+  useEffect(() => {
+    const getAllSessions = async () => {
+      const status = mapStringToSessionStatus(selectedTab);
+      const result = await runGetAllSessions(status ? { status } : undefined);
+      console.log("getAllSessions", result.data?.value ?? []);
+    };
+    getAllSessions();
+  }, [selectedTab]);
+
+  // Convert and filter sessions
+  const filteredSessions = useMemo(() => {
+    const convertedSessions = allSessions.map(convertSessionToUIFormat);
+
     if (selectedTab === "all") {
-      return drivingSessions;
+      return convertedSessions;
     }
-    return drivingSessions.filter((session) => session.status === selectedTab);
-  };
+
+    // Filter by status (note: pending_confirmation doesn't exist in API, so it will return empty)
+    return convertedSessions.filter(
+      (session: UISession) => session.status === selectedTab
+    );
+  }, [allSessions, selectedTab]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -239,27 +223,19 @@ export default function DrivingSessionManagementPage() {
     }
   };
 
-  const handlePlanRoute = (sessionId: string, location: string) => {
-    // Navigate to route planning page
-    router.push(
-      `/route-planning?sessionId=${sessionId}&pickupLocation=${encodeURIComponent(
-        location
-      )}`
-    );
-  };
-
-  const handleViewRoute = (sessionId: string) => {
-    // Navigate to route notification page
-    router.push(`/route-notification?routeId=${sessionId}`);
-  };
-
   const formatDate = (dateString: string) => {
-    // Convert from yyyy-mm-dd to dd/mm/yyyy
-    const [year, month, day] = dateString.split("-");
-    return `${day}/${month}/${year}`;
+    try {
+      // Handle both date-only and datetime strings
+      const datePart = dateString.split("T")[0];
+      const [year, month, day] = datePart.split("-");
+      if (year && month && day) {
+        return `${day}/${month}/${year}`;
+      }
+      return dateString;
+    } catch (error) {
+      return dateString;
+    }
   };
-
-  const filteredSessions = getFilteredSessions();
 
   const getEmptyStateMessage = () => {
     switch (selectedTab) {
@@ -385,7 +361,27 @@ export default function DrivingSessionManagementPage() {
 
       {/* Content Section */}
       <section>
-        {filteredSessions.length === 0 ? (
+        {isLoading ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <Loader2 className="h-12 w-12 text-muted-foreground animate-spin mb-4" />
+              <CardTitle className="mb-2 text-xl">
+                Đang tải dữ liệu...
+              </CardTitle>
+            </CardContent>
+          </Card>
+        ) : errorMessage ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <div className="mb-6 rounded-full bg-muted p-6">
+                <AlertCircle className="h-12 w-12 text-destructive" />
+              </div>
+              <CardTitle className="mb-2 text-xl text-destructive">
+                {errorMessage}
+              </CardTitle>
+            </CardContent>
+          </Card>
+        ) : filteredSessions.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16">
               <div className="mb-6 rounded-full bg-muted p-6">
@@ -398,7 +394,7 @@ export default function DrivingSessionManagementPage() {
           </Card>
         ) : (
           <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
-            {filteredSessions.map((session) => {
+            {filteredSessions.map((session: UISession) => {
               const StatusIcon = getStatusIcon(session.status);
               const statusColor = getStatusColor(session.status);
 
@@ -410,31 +406,15 @@ export default function DrivingSessionManagementPage() {
                   <CardHeader>
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-center gap-4 flex-1">
-                        <Avatar className="h-12 w-12 border-2 border-border">
-                          <AvatarImage
-                            src={
-                              session.instructorAvatar ||
-                              `https://i.pravatar.cc/150?img=${session.instructorId}`
-                            }
-                            alt={session.instructorName}
-                          />
-                          <AvatarFallback className="bg-primary/10 text-primary">
-                            {session.instructorName
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                              .toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
                         <div className="flex-1 min-w-0">
-                          <CardTitle className="text-lg mb-1">
-                            {session.instructorName}
-                          </CardTitle>
                           {session.packageName && (
-                            <CardDescription className="text-sm truncate">
+                            <CardTitle className="text-lg mb-1">
                               {session.packageName}
-                            </CardDescription>
+                            </CardTitle>
                           )}
+                          <CardDescription className="text-sm truncate">
+                            ID: {session.id}
+                          </CardDescription>
                         </div>
                       </div>
                       <Badge
@@ -464,9 +444,16 @@ export default function DrivingSessionManagementPage() {
                       </div>
                       <div className="flex items-start gap-3 text-muted-foreground">
                         <MapPin className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm line-clamp-2">
-                          {session.location}
-                        </span>
+                        <div className="flex-1">
+                          <span className="text-sm line-clamp-2">
+                            Điểm bắt đầu: {session.displayStartLocationName}
+                          </span>
+                          {session.displayEndLocationName && (
+                            <span className="text-sm line-clamp-2 block mt-1">
+                              Điểm kết thúc: {session.displayEndLocationName}
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-center gap-3 text-muted-foreground">
                         <FileText className="h-4 w-4 flex-shrink-0" />
