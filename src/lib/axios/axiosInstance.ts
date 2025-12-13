@@ -1,7 +1,6 @@
 import axios, { AxiosError } from "axios";
 import {
   getAccessToken,
-  getRefreshToken,
   handleTokenStorage,
   clearTokens,
   isAccessTokenExpired,
@@ -20,57 +19,9 @@ const axiosInstance = axios.create({
 let isRefreshing = false as boolean;
 let refreshPromise: Promise<string> | null = null;
 
-async function refreshAccessToken(): Promise<string> {
-  if (refreshPromise) return refreshPromise;
 
-  const refreshToken = getRefreshToken();
-  if (!refreshToken) {
-    throw new Error("No refresh token");
-  }
 
-  isRefreshing = true;
-  refreshPromise = (async () => {
-    const url = `${baseURL?.replace(/\/$/, "") || ""}/auth/refresh`;
-    try {
-      const res = await axios.post(
-        url,
-        { refreshToken },
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-      const newAccess: string | undefined =
-        res.data?.data?.accessToken ?? res.data?.accessToken;
-      const newRefresh: string | undefined =
-        res.data?.data?.refreshToken ?? res.data?.refreshToken ?? refreshToken;
-      if (!newAccess) throw new Error("Invalid refresh response");
-      handleTokenStorage(newAccess, newRefresh || refreshToken);
-      return newAccess;
-    } finally {
-      isRefreshing = false;
-      refreshPromise = null;
-    }
-  })();
 
-  return refreshPromise;
-}
-
-async function ensureValidAccessToken(): Promise<string | null> {
-  if (typeof window === "undefined") return null;
-  const token = getAccessToken();
-  const refreshToken = getRefreshToken();
-  if (!token) return null;
-  if (isAccessTokenExpired()) {
-    if (!refreshToken) return null;
-    try {
-      return await refreshAccessToken();
-    } catch {
-      clearTokens();
-      return null;
-    }
-  }
-  return token;
-}
 
 // Attach/refresh access token for each request (client-only)
 axiosInstance.interceptors.request.use(
@@ -78,8 +29,7 @@ axiosInstance.interceptors.request.use(
     if (typeof window === "undefined") return config;
     // Try to ensure token valid (may refresh)
     try {
-      const maybeNewToken = await ensureValidAccessToken();
-      const finalToken = maybeNewToken || getAccessToken();
+      const finalToken = getAccessToken();
       if (finalToken) {
         (config.headers =
           config.headers ?? {}).Authorization = `Bearer ${finalToken}`;
@@ -116,12 +66,7 @@ axiosInstance.interceptors.response.use(
       if (!originalConfig._retry) {
         originalConfig._retry = true;
         try {
-          const newAccess = await refreshAccessToken();
-          if (newAccess) {
-            originalConfig.headers = originalConfig.headers || {};
-            originalConfig.headers.Authorization = `Bearer ${newAccess}`;
-            return axiosInstance.request(originalConfig);
-          }
+          const newAccess = await getAccessToken();
         } catch {
           // fallthrough to sign-out/redirect
         }
