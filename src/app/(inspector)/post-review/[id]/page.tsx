@@ -14,6 +14,7 @@ import {
   PostStatus,
   ModerationStatus,
   PostModeration,
+  UserRole,
 } from "@/types/post/post.type";
 import postsData from "@/data/mock-posts.json";
 import { toast } from "sonner";
@@ -32,7 +33,7 @@ const currentInspector = {
   name: "Hoàng Văn Đức",
   email: "hoangvanduc@example.com",
   avatar: "https://i.pravatar.cc/150?img=12",
-  role: "INSPECTOR",
+  role: UserRole.INSPECTOR,
 };
 
 export default function PostReviewDetailPage() {
@@ -99,7 +100,7 @@ export default function PostReviewDetailPage() {
       }
 
       toast.success("Bài viết đã được duyệt và xuất bản!");
-      router.push("/inspector/post-review");
+      router.push("/post-review");
     } catch (error) {
       toast.error("Có lỗi xảy ra khi duyệt bài viết.");
     } finally {
@@ -144,7 +145,7 @@ export default function PostReviewDetailPage() {
 
       toast.success("Bài viết đã bị từ chối.");
       setShowRejectDialog(false);
-      router.push("/inspector/post-review");
+      router.push("/post-review");
     } catch (error) {
       toast.error("Có lỗi xảy ra khi từ chối bài viết.");
     } finally {
@@ -335,4 +336,3 @@ export default function PostReviewDetailPage() {
     </div>
   );
 }
-

@@ -1,4 +1,4 @@
-import { EditUserPayload, IUserInfo, InstructorDetailDTO } from "@/types/user/user-profile.type";
+import { EditUserPayload, IUserInfo, InstructorDetailDTO, UpdateInstructorPayload } from "@/types/user/user-profile.type";
 import { createThunk } from "../genericCreateThunk";
 import { HttpMethod } from "@/types/constants/httpMethod";
 import { createAsyncThunk } from "@reduxjs/toolkit";
@@ -35,11 +35,7 @@ export const getLicenseValidity = createThunk<
     `/${NOVICE_DRIVER_PATH}/license-validity`
 );
 
-export interface UpdateInstructorPayload {
-    id: string;
-    bio?: string;
-    experienceYear?: number;
-}
+
 
 /**
  * Helper function to convert UpdateInstructorPayload to FormData
@@ -57,10 +53,7 @@ function createUpdateInstructorFormData(payload: UpdateInstructorPayload): FormD
     return formData;
 }
 
-/**
- * Update instructor thunk that accepts id and optional fields, converts to FormData
- * PATCH /instructors/{id}
- */
+
 export const updateInstructor = createAsyncThunk<
     GenericResponse<InstructorDetailDTO>,
     UpdateInstructorPayload,
@@ -202,3 +195,4 @@ function createEditUserFormData(payload: EditUserPayload): FormData {
     
     return formData;
 }
+

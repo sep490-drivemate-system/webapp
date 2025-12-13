@@ -139,7 +139,7 @@ const data = {
     },
     {
       name: "Quản lý tin tức và bài viết",
-      url: "/blogs-management",
+      url: "/post-review",
       icon: IconNews,
     },
   ],
@@ -172,9 +172,9 @@ const data = {
       icon: IconNavigation,
     },
     {
-      name: "Thông báo",
-      url: "/notification-management",
-      icon: IconBell,
+      name: "Quản lý bài viết",
+      url: "/blog-management",
+      icon: IconArticle,
     },
     {
       name: "Lịch sử giao dịch",
@@ -185,6 +185,11 @@ const data = {
       name: "Giấy tờ tùy thân",
       url: "/identification-document-management",
       icon: IconFile,
+    },
+    {
+      name: "Thông báo",
+      url: "/notification-management",
+      icon: IconBell,
     },
   ],
 };

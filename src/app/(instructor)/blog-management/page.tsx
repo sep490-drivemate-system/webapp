@@ -91,7 +91,7 @@ export default function BlogsInstructorManagementPage() {
         description="Theo dõi, tìm kiếm và tạo mới các bài viết trên hệ thống."
         actionButton={{
           label: "Tạo bài viết",
-          onClick: () => router.push("/blogs/new/form"),
+          onClick: () => router.push("/blog-management/new/form"),
           icon: Plus,
         }}
         className="space-y-4"

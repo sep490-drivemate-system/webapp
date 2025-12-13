@@ -20,7 +20,7 @@ export default function BlogFormPage() {
       : null;
   const isEditMode = Boolean(post);
   const backHref =
-    isEditMode && post ? `/blogs-management/${post.id}` : "/blogs-management";
+    isEditMode && post ? `/blog-management/${post.id}` : "/blog-management";
 
   if (postId && postId !== "new" && !post) {
     return (
@@ -32,7 +32,7 @@ export default function BlogFormPage() {
         <div className="rounded-3xl border bg-card p-6 shadow-sm">
           <div className="mx-auto w-full max-w-5xl">
             <div className="space-y-4 py-12 text-center">
-              <Link href="/blogs-management">
+              <Link href="/blog-management">
                 <Button variant="outline" className="gap-2">
                   <ArrowLeft className="w-4 h-4" />
                   Quay lại danh sách

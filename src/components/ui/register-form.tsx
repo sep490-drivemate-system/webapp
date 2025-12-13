@@ -10,6 +10,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSignUp } from "@/hooks/auth/useSignUp";
+import { Eye, EyeOff } from "lucide-react";
 
 export function RegisterForm({
   className,
@@ -24,6 +25,8 @@ export function RegisterForm({
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const router = useRouter();
@@ -230,15 +233,31 @@ export function RegisterForm({
 
               <div className="grid gap-3">
                 <div>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Mật khẩu"
-                    value={formData.password}
-                    onChange={(e) => handleChange("password", e.target.value)}
-                    className="text-[#10b981] placeholder:text-gray-400 border-[#10b981]/50 focus:border-[#10b981] focus:ring-[#10b981] bg-transparent"
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Mật khẩu"
+                      value={formData.password}
+                      onChange={(e) => handleChange("password", e.target.value)}
+                      className="text-[#10b981] placeholder:text-gray-400 border-[#10b981]/50 focus:border-[#10b981] focus:ring-[#10b981] bg-transparent pr-10"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#10b981] transition-colors"
+                      aria-label={
+                        showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"
+                      }
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
                   {errors.password && (
                     <p className="text-red-400 text-sm mt-1">
                       {errors.password}
@@ -249,17 +268,35 @@ export function RegisterForm({
 
               <div className="grid gap-3">
                 <div>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="Nhập lại mật khẩu"
-                    value={formData.confirmPassword}
-                    onChange={(e) =>
-                      handleChange("confirmPassword", e.target.value)
-                    }
-                    className="text-[#10b981] placeholder:text-gray-400 border-[#10b981]/50 focus:border-[#10b981] focus:ring-[#10b981] bg-transparent"
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Nhập lại mật khẩu"
+                      value={formData.confirmPassword}
+                      onChange={(e) =>
+                        handleChange("confirmPassword", e.target.value)
+                      }
+                      className="text-[#10b981] placeholder:text-gray-400 border-[#10b981]/50 focus:border-[#10b981] focus:ring-[#10b981] bg-transparent pr-10"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#10b981] transition-colors"
+                      aria-label={
+                        showConfirmPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"
+                      }
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
                   {errors.confirmPassword && (
                     <p className="text-red-400 text-sm mt-1">
                       {errors.confirmPassword}
@@ -315,7 +352,7 @@ export function RegisterForm({
               <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-[#10b981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white"
-            disabled={isLoading || authLoading}
+                disabled={isLoading || authLoading}
               >
                 {isLoading ? "Đang lưu thông tin..." : "Tiếp theo"}
               </Button>

@@ -29,6 +29,7 @@ export const useSignIn = () => {
             const role = getUserRole();
             if (role === UserRole.Admin) router.push("/dashboards");
             else if (role === UserRole.Inspector) router.push("/instructor-management");
+            else if (role === UserRole.Instructor) router.push("/overview");
             else router.push("/");
         }
     };

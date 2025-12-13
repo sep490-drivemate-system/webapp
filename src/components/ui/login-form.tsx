@@ -8,7 +8,8 @@ import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
 import Image from "next/image";
 import { useSignIn } from "@/hooks/auth/useSignIn";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 export function LoginForm({
   className,
@@ -25,6 +26,7 @@ export function LoginForm({
   const videoRef = useRef<HTMLVideoElement>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -89,17 +91,31 @@ export function LoginForm({
                 />
               </div>
               <div className="grid gap-3">
-                <Input
-                  ref={passwordInputRef}
-                  id="password"
-                  className="text-[#10b981] placeholder:text-gray-400 border-[#10b981]/50 focus:border-[#10b981] focus:ring-[#10b981] !bg-[#10b981]/10 focus:!bg-[#10b981]/10 hover:!bg-[#10b981]/10 dark:!bg-[#10b981]/10"
-                  type="password"
-                  placeholder="Mật khẩu"
-                  value={signInData.password}
-                  onChange={(e) => updatePassword(e.target.value)}
-                  style={{ backgroundColor: "rgba(16, 185, 129, 0.1)" }}
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    ref={passwordInputRef}
+                    id="password"
+                    className="text-[#10b981] placeholder:text-gray-400 border-[#10b981]/50 focus:border-[#10b981] focus:ring-[#10b981] !bg-[#10b981]/10 focus:!bg-[#10b981]/10 hover:!bg-[#10b981]/10 dark:!bg-[#10b981]/10 pr-10"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Mật khẩu"
+                    value={signInData.password}
+                    onChange={(e) => updatePassword(e.target.value)}
+                    style={{ backgroundColor: "rgba(16, 185, 129, 0.1)" }}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#10b981] transition-colors"
+                    aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
                 <div className="flex items-center text-white">
                   <a
                     href="#"
