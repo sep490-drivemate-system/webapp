@@ -137,7 +137,7 @@ export function LoginForm({
               >
                 {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
               </Button>
-              <div className="flex items-center text-sm text-muted-foreground">
+              {/* <div className="flex items-center text-sm text-muted-foreground">
                 <span className="flex-grow border-t border-border"></span>
                 <span className="px-3 flex items-center gap-2 text-white">
                   Hoặc tiếp tục với
@@ -150,7 +150,7 @@ export function LoginForm({
                   </Button>
                 </span>
                 <span className="flex-grow border-t border-border"></span>
-              </div>
+              </div> */}
 
               <div className="text-center text-sm text-gray-300">
                 Bạn chưa có tài khoản?{" "}

@@ -2,88 +2,51 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
     MessageSquare,
-    Search,
-    Plus,
     CheckCircle2,
     ArrowUp,
     ArrowDown,
     MessageCircle,
-    Eye,
     Clock,
     Tag,
-    User,
     GraduationCap,
-    HelpCircle,
-    Bell,
-    Settings,
-    LogOut,
-    Users,
+    Loader2,
 } from "lucide-react";
 import { Question, Answer } from "@/types/post/qa.type";
 import qaData from "@/data/mock-qa.json";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { UserRole } from "@/types/post/post.type";
+import { useCategories } from "@/hooks/taxonomy/useCategories";
+import AskQuestionCard from "./components/AskQuestionCard";
 
-const currentUser = {
-    id: "user_novice_001",
-    name: "Trần Văn Nam",
-    email: "tranvannam@example.com",
-    avatar: "https://i.pravatar.cc/150?img=20",
-    role: UserRole.NOVICE_DRIVER,
-};
 
 export default function QAPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [sortBy, setSortBy] = useState<"newest" | "popular" | "unanswered">("newest");
-    const [showAskDialog, setShowAskDialog] = useState(false);
-    const [questionTitle, setQuestionTitle] = useState("");
-    const [questionContent, setQuestionContent] = useState("");
-    const [questionCategory, setQuestionCategory] = useState("");
+
+    const { categories: categoriesFromAPI, isLoading: isLoadingCategories } = useCategories();
 
     const questions = (qaData.questions as Question[]);
     const answers = (qaData.answers as Answer[]);
 
-    // Get answers for a question
     const getAnswers = (questionId: string) => {
         return answers.filter((a) => a.questionId === questionId);
     };
 
-    // Get categories
+    // Get categories - use API data, fallback to extracting from   
     const categories = useMemo(() => {
+        if (categoriesFromAPI.length > 0) {
+            return categoriesFromAPI.map((cat) => cat.name);
+        }
+        // Fallback to extracting from questions if API fails
         const cats = new Set(questions.map((q) => q.category));
         return Array.from(cats);
-    }, [questions]);
+    }, [categoriesFromAPI, questions]);
 
     // Filter and sort questions
     const filteredQuestions = useMemo(() => {
@@ -138,35 +101,6 @@ export default function QAPage() {
         });
     };
 
-    const handleAskQuestion = () => {
-        if (!questionTitle.trim() || !questionContent.trim() || !questionCategory) {
-            toast.error("Vui lòng điền đầy đủ thông tin.");
-            return;
-        }
-
-        const newQuestion: Question = {
-            id: `qa_${Date.now()}`,
-            title: questionTitle,
-            content: questionContent,
-            category: questionCategory,
-            author: currentUser as any,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            views: 0,
-            upvotes: 0,
-            downvotes: 0,
-            isSolved: false,
-            tags: [],
-        };
-
-        (qaData.questions as any[]).unshift(newQuestion);
-        toast.success("Câu hỏi đã được đăng!");
-        setShowAskDialog(false);
-        setQuestionTitle("");
-        setQuestionContent("");
-        setQuestionCategory("");
-        window.location.reload();
-    };
 
     const handleVote = (questionId: string, type: "up" | "down") => {
         const question = questions.find((q) => q.id === questionId);
@@ -192,27 +126,37 @@ export default function QAPage() {
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Danh mục</label>
-                                    <div className="space-y-2">
-                                        <Button
-                                            variant={selectedCategory === null ? "default" : "outline"}
-                                            className="w-full justify-start"
-                                            size="sm"
-                                            onClick={() => setSelectedCategory(null)}
-                                        >
-                                            Tất cả
-                                        </Button>
-                                        {categories.map((cat) => (
+                                    {isLoadingCategories ? (
+                                        <div className="flex items-center justify-center py-4">
+                                            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                                        </div>
+                                    ) : categories.length === 0 ? (
+                                        <p className="text-sm text-muted-foreground py-4 text-center">
+                                            Không có danh mục nào
+                                        </p>
+                                    ) : (
+                                        <div className="space-y-2">
                                             <Button
-                                                key={cat}
-                                                variant={selectedCategory === cat ? "default" : "outline"}
+                                                variant={selectedCategory === null ? "default" : "outline"}
                                                 className="w-full justify-start"
                                                 size="sm"
-                                                onClick={() => setSelectedCategory(cat)}
+                                                onClick={() => setSelectedCategory(null)}
                                             >
-                                                {cat}
+                                                Tất cả
                                             </Button>
-                                        ))}
-                                    </div>
+                                            {categories.map((cat) => (
+                                                <Button
+                                                    key={cat}
+                                                    variant={selectedCategory === cat ? "default" : "outline"}
+                                                    className="w-full justify-start"
+                                                    size="sm"
+                                                    onClick={() => setSelectedCategory(cat)}
+                                                >
+                                                    {cat}
+                                                </Button>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>
@@ -220,93 +164,19 @@ export default function QAPage() {
 
                     {/* Main Content */}
                     <div className="lg:col-span-3 space-y-4">
-                        {/* Search & Ask Question Card */}
-                        <Card>
-                            <CardContent className="p-5">
-                                <div className="flex items-center gap-4">
-                                    <Avatar className="h-12 w-12 ring-3 ring-primary/10 shadow-md shrink-0">
-                                        <AvatarImage src={currentUser.avatar} />
-                                        <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-white font-bold">
-                                            {currentUser.name.charAt(0)}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div className="flex-1 relative">
-                                        <Input
-                                            placeholder="Tìm kiếm câu hỏi, chủ đề..."
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
-                                        />
-                                    </div>
-                                    <Dialog open={showAskDialog} onOpenChange={setShowAskDialog}>
-                                        <DialogTrigger asChild>
-                                            <Button
-                                                variant="default"
-                                                className="shrink-0"
-                                            >
-                                                <Plus className="size-4 mr-2" />
-                                                Đặt câu hỏi
-                                            </Button>
-                                        </DialogTrigger>
-                                        <DialogContent className="max-w-2xl">
-                                            <DialogHeader>
-                                                <DialogTitle>Đặt câu hỏi mới</DialogTitle>
-                                                <DialogDescription>
-                                                    Chia sẻ câu hỏi của bạn để nhận được sự giúp đỡ từ cộng đồng
-                                                </DialogDescription>
-                                            </DialogHeader>
-                                            <div className="space-y-4 py-4">
-                                                <div className="space-y-2">
-                                                    <label className="text-sm font-medium">Tiêu đề câu hỏi</label>
-                                                    <Input
-                                                        placeholder="Ví dụ: Làm thế nào để đỗ xe song song?"
-                                                        value={questionTitle}
-                                                        onChange={(e) => setQuestionTitle(e.target.value)}
-                                                    />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <label className="text-sm font-medium">Danh mục</label>
-                                                    <Select
-                                                        value={questionCategory}
-                                                        onValueChange={setQuestionCategory}
-                                                    >
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Chọn danh mục" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {categories.map((cat) => (
-                                                                <SelectItem key={cat} value={cat}>
-                                                                    {cat}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <label className="text-sm font-medium">Nội dung chi tiết</label>
-                                                    <Textarea
-                                                        placeholder="Mô tả chi tiết câu hỏi của bạn..."
-                                                        value={questionContent}
-                                                        onChange={(e) => setQuestionContent(e.target.value)}
-                                                        rows={6}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <DialogFooter>
-                                                <Button
-                                                    variant="outline"
-                                                    onClick={() => setShowAskDialog(false)}
-                                                >
-                                                    Hủy
-                                                </Button>
-                                                <Button onClick={handleAskQuestion}>Đăng câu hỏi</Button>
-                                            </DialogFooter>
-                                        </DialogContent>
-                                    </Dialog>
-                                </div>
-                            </CardContent>
-                        </Card>
+                        <AskQuestionCard
+                            searchQuery={searchQuery}
+                            onSearchChange={setSearchQuery}
+                            categories={categories}
+                            currentUser={{
+                                id: "user_novice_001",
+                                name: "Trần Văn Nam",
+                                email: "tranvannam@example.com",
+                                avatar: "https://i.pravatar.cc/150?img=20",
+                                role: "NOVICE_DRIVER" as any,
+                            }}
+                        />
 
-                        {/* Questions List */}
                         {filteredQuestions.length === 0 ? (
                             <Card>
                                 <CardContent className="py-12 text-center">
@@ -357,7 +227,6 @@ export default function QAPage() {
                                                     )}
                                                 </div>
 
-                                                {/* Question Content */}
                                                 <div className="flex-1">
                                                     <div className="flex items-start justify-between mb-2">
                                                         <Link
@@ -412,7 +281,6 @@ export default function QAPage() {
                                                         </div>
                                                     </div>
 
-                                                    {/* Accepted Answer Preview */}
                                                     {acceptedAnswer && (
                                                         <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                                                             <div className="flex items-start gap-2 mb-2">

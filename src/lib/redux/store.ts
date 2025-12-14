@@ -1,16 +1,27 @@
-import { configureStore } from '@reduxjs/toolkit';
-import authReducer from '@/features/auth/authSlice';
+import { AnyAction, combineReducers, configureStore } from '@reduxjs/toolkit';
+import authReducer, { signOut } from '@/features/auth/authSlice';
 import documentReducer from '@/features/document/documentSlice';
 import transactionReducer from '@/features/transaction/transactionSlice';
 import bookingReducer from '@/features/booking/bookingSlice';
 
-export const store = configureStore({
-    reducer: {
+const appReducer = combineReducers({
         auth: authReducer,
         document: documentReducer,
         transaction: transactionReducer,
-        booking: bookingReducer,
-    },
+});
+
+const rootReducer = (
+    state: ReturnType<typeof appReducer> | undefined,
+    action: AnyAction
+) => {
+    if (action.type === signOut.type) {
+        state = undefined;
+    }
+    return appReducer(state, action);
+};
+
+export const store = configureStore({
+    reducer: rootReducer,
     devTools: process.env.NODE_ENV !== 'production',
 });
 

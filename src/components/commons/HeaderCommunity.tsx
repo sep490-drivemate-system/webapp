@@ -8,38 +8,29 @@ import { Input } from "@/components/ui/input";
 import {
     MessageSquare,
     HelpCircle,
-    Bell,
-    Settings,
-    LogOut,
-    Users,
     Search,
     FileText,
 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
+    DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { User, UserRole } from "@/types/post/post.type";
+import { UserRole } from "@/types/auth/user-role.enum";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { CreatePostDialog } from "@/app/(community)/forum/components/CreatePostDialog";
+import { getUserRole } from "@/lib/jwt/jwt.utils";
+import { UserRole as AuthUserRole } from "@/types/auth/user-role.enum";
 
 interface HeaderCommunityProps {
     searchQuery?: string;
     onSearchChange?: (value: string) => void;
     searchPlaceholder?: string;
-    currentUser?: User;
-    showSearch?: boolean; // true = show search bar, false = show title/description
+    showSearch?: boolean;
 }
 
-// Mock current user - should be replaced with actual auth
-const defaultUser: User = {
-    id: "user_novice_001",
-    name: "Trần Văn Nam",
-    email: "tranvannam@example.com",
-    avatar: "https://i.pravatar.cc/150?img=20",
-    role: UserRole.NOVICE_DRIVER,
-};
 
 function Logo() {
     return (
@@ -62,13 +53,14 @@ export default function HeaderCommunity({
     searchQuery = "",
     onSearchChange,
     searchPlaceholder = "Tìm kiếm bài viết, câu hỏi, hoặc chủ đề...",
-    currentUser = defaultUser,
     showSearch = true,
 }: HeaderCommunityProps) {
     const pathname = usePathname();
     const isForum = pathname?.includes("/forum");
     const isQA = pathname?.includes("/qa");
     const isPracticeTest = pathname?.includes("/practice-test");
+
+    const { isAuthenticated, role: authRole } = useAuth();
 
     return (
         <div className="sticky top-0 z-50 bg-white border-b shadow-md">
@@ -95,49 +87,23 @@ export default function HeaderCommunity({
                                     <h2 className="text-lg md:text-xl font-bold leading-tight">
                                         Chia sẻ kinh nghiệm & Hỏi đáp lái xe
                                     </h2>
-                                    <p className="text-xs md:text-sm text-muted-foreground mt-0.5 hidden sm:block">
-                                        Cộng đồng trao đổi và học hỏi kiến thức lái xe
-                                    </p>
+
                                 </div>
                             </div>
                         </div>
                     )}
 
                     <div className="flex items-center gap-3">
-                        <Button variant="ghost" size="icon" className="relative">
-                            <Bell className="size-5" />
-                            <span className="absolute top-1 right-1 size-2 bg-red-500 rounded-full"></span>
-                        </Button>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button className="flex items-center gap-2 hover:bg-gray-100 rounded-lg p-2 transition-colors">
-                                    <Avatar className="h-9 w-9 ring-2 ring-primary/20">
-                                        <AvatarImage src={currentUser.avatar} />
-                                        <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-semibold">
-                                            {currentUser.name.charAt(0)}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56">
-                                <DropdownMenuItem>
-                                    <Users className="mr-2 size-4" />
-                                    Hồ sơ của tôi
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Settings className="mr-2 size-4" />
-                                    Cài đặt
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <LogOut className="mr-2 size-4" />
-                                    Đăng xuất
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        {!isAuthenticated && (
+                            <Link href="/signin">
+                                <Button variant="outline">
+                                    Đăng nhập
+                                </Button>
+                            </Link>
+                        )}
                     </div>
                 </div>
 
-                {/* Navigation Tabs */}
                 <div className="flex items-center gap-1">
                     <Link
                         href="/forum"
@@ -149,7 +115,7 @@ export default function HeaderCommunity({
                         <MessageSquare className="size-5" />
                         <span>Diễn đàn</span>
                     </Link>
-                    <Link
+                    {/* <Link
                         href="/qa"
                         className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${isQA
                             ? "border-primary text-primary font-semibold"
@@ -158,7 +124,7 @@ export default function HeaderCommunity({
                     >
                         <HelpCircle className="size-5" />
                         <span>Hỏi & Đáp</span>
-                    </Link>
+                    </Link> */}
                     <Link
                         href="/practice-test"
                         className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${isPracticeTest

@@ -30,6 +30,7 @@ import {
   IconFileDescription,
   IconHistory,
   IconKey,
+  IconMessageCircle,
   IconNavigation,
   IconNews,
   IconPackage,
@@ -142,6 +143,11 @@ const data = {
       url: "/post-review",
       icon: IconNews,
     },
+    {
+      name: "Quản lý bài đăng",
+      url: "/management-post",
+      icon: IconArticle,
+    },
   ],
 
   navInstructor: [
@@ -190,6 +196,11 @@ const data = {
       name: "Thông báo",
       url: "/notification-management",
       icon: IconBell,
+    },
+    {
+      name: "Diễn đàn",
+      url: "/forum",
+      icon: IconMessageCircle,
     },
   ],
 };

@@ -18,12 +18,12 @@ import {
     GraduationCap,
     Send,
 } from "lucide-react";
-import { Question, Answer } from "@/types/post/qa.type";
+import { Question, Answer } from "@/types/forum/qa.type";
 import qaData from "@/data/mock-qa.json";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { UserRole } from "@/types/post/post.type";
+import { UserRole } from "@/types/forum/post.type";
 
 const currentUser = {
     id: "user_novice_001",

@@ -1,10 +1,9 @@
 import { useAppSelector, useAppDispatch } from "@/lib/redux/useAppDispatch";
-import { signIn, signOut } from "@/features/auth/authThunk";
+import { signIn } from "@/features/auth/authThunk";
 import { useRouter } from "next/navigation";
 import {
     getUserRole,
     getAccessToken,
-    getRefreshToken,
     clearTokens,
     handleTokenStorage,
     getUserInfo
@@ -12,11 +11,10 @@ import {
 import { UserRole } from "@/types/auth/user-role.enum";
 import { useThunkAction } from "@/lib/redux/useThunkAction";
 import { ISignInRequest, ISignInResponse } from "@/types/auth/signin.type";
-import { setSignInEmailOrPhone, setSignInPassword, resetSignInData, signOutLocal } from "@/features/auth/authSlice";
+import { setSignInEmailOrPhone, setSignInPassword, resetSignInData, signOut } from "@/features/auth/authSlice";
 
 export const useSignIn = () => {
     const { runSafe: runSignIn, loading: signInLoading } = useThunkAction(signIn);
-    const { runSafe: runSignOut, loading: signOutLoading } = useThunkAction(signOut);
     const router = useRouter();
     const dispatch = useAppDispatch();
     const auth = useAppSelector((state) => state.auth);
@@ -44,13 +42,12 @@ export const useSignIn = () => {
 
     // Token management utilities
     const saveTokens = (accessToken: string, refreshToken: string) => {
-        handleTokenStorage(accessToken, refreshToken);
+        handleTokenStorage(accessToken);
     };
 
     const getCurrentTokens = () => {
         return {
             accessToken: getAccessToken(),
-            refreshToken: getRefreshToken()
         };
     };
 
@@ -61,42 +58,27 @@ export const useSignIn = () => {
 
     const isTokenAvailable = () => {
         const tokens = getCurrentTokens();
-        return !!(tokens.accessToken && tokens.refreshToken);
+        return !!(tokens.accessToken);
     };
 
-    // Logout functionality
-    const handleLogout = async () => {
-        const refreshToken = getRefreshToken();
-        if (refreshToken) {
-            // Call API to logout with refreshToken
-            const res = await runSignOut({ refreshToken });
-            if (res.ok) {
-                // Redirect to login page after successful logout
-                router.push("/signin");
-            }
-        } else {
-            // If no refreshToken, just clear local state
-            dispatch(signOutLocal());
-            router.push("/signin");
-        }
+    const handleSignOut = async () => {
+        dispatch(signOut());
+        router.push("/signin");
     };
 
-    // Local logout (without API call)
     const handleLocalLogout = () => {
-        dispatch(signOutLocal());
+        dispatch(signOut());
         router.push("/signin");
     };
 
     return {
         ...auth,
-        isLoading: auth.isLoading || signInLoading || signOutLoading,
+        isLoading: auth.isLoading || signInLoading,
         handleSignIn,
         updateEmailOrPhone,
         updatePassword,
-        // Logout functions
-        handleLogout,
+        handleSignOut,
         handleLocalLogout,
-        // Token utilities
         saveTokens,
         getCurrentTokens,
         removeTokens,

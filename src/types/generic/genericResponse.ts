@@ -9,7 +9,6 @@ export interface GenericResponse<T> {
   errorCode?: string | null;
   value?: T;
 }
-
 export interface PaginatedGeneric<T> {
   currentPage: number;
   pageSize: number;

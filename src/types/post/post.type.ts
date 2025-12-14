@@ -1,3 +1,5 @@
+import { UserRole } from "../auth/user-role.enum";
+
 // Post Status Enum
 export enum PostStatus {
   PENDING_REVIEW = "PENDING_REVIEW",
@@ -18,14 +20,6 @@ export enum ModerationStatus {
 export enum ReactionType {
   LIKE = "LIKE",
   DISLIKE = "DISLIKE",
-}
-
-// User Role Enum
-export enum UserRole {
-  INSTRUCTOR = "INSTRUCTOR",
-  INSPECTOR = "INSPECTOR",
-  NOVICE_DRIVER = "NOVICE_DRIVER",
-  ADMIN = "ADMIN",
 }
 
 // User Interface

@@ -10,14 +10,14 @@ import {
   ISignUpRequest,
 } from "@/types/auth/signup.type";
 import { ISignInRequest } from "@/types/auth/signin.type";
+import { UserRole } from "@/types/auth/user-role.enum";
 
 export interface AuthState extends BaseState {
-  // Authentication state
   signInData: ISignInRequest;
   isAuthenticated: boolean;
-  role: number | null;
+  role: UserRole;
 
-  // Signup flow state
+
   inputCode: string;
   verificationCode: string;
   signupData: ISignUpRequest;
@@ -29,7 +29,7 @@ if (isClient && tokenExpired) {
   // Clear stale tokens early to avoid inconsistent UI state
   try {
     clearTokens();
-  } catch {}
+  } catch { }
 }
 
 const initialState: AuthState = {
@@ -44,7 +44,7 @@ const initialState: AuthState = {
     emailOrPhone: "",
   },
   isAuthenticated: isClient ? !!getUserRole() && !tokenExpired : false,
-  role: isClient && !tokenExpired ? getUserRole() ?? null : null,
+  role: isClient && !tokenExpired ? getUserRole() as unknown as UserRole : UserRole.NoviceDriver,
 
   // Signup flow state
   inputCode: "",
@@ -60,9 +60,15 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    signOut(state) {
+      state.isAuthenticated = false;
+      if (typeof window !== "undefined") {
+        clearTokens();
+      }
+    },
     signOutLocal(state) {
       state.isAuthenticated = false;
-      state.role = null;
+      state.role = UserRole.NoviceDriver;
       state.isLoading = false;
       state.isSuccess = false;
       state.errorMessage = null;
@@ -115,7 +121,7 @@ const authSlice = createSlice({
       })
       .addCase(signIn.fulfilled, (state) => {
         state.isAuthenticated = true;
-        state.role = getUserRole() ?? null;
+        state.role = getUserRole() as unknown as UserRole;
         state.isLoading = false;
         state.isSuccess = true;
       })
@@ -160,6 +166,7 @@ const authSlice = createSlice({
 });
 
 export const {
+  signOut,
   signOutLocal,
   setSignupVerificationCode,
   setInputCode,

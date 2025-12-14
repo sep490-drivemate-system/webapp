@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/redux/useAppDispatch";
 import { useRouter } from "next/navigation";
 
 export const useAuth = () => {
-  const { isAuthenticated, role } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, role} = useAppSelector((state) => state.auth);
   const router = useRouter();
   const dispatch = useAppDispatch();
   const handleSignOut = () => {

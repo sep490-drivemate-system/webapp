@@ -6,8 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
     Car,
-    Truck,
-    Bus,
     CheckCircle2,
     XCircle,
     Clock,
@@ -29,31 +27,17 @@ type Question = {
     explanation: string;
 };
 
-const licenseTypes: { type: LicenseType; name: string; icon: typeof Car; description: string; color: string }[] = [
-    {
-        type: "B",
-        name: "Bằng B",
-        icon: Car,
-        description: "Xe ô tô dưới 9 chỗ, xe tải dưới 3.5 tấn",
-        color: "from-blue-500 to-blue-600",
-    },
-    {
-        type: "C",
-        name: "Bằng C",
-        icon: Truck,
-        description: "Xe tải từ 3.5 tấn trở lên",
-        color: "from-green-500 to-green-600",
-    },
-    {
-        type: "D",
-        name: "Bằng D",
-        icon: Bus,
-        description: "Xe chở khách từ 16 chỗ trở lên",
-        color: "from-purple-500 to-purple-600",
-    },
-];
+// CHỈ CÒN BẰNG B
+const licenseTypeB = {
+    type: "B" as LicenseType,
+    name: "Bằng B",
+    icon: Car,
+    description: "Xe ô tô dưới 9 chỗ, xe tải dưới 3.5 tấn",
+    color: "from-blue-500 to-blue-600",
+};
 
 export default function PracticeTestPage() {
+    // CHỈ CÒN BẰNG B
     const [selectedLicense, setSelectedLicense] = useState<LicenseType | null>(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -162,7 +146,7 @@ export default function PracticeTestPage() {
     };
 
     const handleReset = () => {
-        setSelectedLicense(null);
+        setSelectedLicense(null); // Quay lại màn hình chọn bằng
         setCurrentQuestionIndex(0);
         setSelectedAnswer(null);
         setShowResult(false);
@@ -178,51 +162,47 @@ export default function PracticeTestPage() {
         return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
     };
 
+    // Hiển thị màn hình chọn bằng (chỉ có bằng B)
     if (!selectedLicense) {
+        const Icon = licenseTypeB.icon;
         return (
             <div className="min-h-screen bg-gray-50 py-8">
                 <div className="container mx-auto px-4 max-w-6xl">
                     <div className="text-center mb-8">
                         <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                            Thi thử lý thuyết lái xe
+                            Thi thử lý thuyết lái xe - Bằng B
                         </h1>
                         <p className="text-muted-foreground text-lg">
-                            Chọn loại bằng lái để bắt đầu thi thử
+                            Ô tô dưới 9 chỗ, xe tải dưới 3.5 tấn
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {licenseTypes.map((license) => {
-                            const Icon = license.icon;
-                            return (
-                                <Card
-                                    key={license.type}
-                                    className="hover:shadow-lg transition-all duration-300 cursor-pointer border-2 hover:border-primary/50"
-                                    onClick={() => handleStartTest(license.type)}
-                                >
-                                    <CardContent className="p-6">
-                                        <div className="flex flex-col items-center text-center space-y-4">
-                                            <div
-                                                className={`p-4 rounded-full bg-gradient-to-br ${license.color} text-white shadow-lg`}
-                                            >
-                                                <Icon className="size-8" />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-2xl font-bold mb-2">{license.name}</h3>
-                                                <p className="text-sm text-muted-foreground">
-                                                    {license.description}
-                                                </p>
-                                            </div>
-                                            <Button
-                                                className={`w-full bg-gradient-to-r ${license.color} hover:opacity-90 text-white`}
-                                            >
-                                                Bắt đầu thi thử
-                                            </Button>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            );
-                        })}
+                    <div className="flex justify-center">
+                        <Card
+                            className="hover:shadow-lg transition-all duration-300 cursor-pointer border-2 hover:border-primary/50 max-w-md w-full"
+                            onClick={() => handleStartTest("B")}
+                        >
+                            <CardContent className="p-6">
+                                <div className="flex flex-col items-center text-center space-y-4">
+                                    <div
+                                        className={`p-4 rounded-full bg-gradient-to-br ${licenseTypeB.color} text-white shadow-lg`}
+                                    >
+                                        <Icon className="size-8" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-2xl font-bold mb-2">{licenseTypeB.name}</h3>
+                                        <p className="text-sm text-muted-foreground">
+                                            {licenseTypeB.description}
+                                        </p>
+                                    </div>
+                                    <Button
+                                        className={`w-full bg-gradient-to-r ${licenseTypeB.color} hover:opacity-90 text-white`}
+                                    >
+                                        Bắt đầu thi thử
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
                     </div>
 
                     <div className="mt-8 text-center">
@@ -420,9 +400,6 @@ export default function PracticeTestPage() {
                                 <Button onClick={handleReset} variant="outline">
                                     <RotateCcw className="size-4 mr-2" />
                                     Thi lại
-                                </Button>
-                                <Button onClick={() => setSelectedLicense(null)}>
-                                    Chọn bằng khác
                                 </Button>
                             </div>
                         </div>

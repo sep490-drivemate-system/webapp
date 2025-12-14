@@ -100,9 +100,9 @@ export default function ProfilePage() {
       setUserInfo((prev) =>
         prev
           ? {
-              ...prev,
-              avatarUrl: avatarPreview ?? prev.avatarUrl,
-            }
+            ...prev,
+            avatarUrl: avatarPreview ?? prev.avatarUrl,
+          }
           : prev
       );
       setAvatarFile(null);
@@ -222,12 +222,9 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Main Content with Sidebar */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar Navigation */}
           <ProfileSideBar activeTab={activeTab} onTabChange={setActiveTab} />
 
-          {/* Main Content Area */}
           <ProfileContent
             activeTab={activeTab}
             userInfo={userInfo}

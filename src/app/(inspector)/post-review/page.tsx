@@ -2,12 +2,12 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Eye, CheckCircle, XCircle, MessageSquare } from "lucide-react";
+import { Search, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageHeader from "@/components/commons/Header/header";
-import { Post, PostStatus, ModerationStatus } from "@/types/post/post.type";
+import { Post, PostStatus } from "@/types/post/post.type";
 import postsData from "@/data/mock-posts.json";
 import { Badge } from "@/components/ui/badge";
 
@@ -15,7 +15,6 @@ export default function PostReviewPage() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Get posts pending review
   const pendingPosts = useMemo(() => {
     return (postsData.posts as Post[]).filter(
       (post) => post.status === PostStatus.PENDING_REVIEW
@@ -37,7 +36,6 @@ export default function PostReviewPage() {
         description="Xem và duyệt các bài viết đang chờ kiểm duyệt"
       />
 
-      {/* Search */}
       <Card>
         <CardContent className="pt-6">
           <div className="relative">
@@ -52,7 +50,6 @@ export default function PostReviewPage() {
         </CardContent>
       </Card>
 
-      {/* Stats */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader>
@@ -86,7 +83,6 @@ export default function PostReviewPage() {
         </Card>
       </div>
 
-      {/* Posts List */}
       {filteredPosts.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">

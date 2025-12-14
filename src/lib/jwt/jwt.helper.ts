@@ -29,11 +29,4 @@ export class JwtHelper {
   getAccessToken(): string {
     return this.accessToken;
   }
-  getRefreshToken(): string {
-    return this.refreshToken;
-  }
-
-  getSubject(): string | undefined {
-    return this.decode()?.sub;
-  }
 }

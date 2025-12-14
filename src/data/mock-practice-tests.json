@@ -41,58 +41,6 @@
     },
     {
       "id": "q4",
-      "licenseType": "C",
-      "question": "Xe tải có trọng tải từ 3.5 tấn trở lên thuộc loại bằng lái nào?",
-      "options": [
-        "Bằng B",
-        "Bằng C",
-        "Bằng D",
-        "Bằng E"
-      ],
-      "correctAnswer": 1,
-      "explanation": "Xe tải có trọng tải từ 3.5 tấn trở lên cần bằng lái loại C."
-    },
-    {
-      "id": "q5",
-      "licenseType": "C",
-      "question": "Khi lái xe tải, khoảng cách an toàn tối thiểu với xe phía trước là:",
-      "options": [
-        "50 mét",
-        "70 mét",
-        "90 mét",
-        "110 mét"
-      ],
-      "correctAnswer": 2,
-      "explanation": "Xe tải cần giữ khoảng cách an toàn tối thiểu 90 mét với xe phía trước."
-    },
-    {
-      "id": "q6",
-      "licenseType": "D",
-      "question": "Xe chở khách từ 16 chỗ ngồi trở lên cần bằng lái loại:",
-      "options": [
-        "Bằng B",
-        "Bằng C",
-        "Bằng D",
-        "Bằng E"
-      ],
-      "correctAnswer": 2,
-      "explanation": "Xe chở khách từ 16 chỗ ngồi trở lên cần bằng lái loại D."
-    },
-    {
-      "id": "q7",
-      "licenseType": "D",
-      "question": "Khi lái xe chở khách, tốc độ tối đa trong khu vực đông dân cư là:",
-      "options": [
-        "40 km/h",
-        "50 km/h",
-        "60 km/h",
-        "70 km/h"
-      ],
-      "correctAnswer": 0,
-      "explanation": "Tốc độ tối đa cho xe chở khách trong khu vực đông dân cư là 40 km/h."
-    },
-    {
-      "id": "q8",
       "licenseType": "B",
       "question": "Khi gặp đèn vàng nhấp nháy, người lái xe phải:",
       "options": [
@@ -105,31 +53,407 @@
       "explanation": "Khi gặp đèn vàng nhấp nháy, người lái xe phải giảm tốc độ và chú ý quan sát."
     },
     {
-      "id": "q9",
-      "licenseType": "C",
-      "question": "Khi lái xe tải trên đường dốc, cần chú ý:",
+      "id": "q5",
+      "licenseType": "B",
+      "question": "Tốc độ tối đa cho phép trong khu vực đông dân cư là:",
       "options": [
-        "Tăng tốc độ để vượt dốc nhanh",
-        "Sử dụng số thấp và giữ tốc độ ổn định",
-        "Đi với số cao để tiết kiệm nhiên liệu",
-        "Dừng xe giữa dốc để nghỉ"
+        "40 km/h",
+        "50 km/h",
+        "60 km/h",
+        "70 km/h"
       ],
       "correctAnswer": 1,
-      "explanation": "Khi lái xe tải trên đường dốc, cần sử dụng số thấp và giữ tốc độ ổn định để đảm bảo an toàn."
+      "explanation": "Tốc độ tối đa cho phép trong khu vực đông dân cư là 50 km/h đối với xe ô tô con."
+    },
+    {
+      "id": "q6",
+      "licenseType": "B",
+      "question": "Khi vượt xe khác, người lái xe phải:",
+      "options": [
+        "Vượt bên phải",
+        "Vượt bên trái",
+        "Vượt cả hai bên",
+        "Vượt tùy ý"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi vượt xe khác, người lái xe phải vượt bên trái, trừ một số trường hợp đặc biệt."
+    },
+    {
+      "id": "q7",
+      "licenseType": "B",
+      "question": "Khi đỗ xe trên đường phố, khoảng cách tối thiểu từ xe đến lề đường là:",
+      "options": [
+        "0.2 mét",
+        "0.3 mét",
+        "0.5 mét",
+        "1 mét"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Khi đỗ xe trên đường phố, khoảng cách tối thiểu từ xe đến lề đường là 0.2 mét."
+    },
+    {
+      "id": "q8",
+      "licenseType": "B",
+      "question": "Biển báo hình tròn, nền đỏ, viền trắng có nghĩa là:",
+      "options": [
+        "Biển báo cấm",
+        "Biển báo nguy hiểm",
+        "Biển báo hiệu lệnh",
+        "Biển báo chỉ dẫn"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Biển báo hình tròn, nền đỏ, viền trắng là biển báo cấm."
+    },
+    {
+      "id": "q9",
+      "licenseType": "B",
+      "question": "Khi gặp biển báo 'Cấm đỗ xe', người lái xe được phép:",
+      "options": [
+        "Đỗ xe bình thường",
+        "Dừng xe để đón trả khách",
+        "Dừng xe không quá 5 phút",
+        "Không được dừng, đỗ xe"
+      ],
+      "correctAnswer": 3,
+      "explanation": "Khi gặp biển báo 'Cấm đỗ xe', người lái xe không được dừng, đỗ xe tại vị trí đó."
     },
     {
       "id": "q10",
-      "licenseType": "D",
-      "question": "Trước khi xuất phát, tài xế xe khách phải kiểm tra:",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe trong hầm đường bộ, người lái xe phải:",
       "options": [
-        "Chỉ kiểm tra nhiên liệu",
-        "Kiểm tra hệ thống phanh, đèn, và số lượng hành khách",
-        "Chỉ kiểm tra đèn",
-        "Không cần kiểm tra gì"
+        "Bật đèn chiếu xa",
+        "Bật đèn chiếu gần",
+        "Tắt đèn",
+        "Bật đèn tùy ý"
       ],
       "correctAnswer": 1,
-      "explanation": "Tài xế xe khách phải kiểm tra hệ thống phanh, đèn, và số lượng hành khách trước khi xuất phát."
+      "explanation": "Khi điều khiển xe trong hầm đường bộ, người lái xe phải bật đèn chiếu gần."
+    },
+    {
+      "id": "q11",
+      "licenseType": "B",
+      "question": "Khi gặp xe ưu tiên đang làm nhiệm vụ, người lái xe phải:",
+      "options": [
+        "Tiếp tục đi bình thường",
+        "Giảm tốc độ và nhường đường",
+        "Tăng tốc độ để vượt qua",
+        "Dừng xe hoàn toàn"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi gặp xe ưu tiên đang làm nhiệm vụ, người lái xe phải giảm tốc độ và nhường đường."
+    },
+    {
+      "id": "q12",
+      "licenseType": "B",
+      "question": "Khi quay đầu xe trên đường, người lái xe phải:",
+      "options": [
+        "Quay đầu ở bất kỳ nơi nào",
+        "Quay đầu ở nơi có biển báo cho phép",
+        "Quay đầu ở giữa đường",
+        "Quay đầu ở làn đường bên phải"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi quay đầu xe trên đường, người lái xe chỉ được quay đầu ở nơi có biển báo cho phép."
+    },
+    {
+      "id": "q13",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe qua đường sắt, người lái xe phải:",
+      "options": [
+        "Tăng tốc độ để vượt qua nhanh",
+        "Dừng lại, quan sát và chỉ đi khi an toàn",
+        "Đi bình thường",
+        "Vượt qua khi có tàu đến"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe qua đường sắt, người lái xe phải dừng lại, quan sát và chỉ đi khi an toàn."
+    },
+    {
+      "id": "q14",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe trong trời mưa, người lái xe phải:",
+      "options": [
+        "Tăng tốc độ",
+        "Giảm tốc độ và bật đèn",
+        "Đi với tốc độ bình thường",
+        "Dừng xe"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe trong trời mưa, người lái xe phải giảm tốc độ và bật đèn để đảm bảo an toàn."
+    },
+    {
+      "id": "q15",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe ban đêm, khoảng cách an toàn tối thiểu với xe phía trước là:",
+      "options": [
+        "30 mét",
+        "50 mét",
+        "70 mét",
+        "100 mét"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe ban đêm, khoảng cách an toàn tối thiểu với xe phía trước là 50 mét."
+    },
+    {
+      "id": "q16",
+      "licenseType": "B",
+      "question": "Khi gặp biển báo 'Cấm vượt', người lái xe phải:",
+      "options": [
+        "Vượt bình thường",
+        "Không được vượt xe phía trước",
+        "Vượt khi có cơ hội",
+        "Vượt bên phải"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi gặp biển báo 'Cấm vượt', người lái xe không được vượt xe phía trước."
+    },
+    {
+      "id": "q17",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe trên đường trơn trượt, người lái xe phải:",
+      "options": [
+        "Tăng tốc độ",
+        "Giảm tốc độ và giữ khoảng cách an toàn",
+        "Phanh gấp khi cần",
+        "Đi với tốc độ bình thường"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe trên đường trơn trượt, người lái xe phải giảm tốc độ và giữ khoảng cách an toàn."
+    },
+    {
+      "id": "q18",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe qua đường vòng, người lái xe phải:",
+      "options": [
+        "Tăng tốc độ",
+        "Giảm tốc độ và bật đèn xi nhan",
+        "Đi với tốc độ bình thường",
+        "Vượt xe phía trước"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe qua đường vòng, người lái xe phải giảm tốc độ và bật đèn xi nhan."
+    },
+    {
+      "id": "q19",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe lên dốc, người lái xe phải:",
+      "options": [
+        "Sử dụng số cao",
+        "Sử dụng số thấp và giữ tốc độ ổn định",
+        "Tăng tốc độ",
+        "Dừng xe giữa dốc"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe lên dốc, người lái xe phải sử dụng số thấp và giữ tốc độ ổn định."
+    },
+    {
+      "id": "q20",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe xuống dốc, người lái xe phải:",
+      "options": [
+        "Tắt máy để tiết kiệm nhiên liệu",
+        "Sử dụng số thấp và phanh nhẹ",
+        "Tăng tốc độ",
+        "Đi với số cao"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe xuống dốc, người lái xe phải sử dụng số thấp và phanh nhẹ để đảm bảo an toàn."
+    },
+    {
+      "id": "q21",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe qua ngã tư có đèn tín hiệu, người lái xe phải:",
+      "options": [
+        "Vượt đèn đỏ khi vắng người",
+        "Tuân thủ tín hiệu đèn",
+        "Đi khi đèn vàng",
+        "Đi tùy ý"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe qua ngã tư có đèn tín hiệu, người lái xe phải tuân thủ tín hiệu đèn."
+    },
+    {
+      "id": "q22",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe qua cầu hẹp, người lái xe phải:",
+      "options": [
+        "Tăng tốc độ",
+        "Giảm tốc độ và nhường đường cho xe ngược chiều",
+        "Vượt xe phía trước",
+        "Đi với tốc độ bình thường"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe qua cầu hẹp, người lái xe phải giảm tốc độ và nhường đường cho xe ngược chiều."
+    },
+    {
+      "id": "q23",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe qua khu vực trường học, người lái xe phải:",
+      "options": [
+        "Tăng tốc độ",
+        "Giảm tốc độ và chú ý quan sát",
+        "Đi với tốc độ bình thường",
+        "Bấm còi liên tục"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe qua khu vực trường học, người lái xe phải giảm tốc độ và chú ý quan sát."
+    },
+    {
+      "id": "q24",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe qua khu vực có người đi bộ, người lái xe phải:",
+      "options": [
+        "Tăng tốc độ",
+        "Giảm tốc độ và nhường đường cho người đi bộ",
+        "Bấm còi để người đi bộ tránh",
+        "Đi với tốc độ bình thường"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe qua khu vực có người đi bộ, người lái xe phải giảm tốc độ và nhường đường cho người đi bộ."
+    },
+    {
+      "id": "q25",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe qua đường có vạch kẻ đường, người lái xe phải:",
+      "options": [
+        "Đi bất kỳ làn nào",
+        "Tuân thủ vạch kẻ đường",
+        "Vượt qua vạch kẻ đường",
+        "Đi ngược chiều"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe qua đường có vạch kẻ đường, người lái xe phải tuân thủ vạch kẻ đường."
+    },
+    {
+      "id": "q26",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe qua đường có biển báo 'Giảm tốc độ', người lái xe phải:",
+      "options": [
+        "Tăng tốc độ",
+        "Giảm tốc độ",
+        "Đi với tốc độ bình thường",
+        "Dừng xe"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe qua đường có biển báo 'Giảm tốc độ', người lái xe phải giảm tốc độ."
+    },
+    {
+      "id": "q27",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe qua đường có biển báo 'Cấm bóp còi', người lái xe phải:",
+      "options": [
+        "Bóp còi liên tục",
+        "Không được bóp còi",
+        "Bóp còi khi cần",
+        "Bóp còi tùy ý"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe qua đường có biển báo 'Cấm bóp còi', người lái xe không được bóp còi."
+    },
+    {
+      "id": "q28",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe qua đường có biển báo 'Cấm dừng xe', người lái xe phải:",
+      "options": [
+        "Dừng xe bình thường",
+        "Không được dừng xe",
+        "Dừng xe khi cần",
+        "Dừng xe tùy ý"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe qua đường có biển báo 'Cấm dừng xe', người lái xe không được dừng xe."
+    },
+    {
+      "id": "q29",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe qua đường có biển báo 'Cấm quay đầu', người lái xe phải:",
+      "options": [
+        "Quay đầu bình thường",
+        "Không được quay đầu",
+        "Quay đầu khi cần",
+        "Quay đầu tùy ý"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe qua đường có biển báo 'Cấm quay đầu', người lái xe không được quay đầu."
+    },
+    {
+      "id": "q30",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe qua đường có biển báo 'Cấm rẽ phải', người lái xe được phép:",
+      "options": [
+        "Rẽ phải bình thường",
+        "Rẽ trái hoặc đi thẳng",
+        "Quay đầu xe",
+        "Dừng xe"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe qua đường có biển báo 'Cấm rẽ phải', người lái xe chỉ được phép rẽ trái hoặc đi thẳng."
+    },
+    {
+      "id": "q31",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe qua đường có biển báo 'Cấm đi ngược chiều', người lái xe phải:",
+      "options": [
+        "Đi ngược chiều khi cần",
+        "Không được đi ngược chiều",
+        "Đi ngược chiều khi vắng người",
+        "Đi ngược chiều tùy ý"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe qua đường có biển báo 'Cấm đi ngược chiều', người lái xe không được đi ngược chiều."
+    },
+    {
+      "id": "q32",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe qua đường có biển báo 'Hạn chế tốc độ tối đa', người lái xe phải:",
+      "options": [
+        "Đi với tốc độ cao hơn",
+        "Tuân thủ tốc độ tối đa quy định",
+        "Đi với tốc độ bình thường",
+        "Đi tùy ý"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe qua đường có biển báo 'Hạn chế tốc độ tối đa', người lái xe phải tuân thủ tốc độ tối đa quy định."
+    },
+    {
+      "id": "q33",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe qua đường có biển báo 'Cấm xe tải', người lái xe ô tô con:",
+      "options": [
+        "Không được đi",
+        "Được phép đi",
+        "Chỉ đi khi cần",
+        "Đi tùy ý"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe qua đường có biển báo 'Cấm xe tải', người lái xe ô tô con vẫn được phép đi."
+    },
+    {
+      "id": "q34",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe qua đường có biển báo 'Cấm xe máy', người lái xe ô tô:",
+      "options": [
+        "Không được đi",
+        "Được phép đi",
+        "Chỉ đi khi cần",
+        "Đi tùy ý"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe qua đường có biển báo 'Cấm xe máy', người lái xe ô tô vẫn được phép đi."
+    },
+    {
+      "id": "q35",
+      "licenseType": "B",
+      "question": "Khi điều khiển xe qua đường có biển báo 'Cấm xe đạp', người lái xe ô tô:",
+      "options": [
+        "Không được đi",
+        "Được phép đi",
+        "Chỉ đi khi cần",
+        "Đi tùy ý"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Khi điều khiển xe qua đường có biển báo 'Cấm xe đạp', người lái xe ô tô vẫn được phép đi."
     }
   ]
 }
-
