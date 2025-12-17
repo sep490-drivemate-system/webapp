@@ -3,6 +3,7 @@ import authReducer, { signOut } from '@/features/auth/authSlice';
 import documentReducer from '@/features/document/documentSlice';
 import transactionReducer from '@/features/transaction/transactionSlice';
 import bookingReducer from '@/features/booking/bookingSlice';
+import blogReducer from '@/features/blog/blogSlice';
 
 const appReducer = combineReducers({
         auth: authReducer,

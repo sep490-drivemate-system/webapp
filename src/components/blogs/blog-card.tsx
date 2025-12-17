@@ -28,9 +28,11 @@ interface BlogCardProps {
   publishedAt: string;
   author?: BlogAuthor;
   readTime?: number;
-  variant?: "inspector" | "publish";
+  variant?: "instructor" | "publish" | "inspector"; // keep inspector as backward alias
   detailLink?: string;
   previewLength?: number;
+  statusLabel?: string;
+  statusClassName?: string;
 }
 
 const formatDate = (dateString: string) => {
@@ -50,42 +52,51 @@ export function BlogCard({
   publishedAt,
   author,
   readTime,
-  variant = "inspector",
+  variant = "instructor",
   detailLink,
   previewLength = 110,
+  statusLabel,
+  statusClassName,
 }: BlogCardProps) {
   const formattedDate = formatDate(publishedAt);
   const contentPreview = getPreviewFromContent(content, previewLength);
   const linkPath =
     detailLink ||
-    (variant === "inspector"
+    (variant === "instructor" || variant === "inspector"
       ? `/blog-management/${id}`
       : `/blogs-detail/${id}`);
 
-  if (variant === "inspector") {
+  if (variant === "instructor" || variant === "inspector") {
     return (
-      <Card className="flex h-full flex-col overflow-hidden">
-        <div className="aspect-video w-full overflow-hidden bg-muted">
-          <img
+      <Card className="flex h-full flex-col overflow-hidden p-0">
+        <div className="relative aspect-video w-full overflow-hidden bg-muted">
+          <Image
             src={image}
             alt={title}
-            className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+            fill
+            className="object-cover transition-transform duration-300 hover:scale-105"
+            sizes="(max-width: 768px) 100vw, 33vw"
+            unoptimized
           />
         </div>
-        <CardHeader className="space-y-3">
-          <p className="text-xs text-muted-foreground">{formattedDate}</p>
+        <CardHeader className="space-y-3 px-4 pt-4 flex-1">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground">{formattedDate}</p>
+            {statusLabel ? (
+              <span
+                className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${statusClassName ?? "bg-muted text-muted-foreground"}`}
+              >
+                {statusLabel}
+              </span>
+            ) : null}
+          </div>
           <CardTitle className="line-clamp-2 text-lg">{title}</CardTitle>
           <CardDescription className="line-clamp-3">
             {contentPreview}
           </CardDescription>
         </CardHeader>
-        <CardFooter className="flex items-center justify-end gap-2 border-t bg-muted/30">
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2 border border-border"
-            asChild
-          >
+        <CardFooter className="flex items-center justify-end gap-2 border-t bg-muted/30 px-4 pb-4 pt-3">
+          <Button className="w-full" variant="green" size="sm" asChild>
             <Link href={linkPath}>
               <Eye className="size-4" />
               Xem chi tiết
@@ -119,6 +130,35 @@ export function BlogCard({
         <p className="text-sm text-gray-600 line-clamp-3 flex-1">
           {contentPreview}
         </p>
+        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+          {author ? (
+            <div className="flex items-center gap-3">
+              <div className="relative h-10 w-10 overflow-hidden rounded-full bg-gray-100">
+                <Image
+                  src={author.avatar || "/placeholder.svg"}
+                  alt={author.name}
+                  fill
+                  className="object-cover"
+                  sizes="40px"
+                  unoptimized
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-semibold text-gray-900">
+                  {author.name}
+                </span>
+                <span className="text-xs text-gray-500">
+                  {author.role || "Huấn luyện viên"}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <span className="text-sm font-medium text-gray-700">
+              Không có thông tin tác giả
+            </span>
+          )}
+          <span className="text-xs text-gray-500">{formattedDate}</span>
+        </div>
       </CardContent>
 
       <CardFooter className="flex items-center justify-end gap-2 border-t bg-gray-50/50 px-6 py-4 mt-auto">

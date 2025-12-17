@@ -8,7 +8,7 @@ import {
   useState,
   useRef,
 } from "react";
-import { Trash2, Plus, Upload } from "lucide-react";
+import { Trash2, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,18 +17,30 @@ import { Label } from "@/components/ui/label";
 import { MockBlogPost } from "@/lib/mock-data";
 import { stripHtmlTags } from "@/lib/text-utils";
 import { ShadcnEditor } from "@/components/shadcn-editor/shadcn-editor";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { BlogCategory } from "@/types/blog/blog.type";
+import { log } from "console";
 
 export type BlogFormValues = {
   title: string;
   content: string;
   thumbnail: string;
   galleryImages: string[];
+  categoryId: string | null;
 };
 
 type BlogFormProps = {
   mode: "create" | "edit";
   initialPost?: MockBlogPost | null;
-  onSubmit?: (values: BlogFormValues) => void;
+  onSubmit?: (values: BlogFormValues) => Promise<void> | void;
+  categories?: BlogCategory[];
+  initialCategoryId?: string;
 };
 
 // Square image upload component for blog form
@@ -120,14 +132,30 @@ function SquareImageUpload({
   );
 }
 
-export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
+export function BlogForm({
+  mode,
+  initialPost,
+  onSubmit,
+  categories = [],
+  initialCategoryId,
+}: BlogFormProps) {
   const [values, setValues] = useState<BlogFormValues>(() => ({
     title: initialPost?.title ?? "",
     content: initialPost?.content ?? "",
     thumbnail: initialPost?.thumbnail ?? "",
     galleryImages: initialPost?.galleryImages ?? [],
+    categoryId:
+      initialCategoryId ??
+      ((initialPost as unknown as { categoryId?: string | null })?.categoryId ??
+        null),
   }));
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<{
+    title?: string;
+    content?: string;
+    thumbnail?: string;
+    galleryImages?: string;
+  }>({});
 
   useEffect(() => {
     setValues({
@@ -135,8 +163,15 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
       content: initialPost?.content ?? "",
       thumbnail: initialPost?.thumbnail ?? "",
       galleryImages: initialPost?.galleryImages ?? [],
+      categoryId:
+        initialCategoryId ??
+        ((initialPost as unknown as { categoryId?: string | null })?.categoryId ??
+          null),
     });
-  }, [initialPost]);
+    console.log(values.title);
+    console.log(values.content);
+    console.log(values.thumbnail);
+  }, [initialPost, initialCategoryId]);
 
   const isContentEmpty = useMemo(
     () => !stripHtmlTags(values.content),
@@ -150,12 +185,20 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
         ...prev,
         [field]: value,
       }));
+      setErrors((prev) => ({
+        ...prev,
+        [field]: undefined,
+      }));
     };
 
   const handleContentChange = (html: string) => {
     setValues((prev) => ({
       ...prev,
       content: html,
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      content: undefined,
     }));
   };
 
@@ -164,12 +207,20 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
       ...prev,
       thumbnail: base64,
     }));
+    setErrors((prev) => ({
+      ...prev,
+      thumbnail: undefined,
+    }));
   };
 
   const handleGalleryAdd = (base64: string) => {
     setValues((prev) => ({
       ...prev,
       galleryImages: [...prev.galleryImages, base64],
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      galleryImages: undefined,
     }));
   };
 
@@ -193,16 +244,52 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
     }));
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    const nextErrors: {
+      title?: string;
+      content?: string;
+      thumbnail?: string;
+      galleryImages?: string;
+    } = {};
+
+    if (!values.title.trim()) {
+      nextErrors.title = "Tiêu đề không được để trống.";
+    }
+
     if (isContentEmpty) {
+      nextErrors.content = "Nội dung không được để trống.";
+    }
+
+    if (!values.thumbnail) {
+      nextErrors.thumbnail = "Ảnh đại diện bài viết không được để trống.";
+    }
+
+    // Danh sách ảnh bổ sung là bắt buộc trong chế độ tạo bài viết
+    if (mode === "create" && values.galleryImages.length === 0) {
+      nextErrors.galleryImages = "Danh sách ảnh bổ sung không được để trống.";
+    }
+
+    setErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) {
       return;
     }
+
     setIsSubmitting(true);
 
-    onSubmit?.(values);
-    setIsSubmitting(false);
+    try {
+      await onSubmit?.(values);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  console.log(values.content);
+  if(mode === "edit" && !values.content) {
+    return null;
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 w-full">
@@ -214,29 +301,33 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="title">Tiêu đề</Label>
+            <Label htmlFor="title">
+              Tiêu đề <span className="text-destructive">*</span>
+            </Label>
             <Input
               id="title"
               placeholder="Nhập tiêu đề bài viết"
               value={values.title}
               onChange={handleChange("title")}
-              required
             />
+            {errors.title && (
+              <p className="text-xs text-destructive">{errors.title}</p>
+            )}
           </div>
           <div className="space-y-2">
-            <Label>Nội dung</Label>
+            <Label>
+              Nội dung <span className="text-destructive">*</span>
+            </Label>
             <div className="rounded-xl border bg-muted/30">
               <ShadcnEditor
-                key={initialPost?.id ?? "new-blog"}
-                initialValue={initialPost?.content ?? ""}
+                key={`blog-editor-${initialPost?.id ?? "new"}-${initialPost ? "edit" : "create"}`}
+                initialValue={values.content}
                 onChange={handleContentChange}
                 placeholder="Viết nội dung chính của bài blog..."
               />
             </div>
-            {isContentEmpty ? (
-              <p className="text-xs text-destructive">
-                Nội dung không được để trống.
-              </p>
+            {errors.content ? (
+              <p className="text-xs text-destructive">{errors.content}</p>
             ) : (
               <p className="text-xs text-muted-foreground">
                 Nội dung được định dạng với Shadcn Editor (Lexical).
@@ -245,7 +336,9 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
           </div>
           <div className="space-y-2">
             <div className="flex items-center gap-25">
-              <Label className="text-sm">Ảnh đại diện bài viết</Label>
+              <Label className="text-sm">
+                Ảnh đại diện bài viết <span className="text-destructive">*</span>
+              </Label>
               {values.thumbnail && (
                 <Button
                   type="button"
@@ -265,9 +358,12 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
                 preview={values.thumbnail}
               />
             </div>
+            {errors.thumbnail && (
+              <p className="text-xs text-destructive">{errors.thumbnail}</p>
+            )}
           </div>
           <div className="space-y-3">
-            <Label>Danh sách ảnh bổ sung</Label>
+            <Label>Danh sách ảnh bổ sung <span className="text-destructive">*</span></Label>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {values.galleryImages.map((image, index) => (
                 <div key={`gallery-${index}`} className="h-fit">
@@ -300,6 +396,42 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
                 />
               </div>
             </div>
+            {errors.galleryImages && (
+              <p className="text-xs text-destructive">{errors.galleryImages}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label>Phân loại bài viết</Label>
+            <Select
+              value={values.categoryId ?? ""}
+              onValueChange={(value) =>
+                setValues((prev) => ({
+                  ...prev,
+                  categoryId: value || null,
+                }))
+              }
+              disabled={isSubmitting}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Phân loại bài viết" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__placeholder__" disabled>
+                  Phân loại bài viết
+                </SelectItem>
+                {categories.length > 0 ? (
+                  categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="__no_categories__" disabled>
+                    Không có phân loại khả dụng
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
@@ -307,7 +439,7 @@ export function BlogForm({ mode, initialPost, onSubmit }: BlogFormProps) {
         <Button
           type="submit"
           className="gap-2"
-          disabled={isSubmitting || isContentEmpty}
+          disabled={isSubmitting}
         >
           {mode === "edit" ? "Lưu thay đổi" : "Tạo bài viết"}
         </Button>

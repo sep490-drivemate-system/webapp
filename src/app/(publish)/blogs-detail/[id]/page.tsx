@@ -1,26 +1,104 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Calendar, Eye } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import blogsData from "@/data/mock-blogs.json";
 import { stripHtmlTags } from "@/lib/text-utils";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/useAppDispatch";
+import { getBlogDetailForAllRoles } from "@/features/blog/blogThunk";
+import { getUserById } from "@/features/user/userThunk";
+import type { IUserInfo } from "@/types/user/user-profile.type";
 
 export default function BlogDetailPage() {
   const params = useParams();
   const router = useRouter();
   const blogId = params.id as string;
 
-  const blog = blogsData.blogs.find((b) => b.id === blogId);
+  const dispatch = useAppDispatch();
+  const { blogDetail, isLoading, errorMessage } = useAppSelector(
+    (state) => state.blog
+  );
 
-  if (!blog) {
+  const [author, setAuthor] = useState<{
+    name: string;
+    avatar: string;
+  } | null>(null);
+
+  // Fetch blog detail
+  useEffect(() => {
+    if (!blogId) return;
+    dispatch(getBlogDetailForAllRoles({ id: blogId }));
+  }, [dispatch, blogId]);
+
+  // Fetch author info based on instructorId from blog detail
+  useEffect(() => {
+    if (!blogDetail?.instructorId) return;
+
+    dispatch(getUserById({ id: blogDetail.instructorId }))
+      .unwrap()
+      .then((response) => {
+        const user = (response as any)?.value as IUserInfo | undefined;
+        if (!user) return;
+
+        setAuthor({
+          name: user.fullName,
+          avatar: user.avatarUrl,
+        });
+      })
+      .catch((error) => {
+        console.error("Không thể tải thông tin tác giả", error);
+      });
+  }, [blogDetail?.instructorId, dispatch]);
+
+  const blog = useMemo(() => {
+    if (!blogDetail) return null;
+
+    // Nội dung thực tế nằm trong BlogDetail.content.content (ContentItem)
+    const rawContent =
+      (blogDetail as any).content?.content ??
+      (typeof (blogDetail as any).content === "string"
+        ? (blogDetail as any).content
+        : "") ??
+      "";
+
+    const publishedAt =
+      (blogDetail as any).createdAt ??
+      (blogDetail as any).publishedAt ??
+      undefined;
+
+    return {
+      id: blogDetail.id,
+      title: blogDetail.title,
+      content: stripHtmlTags(
+        typeof rawContent === "string" ? rawContent : String(rawContent ?? "")
+      ),
+      thumbnailUrl: blogDetail.thumbnailUrl || "/placeholder.svg",
+      imageList: blogDetail.imageList || [],
+      publishedAt,
+    };
+  }, [blogDetail]);
+
+  if (isLoading && !blog) {
+    return (
+      <div className="pt-24 pb-12 lg:pt-32 lg:pb-16 bg-gradient-to-br from-blue-50 via-white to-blue-50 min-h-screen">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <div className="text-center py-16 text-gray-600">
+            Đang tải chi tiết bài viết...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (errorMessage || !blog) {
     return (
       <div className="pt-24 pb-12 lg:pt-32 lg:pb-16 bg-gradient-to-br from-blue-50 via-white to-blue-50 min-h-screen">
         <div className="container mx-auto px-4">
           <div className="text-center py-16">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Không tìm thấy bài viết
+              {errorMessage || "Không tìm thấy bài viết"}
             </h1>
             <Button onClick={() => router.push("/blogs")} variant="outline">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -32,17 +110,17 @@ export default function BlogDetailPage() {
     );
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("vi-VN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
+  const formattedDate = blog.publishedAt
+    ? new Date(blog.publishedAt).toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
+    : null;
 
-  const formattedDate = formatDate(blog.publishedAt);
-  const content = stripHtmlTags(blog.content) || blog.content;
+  const galleryImages = blog.imageList.filter(
+    (imageUrl) => imageUrl !== blog.thumbnailUrl
+  );
 
   return (
     <div className="pt-24 pb-12 lg:pt-32 lg:pb-16 bg-gradient-to-br from-blue-50 via-white to-blue-50 min-h-screen">
@@ -53,14 +131,16 @@ export default function BlogDetailPage() {
         </h1>
 
         {/* Published Date */}
-        <div className="flex items-center gap-2 text-gray-600 mb-8">
-          <span className="text-sm">Ngày tạo bài viết: {formattedDate}</span>
-        </div>
+        {formattedDate && (
+          <div className="flex items-center gap-2 text-gray-600 mb-8">
+            <span className="text-sm">Ngày tạo bài viết: {formattedDate}</span>
+          </div>
+        )}
 
         {/* Thumbnail Image */}
         <div className="relative w-full h-64 md:h-96 mb-8 rounded-lg overflow-hidden shadow-lg">
           <Image
-            src={blog.image}
+            src={blog.thumbnailUrl}
             alt={blog.title}
             fill
             className="object-cover"
@@ -72,18 +152,18 @@ export default function BlogDetailPage() {
         {/* Content */}
         <div className="prose prose-lg max-w-none mb-8">
           <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-            {content}
+            {blog.content}
           </div>
         </div>
 
         {/* Gallery Images */}
-        {blog.galleryImages && blog.galleryImages.length > 0 && (
+        {galleryImages.length > 0 && (
           <div className="mt-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               Hình ảnh liên quan
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {blog.galleryImages.map((imageUrl, index) => (
+              {galleryImages.map((imageUrl, index) => (
                 <div
                   key={index}
                   className="relative w-full h-64 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300"
@@ -101,17 +181,28 @@ export default function BlogDetailPage() {
           </div>
         )}
 
-        {/* Back Button */}
-        <div className="mt-12 flex justify-center">
-          <Button
-            className="w-full"
-            variant="green"
-            onClick={() => router.push("/blogs")}
-          > 
-            Quay lại danh sách bài viết
-          </Button>
-        </div>
+        {/* Author Info */}
+        {author && (
+          <div className="mt-12 border-t pt-6 flex items-center gap-4">
+            <div className="relative w-14 h-14 rounded-full overflow-hidden border shadow-sm">
+              <Image
+                src={author.avatar || "/placeholder.svg"}
+                alt={author.name}
+                fill
+                className="object-cover"
+                unoptimized
+              />
+            </div>
+            <div>
+              <div className="text-sm text-gray-500 mb-1">Tác giả</div>
+              <div className="font-semibold text-gray-900">{author.name}</div>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
 }
+
+

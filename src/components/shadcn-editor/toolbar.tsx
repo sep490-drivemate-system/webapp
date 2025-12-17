@@ -21,7 +21,8 @@ import {
   TOGGLE_LINK_COMMAND,
   $isLinkNode,
 } from "@lexical/link";
-import { $setBlocksType, mergeRegister } from "@lexical/utils";
+import { $setBlocksType } from "@lexical/selection";
+import { mergeRegister } from "@lexical/utils";
 import { Button } from "@/components/ui/button";
 import {
   Select,

@@ -35,8 +35,10 @@ import {
   IconNews,
   IconPackage,
   IconSettings,
+  IconTextCaption,
   IconUserCog,
   IconUsersGroup,
+  IconWorld,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import * as React from "react";
@@ -66,7 +68,7 @@ const data = {
     {
       title: "Quản lý tài liệu",
       url: "/management-document",
-      icon: IconArticle,
+      icon: IconTextCaption,
     },
     {
       title: "Quản lý điều khoản dịch vụ",
@@ -139,7 +141,7 @@ const data = {
       icon: IconCar,
     },
     {
-      name: "Quản lý tin tức và bài viết",
+      name: "Quản lý bài đăng diễn đàn",
       url: "/post-review",
       icon: IconNews,
     },
@@ -148,6 +150,12 @@ const data = {
       url: "/management-post",
       icon: IconArticle,
     },
+    {
+      name: "Quản lý bài viết",
+      url: "/blogs-management",
+      icon: IconFile,
+    },
+    
   ],
 
   navInstructor: [
