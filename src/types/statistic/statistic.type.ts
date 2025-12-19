@@ -28,4 +28,18 @@ export interface IBookingStatistic {
   session_cancelation_percentage: { [key: string]: number };
   booking_count_by_day: { [key: string]: number };
   session_average_time: { [key: string]: number };
+  top_packages: ITopPackage[];
+  top_car: ITopCar[];
+}
+
+interface ITopPackage {
+  package_name: string;
+  book_count: number;
+  average_rating: number;
+}
+
+interface ITopCar {
+  car: string;
+  book_count: number;
+  average_rating: number;
 }
