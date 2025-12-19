@@ -423,13 +423,8 @@ function AdminDashboard() {
     };
 
     fetchUserStatisticData();
-  }, [
-    viewMode,
-    selectedYear,
-    selectedMonth,
-    selectedWeek,
-    getUserStatisticData,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewMode, selectedYear, selectedMonth, selectedWeek]);
 
   useEffect(() => {
     const fetchTransactionStatisticData = async () => {
@@ -469,13 +464,8 @@ function AdminDashboard() {
     };
 
     fetchTransactionStatisticData();
-  }, [
-    viewMode,
-    selectedYear,
-    selectedMonth,
-    selectedWeek,
-    getTransactionStatisticData,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewMode, selectedYear, selectedMonth, selectedWeek]);
 
   useEffect(() => {
     const fetchBookingStatisticData = async () => {
@@ -515,13 +505,8 @@ function AdminDashboard() {
     };
 
     fetchBookingStatisticData();
-  }, [
-    viewMode,
-    selectedYear,
-    selectedMonth,
-    selectedWeek,
-    getBookingStatisticData,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewMode, selectedYear, selectedMonth, selectedWeek]);
 
   const bookingTimeData = useMemo(() => {
     const bookingCountByDay = bookingStatisticData?.booking_count_by_day ?? {};
@@ -1097,8 +1082,8 @@ function AdminDashboard() {
                 <div className="flex items-center gap-2">
                   <Zap className="h-5 w-5 text-primary" />
                   <div>
-                    <CardTitle>Tình Trạng Hoạt Động Buổi Huấn Luyện</CardTitle>
-                    <CardDescription>Tỷ lệ buổi huấn luyện</CardDescription>
+                    <CardTitle>Tình Trạng Hoạt Động gói huấn luyện</CardTitle>
+                    <CardDescription>Tỷ lệ gói huấn luyện</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -1171,9 +1156,9 @@ function AdminDashboard() {
                 <div className="flex items-center gap-2">
                   <Calendar className="h-5 w-5 text-primary" />
                   <div>
-                    <CardTitle>Thống Kê Trạng Thái Buổi Huấn Luyện</CardTitle>
+                    <CardTitle>Thống Kê Trạng Thái gói huấn luyện</CardTitle>
                     <CardDescription>
-                      Tình trạng các buổi huấn luyện
+                      Tình trạng các gói huấn luyện
                     </CardDescription>
                   </div>
                 </div>
