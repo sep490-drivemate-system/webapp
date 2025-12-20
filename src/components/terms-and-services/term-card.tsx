@@ -15,28 +15,12 @@ interface TermsCardProps {
 }
 
 export default function TermsCard({ term, userType }: TermsCardProps) {
-  const getIcon = (type: 1 | 2, index: number) => {
-    const newDriverIcons = ["⚠️", "🛡️", "✋", "📱"];
-    const mentorIcons = ["📝", "⭐", "💼", "🔒"];
-
-    if (type === 1) {
-      return newDriverIcons[Number.parseInt(term.id) % newDriverIcons.length];
-    } else {
-      return mentorIcons[Number.parseInt(term.id) % mentorIcons.length];
-    }
-  };
-
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 hover:border-accent/60 bg-card/50 backdrop-blur-sm">
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-3">
-          <CardTitle className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
-            {term.title}
-          </CardTitle>
-          <span className="text-3xl flex-shrink-0">
-            {getIcon(term.type, Number.parseInt(term.id))}
-          </span>
-        </div>
+        <CardTitle className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
+          {term.title}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-foreground/75 leading-relaxed text-sm line-clamp-4">

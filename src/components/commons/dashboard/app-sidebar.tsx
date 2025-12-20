@@ -141,11 +141,6 @@ const data = {
       icon: IconCar,
     },
     {
-      name: "Quản lý bài đăng diễn đàn",
-      url: "/post-review",
-      icon: IconNews,
-    },
-    {
       name: "Quản lý bài đăng",
       url: "/management-post",
       icon: IconArticle,
