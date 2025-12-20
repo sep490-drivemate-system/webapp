@@ -16,6 +16,10 @@ export interface IPostUpdate {
   reasion?: string;
   status?: PostStatus;
 }
+export interface IPostReject {
+  postId: string;
+  reason: string;
+}
 
 export interface IPost {
   id: string;

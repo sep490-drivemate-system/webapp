@@ -6,6 +6,7 @@ import {
     IPostReaction,
     ICommentCreation,
     PostsDTO,
+    IPostReject,
 } from "@/types/forum/post.type";
 import { IPostFilter } from "@/types/forum/post.type.filter";
 import { PaginatedGeneric } from "@/types/generic/genericResponse";
@@ -21,28 +22,55 @@ export const createPost = createThunk<boolean, IPostCreation>(
             const formData = new FormData();
             formData.append("Title", payload.title);
             formData.append("Content", payload.content);
-            payload.tagIds?.forEach((id) => formData.append("TagIds", id));
-            payload.categoryIds?.forEach((id) => formData.append("CategoryIds", id));
 
-            payload.images?.forEach((file, idx) => {
-                formData.append("Images", file);
-                if (payload.imageOrders?.[idx] !== undefined) {
-                    formData.append("ImageOrders", String(payload.imageOrders[idx]!));
-                }
-            });
+            if (payload.tagIds && payload.tagIds.length > 0) {
+                payload.tagIds.forEach((id) => formData.append("TagIds", id));
+            }
 
-            payload.videos?.forEach((file, idx) => {
-                formData.append("Videos", file);
-                if (payload.videoOrders?.[idx] !== undefined) {
-                    formData.append("VideoOrders", String(payload.videoOrders[idx]!));
+            if (payload.categoryIds && payload.categoryIds.length > 0) {
+                payload.categoryIds.forEach((id) => formData.append("CategoryIds", id));
+            }
+
+            if (payload.images && payload.images.length > 0) {
+                payload.images.forEach((file, idx) => {
+                    formData.append("Images", file);
+                    if (payload.imageOrders?.[idx] !== undefined) {
+                        formData.append("ImageOrders", String(payload.imageOrders[idx]!));
+                    }
+                });
+            }
+
+            if (payload.videos && payload.videos.length > 0) {
+                payload.videos.forEach((file, idx) => {
+                    formData.append("Videos", file);
+                    if (payload.videoOrders?.[idx] !== undefined) {
+                        formData.append("VideoOrders", String(payload.videoOrders[idx]!));
+                    }
+                });
+            }
+
+            // Debug: Log FormData contents
+            console.log("[FormData] Title:", payload.title);
+            console.log("[FormData] Content:", payload.content);
+            console.log("[FormData] CategoryIds:", payload.categoryIds);
+            console.log("[FormData] TagIds:", payload.tagIds);
+            console.log("[FormData] Images count:", payload.images?.length || 0);
+            console.log("[FormData] Videos count:", payload.videos?.length || 0);
+
+            // Log FormData entries (for debugging)
+            if (typeof window !== "undefined") {
+                console.log("[FormData] Entries:");
+                for (const [key, value] of formData.entries()) {
+                    if (value instanceof File) {
+                        console.log(`  ${key}: File(${value.name}, ${value.size} bytes, ${value.type})`);
+                    } else {
+                        console.log(`  ${key}:`, value);
+                    }
                 }
-            });
+            }
 
             return formData;
         },
-        config: () => ({
-            headers: { "Content-Type": "multipart/form-data" },
-        }),
     }
 );
 
@@ -73,6 +101,19 @@ export const updatePost = createThunk<boolean, { id: string; data: IPostUpdate }
     {
         buildUrl: (payload) => `${POST_PATH}/${payload.id}`,
         buildBody: (payload) => payload.data,
+    }
+);
+
+export const rejectPost = createThunk<boolean, IPostReject>(
+    HttpMethod.PUT,
+    "rejectPost",
+    `${POST_PATH}/:id/reject`,
+    {
+        buildUrl: (payload) => `${POST_PATH}/${payload.postId}/reject-post`,
+        buildBody: (payload) => ({
+            Reason: payload.reason,
+            PostId: payload.postId,
+        }),
     }
 );
 

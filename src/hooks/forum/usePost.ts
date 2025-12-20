@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { createPost, getPosts, updatePost } from "@/features/forum/postThunk";
+import { createPost, getPosts, updatePost, rejectPost } from "@/features/forum/postThunk";
 import { getCategories } from "@/features/taxonomy/category/categoryThunk";
 import { getTags } from "@/features/taxonomy/tag/tagThunk";
 import { ICategory } from "@/types/taxonomy/category/category.type";
@@ -188,11 +188,16 @@ export const useCreatePost = (onSuccess?: () => void) => {
     }
 
 
+    if (!selectedCategoryId || selectedCategoryId.trim() === "") {
+      toast.error("Vui lòng chọn danh mục.");
+      return;
+    }
+
     const postData: IPostCreation = {
       title: trimmedTitle,
       content: trimmedContent,
       categoryIds: [selectedCategoryId],
-      tagIds: selectedTagIds,
+      tagIds: selectedTagIds.length > 0 ? selectedTagIds : [],
       images: imageFiles.length > 0 ? imageFiles : undefined,
       imageOrders: imageFiles.length > 0 ? imageFiles.map((_, idx) => idx + 1) : undefined,
       videos: videoFiles.length > 0 ? videoFiles : undefined,
@@ -279,6 +284,7 @@ export const usePostManagement = () => {
 
   const { runSafe: runGetPosts } = useThunkAction(getPosts);
   const { runSafe: runUpdatePost, loading: isUpdatingPost } = useThunkAction(updatePost);
+  const { runSafe: runRejectPost, loading: isRejectingPost } = useThunkAction(rejectPost);
 
   useEffect(() => {
     loadPosts();
@@ -358,6 +364,7 @@ export const usePostManagement = () => {
   };
 
   const handleReject = async () => {
+    console.log("handleReject", selectedPost?.postId);
     if (!selectedPost) return;
 
     if (!rejectReason.trim()) {
@@ -367,13 +374,10 @@ export const usePostManagement = () => {
 
     setIsUpdating(true);
     try {
-      const result = await runUpdatePost(
+      const result = await runRejectPost(
         {
-          id: selectedPost.postId,
-          data: {
-            status: PostStatus.Rejected,
-            reasion: rejectReason.trim(),
-          },
+          postId: selectedPost.postId,
+          reason: rejectReason.trim(),
         },
         {
           onSuccess: () => {
@@ -462,7 +466,7 @@ export const usePostManagement = () => {
     // Posts data
     posts: filteredPosts,
     isLoading,
-    isUpdating: isUpdating || isUpdatingPost,
+    isUpdating: isUpdating || isUpdatingPost || isRejectingPost,
 
     // Filters
     searchTerm,
