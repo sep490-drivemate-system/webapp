@@ -1,11 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { TermsList } from "@/components/terms-and-services/terms-list";
 import { TermsFormModal } from "@/components/terms-and-services/terms-form-modal";
 import PageHeader from "@/components/commons/Header/header";
 import { Plus } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/useAppDispatch";
+import { getNewDriverPolicy, getInstructorPolicy, createPolicy, updatePolicy, deletePolicy } from "@/features/policy/policyThunk";
+import { Policy } from "@/types/policy";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Term {
   id: string;
@@ -15,63 +28,62 @@ interface Term {
   createdAt: string;
 }
 
-// Mock data
-const initialTerms: Term[] = [
-  {
-    id: "1",
-    title: "Chính sách hủy lịch",
-    description:
-      "Khách hàng có thể hủy lịch trước 24 giờ mà không mất phí. Hủy trong vòng 24 giờ sẽ tính 50% phí dịch vụ.",
-    type: "1",
-    createdAt: "2025-01-01T10:00:00.000Z",
-  },
-  {
-    id: "2",
-    title: "Yêu cầu về tài liệu tài chính",
-    description:
-      "Người lái mới phải nộp giấy phép lái xe hợp lệ và bằng cấp chứng chỉ lái xe. Tất cả tài liệu phải được xác thực bởi cơ quan chính phủ.",
-    type: "1",
-    createdAt: "2025-01-01T10:05:00.000Z",
-  },
-  {
-    id: "3",
-    title: "Quy tắc an toàn khi lái xe",
-    description:
-      "Người lái mới phải tuân thủ tất cả các quy luật giao thông. Đeo dây an toàn, không sử dụng điện thoại khi lái, giữ tốc độ hợp pháp.",
-    type: "1",
-    createdAt: "2025-01-01T10:10:00.000Z",
-  },
-  {
-    id: "4",
-    title: "Quyền và trách nhiệm của người hướng dẫn",
-    description:
-      "Người hướng dẫn có trách nhiệm giám sát an toàn của người lái. Có quyền yêu cầu dừng lại bất cứ lúc nào nếu thấy nguy hiểm. Phải có bằng cấp hướng dẫn lái xe được công nhân.",
-    type: "2",
-    createdAt: "2025-01-01T10:15:00.000Z",
-  },
-  {
-    id: "5",
-    title: "Mức lương và thanh toán cho người hướng dẫn",
-    description:
-      "Người hướng dẫn sẽ nhận 80% lệ phí hướng dẫn. Thanh toán được thực hiện hàng tuần vào thứ Sáu. Cần cung cấp thông tin ngân hàng để nhận tiền.",
-    type: "2",
-    createdAt: "2025-01-01T10:20:00.000Z",
-  },
-  {
-    id: "6",
-    title: "Bảo hiểm và bảo vệ người hướng dẫn",
-    description:
-      "Công ty bảo vệ toàn bộ bảo hiểm trách nhiệm dân sự. Nếu xảy ra tai nạn, người hướng dẫn sẽ được hỗ trợ y tế. Yêu cầu báo cáo sự cố trong vòng 24 giờ.",
-    type: "2",
-    createdAt: "2025-01-01T10:25:00.000Z",
-  },
-];
-
 export default function AdminTermsPage() {
+  const dispatch = useAppDispatch();
+  const { newDriverPolicies, instructorPolicies, isLoading } = useAppSelector(
+    (state) => state.policy
+  );
+
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedTerm, setSelectedTerm] = useState<Term | undefined>();
   const [loading, setLoading] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [termToDelete, setTermToDelete] = useState<string | null>(null);
+
+  // Fetch policies on mount and when refreshTrigger changes
+  useEffect(() => {
+    dispatch(getNewDriverPolicy())
+      .unwrap()
+      .catch((error) => {
+        console.error("Không thể tải điều khoản người lái mới", error);
+      });
+
+    dispatch(getInstructorPolicy())
+      .unwrap()
+      .catch((error) => {
+        console.error("Không thể tải điều khoản người hướng dẫn", error);
+      });
+  }, [dispatch, refreshTrigger]);
+
+  // Combine and transform policies to Term format
+  const terms = useMemo(() => {
+    const allPolicies: Term[] = [];
+
+    // Transform new driver policies (type 1)
+    newDriverPolicies.forEach((policy) => {
+      allPolicies.push({
+        id: policy.id,
+        title: policy.title,
+        description: policy.detail,
+        type: "1",
+        createdAt: new Date().toISOString(), // API doesn't return createdAt, using current date
+      });
+    });
+
+    // Transform instructor policies (type 2)
+    instructorPolicies.forEach((policy) => {
+      allPolicies.push({
+        id: policy.id,
+        title: policy.title,
+        description: policy.detail,
+        type: "2",
+        createdAt: new Date().toISOString(), // API doesn't return createdAt, using current date
+      });
+    });
+
+    return allPolicies;
+  }, [newDriverPolicies, instructorPolicies]);
 
   const handleEdit = (term: Term) => {
     setSelectedTerm(term);
@@ -86,23 +98,19 @@ export default function AdminTermsPage() {
   const handleSubmit = async (termData: Omit<Term, "id" | "createdAt">) => {
     setLoading(true);
     try {
+      // Transform termData to Policy format (type string -> number, description -> description)
+      const policyData: Omit<Policy, "id"> = {
+        title: termData.title,
+        description: termData.description,
+        type: parseInt(termData.type, 10), // Convert string to number
+      };
+
       if (selectedTerm) {
-        const response = await fetch("/api/terms", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id: selectedTerm.id,
-            ...termData,
-          }),
-        });
-        if (!response.ok) throw new Error("Failed to update");
+        // Update existing policy
+        await dispatch(updatePolicy({ id: selectedTerm.id, data: policyData })).unwrap();
       } else {
-        const response = await fetch("/api/terms", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(termData),
-        });
-        if (!response.ok) throw new Error("Failed to create");
+        // Create new policy
+        await dispatch(createPolicy(policyData)).unwrap();
       }
 
       setModalOpen(false);
@@ -111,6 +119,29 @@ export default function AdminTermsPage() {
     } catch (error) {
       console.error("Error saving term:", error);
       alert("Lỗi khi lưu điều khoản");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = (id: string) => {
+    setTermToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!termToDelete) return;
+
+    setLoading(true);
+    try {
+      // Delete policy using batch API
+      await dispatch(deletePolicy([termToDelete])).unwrap();
+      setRefreshTrigger((prev) => prev + 1);
+      setDeleteDialogOpen(false);
+      setTermToDelete(null);
+    } catch (error) {
+      console.error("Error deleting term:", error);
+      alert("Lỗi khi xóa điều khoản");
     } finally {
       setLoading(false);
     }
@@ -131,7 +162,13 @@ export default function AdminTermsPage() {
         />
 
         <Card className="p-6">
-          <TermsList onEdit={handleEdit} refreshTrigger={refreshTrigger} />
+          <TermsList 
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            refreshTrigger={refreshTrigger}
+            terms={terms}
+            loading={isLoading}
+          />
         </Card>
 
         <TermsFormModal
@@ -141,6 +178,27 @@ export default function AdminTermsPage() {
           onSubmit={handleSubmit}
           loading={loading}
         />
+
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Xác nhận xóa điều khoản</AlertDialogTitle>
+              <AlertDialogDescription>
+                Bạn có chắc chắn muốn xóa điều khoản này? Hành động này không thể hoàn tác.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={loading}>Hủy</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmDelete}
+                disabled={loading}
+                className="bg-destructive text-white hover:bg-destructive/90"
+              >
+                {loading ? "Đang xóa..." : "Xóa"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

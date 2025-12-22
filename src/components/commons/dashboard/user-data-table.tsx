@@ -6,11 +6,8 @@ import {
   IconChevronRight,
   IconChevronsLeft,
   IconChevronsRight,
-  IconPencil,
-  IconPlus,
-  IconTrash,
 } from "@tabler/icons-react";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Ban, CheckCircle2, Eye, MoreHorizontal } from "lucide-react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -61,9 +58,8 @@ export type User = IUserManagement;
 
 interface UserDataTableProps {
   data: User[];
-  onEdit?: (user: User) => void;
-  onDelete?: (userId: string) => void;
-  onAdd?: () => void;
+  onView?: (user: User) => void;
+  onToggleBlock?: (user: User) => void;
 }
 
 // STT column component
@@ -166,14 +162,16 @@ const getStatusLabel = (status: User["status"]): string => {
 function UserTableRow({
   row,
   index,
-  onEdit,
-  onDelete,
+  onView,
+  onToggleBlock,
 }: {
   row: Row<User>;
   index: number;
-  onEdit?: (user: User) => void;
-  onDelete?: (userId: string) => void;
+  onView?: (user: User) => void;
+  onToggleBlock?: (user: User) => void;
 }) {
+  const isBlocked = row.original.status === "Suspended";
+
   return (
     <TableRow data-state={row.getIsSelected() && "selected"}>
       {row.getVisibleCells().map((cell) => {
@@ -195,17 +193,26 @@ function UserTableRow({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onSelect={() => onEdit?.(row.original)}>
-                      <Pencil className="mr-2 size-4" />
-                      Chỉnh sửa
+                    <DropdownMenuItem onSelect={() => onView?.(row.original)}>
+                      <Eye className="mr-2 size-4" />
+                      Xem chi tiết
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      onSelect={() => onDelete?.(row.original.id)}
-                      className="text-red-600"
+                      onSelect={() => onToggleBlock?.(row.original)}
+                      className={isBlocked ? "text-emerald-600" : "text-red-600"}
                     >
-                      <Trash2 className="mr-2 size-4" />
-                      Xóa
+                      {isBlocked ? (
+                        <>
+                          <CheckCircle2 className="mr-2 size-4" />
+                          Bỏ chặn người dùng
+                        </>
+                      ) : (
+                        <>
+                          <Ban className="mr-2 size-4" />
+                          Chặn người dùng
+                        </>
+                      )}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -225,9 +232,8 @@ function UserTableRow({
 
 export function UserDataTable({
   data: initialData,
-  onEdit,
-  onDelete,
-  onAdd,
+  onView,
+  onToggleBlock,
 }: UserDataTableProps) {
   const [data, setData] = React.useState(() => initialData);
   const [columnVisibility, setColumnVisibility] =
@@ -300,13 +306,6 @@ export function UserDataTable({
         ),
       },
       {
-        accessorKey: "createdAt",
-        header: "Ngày tạo",
-        cell: ({ row }) => (
-          <div>{row.original.createdAt.toLocaleDateString("vi-VN")}</div>
-        ),
-      },
-      {
         id: "actions",
         header: () => <div className="text-center">Thao tác</div>,
         cell: () => null, // This will be handled in UserTableRow
@@ -371,8 +370,8 @@ export function UserDataTable({
                       key={row.id}
                       row={row}
                       index={index}
-                      onEdit={onEdit}
-                      onDelete={onDelete}
+                      onView={onView}
+                      onToggleBlock={onToggleBlock}
                     />
                   ))
               ) : (

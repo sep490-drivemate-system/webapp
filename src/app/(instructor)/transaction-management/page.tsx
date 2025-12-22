@@ -218,6 +218,15 @@ export default function TransactionsPage() {
     return filteredTransactions.slice(startIndex, startIndex + pageSize);
   }, [filteredTransactions, currentPage]);
 
+  const hasActiveFilters = useMemo(() => {
+    return (
+      filters.timeRange !== "all" ||
+      filters.amount.trim() !== "" ||
+      filters.status !== "all" ||
+      searchValue.trim() !== ""
+    );
+  }, [filters, searchValue]);
+
   useEffect(() => {
     setCurrentPage(1);
   }, [searchValue, filters]);
@@ -383,7 +392,9 @@ export default function TransactionsPage() {
 
             {!isLoading && paginatedTransactions.length === 0 && (
               <div className="border rounded-xl p-6 text-sm text-gray-600 bg-white">
-                Không có giao dịch phù hợp với bộ lọc hiện tại.
+                {hasActiveFilters
+                  ? "Không có giao dịch phù hợp với bộ lọc hiện tại."
+                  : "Không có giao dịch nào."}
               </div>
             )}
 

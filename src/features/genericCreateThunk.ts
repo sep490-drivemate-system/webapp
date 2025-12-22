@@ -55,9 +55,14 @@ export function createThunk<ResponseType = void, RequestType = void>(
           );
           break;
         case HttpMethod.DELETE:
+          // For DELETE requests with body, pass data in config
+          // Axios delete method accepts body via config.data
+          const deleteConfig = body !== undefined && body !== null
+            ? { ...config, data: body }
+            : config;
           response = await axiosInstance.delete<GenericResponse<ResponseType>>(
             url,
-            config
+            deleteConfig
           );
           break;
         default:
