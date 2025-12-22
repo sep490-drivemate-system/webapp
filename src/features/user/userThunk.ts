@@ -1,4 +1,4 @@
-import { EditUserPayload, IUserInfo, InstructorDetailDTO, UpdateInstructorPayload } from "@/types/user/user-profile.type";
+import { EditUserPayload, IUserInfo, InstructorDetailDTO, UpdateInstructorPayload, createUserForAdmin } from "@/types/user/user-profile.type";
 import { createThunk } from "../genericCreateThunk";
 import { HttpMethod } from "@/types/constants/httpMethod";
 import { createAsyncThunk } from "@reduxjs/toolkit";
@@ -195,4 +195,45 @@ function createEditUserFormData(payload: EditUserPayload): FormData {
     
     return formData;
 }
+export const getAllUser = createThunk<
+    IUserInfo[],
+    void
+>(
+    HttpMethod.GET,
+    "getAllUser",
+    `/${USER_PATH}`
+);
+export const createUserForAdminThunk = createAsyncThunk<
+    GenericResponse<IUserInfo>,
+    createUserForAdmin,
+    { rejectValue: string }
+>(
+    "createUserForAdmin",
+    async (payload, { rejectWithValue }) => {
+        const url = `/${USER_PATH}`;
 
+        try {
+            const response = await axiosInstance.post<GenericResponse<IUserInfo>>(url, payload);
+            console.log(`[Thunk] Response:`, response.data);
+            return response.data;
+        } catch (err) {
+            const error = err as unknown as {
+                response?: { data?: { message?: string } };
+                message?: string;
+            };
+
+            console.log(`[Thunk Error] POST ${url}:`, error);
+
+            let message = "";
+            if (error.response?.data?.message) {
+                message = error.response.data.message;
+            } else if (error.message) {
+                message = error.message;
+            } else {
+                message = "Đã xảy ra lỗi. Vui lòng thử lại.";
+            }
+
+            return rejectWithValue(message);
+        }
+    }
+);
