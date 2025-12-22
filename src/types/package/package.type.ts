@@ -48,6 +48,11 @@ export interface DrivingSkill {
   display_name: string;
 }
 
+export interface createUpdateDrivingSkill{
+  id: string;
+  name: string;
+}
+
 export type RoadType = {
   id: string;
   name: string;
