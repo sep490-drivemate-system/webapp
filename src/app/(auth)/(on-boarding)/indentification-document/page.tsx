@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,12 +28,18 @@ import { cn } from "@/lib/utils";
 import { useSignUp } from "@/hooks/auth/useSignUp";
 import type { InstructorRegistrationRequest } from "@/types/auth/instructor-registration.type";
 
+const ID_API_URL = process.env.NEXT_PUBLIC_FPT_AI_ID_API_URL as string;
+const API_KEY = process.env.NEXT_PUBLIC_FPT_AI_API_KEY as string;
+const LICENSE_API_URL = process.env.NEXT_PUBLIC_FPT_AI_DLC_API_URL as string;
+
 export default function IdentificationDocumentPage() {
   const router = useRouter();
   const { handleRegisterInstructor, instructorLoading, signupData } =
     useSignUp();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isProcessingId, setIsProcessingId] = useState(false);
+  const [isProcessingLicense, setIsProcessingLicense] = useState(false);
   const [formData, setFormData] = useState<{
     // Ảnh đại diện
     avatar: File | null;
@@ -51,6 +58,8 @@ export default function IdentificationDocumentPage() {
     trainingClass: string;
     // Giấy khám sức khỏe
     healthCertificate: File | null;
+    // Lí lịch tư pháp
+    criminalRecord: File | null;
     // Thông tin liên hệ khẩn cấp
     emergencyContactName: string;
     emergencyContactPhone: string;
@@ -72,6 +81,8 @@ export default function IdentificationDocumentPage() {
     trainingClass: "",
     // Giấy khám sức khỏe
     healthCertificate: null,
+    // Lí lịch tư pháp
+    criminalRecord: null,
     // Thông tin liên hệ khẩn cấp
     emergencyContactName: "",
     emergencyContactPhone: "",
@@ -120,11 +131,147 @@ export default function IdentificationDocumentPage() {
     return dateStr;
   };
 
+  const processIdImage = async (file: File) => {
+    try {
+      setIsProcessingId(true);
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const response = await axios.post(ID_API_URL, formData, {
+        headers: {
+          "api-key": API_KEY,
+        },
+      });
+
+      console.log("API Response:", response.data);
+
+      // Get first element from response array
+      const data = response.data.data[0];
+
+      console.log("Extracted data:", data);
+
+      if (data) {
+        // Extract name, sex, dob - handle both lowercase and uppercase field names
+        const name = data.name || data.Name || data.NAME || "";
+        const sex = data.sex || data.Sex || data.SEX || "";
+        const dob =
+          data.dob ||
+          data.Dob ||
+          data.DOB ||
+          data.dateOfBirth ||
+          data.DateOfBirth ||
+          "";
+
+        console.log("Extracted values:", { name, sex, dob });
+
+        // Map sex: "NAM" -> "Male", "NỮ" or "NU" -> "Female"
+        let gender = "";
+        const sexUpper = sex.toUpperCase().trim();
+        if (sexUpper === "NAM") {
+          gender = "Male";
+        } else if (
+          sexUpper === "NỮ" ||
+          sexUpper === "NU" ||
+          sexUpper === "NỮ"
+        ) {
+          gender = "Female";
+        }
+
+        // Parse dob from dd/mm/yyyy to yyyy-MM-dd
+        let formattedDob = "";
+        if (dob) {
+          formattedDob = parseDateForStorage(dob);
+        }
+
+        console.log("Mapped values:", { name, gender, formattedDob });
+
+        // Update form data
+        setFormData((prev) => ({
+          ...prev,
+          citizenIdFullName: name,
+          citizenIdGender: gender,
+          citizenIdDateOfBirth: formattedDob,
+        }));
+
+        console.log("Form data updated");
+      } else {
+        console.warn("No data found in response");
+      }
+    } catch (error) {
+      console.error("Error processing ID image:", error);
+      if (axios.isAxiosError(error)) {
+        console.error("Error response:", error.response?.data);
+        console.error("Error status:", error.response?.status);
+      }
+    } finally {
+      setIsProcessingId(false);
+    }
+  };
+
+  const processLicenseImage = async (file: File) => {
+    try {
+      setIsProcessingLicense(true);
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const response = await axios.post(LICENSE_API_URL, formData, {
+        headers: {
+          "api-key": API_KEY,
+        },
+      });
+
+      console.log("License API Response:", response.data);
+
+      // Get first element from response array
+      const data = response.data.data[0];
+
+      console.log("Extracted license data:", data);
+
+      if (data) {
+        // Extract driver license class/tier - handle both lowercase and uppercase field names
+        const licenseClass = data.class 
+        console.log("Extracted license class:", licenseClass);
+
+        if (licenseClass) {
+          // Update form data with extracted license class
+          setFormData((prev) => ({
+            ...prev,
+            driverLicenseClass: licenseClass,
+          }));
+
+          console.log("License form data updated");
+        } else {
+          console.warn("No license class found in response");
+        }
+      } else {
+        console.warn("No data found in license response");
+      }
+    } catch (error) {
+      console.error("Error processing license image:", error);
+      if (axios.isAxiosError(error)) {
+        console.error("Error response:", error.response?.data);
+        console.error("Error status:", error.response?.status);
+      }
+    } finally {
+      setIsProcessingLicense(false);
+    }
+  };
+
   const handleImageUpload = (field: string, file: File | null) => {
     setFormData((prev) => ({
       ...prev,
       [field]: file,
     }));
+
+    // If citizenIdFront is uploaded, call API to extract information
+    if (field === "citizenIdFront" && file) {
+      processIdImage(file);
+    }
+
+    // If driverLicenseFront is uploaded, call API to extract information
+    if (field === "driverLicenseFront" && file) {
+      processLicenseImage(file);
+    }
   };
 
   // Create preview URLs for File objects and cleanup old URLs
@@ -158,6 +305,9 @@ export default function IdentificationDocumentPage() {
     if (formData.healthCertificate) {
       urls.healthCertificate = URL.createObjectURL(formData.healthCertificate);
     }
+    if (formData.criminalRecord) {
+      urls.criminalRecord = URL.createObjectURL(formData.criminalRecord);
+    }
 
     // Cleanup old URLs before setting new ones
     setPreviewUrls((oldUrls) => {
@@ -174,6 +324,7 @@ export default function IdentificationDocumentPage() {
     formData.driverLicenseBack,
     formData.trainingCertificate,
     formData.healthCertificate,
+    formData.criminalRecord,
   ]);
 
   // Cleanup all URLs on unmount
@@ -202,7 +353,8 @@ export default function IdentificationDocumentPage() {
         !formData.driverLicenseFront ||
         !formData.driverLicenseBack ||
         !formData.trainingCertificate ||
-        !formData.healthCertificate
+        !formData.healthCertificate ||
+        !formData.criminalRecord
       ) {
         alert("Vui lòng điền đầy đủ thông tin bắt buộc.");
         setIsSubmitting(false);
@@ -236,7 +388,7 @@ export default function IdentificationDocumentPage() {
         TeachingLicenseFront: formData.trainingCertificate,
         TeachingTier: formData.trainingClass,
         HealthCheckup: formData.healthCertificate,
-        PersonalProfile: formData.citizenIdFront,
+        PersonalProfile: formData.criminalRecord,
       };
 
       // Call API
@@ -309,15 +461,22 @@ export default function IdentificationDocumentPage() {
                 </CardHeader>
                 <CardContent className="pt-4 space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <ImageUploadField
-                      label="Ảnh Mặt Trước"
-                      onUpload={(file) =>
-                        handleImageUpload("citizenIdFront", file)
-                      }
-                      preview={previewUrls.citizenIdFront}
-                      labelClassName="text-white"
-                      uploadAreaClassName="border-2 border-dashed border-[#10b981]/50 rounded-lg p-6 text-center cursor-pointer transition-colors bg-[#10b981]/10 hover:bg-[#10b981]/20"
-                    />
+                    <div>
+                      <ImageUploadField
+                        label="Ảnh Mặt Trước"
+                        onUpload={(file) =>
+                          handleImageUpload("citizenIdFront", file)
+                        }
+                        preview={previewUrls.citizenIdFront}
+                        labelClassName="text-white"
+                        uploadAreaClassName="border-2 border-dashed border-[#10b981]/50 rounded-lg p-6 text-center cursor-pointer transition-colors bg-[#10b981]/10 hover:bg-[#10b981]/20"
+                      />
+                      {isProcessingId && (
+                        <p className="text-sm text-[#10b981] mt-2">
+                          Đang xử lý ảnh và trích xuất thông tin...
+                        </p>
+                      )}
+                    </div>
                     <ImageUploadField
                       label="Ảnh Mặt Sau"
                       onUpload={(file) =>
@@ -498,15 +657,22 @@ export default function IdentificationDocumentPage() {
                 </CardHeader>
                 <CardContent className="pt-4 space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <ImageUploadField
-                      label="Ảnh Mặt Trước"
-                      onUpload={(file) =>
-                        handleImageUpload("driverLicenseFront", file)
-                      }
-                      preview={previewUrls.driverLicenseFront}
-                      labelClassName="text-white"
-                      uploadAreaClassName="border-2 border-dashed border-[#10b981]/50 rounded-lg p-6 text-center cursor-pointer transition-colors bg-[#10b981]/10 hover:bg-[#10b981]/20"
-                    />
+                    <div>
+                      <ImageUploadField
+                        label="Ảnh Mặt Trước"
+                        onUpload={(file) =>
+                          handleImageUpload("driverLicenseFront", file)
+                        }
+                        preview={previewUrls.driverLicenseFront}
+                        labelClassName="text-white"
+                        uploadAreaClassName="border-2 border-dashed border-[#10b981]/50 rounded-lg p-6 text-center cursor-pointer transition-colors bg-[#10b981]/10 hover:bg-[#10b981]/20"
+                      />
+                      {isProcessingLicense && (
+                        <p className="text-sm text-[#10b981] mt-2">
+                          Đang xử lý ảnh và trích xuất thông tin...
+                        </p>
+                      )}
+                    </div>
                     <ImageUploadField
                       label="Ảnh Mặt Sau"
                       onUpload={(file) =>
@@ -533,46 +699,10 @@ export default function IdentificationDocumentPage() {
                       </SelectTrigger>
                       <SelectContent className="bg-[#10b981]/20 backdrop-blur-md border-[#10b981]/50">
                         <SelectItem
-                          value="A1"
-                          className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
-                        >
-                          Hạng A1
-                        </SelectItem>
-                        <SelectItem
-                          value="A2"
-                          className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
-                        >
-                          Hạng A2
-                        </SelectItem>
-                        <SelectItem
-                          value="A"
-                          className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
-                        >
-                          Hạng A
-                        </SelectItem>
-                        <SelectItem
-                          value="B1"
-                          className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
-                        >
-                          Hạng B1
-                        </SelectItem>
-                        <SelectItem
-                          value="B2"
-                          className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
-                        >
-                          Hạng B2
-                        </SelectItem>
-                        <SelectItem
                           value="B"
                           className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
                         >
                           Hạng B
-                        </SelectItem>
-                        <SelectItem
-                          value="C1"
-                          className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
-                        >
-                          Hạng C1
                         </SelectItem>
                         <SelectItem
                           value="C"
@@ -581,10 +711,10 @@ export default function IdentificationDocumentPage() {
                           Hạng C
                         </SelectItem>
                         <SelectItem
-                          value="D1"
+                          value="C1"
                           className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
                         >
-                          Hạng D1
+                          Hạng C1
                         </SelectItem>
                         <SelectItem
                           value="D"
@@ -593,16 +723,52 @@ export default function IdentificationDocumentPage() {
                           Hạng D
                         </SelectItem>
                         <SelectItem
-                          value="E"
+                          value="D1"
                           className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
                         >
-                          Hạng E
+                          Hạng D1
                         </SelectItem>
                         <SelectItem
-                          value="F"
+                          value="D2"
                           className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
                         >
-                          Hạng F
+                          Hạng D2
+                        </SelectItem>
+                        <SelectItem
+                          value="BE"
+                          className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
+                        >
+                          Hạng BE
+                        </SelectItem>
+                        <SelectItem
+                          value="C1E"
+                          className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
+                        >
+                          Hạng C1E
+                        </SelectItem>
+                        <SelectItem
+                          value="CE"
+                          className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
+                        >
+                          Hạng CE
+                        </SelectItem>
+                        <SelectItem
+                          value="DE"
+                          className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
+                        >
+                          Hạng DE
+                        </SelectItem>
+                        <SelectItem
+                          value="D1E"
+                          className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
+                        >
+                          Hạng D1E
+                        </SelectItem>
+                        <SelectItem
+                          value="D2E"
+                          className="text-[#10b981] focus:bg-[#10b981]/30 focus:text-white hover:bg-[#10b981]/20"
+                        >
+                          Hạng D2E
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -734,6 +900,26 @@ export default function IdentificationDocumentPage() {
                       handleImageUpload("healthCertificate", file)
                     }
                     preview={previewUrls.healthCertificate}
+                    labelClassName="text-white"
+                    uploadAreaClassName="border-2 border-dashed border-[#10b981]/50 rounded-lg p-6 text-center cursor-pointer transition-colors bg-[#10b981]/10 hover:bg-[#10b981]/20"
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Lí lịch tư pháp */}
+              <Card className="border-[#10b981]/50 bg-white/5">
+                <CardHeader>
+                  <CardTitle className="text-[#10b981] text-lg">
+                    Lí Lịch Tư Pháp
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <ImageUploadField
+                    label="Ảnh Lí Lịch Tư Pháp"
+                    onUpload={(file) =>
+                      handleImageUpload("criminalRecord", file)
+                    }
+                    preview={previewUrls.criminalRecord}
                     labelClassName="text-white"
                     uploadAreaClassName="border-2 border-dashed border-[#10b981]/50 rounded-lg p-6 text-center cursor-pointer transition-colors bg-[#10b981]/10 hover:bg-[#10b981]/20"
                   />

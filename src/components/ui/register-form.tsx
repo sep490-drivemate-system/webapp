@@ -85,8 +85,19 @@ export function RegisterForm({
     // Validate password
     if (!formData.password) {
       newErrors.password = "Mật khẩu là bắt buộc";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Mật khẩu phải có ít nhất 6 ký tự";
+    } else {
+      const password = formData.password;
+      const hasMinLength = password.length >= 6;
+      const hasUpperCase = /[A-Z]/.test(password);
+      const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+      
+      if (!hasMinLength) {
+        newErrors.password = "Mật khẩu phải có ít nhất 6 ký tự";
+      } else if (!hasUpperCase) {
+        newErrors.password = "Mật khẩu phải có ít nhất 1 ký tự viết hoa";
+      } else if (!hasSpecialChar) {
+        newErrors.password = "Mật khẩu phải có ít nhất 1 ký tự đặc biệt";
+      }
     }
 
     // Validate confirm password
@@ -206,7 +217,6 @@ export function RegisterForm({
                     value={formData.email}
                     onChange={(e) => handleChange("email", e.target.value)}
                     className="text-[#10b981] placeholder:text-gray-400 border-[#10b981]/50 focus:border-[#10b981] focus:ring-[#10b981] bg-transparent"
-                    required
                   />
                   {errors.email && (
                     <p className="text-red-400 text-sm mt-1">{errors.email}</p>
@@ -223,7 +233,6 @@ export function RegisterForm({
                     value={formData.phone}
                     onChange={(e) => handleChange("phone", e.target.value)}
                     className="text-[#10b981] placeholder:text-gray-400 border-[#10b981]/50 focus:border-[#10b981] focus:ring-[#10b981] bg-transparent"
-                    required
                   />
                   {errors.phone && (
                     <p className="text-red-400 text-sm mt-1">{errors.phone}</p>
@@ -241,7 +250,6 @@ export function RegisterForm({
                       value={formData.password}
                       onChange={(e) => handleChange("password", e.target.value)}
                       className="text-[#10b981] placeholder:text-gray-400 border-[#10b981]/50 focus:border-[#10b981] focus:ring-[#10b981] bg-transparent pr-10"
-                      required
                     />
                     <button
                       type="button"
@@ -278,7 +286,6 @@ export function RegisterForm({
                         handleChange("confirmPassword", e.target.value)
                       }
                       className="text-[#10b981] placeholder:text-gray-400 border-[#10b981]/50 focus:border-[#10b981] focus:ring-[#10b981] bg-transparent pr-10"
-                      required
                     />
                     <button
                       type="button"
