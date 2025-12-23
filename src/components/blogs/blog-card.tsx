@@ -25,7 +25,7 @@ interface BlogCardProps {
   title: string;
   content: string;
   image: string;
-  publishedAt: string;
+  publishedAt?: string;
   author?: BlogAuthor;
   readTime?: number;
   variant?: "instructor" | "publish" | "inspector"; // keep inspector as backward alias
@@ -58,7 +58,7 @@ export function BlogCard({
   statusLabel,
   statusClassName,
 }: BlogCardProps) {
-  const formattedDate = formatDate(publishedAt);
+  const formattedDate = publishedAt ? formatDate(publishedAt) : null;
   const contentPreview = getPreviewFromContent(content, previewLength);
   const linkPath =
     detailLink ||
@@ -81,7 +81,9 @@ export function BlogCard({
         </div>
         <CardHeader className="space-y-3 px-4 pt-4 flex-1">
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            <p className="text-xs text-muted-foreground">{formattedDate}</p>
+            {formattedDate && (
+              <p className="text-xs text-muted-foreground">{formattedDate}</p>
+            )}
             {statusLabel ? (
               <span
                 className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${statusClassName ?? "bg-muted text-muted-foreground"}`}
@@ -157,7 +159,9 @@ export function BlogCard({
               Không có thông tin tác giả
             </span>
           )}
-          <span className="text-xs text-gray-500">{formattedDate}</span>
+          {formattedDate && (
+            <span className="text-xs text-gray-500">{formattedDate}</span>
+          )}
         </div>
       </CardContent>
 

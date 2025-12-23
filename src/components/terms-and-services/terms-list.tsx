@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -30,7 +30,10 @@ interface Term {
 
 interface TermsListProps {
   onEdit: (term: Term) => void;
+  onDelete: (id: string) => void;
   refreshTrigger: number;
+  terms: Term[];
+  loading: boolean;
 }
 
 const getTypeLabel = (type: string): string => {
@@ -46,9 +49,7 @@ const getTypeLabel = (type: string): string => {
 
 const DEFAULT_PAGE_SIZE = 10;
 
-export function TermsList({ onEdit, refreshTrigger }: TermsListProps) {
-  const [terms, setTerms] = useState<Term[]>([]);
-  const [loading, setLoading] = useState(true);
+export function TermsList({ onEdit, onDelete, refreshTrigger, terms, loading }: TermsListProps) {
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   const { page, totalPages, currentItems, setPage, next, prev } = usePagination(
@@ -56,34 +57,8 @@ export function TermsList({ onEdit, refreshTrigger }: TermsListProps) {
     pageSize
   );
 
-  useEffect(() => {
-    fetchTerms();
-  }, [refreshTrigger]);
-
-  const fetchTerms = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch("/api/terms");
-      if (!response.ok) throw new Error("Failed to fetch");
-      const data = await response.json();
-      setTerms(data);
-    } catch (error) {
-      console.error("Error fetching terms:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Bạn có chắc chắn muốn xóa điều khoản này?")) return;
-
-    try {
-      const response = await fetch(`/api/terms?id=${id}`, { method: "DELETE" });
-      if (!response.ok) throw new Error("Failed to delete");
-      setTerms(terms.filter((t) => t.id !== id));
-    } catch (error) {
-      console.error("Error deleting term:", error);
-    }
+  const handleDelete = (id: string) => {
+    onDelete(id);
   };
 
   const canGoPrevious = page > 1;

@@ -53,10 +53,10 @@ export function SetSchedule() {
           <div className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-primary" />
             <div>
-              <CardTitle>Cấu Hình Thời Gian Hẹn Lịch</CardTitle>
+              <CardTitle className="text-xl">Chính sách hẹn lịch</CardTitle>
               <CardDescription>
                 Thiết lập thời gian tối đa giữa khi người hướng dẫn nộp giấy tờ
-                và khi người kiểm duyệt xem xét tại trung tâm
+                và khi người kiểm duyệt xem xét tại trung tâm.
               </CardDescription>
             </div>
           </div>
@@ -109,8 +109,7 @@ export function SetSchedule() {
               disabled={isSaving || maxDays < 1 || maxDays > 365}
               className="flex items-center gap-2"
             >
-              <Save className="h-4 w-4" />
-              {isSaving ? "Đang lưu..." : "Lưu Cấu Hình"}
+              {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
             </Button>
             <p className="text-sm text-muted-foreground">
               Giá trị hiện tại:{" "}

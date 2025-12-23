@@ -8,6 +8,7 @@ import {
   Package,
   PaginatedPackagesResponse,
   RoadType,
+  createUpdateDrivingSkill,
 } from "@/types/package/package.type";
 
 export const PACKAGE_PATH = "package";
@@ -53,17 +54,7 @@ export const getInstructorPackages = createThunk<
   }
 );
 
-export const getDrivingSkills = createThunk<DrivingSkill[]>(
-  HttpMethod.GET,
-  "driving-skill",
-  `skills`
-);
 
-export const getRoadTypes = createThunk<RoadType[]>(
-  HttpMethod.GET,
-  "road-type",
-  `roadtypes`
-);
 
 export const createInstructorPackage = createThunk<
   boolean,
@@ -75,3 +66,96 @@ export const getRecommendedPackages = createThunk<Package[]>(
   "getRecommendedPackages",
   `${PACKAGE_PATH}/recommended`
 );
+
+export const getRoadTypes = createThunk<RoadType[]>(
+  HttpMethod.GET,
+  "road-type",
+  `roadtypes`
+);
+
+type CreateRoadTypePayload = {
+  name: string;
+  description?: string | null;
+};
+
+type UpdateRoadTypePayload = {
+  id: string;
+  name: string;
+  description?: string | null;
+};
+
+type DeleteRoadTypePayload = {
+  id: string;
+};
+
+export const createRoadType = createThunk<RoadType, CreateRoadTypePayload>(
+  HttpMethod.POST,
+  "createRoadType",
+  `roadtypes`,
+  {
+    buildBody: (payload) => ({
+      name: payload.name,
+      description: payload.description ?? null,
+    }),
+  }
+);
+
+export const updateRoadType = createThunk<RoadType, UpdateRoadTypePayload>(
+  HttpMethod.PUT,
+  "updateRoadType",
+  `roadtypes/:id`,
+  {
+    buildUrl: (payload) => `roadtypes/${payload.id}`,
+    buildBody: (payload) => ({
+      name: payload.name,
+      description: payload.description ?? null,
+    }),
+  }
+);
+
+export const deleteRoadType = createThunk<boolean, DeleteRoadTypePayload>(
+  HttpMethod.DELETE,
+  "deleteRoadType",
+  `roadtypes/:id`,
+  {
+    buildUrl: (payload) => `roadtypes/${payload.id}`,
+    buildBody: () => undefined,
+  }
+);
+
+export const getDrivingSkills = createThunk<DrivingSkill[]>(
+  HttpMethod.GET,
+  "driving-skill",
+  `skills`
+);
+
+type CreateDrivingSkillPayload = Pick<createUpdateDrivingSkill, "name">;
+type UpdateDrivingSkillPayload = createUpdateDrivingSkill;
+type DeleteDrivingSkillPayload = Pick<createUpdateDrivingSkill, "id">;
+
+export const createDrivingSkill = createThunk<
+  DrivingSkill,
+  CreateDrivingSkillPayload
+>(HttpMethod.POST, "createDrivingSkill", `skills`, {
+  buildBody: (payload) => ({
+    name: payload.name,
+  }),
+});
+
+export const updateDrivingSkill = createThunk<
+  DrivingSkill,
+  UpdateDrivingSkillPayload
+>(HttpMethod.PUT, "updateDrivingSkill", `skills/:id`, {
+  buildUrl: (payload) => `skills/${payload.id}`,
+  buildBody: (payload) => ({
+    name: payload.name,
+  }),
+});
+
+export const deleteDrivingSkill = createThunk<
+  boolean,
+  DeleteDrivingSkillPayload
+>(HttpMethod.DELETE, "deleteDrivingSkill", `skills/:id`, {
+  buildUrl: (payload) => `skills/${payload.id}`,
+  buildBody: () => undefined,
+});

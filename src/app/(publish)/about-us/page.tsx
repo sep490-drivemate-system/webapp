@@ -237,27 +237,6 @@ export default function AboutUsPage() {
               );
             })}
           </div>
-
-          <div className="mt-16 grid md:grid-cols-3 gap-6">
-            <Card className="p-6 border border-emerald-700 bg-gradient-to-br from-emerald-100 to-emerald-500/30 text-center">
-              <p className="text-4xl font-bold text-emerald-700 mb-2">99%</p>
-              <p className="text-foreground/70">
-                Mức độ hài lòng của người dùng
-              </p>
-            </Card>
-            <Card className="p-6 border border-amber-600 bg-gradient-to-br from-amber-100 to-amber-400/40 text-center">
-              <p className="text-4xl font-bold text-amber-600 mb-2">5.0</p>
-              <p className="text-foreground/70">
-                Đánh giá trung bình từ huấn luyện viên
-              </p>
-            </Card>
-            <Card className="p-6 border border-emerald-700 bg-gradient-to-br from-emerald-100 to-emerald-500/30 text-center">
-              <p className="text-4xl font-bold text-emerald-700 mb-2">24/7</p>
-              <p className="text-foreground/70">
-                Hỗ trợ khách hàng luôn sẵn sàng
-              </p>
-            </Card>
-          </div>
         </div>
       </section>
     </main>

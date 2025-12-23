@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,17 +13,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import {
   Select,
   SelectContent,
@@ -51,11 +40,13 @@ import {
   UserCog,
   UserPlus,
 } from "lucide-react";
-import { useRequireAuth } from "@/hooks/auth/useRequireAuth";
 import { UserRole } from "@/types/auth/user-role.enum";
 import { IUserManagement } from "@/types/user/manage-user.type";
 import { UserDataTable } from "@/components/commons/dashboard/user-data-table";
 import PageHeader from "@/components/commons/Header/header";
+import { useAppDispatch } from "@/lib/redux/useAppDispatch";
+import { createUserForAdminThunk, getAllUser } from "@/features/user/userThunk";
+import { Gender } from "@/types/user/gender.enum";
 
 const changeClassMap: Record<"up" | "down" | "neutral", string> = {
   up: "text-emerald-500",
@@ -71,140 +62,11 @@ const getChangeColor = (change: string): "up" | "down" | "neutral" => {
   return "neutral";
 };
 
-// Mock data using IUserManagement interface
-const initialUsers: IUserManagement[] = [
-  {
-    id: "1",
-    userName: "Nguyễn Văn An",
-    email: "nguyenvanan@example.com",
-    phone: "0901234567",
-    role: UserRole.Admin,
-    status: "Active",
-    createdAt: new Date("2024-01-15"),
-  },
-  {
-    id: "2",
-    userName: "Trần Thị Bình",
-    email: "tranthibinh@example.com",
-    phone: "0912345678",
-    role: UserRole.Inspector,
-    status: "Active",
-    createdAt: new Date("2024-02-20"),
-  },
-  {
-    id: "3",
-    userName: "Lê Văn Cường",
-    email: "levancuong@example.com",
-    phone: "0923456789",
-    role: UserRole.Instructor,
-    status: "Active",
-    createdAt: new Date("2024-03-10"),
-  },
-  {
-    id: "4",
-    userName: "Phạm Thị Dung",
-    email: "phamthidung@example.com",
-    phone: "0934567890",
-    role: UserRole.NoviceDriver,
-    status: "Inactive",
-    createdAt: new Date("2024-03-25"),
-  },
-  {
-    id: "5",
-    userName: "Hoàng Minh Đức",
-    email: "hoangminhduc@example.com",
-    phone: "0945678901",
-    role: UserRole.Instructor,
-    status: "Active",
-    createdAt: new Date("2024-04-05"),
-  },
-  {
-    id: "6",
-    userName: "Vũ Thị Hoa",
-    email: "vuthihoa@example.com",
-    phone: "0956789012",
-    role: UserRole.NoviceDriver,
-    status: "Active",
-    createdAt: new Date("2024-04-12"),
-  },
-  {
-    id: "7",
-    userName: "Đỗ Văn Hùng",
-    email: "dovanhung@example.com",
-    phone: "0967890123",
-    role: UserRole.Inspector,
-    status: "Active",
-    createdAt: new Date("2024-04-18"),
-  },
-  {
-    id: "8",
-    userName: "Bùi Thị Lan",
-    email: "buithilan@example.com",
-    phone: "0978901234",
-    role: UserRole.NoviceDriver,
-    status: "Suspended",
-    createdAt: new Date("2024-04-22"),
-  },
-  {
-    id: "9",
-    userName: "Ngô Văn Minh",
-    email: "ngovanminh@example.com",
-    phone: "0989012345",
-    role: UserRole.Instructor,
-    status: "Active",
-    createdAt: new Date("2024-05-01"),
-  },
-  {
-    id: "10",
-    userName: "Lý Thị Nga",
-    email: "lythinga@example.com",
-    phone: "0990123456",
-    role: UserRole.NoviceDriver,
-    status: "Active",
-    createdAt: new Date("2024-05-08"),
-  },
-  {
-    id: "11",
-    userName: "Trương Văn Phúc",
-    email: "truongvanphuc@example.com",
-    phone: "0901234568",
-    role: UserRole.NoviceDriver,
-    status: "Inactive",
-    createdAt: new Date("2024-05-15"),
-  },
-  {
-    id: "12",
-    userName: "Đinh Thị Quỳnh",
-    email: "dinhthiquynh@example.com",
-    phone: "0912345679",
-    role: UserRole.Instructor,
-    status: "Active",
-    createdAt: new Date("2024-05-20"),
-  },
-  {
-    id: "13",
-    userName: "Phan Văn Sơn",
-    email: "phanvanson@example.com",
-    phone: "0923456780",
-    role: UserRole.NoviceDriver,
-    status: "Active",
-    createdAt: new Date("2024-05-25"),
-  },
-  {
-    id: "14",
-    userName: "Mai Thị Tâm",
-    email: "maithitam@example.com",
-    phone: "0934567891",
-    role: UserRole.Inspector,
-    status: "Active",
-    createdAt: new Date("2024-06-01"),
-  },
-];
-
 export default function ManagementUserPage() {
   // useRequireAuth([UserRole.Admin, UserRole.Manager]);
 
-  const [users, setUsers] = useState<IUserManagement[]>(initialUsers);
+  const dispatch = useAppDispatch();
+  const [users, setUsers] = useState<IUserManagement[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -212,22 +74,86 @@ export default function ManagementUserPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<IUserManagement | null>(null);
   const [formData, setFormData] = useState({
-    userName: "",
+    username: "",
+    password: "",
     email: "",
-    phone: "",
-    role: UserRole.NoviceDriver as UserRole,
-    status: "Active" as string,
+    fullname: "",
+    phoneNumber: "",
+    gender: Gender.Male as Gender,
+    dateOfBirth: "",
+    role: UserRole.Inspector as UserRole,
   });
+  const [errors, setErrors] = useState<Partial<Record<keyof typeof formData, string>>>({});
+
+  // Fetch users from API
+  useEffect(() => {
+    let isMounted = true;
+
+    dispatch(getAllUser())
+      .unwrap()
+      .then((res: any) => {
+        if (!isMounted) return;
+
+        let apiUsers: any[] = [];
+
+        // Trường hợp API theo chuẩn GenericResponse { value: T }
+        if (res && typeof res === "object" && "value" in res) {
+          const value = (res as any).value;
+
+          if (Array.isArray(value)) {
+            apiUsers = value;
+          } else if (value && Array.isArray(value.pageContent)) {
+            // Trường hợp API trả về dạng phân trang PaginatedGeneric<T>
+            apiUsers = value.pageContent;
+          }
+        }
+        // Trường hợp API trả trực tiếp mảng người dùng
+        else if (Array.isArray(res)) {
+          apiUsers = res;
+        }
+
+        if (!Array.isArray(apiUsers)) {
+          console.error("getAllUser returned unexpected format:", res);
+          apiUsers = [];
+        }
+
+        const mappedUsers: IUserManagement[] = apiUsers.map((u: any) => ({
+          id: u.userId,
+          userName: u.fullName,
+          email: u.email,
+          phone: u.phone,
+          role: u.role,
+          // Backend model không có trường này, tạm thời đặt mặc định
+          status: "Active",
+          // Nếu backend có ngày tạo trong tương lai, có thể thay thế tại đây
+          createdAt: new Date(),
+        }));
+
+        setUsers(mappedUsers);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch users:", err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [dispatch]);
 
   // Filter users based on search term and filters
   const filteredUsers = users.filter((user) => {
+    const safeUserName = (user.userName || "").toLowerCase();
+    const safeEmail = (user.email || "").toLowerCase();
+    const safePhone = user.phone || "";
+    const search = searchTerm.toLowerCase();
+
     const matchesSearch =
-      user.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.phone.includes(searchTerm);
+      safeUserName.includes(search) ||
+      safeEmail.includes(search) ||
+      safePhone.includes(searchTerm);
 
     const matchesRole =
-      roleFilter === "all" || UserRole[user.role] === roleFilter;
+      roleFilter === "all" || String(user.role) === roleFilter;
     const matchesStatus =
       statusFilter === "all" || user.status === statusFilter;
 
@@ -248,51 +174,120 @@ export default function ManagementUserPage() {
   // Reset form
   const resetForm = () => {
     setFormData({
-      userName: "",
+      username: "",
+      password: "",
       email: "",
-      phone: "",
-      role: UserRole.NoviceDriver,
-      status: "Active",
+      fullname: "",
+      phoneNumber: "",
+      gender: Gender.Male,
+      dateOfBirth: "",
+      role: UserRole.Inspector,
     });
+    setErrors({});
   };
 
-  // Handle create user
-  const handleCreateUser = () => {
-    const newUser: IUserManagement = {
-      id: Date.now().toString(),
-      ...formData,
-      createdAt: new Date(),
-    };
-    setUsers([...users, newUser]);
-    setIsCreateDialogOpen(false);
-    resetForm();
+  const validateForm = () => {
+    const newErrors: Partial<Record<keyof typeof formData, string>> = {};
+
+    if (!formData.username.trim()) newErrors.username = "Tên đăng nhập là bắt buộc";
+    if (!formData.password.trim()) newErrors.password = "Mật khẩu là bắt buộc";
+    if (!formData.email.trim()) newErrors.email = "Email là bắt buộc";
+    if (!formData.fullname.trim()) newErrors.fullname = "Họ và tên là bắt buộc";
+    if (!formData.phoneNumber.trim())
+      newErrors.phoneNumber = "Số điện thoại là bắt buộc";
+    if (!formData.dateOfBirth) {
+      newErrors.dateOfBirth = "Ngày sinh là bắt buộc";
+    } else {
+      const today = new Date().toISOString().split("T")[0];
+      if (formData.dateOfBirth > today) {
+        newErrors.dateOfBirth = "Ngày sinh không được lớn hơn ngày hiện tại";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  // Handle edit user
+  // Handle create user (Inspector only)
+  const handleCreateUser = async () => {
+    if (!validateForm()) return;
+
+    try {
+      const res: any = await dispatch(
+        createUserForAdminThunk({
+          ...formData,
+          role: UserRole.Inspector,
+        })
+      ).unwrap();
+
+      let createdUser: any = null;
+      if (res && typeof res === "object" && "value" in res) {
+        createdUser = (res as any).value;
+      } else {
+        createdUser = res;
+      }
+
+      if (createdUser) {
+        const newUser: IUserManagement = {
+          id: createdUser.userId,
+          userName: createdUser.fullName,
+          email: createdUser.email,
+          phone: createdUser.phone,
+          role: createdUser.role,
+          status: "Active",
+          createdAt: new Date(),
+        };
+        setUsers((prev) => [...prev, newUser]);
+      }
+
+      setIsCreateDialogOpen(false);
+      resetForm();
+    } catch (error) {
+      console.error("Failed to create inspector:", error);
+
+      // Xử lý lỗi từ thunk (ví dụ 409 - email đã tồn tại)
+      let message = "";
+      if (typeof error === "string") {
+        message = error;
+      } else if (error instanceof Error) {
+        message = error.message;
+      } else if (error && typeof (error as any).message === "string") {
+        message = (error as any).message;
+      } else {
+        message = "Tạo người kiểm duyệt thất bại. Vui lòng thử lại.";
+      }
+
+      setErrors((prev) => ({
+        ...prev,
+        email: message,
+      }));
+    }
+  };
+
+  // Handle edit user (giữ nguyên logic hiện tại, không dùng popup tạo)
   const handleEditUser = (user: IUserManagement) => {
     setEditingUser(user);
-    setFormData({
-      userName: user.userName,
-      email: user.email,
-      phone: user.phone,
-      role: user.role,
-      status: user.status,
-    });
     setIsEditDialogOpen(true);
   };
 
-  // Handle update user
-  const handleUpdateUser = () => {
-    if (!editingUser) return;
-
-    setUsers(
-      users.map((user) =>
-        user.id === editingUser.id ? { ...user, ...formData } : user
+  const handleToggleBlockUser = (user: IUserManagement) => {
+    setUsers((prev) =>
+      prev.map((u) =>
+        u.id === user.id
+          ? {
+              ...u,
+              status: u.status === "Suspended" ? "Active" : "Suspended",
+            }
+          : u
       )
     );
+  };
+
+  // Handle update user (placeholder - chưa chỉnh sửa thông tin chi tiết ở đây)
+  const handleUpdateUser = () => {
+    if (!editingUser) return;
     setIsEditDialogOpen(false);
     setEditingUser(null);
-    resetForm();
   };
 
   // Handle delete user
@@ -307,7 +302,7 @@ export default function ManagementUserPage() {
         title="Quản Lý Người Dùng"
         description="Quản lý và theo dõi tất cả người dùng trong hệ thống."
         actionButton={{
-          label: "Thêm người dùng",
+          label: "Thêm người kiểm duyệt",
           onClick: () => setIsCreateDialogOpen(true),
           icon: Plus,
         }}
@@ -324,13 +319,7 @@ export default function ManagementUserPage() {
               <CardTitle className="text-2xl font-semibold">
                 {users.length}
               </CardTitle>
-              <p
-                className={`text-sm ${
-                  changeClassMap[getChangeColor("+12.5%")]
-                }`}
-              >
-                +12.5%
-              </p>
+             
             </div>
             <span className="rounded-xl p-3 bg-blue-50 text-blue-600">
               <Users className="size-5" />
@@ -346,11 +335,7 @@ export default function ManagementUserPage() {
               <CardTitle className="text-2xl font-semibold">
                 {users.filter((u) => u.role === UserRole.Inspector).length}
               </CardTitle>
-              <p
-                className={`text-sm ${changeClassMap[getChangeColor("+2.1%")]}`}
-              >
-                +2.1%
-              </p>
+            
             </div>
             <span className="rounded-xl p-3 bg-purple-50 text-purple-600">
               <UserCheck className="size-5" />
@@ -366,11 +351,7 @@ export default function ManagementUserPage() {
               <CardTitle className="text-2xl font-semibold">
                 {users.filter((u) => u.role === UserRole.Instructor).length}
               </CardTitle>
-              <p
-                className={`text-sm ${changeClassMap[getChangeColor("+8.2%")]}`}
-              >
-                +8.2%
-              </p>
+             
             </div>
             <span className="rounded-xl p-3 bg-sky-50 text-sky-600">
               <UserCog className="size-5" />
@@ -386,13 +367,7 @@ export default function ManagementUserPage() {
               <CardTitle className="text-2xl font-semibold">
                 {users.filter((u) => u.role === UserRole.NoviceDriver).length}
               </CardTitle>
-              <p
-                className={`text-sm ${
-                  changeClassMap[getChangeColor("+15.3%")]
-                }`}
-              >
-                +15.3%
-              </p>
+             
             </div>
             <span className="rounded-xl p-3 bg-emerald-50 text-emerald-600">
               <UserPlus className="size-5" />
@@ -420,10 +395,15 @@ export default function ManagementUserPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tất cả vai trò</SelectItem>
-                <SelectItem value="Admin">Quản trị viên</SelectItem>
-                <SelectItem value="Inspector">Người kiểm duyệt</SelectItem>
-                <SelectItem value="Instructor">Người hướng dẫn</SelectItem>
-                <SelectItem value="NoviceDriver">Người lái mới</SelectItem>
+                <SelectItem value={String(UserRole.Inspector)}>
+                  Người kiểm duyệt
+                </SelectItem>
+                <SelectItem value={String(UserRole.Instructor)}>
+                  Người hướng dẫn
+                </SelectItem>
+                <SelectItem value={String(UserRole.NoviceDriver)}>
+                  Người lái mới
+                </SelectItem>
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -450,22 +430,45 @@ export default function ManagementUserPage() {
           >
             <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Thêm người dùng mới</DialogTitle>
+                <DialogTitle>Thêm người kiểm duyệt</DialogTitle>
                 <DialogDescription>
-                  Nhập thông tin để tạo người dùng mới trong hệ thống.
+                  Nhập thông tin để tạo mới tài khoản người kiểm duyệt trong hệ
+                  thống.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="userName">Họ tên</Label>
+                  <Label htmlFor="username">Tên đăng nhập</Label>
                   <Input
-                    id="userName"
-                    value={formData.userName}
+                    id="username"
+                    value={formData.username}
                     onChange={(e) =>
-                      setFormData({ ...formData, userName: e.target.value })
+                      setFormData({ ...formData, username: e.target.value })
                     }
-                    placeholder="Nhập họ tên"
+                    placeholder="Nhập tên đăng nhập"
                   />
+                  {errors.username && (
+                    <p className="text-sm text-destructive">
+                      {errors.username}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Mật khẩu</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                    placeholder="Nhập mật khẩu"
+                  />
+                  {errors.password && (
+                    <p className="text-sm text-destructive">
+                      {errors.password}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
@@ -478,68 +481,95 @@ export default function ManagementUserPage() {
                     }
                     placeholder="Nhập email"
                   />
+                  {errors.email && (
+                    <p className="text-sm text-destructive">{errors.email}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Số điện thoại</Label>
+                  <Label htmlFor="fullname">Họ và tên</Label>
                   <Input
-                    id="phone"
-                    value={formData.phone}
+                    id="fullname"
+                    value={formData.fullname}
                     onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
+                      setFormData({ ...formData, fullname: e.target.value })
+                    }
+                    placeholder="Nhập họ và tên"
+                  />
+                  {errors.fullname && (
+                    <p className="text-sm text-destructive">
+                      {errors.fullname}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phoneNumber">Số điện thoại</Label>
+                  <Input
+                    id="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={(e) =>
+                      setFormData({ ...formData, phoneNumber: e.target.value })
                     }
                     placeholder="Nhập số điện thoại"
                   />
+                  {errors.phoneNumber && (
+                    <p className="text-sm text-destructive">
+                      {errors.phoneNumber}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="role">Vai trò</Label>
+                  <Label htmlFor="gender">Giới tính</Label>
                   <Select
-                    value={UserRole[formData.role]}
+                    value={Gender[formData.gender]}
                     onValueChange={(value: string) =>
                       setFormData({
                         ...formData,
-                        role: UserRole[value as keyof typeof UserRole],
+                        gender: Gender[value as keyof typeof Gender],
                       })
                     }
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Chọn vai trò" />
+                    <SelectTrigger id="gender">
+                      <SelectValue placeholder="Chọn giới tính" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Admin">Quản trị viên</SelectItem>
-                      <SelectItem value="Inspector">
-                        Người kiểm duyệt
-                      </SelectItem>
-                      <SelectItem value="Instructor">
-                        Người hướng dẫn
-                      </SelectItem>
-                      <SelectItem value="NoviceDriver">
-                        Người lái mới
-                      </SelectItem>
+                      <SelectItem value="Male">Nam</SelectItem>
+                      <SelectItem value="Female">Nữ</SelectItem>
+                      <SelectItem value="Other">Khác</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="status">Trạng thái</Label>
-                  <Select
-                    value={formData.status}
-                    onValueChange={(value: string) =>
-                      setFormData({ ...formData, status: value })
+                  <Label htmlFor="dateOfBirth">Ngày sinh</Label>
+                  <Input
+                    id="dateOfBirth"
+                    type="date"
+                    value={formData.dateOfBirth}
+                    max={new Date().toISOString().split("T")[0]}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        dateOfBirth: e.target.value,
+                      })
                     }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Chọn trạng thái" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Active">Hoạt động</SelectItem>
-                      <SelectItem value="Inactive">Ngừng hoạt động</SelectItem>
-                      <SelectItem value="Suspended">Bị đình chỉ</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  />
+                  {errors.dateOfBirth && (
+                    <p className="text-sm text-destructive">
+                      {errors.dateOfBirth}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label>Vai trò</Label>
+                  <Input
+                    value="Người kiểm duyệt"
+                    disabled
+                    className="bg-muted/50"
+                  />
                 </div>
               </div>
               <DialogFooter>
                 <Button type="submit" onClick={handleCreateUser}>
-                  Tạo người dùng
+                  Tạo người kiểm duyệt
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -558,7 +588,14 @@ export default function ManagementUserPage() {
               )}
               {roleFilter !== "all" && (
                 <Badge variant="secondary" className="text-xs">
-                  Vai trò: {roleFilter}
+                  Vai trò:{" "}
+                  {roleFilter === String(UserRole.Inspector)
+                    ? "Người kiểm duyệt"
+                    : roleFilter === String(UserRole.Instructor)
+                    ? "Người hướng dẫn"
+                    : roleFilter === String(UserRole.NoviceDriver)
+                    ? "Người lái mới"
+                    : roleFilter}
                 </Badge>
               )}
               {statusFilter !== "all" && (
@@ -573,18 +610,8 @@ export default function ManagementUserPage() {
         <CardContent className="p-0">
           <UserDataTable
             data={filteredUsers}
-            onEdit={handleEditUser}
-            onDelete={(userId) => {
-              const user = users.find((u) => u.id === userId);
-              if (
-                user &&
-                window.confirm(
-                  `Bạn có chắc chắn muốn xóa người dùng "${user.userName}"? Hành động này không thể hoàn tác.`
-                )
-              ) {
-                handleDeleteUser(userId);
-              }
-            }}
+            onView={handleEditUser}
+            onToggleBlock={handleToggleBlockUser}
           />
         </CardContent>
       </Card>
@@ -593,90 +620,14 @@ export default function ManagementUserPage() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Chỉnh sửa người dùng</DialogTitle>
+            <DialogTitle>Chi tiết người dùng</DialogTitle>
             <DialogDescription>
-              Cập nhật thông tin người dùng trong hệ thống.
+              Chức năng xem chi tiết người dùng sẽ được cập nhật sau.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-userName">Họ tên</Label>
-              <Input
-                id="edit-userName"
-                value={formData.userName}
-                onChange={(e) =>
-                  setFormData({ ...formData, userName: e.target.value })
-                }
-                placeholder="Nhập họ tên"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-email">Email</Label>
-              <Input
-                id="edit-email"
-                type="email"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                placeholder="Nhập email"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-phone">Số điện thoại</Label>
-              <Input
-                id="edit-phone"
-                value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
-                placeholder="Nhập số điện thoại"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-role">Vai trò</Label>
-              <Select
-                value={UserRole[formData.role]}
-                onValueChange={(value: string) =>
-                  setFormData({
-                    ...formData,
-                    role: UserRole[value as keyof typeof UserRole],
-                  })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Admin">Quản trị viên</SelectItem>
-                  <SelectItem value="Inspector">Người kiểm duyệt</SelectItem>
-                  <SelectItem value="Instructor">Người hướng dẫn</SelectItem>
-                  <SelectItem value="NoviceDriver">Người lái mới</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-status">Trạng thái</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value: string) =>
-                  setFormData({ ...formData, status: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Active">Hoạt động</SelectItem>
-                  <SelectItem value="Inactive">Ngừng hoạt động</SelectItem>
-                  <SelectItem value="Suspended">Bị đình chỉ</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
           <DialogFooter>
-            <Button type="submit" onClick={handleUpdateUser}>
-              Cập nhật
+            <Button type="button" onClick={handleUpdateUser}>
+              Đóng
             </Button>
           </DialogFooter>
         </DialogContent>

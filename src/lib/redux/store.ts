@@ -4,11 +4,15 @@ import documentReducer from '@/features/document/documentSlice';
 import transactionReducer from '@/features/transaction/transactionSlice';
 import bookingReducer from '@/features/booking/bookingSlice';
 import blogReducer from '@/features/blog/blogSlice';
+import policyReducer from '@/features/policy/policySlice';
 
 const appReducer = combineReducers({
         auth: authReducer,
         document: documentReducer,
         transaction: transactionReducer,
+        booking: bookingReducer,
+        blog: blogReducer,
+        policy: policyReducer,
 });
 
 const rootReducer = (

@@ -1,5 +1,6 @@
 import { UserRole } from "../auth/user-role.enum";
 import { LicenseTier } from "../car/car.type";
+import { Gender } from "./gender.enum";
 
 export interface IUserProfile {
   id: string;
@@ -119,4 +120,15 @@ export interface UpdateInstructorPayload {
   id: string;
   bio?: string;
   experienceYear?: number;
+}
+
+export interface createUserForAdmin {
+  username: string,
+  password: string,
+  email: string,
+  fullname: string,
+  phoneNumber: string,
+  gender: Gender,
+  dateOfBirth: string,
+  role: UserRole,
 }

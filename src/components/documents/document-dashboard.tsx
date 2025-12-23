@@ -1,7 +1,6 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
 import {
   Card,
   CardContent,
@@ -9,26 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
 import { DocumentConfigPage } from "./document-config-page";
-
 import { StatsCards } from "./stats-card";
-
 import { DocumentSummary } from "./document-sumary";
-
-import { SetSchedule } from "./set-schdedule";
-
-import {
-  Users,
-  FileText,
-  Car,
-  Settings,
-  LayoutDashboard,
-  BarChart3,
-  FileCheck,
-  TrendingUp,
-} from "lucide-react";
-
+import { Car, BarChart3, FileCheck } from "lucide-react";
 import PageHeader from "@/components/commons/Header/header";
 
 export function DocumentDashboard() {
@@ -42,7 +25,7 @@ export function DocumentDashboard() {
         />
 
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8 bg-secondary">
+          <TabsList className="grid w-full grid-cols-2 mb-8 bg-secondary">
             <TabsTrigger
               value="dashboard"
               className="text-sm text-foreground data-[state=active]:bg-emerald-600 data-[state=active]:text-primary-foreground flex items-center gap-2"
@@ -54,12 +37,6 @@ export function DocumentDashboard() {
               className="text-sm text-foreground data-[state=active]:bg-emerald-600 data-[state=active]:text-primary-foreground flex items-center gap-2"
             >
               <span className="hidden sm:inline">Cấu Hình</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="schedule"
-              className="text-sm text-foreground data-[state=active]:bg-emerald-600 data-[state=active]:text-primary-foreground flex items-center gap-2"
-            >
-              <span className="hidden sm:inline">Hẹn Lịch</span>
             </TabsTrigger>
           </TabsList>
 
@@ -129,10 +106,6 @@ export function DocumentDashboard() {
 
           <TabsContent value="config" className="space-y-6">
             <DocumentConfigPage />
-          </TabsContent>
-
-          <TabsContent value="schedule" className="space-y-6">
-            <SetSchedule />
           </TabsContent>
         </Tabs>
       </div>

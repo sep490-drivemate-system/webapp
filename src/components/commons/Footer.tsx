@@ -16,8 +16,8 @@ const links = {
     "Liên hệ hỗ trợ",
   ],
   "Chính sách": [
+    "Điều khoản và dịch vụ",
     "Chính sách bảo mật",
-    "Điều khoản sử dụng",
     "Chính sách hoàn tiền",
     "Quy định chung",
   ],
@@ -47,37 +47,31 @@ export default function Footer() {
           {Object.entries(links).map(([section, items]) => (
             <div key={section} className="flex flex-col gap-2 sm:gap-3">
               <h3 className="mb-2 text-base sm:text-lg font-bold">{section}</h3>
-              {items.map((item) => (
-                <div key={item}>
-                  <span className="opacity-60 text-sm block">{item}</span>
-                </div>
-              ))}
+              {items.map((item) => {
+                // Check if item should be a link
+                const isTermsLink = item === "Điều khoản và dịch vụ";
+                
+                if (isTermsLink) {
+                  return (
+                    <Link
+                      key={item}
+                      href="/terms-and-sersvices"
+                      className="opacity-60 hover:opacity-100 text-sm block transition-opacity"
+                    >
+                      {item}
+                    </Link>
+                  );
+                }
+                
+                return (
+                  <div key={item}>
+                    <span className="opacity-60 text-sm block">{item}</span>
+                  </div>
+                );
+              })}
             </div>
           ))}
         </div>
-
-        {/* Bottom section with copyright */}
-        {/* <div className="mt-8 sm:mt-10 pt-6 sm:pt-8 border-t border-border">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-muted-foreground text-xs sm:text-sm text-center sm:text-left">
-              © 2024 DriveMate. All rights reserved.
-            </p>
-            <div className="flex items-center gap-4 text-xs sm:text-sm">
-              <a
-                href="#"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Privacy Policy
-              </a>
-              <a
-                href="#"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Terms of Service
-              </a>
-            </div>
-          </div>
-        </div> */}
       </div>
     </footer>
   );
