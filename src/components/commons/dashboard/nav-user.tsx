@@ -84,7 +84,6 @@ export function NavUser({
     };
   }, [dispatch]);
 
-  // Use fetched user data if available, otherwise fall back to prop
   const displayUser = userData ||
     user || {
       name: "",

@@ -2,9 +2,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ArrowLeft, Upload, Camera, X, Mail, AlertCircle } from "lucide-react"
+import { ArrowLeft, Upload, X, Mail, AlertCircle } from "lucide-react"
 import { useState } from "react"
-import { DocumentType, InstructorRegistrationData, InstructorSignupRequest } from "../../../../types/auth/signup-instructor.types"
+import { DocumentType, InstructorSignupRequest } from "../../../../types/auth/signup-instructor.types"
 
 interface InstructorStep5DocumentsProps {
     onNext: (data: InstructorSignupRequest) => void
@@ -31,24 +31,6 @@ const documentTypes: DocumentType[] = [
         description: "Chứng chỉ hành nghề lái xe",
         required: true
     },
-    // {
-    //     id: "health_certificate",
-    //     name: "Giấy khám sức khỏe",
-    //     description: "Giấy khám sức khỏe đáp ứng hạng B2 trở lên",
-    //     required: true
-    // },
-    // {
-    //     id: "vehicle_papers",
-    //     name: "Giấy tờ về xe",
-    //     description: "Đăng kiểm, đăng ký xe",
-    //     required: true
-    // },
-    // {
-    //     id: "vehicle_insurance",
-    //     name: "Bảo hiểm xe",
-    //     description: "Bảo hiểm bắt buộc TNDS loại hình kinh doanh",
-    //     required: true
-    // }
 ]
 
 export function InstructorStep5Documents({ onNext, onBack, loading = false }: InstructorStep5DocumentsProps) {
@@ -138,8 +120,6 @@ export function InstructorStep5Documents({ onNext, onBack, loading = false }: In
                 <h1 className="text-2xl font-bold text-white mb-2">Upload giấy tờ</h1>
                 <p className="text-gray-300">Vui lòng upload các giấy tờ cần thiết (mặt trước và mặt sau)</p>
             </div>
-
-            {/* Email input section */}
             <Card className="bg-white/10 border-white/20">
                 <CardContent className="p-4">
                     <div className="flex items-start gap-3 mb-4">
@@ -186,7 +166,6 @@ export function InstructorStep5Documents({ onNext, onBack, loading = false }: In
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
-                                {/* Mặt trước */}
                                 <div>
                                     <label className="block text-sm text-gray-300 mb-2">Mặt trước</label>
                                     <div className="relative">
@@ -222,7 +201,6 @@ export function InstructorStep5Documents({ onNext, onBack, loading = false }: In
                                     </div>
                                 </div>
 
-                                {/* Mặt sau (chỉ cho CCCD và Bằng lái) */}
                                 {(doc.id === 'cccd' || doc.id === 'b2_license') && (
                                     <div>
                                         <label className="block text-sm text-gray-300 mb-2">Mặt sau</label>

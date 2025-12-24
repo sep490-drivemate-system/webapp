@@ -23,36 +23,28 @@ export default function WaitingConfirmPage() {
     router.push("/signin");
   }, [router]);
 
-  // Tính toán steps dựa trên applicationStatus và contractSigned flag
   const steps = useMemo<Step[]>(() => {
     const applicationStatus = application?.applicationStatus;
-    
-    // Mặc định: step 1 completed, step 2 active (pending)
     let step1Status: Step["status"] = "completed";
     let step2Status: Step["status"] = "active";
     let step3Status: Step["status"] = "inactive";
     let step4Status: Step["status"] = "inactive";
-
-    // Nếu contract đã được ký (từ contract page), step 3 và 4 completed
     if (contractSigned) {
       step1Status = "completed";
       step2Status = "completed";
       step3Status = "completed";
       step4Status = "completed";
     } else if (applicationStatus === 1) {
-      // applicationStatus = 1: Step 1 completed, Step 2 pending
       step1Status = "completed";
       step2Status = "active";
       step3Status = "inactive";
       step4Status = "inactive";
     } else if (applicationStatus === 2) {
-      // applicationStatus = 2: Step 2 completed, Step 3 pending
       step1Status = "completed";
       step2Status = "completed";
       step3Status = "active";
       step4Status = "inactive";
     } else if (applicationStatus === 3) {
-      // applicationStatus = 3: Step 3 completed, Step 4 completed
       step1Status = "completed";
       step2Status = "completed";
       step3Status = "completed";
@@ -112,7 +104,6 @@ export default function WaitingConfirmPage() {
         <Card className="overflow-hidden p-0 bg-white/10 backdrop-blur-md border-none shadow-lg rounded-2xl w-full max-w-4xl mx-auto">
           <CardContent className="p-6 md:p-8 max-h-[90vh] overflow-y-auto">
             <div className="flex flex-col gap-8">
-              {/* Header with logo */}
               <div className="flex flex-col items-center text-center gap-4">
                 <Link
                   href="/"
@@ -130,8 +121,6 @@ export default function WaitingConfirmPage() {
                   Chúng tôi đã nhận được đơn đăng ký của bạn
                 </h1>
               </div>
-
-              {/* Progress Steps */}
               <StepProgress steps={steps} />
             </div>
           </CardContent>

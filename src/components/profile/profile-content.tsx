@@ -272,7 +272,6 @@ export default function ProfileContent({
 
   return (
     <div className="lg:col-span-3 space-y-6">
-      {/* Personal Information Tab */}
       {activeTab === "info" && (
         <div className="space-y-6">
           {saveError && (
@@ -295,7 +294,6 @@ export default function ProfileContent({
         </div>
       )}
 
-      {/* Transaction History Tab */}
       {activeTab === "history" && (
         <ProfileContentTransaction
           formatDate={formatDate}
@@ -303,7 +301,6 @@ export default function ProfileContent({
         />
       )}
 
-      {/* Package Purchases Tab */}
       {activeTab === "packages" && (
         <Card className="border-none shadow-lg">
           <CardHeader className="border-b">
@@ -405,10 +402,8 @@ export default function ProfileContent({
         </Card>
       )}
 
-      {/* Wallet Tab */}
       {activeTab === "wallet" && (
         <div className="space-y-6">
-          {/* Wallet Balance Card */}
           <Card className="border-none shadow-lg bg-gradient-to-br from-[#1AD562] to-[#16B854] text-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
@@ -463,8 +458,6 @@ export default function ProfileContent({
               </div>
             </CardContent>
           </Card>
-
-          {/* Quick Actions */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Button
               variant="outline"
@@ -489,7 +482,6 @@ export default function ProfileContent({
             </Button>
           </div>
 
-          {/* Transaction History */}
           <Card className="border-none shadow-lg">
             <CardHeader className="border-b">
               <CardTitle className="flex items-center gap-2">
@@ -579,7 +571,6 @@ export default function ProfileContent({
         </div>
       )}
 
-      {/* Notifications Tab */}
       {activeTab === "notifications" && (
         <div className="space-y-6">
           <Card className="border-none shadow-lg">
@@ -591,7 +582,6 @@ export default function ProfileContent({
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-4">
-                {/* Notification Item 1 */}
                 <div className="border rounded-xl p-5 hover:shadow-md transition-all bg-white">
                   <div className="flex items-start gap-4">
                     <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg flex-shrink-0">
@@ -617,8 +607,6 @@ export default function ProfileContent({
                     </div>
                   </div>
                 </div>
-
-                {/* Notification Item 2 */}
                 <div className="border rounded-xl p-5 hover:shadow-md transition-all bg-white">
                   <div className="flex items-start gap-4">
                     <div className="p-3 bg-gradient-to-br from-green-50 to-green-100 rounded-lg flex-shrink-0">
@@ -645,7 +633,6 @@ export default function ProfileContent({
                   </div>
                 </div>
 
-                {/* Notification Item 3 */}
                 <div className="border rounded-xl p-5 hover:shadow-md transition-all bg-white">
                   <div className="flex items-start gap-4">
                     <div className="p-3 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg flex-shrink-0">
@@ -672,7 +659,6 @@ export default function ProfileContent({
                   </div>
                 </div>
 
-                {/* Notification Item 4 */}
                 <div className="border rounded-xl p-5 hover:shadow-md transition-all bg-white opacity-75">
                   <div className="flex items-start gap-4">
                     <div className="p-3 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex-shrink-0">
@@ -698,8 +684,6 @@ export default function ProfileContent({
                     </div>
                   </div>
                 </div>
-
-                {/* Notification Item 5 */}
                 <div className="border rounded-xl p-5 hover:shadow-md transition-all bg-white opacity-75">
                   <div className="flex items-start gap-4">
                     <div className="p-3 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg flex-shrink-0">
@@ -725,28 +709,12 @@ export default function ProfileContent({
                     </div>
                   </div>
                 </div>
-
-                {/* Empty State (if no notifications) */}
-                {/* Uncomment this if you want to show empty state
-                <div className="text-center py-12">
-                  <Bell className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                  <p className="text-gray-500 text-lg font-medium mb-2">
-                    Chưa có thông báo
-                  </p>
-                  <p className="text-gray-400 text-sm">
-                    Tất cả thông báo của bạn sẽ hiển thị ở đây
-                  </p>
-                </div>
-                */}
               </div>
-
-              {/* Load More Button */}
               <div className="mt-6 text-center">
                 <Button
                   variant="outline"
                   className="w-full sm:w-auto"
                   onClick={() => {
-                    // Load more notifications
                   }}
                 >
                   Xem thêm thông báo
@@ -756,11 +724,8 @@ export default function ProfileContent({
           </Card>
         </div>
       )}
-
-      {/* Settings Tab */}
       {activeTab === "settings" && (
         <div className="space-y-6">
-          {/* Notifications Settings */}
           <Card className="border-none shadow-lg">
             <CardHeader className="border-b">
               <CardTitle className="flex items-center gap-2">
@@ -820,7 +785,6 @@ export default function ProfileContent({
             </CardContent>
           </Card>
 
-          {/* Security Settings */}
           <Card className="border-none shadow-lg">
             <CardHeader className="border-b">
               <CardTitle className="flex items-center gap-2">

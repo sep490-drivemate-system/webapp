@@ -76,7 +76,6 @@ export default function CheckRolePage() {
             </div>
             <div className="p-6 md:p-8 order-2">
               <div className="flex flex-col gap-6">
-                {/* Header with logo */}
                 <div className="flex flex-col items-center text-center">
                   <Link
                     href="/"
@@ -94,8 +93,6 @@ export default function CheckRolePage() {
                     Bạn muốn đăng ký với tư cách là
                   </p>
                 </div>
-
-                {/* Role Selection */}
                 <div className="flex flex-col gap-4">
                   <Select value={selectedRole} onValueChange={setSelectedRole}>
                     <SelectTrigger className="w-full h-12 text-[#10b981] border-[#10b981]/50 focus:border-[#10b981] focus:ring-[#10b981] !bg-[#10b981]/10 focus:!bg-[#10b981]/20 hover:!bg-[#10b981]/10 dark:!bg-[#10b981]/10">
@@ -114,8 +111,6 @@ export default function CheckRolePage() {
                     </SelectContent>
                   </Select>
                 </div>
-
-                {/* Continue Button */}
                 <Button
                   type="button"
                   onClick={handleContinue}

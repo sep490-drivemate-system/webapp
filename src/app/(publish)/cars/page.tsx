@@ -16,7 +16,7 @@ import { CarDetailDialog } from "@/components/car/car-detail-dialog";
 import { CarCard } from "@/components/car/car-card";
 import { CarStatus } from "@/types/constants/enum";
 
-const PAGE_SIZE = 6; // 3 items per row on web, 2 rows = 6 items per page
+const PAGE_SIZE = 6; 
 const SEAT_OPTIONS = [4, 5, 7, 9, 16, 29, 35, 45];
 const FUEL_OPTIONS = ["Xăng", "Dầu", "Điện", "Hybrid"];
 
@@ -176,7 +176,6 @@ export default function CarsPage() {
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Filters Sidebar */}
           <div className="lg:col-span-1">
             <PackageFilterSidebar
               filters={filters}
@@ -188,7 +187,6 @@ export default function CarsPage() {
             />
           </div>
 
-          {/* Cars Grid */}
           <div className="lg:col-span-3">
             {loading && (
               <div className="flex justify-center items-center py-12">
@@ -213,7 +211,6 @@ export default function CarsPage() {
               </div>
             )}
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <PaginationControls
                 currentPage={currentPage}
@@ -222,7 +219,6 @@ export default function CarsPage() {
               />
             )}
 
-            {/* No Results */}
             {!loading && cars.length === 0 && !error && (
               <div className="text-center py-12">
                 <div className="text-gray-500 mb-4">

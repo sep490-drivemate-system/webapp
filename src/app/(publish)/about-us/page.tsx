@@ -84,7 +84,6 @@ export default function AboutUsPage() {
 
   return (
     <main className="min-h-screen bg-background">
-      {/* Giới thiệu */}
       <section id="about" className="pt-32 pb-20 bg-background">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-16">
@@ -152,7 +151,6 @@ export default function AboutUsPage() {
         </div>
       </section>
 
-      {/* Sứ mệnh */}
       <section id="mission" className="py-20 bg-secondary/20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-16">
@@ -197,7 +195,6 @@ export default function AboutUsPage() {
         </div>
       </section>
 
-      {/* Giá trị */}
       <section id="values" className="py-20 bg-background">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-16">

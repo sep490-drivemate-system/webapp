@@ -245,8 +245,6 @@ export default function PackagesPage() {
                 onPageChange={setCurrentPage}
               />
             )}
-
-            {/* No Results */}
             {!loading && sortedPackages.length === 0 && (
               <div className="text-center py-12">
                 <div className="text-gray-500 mb-4">

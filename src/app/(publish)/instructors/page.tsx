@@ -103,7 +103,6 @@ export default function InstructorsPage() {
   return (
     <div className="pt-24 pb-12 lg:pt-32 lg:pb-16 bg-gradient-to-br from-blue-50 via-white to-blue-50">
       <div className="container mx-auto px-4">
-        {/* Header */}
         <PageSectionHeader
           title="Danh sách người hướng dẫn"
           description="Tìm kiếm người hướng dẫn phù hợp với khu vực, kinh nghiệm và ngân sách của bạn."
@@ -131,8 +130,6 @@ export default function InstructorsPage() {
                 Đang tải danh sách người hướng dẫn...
               </div>
             )}
-
-            {/* Instructors Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {paginatedInstructors.map((instructor) => {
                 return (
@@ -153,8 +150,6 @@ export default function InstructorsPage() {
                 />
               </div>
             )}
-
-            {/* No Results */}
             {!loading && paginatedInstructors.length === 0 && (
               <div className="text-center py-12">
                 <div className="text-gray-500 mb-4">

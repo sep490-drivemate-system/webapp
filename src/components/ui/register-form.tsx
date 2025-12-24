@@ -35,22 +35,15 @@ export function RegisterForm({
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-
-    // Optimize video playback
     const optimizeVideo = () => {
-      // Set playback quality hints
       if ("requestVideoFrameCallback" in video) {
-        // Modern browsers support this
       }
-
-      // Preload and play
       video.load();
 
       const playPromise = video.play();
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
-            // Video is playing smoothly
             video.playbackRate = 1.0;
           })
           .catch((error) => {
@@ -58,10 +51,7 @@ export function RegisterForm({
           });
       }
     };
-
-    // Wait for video to be ready
     if (video.readyState >= 2) {
-      // Video is already loaded
       optimizeVideo();
     } else {
       video.addEventListener("loadeddata", optimizeVideo, { once: true });
@@ -74,15 +64,11 @@ export function RegisterForm({
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-
-    // Validate email
     if (!formData.email) {
       newErrors.email = "Email là bắt buộc";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "Email không hợp lệ";
     }
-
-    // Validate password
     if (!formData.password) {
       newErrors.password = "Mật khẩu là bắt buộc";
     } else {
@@ -99,22 +85,16 @@ export function RegisterForm({
         newErrors.password = "Mật khẩu phải có ít nhất 1 ký tự đặc biệt";
       }
     }
-
-    // Validate confirm password
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = "Vui lòng nhập lại mật khẩu";
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Mật khẩu không khớp";
     }
-
-    // Validate phone
     if (!formData.phone) {
       newErrors.phone = "Số điện thoại là bắt buộc";
     } else if (!/^[0-9]{10}$/.test(formData.phone.replace(/\s/g, ""))) {
       newErrors.phone = "Số điện thoại không hợp lệ";
     }
-
-    // Validate terms
     if (!formData.acceptTerms) {
       newErrors.acceptTerms = "Bạn phải đồng ý với điều khoản";
     }
@@ -136,7 +116,6 @@ export function RegisterForm({
         });
 
         if (result.ok) {
-          // Điều hướng sang trang nhập OTP kèm email để hiển thị
           router.push(`/otp?email=${encodeURIComponent(formData.email)}`);
         } else {
           setErrors({
@@ -206,8 +185,6 @@ export function RegisterForm({
                 </Link>
                 <p className="text-[#10b981]">Đăng ký tài khoản mới</p>
               </div>
-
-              {/* Form fields */}
               <div className="grid gap-3">
                 <div>
                   <Input
@@ -311,8 +288,6 @@ export function RegisterForm({
                   )}
                 </div>
               </div>
-
-              {/* Terms checkbox */}
               <div className="flex items-start gap-2">
                 <Checkbox
                   id="terms"
@@ -363,8 +338,6 @@ export function RegisterForm({
               >
                 {isLoading ? "Đang lưu thông tin..." : "Tiếp theo"}
               </Button>
-
-              {/* Footer link */}
               <div className="text-center text-sm text-gray-300">
                 Bạn đã có tài khoản?{" "}
                 <Link

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, CheckCircle, FileText } from "lucide-react"
+import { ArrowLeft, CheckCircle} from "lucide-react"
 
 interface InstructorStep3JudicialProps {
     onNext: () => void
@@ -19,13 +19,6 @@ export function InstructorStep3Judicial({ onNext, onBack }: InstructorStep3Judic
                     Bạn đã có lý lịch tư pháp chưa?
                 </h1>
             </div>
-
-            {/* Document illustration placeholder */}
-            {/* <div className="flex justify-center mb-4">
-                <div className="w-24 h-32 bg-gradient-to-b from-blue-400 to-purple-500 rounded-lg flex items-center justify-center">
-                    <FileText className="h-12 w-12 text-white" />
-                </div>
-            </div> */}
 
             <div className="bg-white/10 rounded-lg p-4 border border-white/20">
                 <ul className="space-y-3">

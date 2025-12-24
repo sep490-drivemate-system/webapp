@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, CheckCircle, Users } from "lucide-react"
+import { ArrowLeft, CheckCircle } from "lucide-react"
 
 interface InstructorStep4CooperativeProps {
     onNext: () => void
@@ -19,13 +19,6 @@ export function InstructorStep4Cooperative({ onNext, onBack }: InstructorStep4Co
                     Bạn đã tham gia Hợp tác xã vận tải nào chưa?
                 </h1>
             </div>
-
-            {/* Cooperative illustration placeholder */}
-            {/* <div className="flex justify-center mb-4">
-                <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
-                    <Users className="h-12 w-12 text-white" />
-                </div>
-            </div> */}
 
             <div className="bg-white/10 rounded-lg p-4 border border-white/20">
                 <ul className="space-y-3">
