@@ -21,14 +21,7 @@ export function InstructorStep2Vehicle({ onNext, onBack }: InstructorStep2Vehicl
                     Bạn có đáp ứng các yêu cầu về phương tiện không?
                 </h1>
             </div>
-
-            {/* Car illustration placeholder */}
-            {/* <div className="flex justify-center mb-4">
-                <div className="w-32 h-20 bg-gradient-to-r from-green-400 to-blue-500 rounded-lg flex items-center justify-center">
-                    <Car className="h-12 w-12 text-white" />
-                </div>
-            </div> */}
-
+            
             <div className="bg-white/10 rounded-lg p-4 border border-white/20">
                 <ul className="space-y-3">
                     {vehicleRequirements.map((req, index) => (

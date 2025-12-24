@@ -94,7 +94,6 @@ const ProfileContentPersonal = ({
         </CardHeader>
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Full Name */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="userName" className="text-gray-700 font-medium">
@@ -149,8 +148,6 @@ const ProfileContentPersonal = ({
                 />
               </div>
             </div>
-
-            {/* Email */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="email" className="text-gray-700 font-medium">
@@ -171,8 +168,6 @@ const ProfileContentPersonal = ({
                 />
               </div>
             </div>
-
-            {/* Phone */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="phone" className="text-gray-700 font-medium">
@@ -229,8 +224,6 @@ const ProfileContentPersonal = ({
                 />
               </div>
             </div>
-
-            {/* Password */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password" className="text-gray-700 font-medium">
@@ -380,7 +373,6 @@ const ProfileContentPersonal = ({
         </CardHeader>
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Emergency Contact Name */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label
@@ -435,8 +427,6 @@ const ProfileContentPersonal = ({
                 />
               </div>
             </div>
-
-            {/* Emergency Contact Phone */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label

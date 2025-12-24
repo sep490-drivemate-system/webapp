@@ -35,7 +35,6 @@ export function DocumentForm({
       ...prev,
       [fieldName]: value,
     }));
-    // Clear error for this field when user starts typing
     if (errors[fieldName]) {
       setErrors((prev) => ({
         ...prev,

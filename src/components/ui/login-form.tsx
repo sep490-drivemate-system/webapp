@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
 import Image from "next/image";
 import { useSignIn } from "@/hooks/auth/useSignIn";
@@ -125,11 +124,6 @@ export function LoginForm({
                   </a>
                 </div>
               </div>
-              {/* {error && (
-                <div className="text-red-400 text-sm text-center bg-red-100/10 p-2 rounded">
-                  {error}
-                </div>
-              )} */}
               <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-[#10b981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white"
@@ -137,21 +131,6 @@ export function LoginForm({
               >
                 {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
               </Button>
-              {/* <div className="flex items-center text-sm text-muted-foreground">
-                <span className="flex-grow border-t border-border"></span>
-                <span className="px-3 flex items-center gap-2 text-white">
-                  Hoặc tiếp tục với
-                  <Button
-                    variant="outline"
-                    type="button"
-                    className="flex items-center justify-center gap-2 px-3 py-1 h-auto"
-                  >
-                    <FcGoogle className="h-5 w-5" />
-                  </Button>
-                </span>
-                <span className="flex-grow border-t border-border"></span>
-              </div> */}
-
               <div className="text-center text-sm text-gray-300">
                 Bạn chưa có tài khoản?{" "}
                 <Link

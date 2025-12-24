@@ -31,7 +31,6 @@ type BlogFormProps = {
   onSubmit?: (values: BlogFormValues) => void;
 };
 
-// Square image upload component for blog form
 function SquareImageUpload({
   label,
   onUpload,

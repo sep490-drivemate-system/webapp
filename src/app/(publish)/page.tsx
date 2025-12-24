@@ -108,11 +108,9 @@ export default function HomePage() {
 
   return (
     <div className="bg-gray-50">
-      {/* Hero Section */}
       <section className="pt-24 pb-12 lg:pt-32 lg:pb-16 bg-gradient-to-br from-blue-50 via-white to-blue-50">
         <div className="container mx-auto px-6">
           <div className="grid items-center gap-12 lg:grid-cols-2">
-            {/* Content */}
             <div className="space-y-6">
               <h1 className="text-4xl font-bold leading-tight text-gray-900 lg:text-5xl xl:text-6xl">
                 Bổ túc lái xe an toàn cùng người hướng dẫn chuyên nghiệp
@@ -123,8 +121,6 @@ export default function HomePage() {
                 nhu cầu của bạn.
               </p>
             </div>
-
-            {/* Image */}
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 to-transparent rounded-2xl"></div>
               <img
@@ -136,8 +132,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Featured Packages Section */}
       <section className="py-12 lg:py-16 bg-white">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between mb-8">
@@ -185,7 +179,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Instructors Section */}
       <section className="py-12 lg:py-16 bg-gray-50">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between mb-8">
@@ -231,8 +224,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Featured Cars Section */}
       <section className="py-12 lg:py-16 bg-white">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between mb-8">

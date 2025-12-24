@@ -30,8 +30,6 @@ export default function ContractPage() {
 
   const handleConfirm = () => {
     if (!allChecked) return;
-    
-    // Navigate to waiting-confirm with contract signed flag
     router.push("/waiting-confirm?contractSigned=true");
   };
 
@@ -81,7 +79,6 @@ export default function ContractPage() {
         <Card className="overflow-hidden p-0 bg-white/10 backdrop-blur-md border-none shadow-lg rounded-2xl w-full mx-auto max-h-[calc(100vh-2rem)] md:max-h-[calc(100vh-4rem)] flex flex-col">
           <CardContent className="p-6 md:p-10 flex flex-col flex-1 min-h-0 overflow-hidden">
             <div className="flex flex-col gap-6 h-full min-h-0">
-              {/* Header with logo */}
               <div className="flex flex-col items-center text-center flex-shrink-0">
                 <Link
                   href="/"
@@ -100,7 +97,6 @@ export default function ContractPage() {
                 </p>
               </div>
 
-              {/* Policies list */}
               <div className="custom-scrollbar flex flex-col gap-4 flex-1 min-h-0 overflow-y-auto pr-2">
                 {policies.map((policy) => (
                   <label
@@ -123,7 +119,6 @@ export default function ContractPage() {
                 ))}
               </div>
 
-              {/* Confirm Button */}
               <Button
                 type="button"
                 onClick={handleConfirm}

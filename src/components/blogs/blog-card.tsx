@@ -108,8 +108,7 @@ export function BlogCard({
       </Card>
     );
   }
-
-  // Publish variant
+  
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full group p-0 gap-0">
       <div className="relative h-48 overflow-hidden">

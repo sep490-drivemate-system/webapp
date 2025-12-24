@@ -5,29 +5,13 @@ import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Calendar } from "@/components/ui/calendar";
 import { CarDetailDialog } from "@/components/car/car-detail-dialog";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import {
   Star,
-  MapPin,
-  ArrowLeft,
   Calendar as CalendarIcon,
   Award,
   CheckCircle,
-  Phone,
-  Mail,
-  Shield,
-  Clock,
   User,
   Package,
   Car,
@@ -39,7 +23,6 @@ import {
   IInstructors,
 } from "@/types/instructor/instructor-management.types";
 import { Gender } from "@/types/user/gender.enum";
-import { IconTent } from "@tabler/icons-react";
 import { Loader2 } from "lucide-react";
 import { ICar, ICarDetail } from "@/types/car/car.type";
 import { useThunkAction } from "@/lib/redux/useThunkAction";
@@ -56,12 +39,6 @@ const formatDate = (date: Date | string) => {
 export default function InstructorDetailPage() {
   const params = useParams();
   const instructorId = params.id as string;
-
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    new Date()
-  );
-  const [bookingType, setBookingType] = useState("hourly");
-  const [duration, setDuration] = useState("2");
   const [instructor, setInstructor] = useState<IInstructors | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -184,7 +161,6 @@ export default function InstructorDetailPage() {
   };
 
   const calculateTotalPrice = () => {
-    // TODO: Implement pricing calculation when pricing fields are available
     return 0;
   };
 
@@ -197,7 +173,6 @@ export default function InstructorDetailPage() {
   };
 
   const handleBuyPackage = (pkg: IInstructorPackages) => {
-    // TODO: integrate checkout/booking flow
     console.log("Buy package", pkg.id);
   };
 
@@ -316,7 +291,6 @@ export default function InstructorDetailPage() {
         <div className="px-16">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Instructor Profile */}
             <Card className="overflow-hidden border shadow-md bg-white">
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-6 items-start">
@@ -393,7 +367,6 @@ export default function InstructorDetailPage() {
               </CardContent>
             </Card>
 
-            {/* service packages section */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -525,7 +498,6 @@ export default function InstructorDetailPage() {
               </CardContent>
             </Card>
 
-            {/* car section */}
             <Card className="border shadow-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -622,7 +594,6 @@ export default function InstructorDetailPage() {
               </CardContent>
             </Card>
 
-            {/* Reviews Section */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

@@ -20,8 +20,7 @@ const MAIN_MENU = [
   { path: "/packages", label: "Gói dịch vụ" },
   { path: "/instructors", label: "Người hướng dẫn" },
   { path: "/cars", label: "Xe tập" },
-  { path: "/blogs", label: "Bài viết" },
-  // { path: "/terms-and-sersvices", label: "Điều khoản và dịch vụ" },
+  // { path: "/blogs", label: "Bài viết" },
   { path: "/about-us", label: "Về chúng tôi" },
   { path: "/forum", label: "Diễn đàn" },
 ];

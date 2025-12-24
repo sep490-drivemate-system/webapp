@@ -26,12 +26,10 @@ export function DocumentConfigPage() {
   const handleSaveDocumentType = (type: DocumentType) => {
     const index = documentTypes.findIndex((t) => t.id === type.id);
     if (index >= 0) {
-      // Update existing
       const updated = [...documentTypes];
       updated[index] = type;
       setDocumentTypes(updated);
     } else {
-      // Create new
       setDocumentTypes([...documentTypes, type]);
     }
   };
@@ -41,7 +39,6 @@ export function DocumentConfigPage() {
   };
 
   const handleRefresh = () => {
-    // Refresh logic if needed
   };
 
   const personalCount = documentTypes.filter(

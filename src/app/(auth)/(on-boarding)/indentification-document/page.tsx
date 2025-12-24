@@ -41,49 +41,35 @@ export default function IdentificationDocumentPage() {
   const [isProcessingId, setIsProcessingId] = useState(false);
   const [isProcessingLicense, setIsProcessingLicense] = useState(false);
   const [formData, setFormData] = useState<{
-    // Ảnh đại diện
     avatar: File | null;
-    // Căn cước công dân
     citizenIdFront: File | null;
     citizenIdBack: File | null;
     citizenIdFullName: string;
     citizenIdDateOfBirth: string;
     citizenIdGender: string;
-    // Giấy phép lái xe
     driverLicenseFront: File | null;
     driverLicenseBack: File | null;
     driverLicenseClass: string;
-    // Chứng chỉ hành nghề
     trainingCertificate: File | null;
     trainingClass: string;
-    // Giấy khám sức khỏe
     healthCertificate: File | null;
-    // Lí lịch tư pháp
     criminalRecord: File | null;
-    // Thông tin liên hệ khẩn cấp
     emergencyContactName: string;
     emergencyContactPhone: string;
   }>({
-    // Ảnh đại diện
     avatar: null,
-    // Căn cước công dân
     citizenIdFront: null,
     citizenIdBack: null,
     citizenIdFullName: "",
     citizenIdDateOfBirth: "",
     citizenIdGender: "",
-    // Giấy phép lái xe
     driverLicenseFront: null,
     driverLicenseBack: null,
     driverLicenseClass: "",
-    // Chứng chỉ hành nghề
     trainingCertificate: null,
     trainingClass: "",
-    // Giấy khám sức khỏe
     healthCertificate: null,
-    // Lí lịch tư pháp
     criminalRecord: null,
-    // Thông tin liên hệ khẩn cấp
     emergencyContactName: "",
     emergencyContactPhone: "",
   });
@@ -95,10 +81,8 @@ export default function IdentificationDocumentPage() {
     }));
   };
 
-  // Format date from yyyy-MM-dd to DD/MM/YYYY for display
   const formatDateForDisplay = (dateStr: string): string => {
     if (!dateStr) return "";
-    // If already in yyyy-MM-dd format
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
       try {
         const date = parse(dateStr, "yyyy-MM-dd", new Date());
@@ -107,18 +91,14 @@ export default function IdentificationDocumentPage() {
         return dateStr;
       }
     }
-    // If already in DD/MM/YYYY format, return as is
     return dateStr;
   };
 
-  // Parse date from DD/MM/YYYY to yyyy-MM-dd for storage
   const parseDateForStorage = (dateStr: string): string => {
     if (!dateStr) return "";
-    // If already in yyyy-MM-dd format, return as is
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
       return dateStr;
     }
-    // Try parsing DD/MM/YYYY format
     if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
       try {
         const date = parse(dateStr, "dd/MM/yyyy", new Date());
@@ -127,7 +107,6 @@ export default function IdentificationDocumentPage() {
         return dateStr;
       }
     }
-    // Return as is if format doesn't match
     return dateStr;
   };
 
@@ -144,14 +123,11 @@ export default function IdentificationDocumentPage() {
       });
 
       console.log("API Response:", response.data);
-
-      // Get first element from response array
       const data = response.data.data[0];
 
       console.log("Extracted data:", data);
 
       if (data) {
-        // Extract name, sex, dob - handle both lowercase and uppercase field names
         const name = data.name || data.Name || data.NAME || "";
         const sex = data.sex || data.Sex || data.SEX || "";
         const dob =
@@ -163,8 +139,6 @@ export default function IdentificationDocumentPage() {
           "";
 
         console.log("Extracted values:", { name, sex, dob });
-
-        // Map sex: "NAM" -> "Male", "NỮ" or "NU" -> "Female"
         let gender = "";
         const sexUpper = sex.toUpperCase().trim();
         if (sexUpper === "NAM") {
@@ -176,16 +150,12 @@ export default function IdentificationDocumentPage() {
         ) {
           gender = "Female";
         }
-
-        // Parse dob from dd/mm/yyyy to yyyy-MM-dd
         let formattedDob = "";
         if (dob) {
           formattedDob = parseDateForStorage(dob);
         }
 
         console.log("Mapped values:", { name, gender, formattedDob });
-
-        // Update form data
         setFormData((prev) => ({
           ...prev,
           citizenIdFullName: name,
@@ -221,19 +191,15 @@ export default function IdentificationDocumentPage() {
       });
 
       console.log("License API Response:", response.data);
-
-      // Get first element from response array
       const data = response.data.data[0];
 
       console.log("Extracted license data:", data);
 
       if (data) {
-        // Extract driver license class/tier - handle both lowercase and uppercase field names
         const licenseClass = data.class 
         console.log("Extracted license class:", licenseClass);
 
         if (licenseClass) {
-          // Update form data with extracted license class
           setFormData((prev) => ({
             ...prev,
             driverLicenseClass: licenseClass,
@@ -262,19 +228,13 @@ export default function IdentificationDocumentPage() {
       ...prev,
       [field]: file,
     }));
-
-    // If citizenIdFront is uploaded, call API to extract information
     if (field === "citizenIdFront" && file) {
       processIdImage(file);
     }
-
-    // If driverLicenseFront is uploaded, call API to extract information
     if (field === "driverLicenseFront" && file) {
       processLicenseImage(file);
     }
   };
-
-  // Create preview URLs for File objects and cleanup old URLs
   const [previewUrls, setPreviewUrls] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -308,8 +268,6 @@ export default function IdentificationDocumentPage() {
     if (formData.criminalRecord) {
       urls.criminalRecord = URL.createObjectURL(formData.criminalRecord);
     }
-
-    // Cleanup old URLs before setting new ones
     setPreviewUrls((oldUrls) => {
       Object.values(oldUrls).forEach((url) => {
         if (url) URL.revokeObjectURL(url);
@@ -327,7 +285,6 @@ export default function IdentificationDocumentPage() {
     formData.criminalRecord,
   ]);
 
-  // Cleanup all URLs on unmount
   useEffect(() => {
     return () => {
       Object.values(previewUrls).forEach((url) => {
@@ -341,7 +298,6 @@ export default function IdentificationDocumentPage() {
     setIsSubmitting(true);
 
     try {
-      // Validate required fields
       if (
         !formData.citizenIdFullName ||
         !formData.citizenIdDateOfBirth ||
@@ -360,8 +316,6 @@ export default function IdentificationDocumentPage() {
         setIsSubmitting(false);
         return;
       }
-
-      // Check if signup data exists
       if (
         !signupData.email ||
         !signupData.password ||
@@ -380,7 +334,7 @@ export default function IdentificationDocumentPage() {
         Email: signupData.email,
         PhoneNumber: signupData.phoneNumber,
         Avatar: formData.avatar,
-        BirthDate: formData.citizenIdDateOfBirth, // Already in yyyy-MM-dd format
+        BirthDate: formData.citizenIdDateOfBirth, 
         Gender: formData.citizenIdGender,
         DrivingLicenseFront: formData.driverLicenseFront,
         DrivingLicenseBack: formData.driverLicenseBack,
@@ -391,11 +345,9 @@ export default function IdentificationDocumentPage() {
         PersonalProfile: formData.criminalRecord,
       };
 
-      // Call API
       const result = await handleRegisterInstructor(registrationData);
       console.log(result);
       if (result.ok) {
-        // Navigate to waiting confirm page
         localStorage.setItem("instructorId", result.data.value!);
         router.push("/waiting-confirm");
       } else {
@@ -417,7 +369,6 @@ export default function IdentificationDocumentPage() {
         <Card className="overflow-hidden p-0 bg-white/10 backdrop-blur-md border-none shadow-lg rounded-2xl w-full max-w-4xl mx-auto">
           <CardContent className="p-6 md:p-8 max-h-[90vh] overflow-y-auto">
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-              {/* Header with logo */}
               <div className="relative flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-3">
                   <Image
@@ -434,7 +385,6 @@ export default function IdentificationDocumentPage() {
                 <div className="w-[120px]"></div>
               </div>
 
-              {/* Ảnh đại diện */}
               <Card className="border-[#10b981]/50 bg-white/5">
                 <CardHeader>
                   <CardTitle className="text-[#10b981] text-lg">
@@ -452,7 +402,6 @@ export default function IdentificationDocumentPage() {
                 </CardContent>
               </Card>
 
-              {/* Căn cước công dân */}
               <Card className="border-[#10b981]/50 bg-white/5">
                 <CardHeader>
                   <CardTitle className="text-[#10b981] text-lg">
@@ -549,15 +498,12 @@ export default function IdentificationDocumentPage() {
                             selected={
                               formData.citizenIdDateOfBirth
                                 ? (() => {
-                                    // Try to parse the date - support yyyy-MM-dd format
                                     const dateStr =
                                       formData.citizenIdDateOfBirth;
                                     const date = new Date(dateStr);
-                                    // Check if date is valid
                                     if (!isNaN(date.getTime())) {
                                       return date;
                                     }
-                                    // Try parsing DD/MM/YYYY format
                                     const parts = dateStr.split("/");
                                     if (parts.length === 3) {
                                       const day = parseInt(parts[0], 10);
@@ -648,7 +594,6 @@ export default function IdentificationDocumentPage() {
                 </CardContent>
               </Card>
 
-              {/* Giấy phép lái xe */}
               <Card className="border-[#10b981]/50 bg-white/5">
                 <CardHeader>
                   <CardTitle className="text-[#10b981] text-lg">
@@ -776,7 +721,6 @@ export default function IdentificationDocumentPage() {
                 </CardContent>
               </Card>
 
-              {/* Chứng chỉ hành nghề */}
               <Card className="border-[#10b981]/50 bg-white/5">
                 <CardHeader>
                   <CardTitle className="text-[#10b981] text-lg">
@@ -886,7 +830,6 @@ export default function IdentificationDocumentPage() {
                 </CardContent>
               </Card>
 
-              {/* Giấy khám sức khỏe */}
               <Card className="border-[#10b981]/50 bg-white/5">
                 <CardHeader>
                   <CardTitle className="text-[#10b981] text-lg">
@@ -906,7 +849,6 @@ export default function IdentificationDocumentPage() {
                 </CardContent>
               </Card>
 
-              {/* Lí lịch tư pháp */}
               <Card className="border-[#10b981]/50 bg-white/5">
                 <CardHeader>
                   <CardTitle className="text-[#10b981] text-lg">
@@ -926,7 +868,6 @@ export default function IdentificationDocumentPage() {
                 </CardContent>
               </Card>
 
-              {/* Submit Button */}
               <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-[#10b981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white"
