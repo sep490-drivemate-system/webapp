@@ -1,6 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/useAppDispatch";
+import { getStatisticsInstructor, getStatisticOverviewPriceInstructor } from "@/features/instructor/instructorThunk";
+import { StatisticTimeType } from "@/types/instructor/instructor-management.types";
+import { getUserInfo } from "@/lib/jwt/jwt.utils";
 import {
   Bar,
   BarChart,
@@ -216,10 +220,7 @@ const sessionTemplate = [
   { completed: 18, cancelled: 2, rescheduled: 2 },
 ];
 
-const commissionRate = 0.15;
-
-const formatCurrency = (value: number) =>
-  value.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+// Commission rate is now calculated from API data
 
 const formatDateLabel = (date: Date) => {
   return new Intl.DateTimeFormat("vi-VN", {
@@ -300,6 +301,11 @@ type KpiCard = {
 };
 
 export default function InstructorOverviewPage() {
+  const dispatch = useAppDispatch();
+  const { statistics, revenueStatistics, isLoading, errorMessage } = useAppSelector(
+    (state) => state.instructor
+  );
+
   const [timeRange, setTimeRange] = useState<TimeRange>("week");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
@@ -326,6 +332,39 @@ export default function InstructorOverviewPage() {
   const [selectedWeek, setSelectedWeek] = useState(
     getCurrentWeekOfMonth(now.getFullYear(), now.getMonth() + 1, now.getDate())
   );
+
+  // Fetch statistics when filters change
+  useEffect(() => {
+    const filter: {
+      year?: number;
+      month?: number;
+      week?: number;
+      type?: StatisticTimeType;
+    } = {};
+
+    if (viewMode === "year") {
+      filter.year = selectedYear;
+      filter.type = StatisticTimeType.Yearly;
+    } else if (viewMode === "month") {
+      filter.year = selectedYear;
+      filter.month = selectedMonth;
+      filter.type = StatisticTimeType.Monthly;
+    } else if (viewMode === "week") {
+      filter.year = selectedYear;
+      filter.month = selectedMonth;
+      filter.week = selectedWeek;
+      filter.type = StatisticTimeType.Weekly;
+    }
+
+    dispatch(getStatisticsInstructor(filter));
+    
+    // Get instructorId from JWT token
+    const userInfo = getUserInfo();
+    const instructorId = userInfo?.id;
+    if (instructorId) {
+      dispatch(getStatisticOverviewPriceInstructor({ instructorId }));
+    }
+  }, [dispatch, viewMode, selectedYear, selectedMonth, selectedWeek]);
 
   // Calculate available years (current year and previous years)
   const getAvailableYears = () => {
@@ -412,86 +451,65 @@ export default function InstructorOverviewPage() {
     }
   };
 
-  // Get scaled data based on selected time period
-  const getScaledData = useMemo(() => {
-    const baseData = overviewDataByRange[timeRange];
-
-    // Calculate scale factor based on selected time vs current time
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth() + 1;
-    // Calculate current week of month
-    const firstDayOfCurrentMonth = new Date(currentYear, currentMonth - 1, 1);
-    const firstWeekday = firstDayOfCurrentMonth.getDay();
-    const currentDay = now.getDate();
-    const currentWeek = Math.ceil((currentDay + firstWeekday) / 7);
-
-    // For past periods, use a slight variation factor
-    // For future periods (shouldn't happen), use base data
-    let scaleFactor = 1;
-
-    if (viewMode === "year") {
-      // Scale based on year difference (slight variation for different years)
-      const yearDiff = Math.abs(selectedYear - currentYear);
-      scaleFactor = 1 - yearDiff * 0.05; // 5% variation per year
-      if (scaleFactor < 0.5) scaleFactor = 0.5; // Minimum 50%
-    } else if (viewMode === "month") {
-      // Scale based on month difference
-      if (selectedYear === currentYear) {
-        const monthDiff = Math.abs(selectedMonth - currentMonth);
-        scaleFactor = 1 - monthDiff * 0.08; // 8% variation per month
-        if (scaleFactor < 0.6) scaleFactor = 0.6; // Minimum 60%
-      } else {
-        scaleFactor = 0.7; // Different year, use 70%
-      }
-    } else if (viewMode === "week") {
-      // Scale based on week difference
-      if (selectedYear === currentYear && selectedMonth === currentMonth) {
-        const weekDiff = Math.abs(selectedWeek - currentWeek);
-        scaleFactor = 1 - weekDiff * 0.1; // 10% variation per week
-        if (scaleFactor < 0.7) scaleFactor = 0.7; // Minimum 70%
-      } else {
-        scaleFactor = 0.8; // Different month/year, use 80%
-      }
+  // Transform API data to UI format
+  const transformedData = useMemo(() => {
+    if (!statistics) {
+      // Fallback to mock data if API hasn't loaded yet
+      const baseData = overviewDataByRange[timeRange];
+      return {
+        packageData: baseData.packageData,
+        students: baseData.students,
+      };
     }
 
+    // Transform topPersonalPackages to packageData format
+    const packageData = statistics.topPersonalPackages.map((pkg) => ({
+      name: pkg.name,
+      hours: 0, // Not available in API
+      buyers: pkg.bookCount,
+      sessions: pkg.bookCount, // Using bookCount as approximation
+    }));
+
+    // Transform recentPurchases to students format
+    const students = statistics.recentPurchases.map((purchase, idx) => ({
+      id: idx + 1,
+      name: purchase.fullname,
+      phone: purchase.phoneNumber,
+      package: purchase.packageName,
+      sessions: 0, // Not directly available, will need to calculate from other data
+      completed: 0,
+      rescheduled: 0,
+      cancelled: 0,
+    }));
+
     return {
-      packageData: baseData.packageData.map((pkg) => ({
-        ...pkg,
-        buyers: Math.round(pkg.buyers * scaleFactor),
-        sessions: Math.round(pkg.sessions * scaleFactor),
-      })),
-      students: baseData.students.map((student) => ({
-        ...student,
-        sessions: Math.round(student.sessions * scaleFactor),
-        completed: Math.round(student.completed * scaleFactor),
-        rescheduled: Math.round(student.rescheduled * scaleFactor),
-        cancelled: Math.round(student.cancelled * scaleFactor),
-      })),
-      grossRevenue: Math.round(baseData.grossRevenue * scaleFactor),
+      packageData,
+      students,
     };
-  }, [timeRange, viewMode, selectedYear, selectedMonth, selectedWeek]);
+  }, [statistics, timeRange]);
 
-  const currentData = getScaledData;
-  const packageData = currentData.packageData;
-  const students = currentData.students;
-  const grossRevenue = currentData.grossRevenue;
-  const commission = Math.round(grossRevenue * commissionRate);
-  const netRevenue = grossRevenue - commission;
+  const packageData = transformedData.packageData;
+  const students = transformedData.students;
 
-  const totalPackages = packageData.length;
-  const totalSessions = students.reduce(
-    (sum, student) => sum + student.sessions,
-    0
-  );
-  const totalCancelled = students.reduce(
-    (sum, student) => sum + student.cancelled,
-    0
-  );
-  const totalRescheduled = students.reduce(
-    (sum, student) => sum + student.rescheduled,
-    0
-  );
+  // Calculate revenue from API
+  const grossRevenue = revenueStatistics?.totalRevenue ?? 0;
+  const commission = revenueStatistics?.totalDeduction ?? 0;
+  const netRevenue = revenueStatistics?.revenueAfterDeduction ?? 0;
+  const commissionRate = grossRevenue > 0 ? commission / grossRevenue : 0.15;
+
+  // Calculate totals from API
+  const totalPackages = statistics?.totalPackageCount ?? 0;
+  const totalSessions = useMemo(() => {
+    if (!statistics?.totalSessionByStatusCount) return 0;
+    return Object.values(statistics.totalSessionByStatusCount).reduce(
+      (sum, count) => sum + count,
+      0
+    );
+  }, [statistics]);
+  
+  // Get session counts from API - note: backend uses capitalized keys
+  const totalCancelled = statistics?.totalSessionByStatusCount?.Cancelled ?? 0;
+  const totalRescheduled = statistics?.totalSessionByStatusCount?.Reschedule ?? 0;
 
   const kpis: KpiCard[] = [
     {
@@ -510,70 +528,124 @@ export default function InstructorOverviewPage() {
     },
     {
       title: "Doanh thu thực nhận",
-      value: `${netRevenue.toLocaleString("vi-VN")} VNĐ`,
-      sub: `Hoa hồng ${commissionRate * 100}%`,
+      value: `${netRevenue.toLocaleString("vi-VN")} đ`,
+      sub: `Hoa hồng ${(commissionRate * 100).toFixed(0)}%`,
       icon: TrendingUp,
       accent: "bg-emerald-50 text-emerald-600",
     },
   ];
 
   const pieData = useMemo(
-    () =>
-      packageData.map((pkg, idx) => ({
+    () => {
+      if (statistics?.topPersonalPackages) {
+        return statistics.topPersonalPackages.map((pkg, idx) => ({
+          name: pkg.name,
+          value: pkg.bookCount,
+          fill: chartColors[idx % chartColors.length],
+        }));
+      }
+      return packageData.map((pkg, idx) => ({
         name: pkg.name,
         value: pkg.buyers,
         fill: chartColors[idx % chartColors.length],
-      })),
-    [packageData]
+      }));
+    },
+    [statistics, packageData]
   );
 
-  // Get sessions data based on selected time period
+  // Transform totalSessionByDay to sessionsData format based on viewMode (matching mobile logic)
   const sessionsData = useMemo(() => {
-    const baseSessions = getSessionsByRange(timeRange);
-
-    // Calculate scale factor
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth() + 1;
-    // Calculate current week of month
-    const firstDayOfCurrentMonth = new Date(currentYear, currentMonth - 1, 1);
-    const firstWeekday = firstDayOfCurrentMonth.getDay();
-    const currentDay = now.getDate();
-    const currentWeek = Math.ceil((currentDay + firstWeekday) / 7);
-
-    let scaleFactor = 1;
+    // Handle both totalSessionByDay and totalSessionByday (backend typo)
+    const dayData = (statistics?.totalSessionByDay as Record<string, Record<string, number>> | undefined) || 
+                    ((statistics as { totalSessionByday?: Record<string, Record<string, number>> })?.totalSessionByday) || 
+                    {};
+    
+    const sessions: Array<{
+      label: string;
+      completed: number;
+      cancelled: number;
+      rescheduled: number;
+    }> = [];
 
     if (viewMode === "year") {
-      const yearDiff = Math.abs(selectedYear - currentYear);
-      scaleFactor = 1 - yearDiff * 0.05;
-      if (scaleFactor < 0.5) scaleFactor = 0.5;
-    } else if (viewMode === "month") {
-      if (selectedYear === currentYear) {
-        const monthDiff = Math.abs(selectedMonth - currentMonth);
-        scaleFactor = 1 - monthDiff * 0.08;
-        if (scaleFactor < 0.6) scaleFactor = 0.6;
-      } else {
-        scaleFactor = 0.7;
+      // Display 12 months in the year
+      for (let month = 1; month <= 12; month++) {
+        const monthKey = month.toString();
+        const dataItem = dayData[monthKey];
+        const completed = dataItem?.Completed ?? 0;
+        const cancelled = dataItem?.Cancelled ?? 0;
+        const rescheduled = dataItem?.Reschedule ?? 0;
+        sessions.push({
+          label: `T${month}`,
+          completed,
+          cancelled,
+          rescheduled,
+        });
       }
-    } else if (viewMode === "week") {
-      if (selectedYear === currentYear && selectedMonth === currentMonth) {
-        const weekDiff = Math.abs(selectedWeek - currentWeek);
-        scaleFactor = 1 - weekDiff * 0.1;
-        if (scaleFactor < 0.7) scaleFactor = 0.7;
-      } else {
-        scaleFactor = 0.8;
+    } else if (viewMode === "month") {
+      // Display all days in the month
+      const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayKey = day.toString();
+        const dataItem = dayData[dayKey];
+        const completed = dataItem?.Completed ?? 0;
+        const cancelled = dataItem?.Cancelled ?? 0;
+        const rescheduled = dataItem?.Reschedule ?? 0;
+        sessions.push({
+          label: `${day}`.padStart(2, "0"),
+          completed,
+          cancelled,
+          rescheduled,
+        });
+      }
+    } else {
+      // Week view - display 7 days in the week
+      // Calculate start date of the week (Monday)
+      const today = new Date(selectedYear, selectedMonth - 1, 1);
+      const firstMonday = new Date(today);
+      const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ...
+      const daysToMonday = dayOfWeek === 0 ? 1 : dayOfWeek === 1 ? 0 : 8 - dayOfWeek;
+      firstMonday.setDate(today.getDate() + daysToMonday);
+
+      // Calculate week based on selectedWeek (week 1, 2, 3, 4)
+      const weekStartDate = new Date(firstMonday);
+      weekStartDate.setDate(firstMonday.getDate() + (selectedWeek - 1) * 7);
+
+      for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+        const currentDate = new Date(weekStartDate);
+        currentDate.setDate(weekStartDate.getDate() + dayOffset);
+        const day = currentDate.getDate();
+        const dayKey = day.toString();
+        const dataItem = dayData[dayKey];
+        const completed = dataItem?.Completed ?? 0;
+        const cancelled = dataItem?.Cancelled ?? 0;
+        const rescheduled = dataItem?.Reschedule ?? 0;
+        
+        sessions.push({
+          label: formatDateLabel(currentDate),
+          completed,
+          cancelled,
+          rescheduled,
+        });
       }
     }
 
-    return baseSessions.map((session) => ({
-      ...session,
-      completed: Math.round(session.completed * scaleFactor),
-      rescheduled: Math.round(session.rescheduled * scaleFactor),
-      cancelled: Math.round(session.cancelled * scaleFactor),
-    }));
-  }, [timeRange, viewMode, selectedYear, selectedMonth, selectedWeek]);
+    if (sessions.length === 0) {
+      // Fallback to mock data
+      return getSessionsByRange(timeRange);
+    }
+
+    return sessions;
+  }, [statistics, viewMode, selectedYear, selectedMonth, selectedWeek, timeRange]);
 
   const sessionTotals = useMemo(() => {
+    if (statistics?.totalSessionByStatusCount) {
+      return {
+        completed: statistics.totalSessionByStatusCount.Completed || 0,
+        rescheduled: statistics.totalSessionByStatusCount.Reschedule || 0,
+        cancelled: statistics.totalSessionByStatusCount.Cancelled || 0,
+      };
+    }
     return sessionsData.reduce(
       (totals, session) => ({
         completed: totals.completed + session.completed,
@@ -582,7 +654,7 @@ export default function InstructorOverviewPage() {
       }),
       { completed: 0, rescheduled: 0, cancelled: 0 }
     );
-  }, [sessionsData]);
+  }, [statistics, sessionsData]);
 
   return (
     <div className="space-y-8">
@@ -590,6 +662,16 @@ export default function InstructorOverviewPage() {
         title="Quản Lý Doanh Thu, Người Lái Mới & Gói Dịch Vụ"
         description="Theo dõi hiệu suất buổi huấn luyện, doanh thu và danh sách người lái mới."
       />
+      {isLoading && (
+        <div className="text-center py-4 text-muted-foreground">
+          Đang tải dữ liệu...
+        </div>
+      )}
+      {errorMessage && (
+        <div className="text-center py-4 text-destructive">
+          Lỗi: {errorMessage}
+        </div>
+      )}
       <div className="flex justify-end">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">
@@ -836,7 +918,7 @@ export default function InstructorOverviewPage() {
                     outerRadius={100}
                     paddingAngle={4}
                   >
-                    {pieData.map((entry, index) => (
+                    {pieData.map((entry) => (
                       <Cell key={entry.name} fill={entry.fill} />
                     ))}
                   </Pie>
@@ -988,21 +1070,21 @@ export default function InstructorOverviewPage() {
             <div className="rounded-xl border bg-muted/20 p-4">
               <p className="text-sm text-muted-foreground">Tổng doanh thu</p>
               <p className="text-2xl font-semibold text-foreground">
-                {grossRevenue.toLocaleString("vi-VN")} VNĐ
+                {grossRevenue.toLocaleString("vi-VN")} đ
               </p>
             </div>
             <div className="rounded-xl border bg-rose-50 p-4">
               <p className="text-sm text-rose-600">
-                Hoa hồng ({commissionRate * 100}%)
+                Hoa hồng ({(commissionRate * 100).toFixed(0)}%)
               </p>
               <p className="text-2xl font-semibold text-rose-600">
-                {commission.toLocaleString("vi-VN")} VNĐ
+                {commission.toLocaleString("vi-VN")} đ
               </p>
             </div>
             <div className="rounded-xl border bg-emerald-50 p-4">
               <p className="text-sm text-emerald-600">Doanh thu thực nhận</p>
               <p className="text-2xl font-semibold text-emerald-600">
-                {netRevenue.toLocaleString("vi-VN")} VNĐ
+                {netRevenue.toLocaleString("vi-VN")} đ
               </p>
             </div>
           </CardContent>

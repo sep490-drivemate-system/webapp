@@ -1,7 +1,15 @@
 import { ICar } from "@/types/car/car.type";
-import { createThunk } from "../genericCreateThunk";
 import { HttpMethod } from "@/types/constants/httpMethod";
-import { GetInstructorsParams, IInstructors, InstructorApplication, PaginatedInstructorsResponse, IInstructorStatistic } from "@/types/instructor/instructor-management.types";
+import {
+  GetInstructorsParams,
+  IInstructors,
+  IInstructorStatistic,
+  IInstructorStatisticFilter,
+  InstructorApplication,
+  IStatisticsInstructor,
+  PaginatedInstructorsResponse
+} from "@/types/instructor/instructor-management.types";
+import { createThunk } from "../genericCreateThunk";
 
 export const INSTRUCTOR_PATH = "instructors";
 
@@ -50,53 +58,90 @@ export const getInstructorById = createThunk<IInstructors, { id: string }>(
   "getInstructorById",
   `${INSTRUCTOR_PATH}/:id`,
   {
-    buildUrl: (payload) => `${INSTRUCTOR_PATH}/${payload.id}`
+    buildUrl: (payload) => `${INSTRUCTOR_PATH}/${payload.id}`,
   }
 );
 
-export const getInstructorCars = createThunk<
-  ICar[],
-  { id: string }
->(HttpMethod.GET, "getInstructorCars", `car/instructor/:id/cars`, {
-  buildUrl: (payload) => `car/instructor/${payload.id}/cars`,
-});
+export const getInstructorCars = createThunk<ICar[], { id: string }>(
+  HttpMethod.GET,
+  "getInstructorCars",
+  `car/instructor/:id/cars`,
+  {
+    buildUrl: (payload) => `car/instructor/${payload.id}/cars`,
+  }
+);
 
-export const getRecommendedInstructors = createThunk<
-  IInstructors[],
-  void
->(HttpMethod.GET, "getRecommendedInstructors", `/${INSTRUCTOR_PATH}/recommended`);
+export const getRecommendedInstructors = createThunk<IInstructors[], void>(
+  HttpMethod.GET,
+  "getRecommendedInstructors",
+  `/${INSTRUCTOR_PATH}/recommended`
+);
 
 export const getIntructorApplicationByInstructorId = createThunk<
   InstructorApplication,
   { instructorId: string }
->(HttpMethod.GET, "getIntructorApplicationByInstructorId", `${INSTRUCTOR_PATH}/:instructorId/applicants`, {
-  buildUrl: (payload) => `${INSTRUCTOR_PATH}/${payload.instructorId}/applicants`
-});
-
-export interface GetInstructorStatisticParams {
-  from?: string; // ISO 8601 date string
-  to?: string; // ISO 8601 date string
-}
-
-export const getInstructorStatistic = createThunk<
-  IInstructorStatistic,
-  GetInstructorStatisticParams | void
 >(
   HttpMethod.GET,
-  "getInstructorStatistic",
-  "booking/instructor-statistic",
+  "getIntructorApplicationByInstructorId",
+  `${INSTRUCTOR_PATH}/:instructorId/applicants`,
   {
-    buildUrl: (payload) => {
-      if (!payload || (!payload.from && !payload.to)) {
-        return "booking/instructor-statistic";
-      }
-      
-      const params = new URLSearchParams();
-      if (payload.from) params.append("from", payload.from);
-      if (payload.to) params.append("to", payload.to);
-      
-      const queryString = params.toString();
-      return `booking/instructor-statistic${queryString ? `?${queryString}` : ""}`;
-    },
+    buildUrl: (payload) =>
+      `${INSTRUCTOR_PATH}/${payload.instructorId}/applicants`,
   }
 );
+
+export const getStatisticsInstructor = createThunk<
+  IInstructorStatistic,
+  IInstructorStatisticFilter | void
+>(HttpMethod.GET, "getStatisticsInstructor", `booking/instructor-statistic`, {
+  buildUrl: (payload) => {
+    const baseUrl = `booking/instructor-statistic`;
+    if (!payload || typeof payload !== "object") {
+      return baseUrl;
+    }
+
+    const params = new URLSearchParams();
+
+    // Always add type if provided
+    if (payload.type !== undefined && payload.type !== null) {
+      params.append("type", payload.type.toString());
+    }
+
+    // Add year if provided
+    if (
+      payload.year !== undefined &&
+      payload.year !== null &&
+      payload.year !== 0
+    ) {
+      params.append("year", payload.year.toString());
+    }
+
+    // Add month if provided (for month and week viewMode)
+    if (
+      payload.month !== undefined &&
+      payload.month !== null &&
+      payload.month !== 0
+    ) {
+      params.append("month", payload.month.toString());
+    }
+
+    // Add week if provided (only for week viewMode)
+    if (
+      payload.week !== undefined &&
+      payload.week !== null &&
+      payload.week !== 0
+    ) {
+      params.append("week", payload.week.toString());
+    }
+
+    const queryString = params.toString();
+    return queryString ? `${baseUrl}?${queryString}` : baseUrl;
+  },
+});
+
+export const getStatisticOverviewPriceInstructor = createThunk<
+  IStatisticsInstructor,
+  { instructorId: string }
+>(HttpMethod.GET, "getWallet", `transaction/users/:id/statistics`, {
+  buildUrl: (payload) => `transaction/users/${payload.instructorId}/statistic`,
+});

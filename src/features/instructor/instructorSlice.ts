@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { BaseState } from '@/types/generic/baseState';
-import { IInstructors } from '@/types/instructor/instructor-management.types';
+import { IInstructors, IInstructorStatistic, IStatisticsInstructor } from '@/types/instructor/instructor-management.types';
 import {
   FilterType,
   DistanceFilter,
@@ -9,6 +9,7 @@ import {
   SortType,
   FilterState,
 } from '@/types/instructor/instructor-filter.type';
+import { getStatisticsInstructor, getStatisticOverviewPriceInstructor } from './instructorThunk';
 
 interface PaginationState {
   currentPage: number;
@@ -21,6 +22,10 @@ interface InstructorState extends BaseState {
   allInstructors: IInstructors[];
   filteredInstructors: IInstructors[];
   displayedInstructors: IInstructors[];
+  
+  // Statistics
+  statistics: IInstructorStatistic | null;
+  revenueStatistics: IStatisticsInstructor | null;
   
   // Search & Filter
   searchQuery: string;
@@ -52,6 +57,10 @@ const initialState: InstructorState = {
   allInstructors: [],
   filteredInstructors: [],
   displayedInstructors: [],
+  
+  // Statistics
+  statistics: null,
+  revenueStatistics: null,
   
   // Search & Filter
   searchQuery: '',
@@ -157,6 +166,43 @@ const instructorSlice = createSlice({
     clearError: (state) => {
       state.errorMessage = null;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      // Handle getStatisticsInstructor
+      .addCase(getStatisticsInstructor.pending, (state) => {
+        state.isLoading = true;
+        state.errorMessage = null;
+      })
+      .addCase(getStatisticsInstructor.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        if (action.payload.value) {
+          state.statistics = action.payload.value;
+        }
+      })
+      .addCase(getStatisticsInstructor.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.errorMessage = action.payload || 'Failed to fetch statistics';
+      })
+      // Handle getStatisticOverviewPriceInstructor
+      .addCase(getStatisticOverviewPriceInstructor.pending, (state) => {
+        state.isLoading = true;
+        state.errorMessage = null;
+      })
+      .addCase(getStatisticOverviewPriceInstructor.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        if (action.payload.value) {
+          state.revenueStatistics = action.payload.value;
+        }
+      })
+      .addCase(getStatisticOverviewPriceInstructor.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.errorMessage = action.payload || 'Failed to fetch revenue statistics';
+      });
   },
 });
 

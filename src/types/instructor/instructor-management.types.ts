@@ -149,7 +149,7 @@ export interface IInstructor {
   gender: gender;
   packages?: IInstructorPackages[]; // Optional packages array
   price?: number; // Optional price for some instructors
-  vehicels?: any[]; // Optional vehicles (typo in data, keeping for compatibility)
+  vehicels?: ICar[]; // Optional vehicles (typo in data, keeping for compatibility)
 }
 
 // Type for InstructorItem component (with price for display)
@@ -221,9 +221,6 @@ export interface ITopPersonalCar {
   bookCount: number;
   percentage: number;
 }
-
-
-
 
 export interface IInstructorStatistic {
   totalPackageCount: number;

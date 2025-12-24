@@ -5,6 +5,7 @@ import transactionReducer from '@/features/transaction/transactionSlice';
 import bookingReducer from '@/features/booking/bookingSlice';
 import blogReducer from '@/features/blog/blogSlice';
 import policyReducer from '@/features/policy/policySlice';
+import instructorReducer from '@/features/instructor/instructorSlice';
 
 const appReducer = combineReducers({
         auth: authReducer,
@@ -13,6 +14,7 @@ const appReducer = combineReducers({
         booking: bookingReducer,
         blog: blogReducer,
         policy: policyReducer,
+        instructor: instructorReducer,
 });
 
 const rootReducer = (
