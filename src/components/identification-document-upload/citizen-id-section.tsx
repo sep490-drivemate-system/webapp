@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import ImageUploadField from "../commons/image-upload-field";
+import ImageUploadField from "@/components/commons/image-upload-field";
 
 export default function CitizenIdSection() {
   const [formData, setFormData] = useState({

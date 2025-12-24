@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import ImageUploadField from "../commons/image-upload-field";
+import ImageUploadField from "@/components/commons/image-upload-field";
 
 export default function HealthCertificateSection() {
   const [formData, setFormData] = useState({
