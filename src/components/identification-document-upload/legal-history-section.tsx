@@ -4,11 +4,10 @@ import { useState } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import ImageUploadField from "../image-upload-field";
+import ImageUploadField from "@/components/commons/image-upload-field";
 
 export default function LegalHistorySection() {
   const [formData, setFormData] = useState({

@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import ImageUploadField from "../image-upload-field";
+import ImageUploadField from "@/components/commons/image-upload-field";
 
 export default function DriverLicenseSection() {
   const [formData, setFormData] = useState({
