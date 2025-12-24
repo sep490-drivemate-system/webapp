@@ -8,7 +8,6 @@ import {
   Loader2,
   MapPin,
   Plus,
-  Trash2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -126,14 +125,7 @@ function VehicleCard({ vehicle, onDetail, onDelete }: VehicleCardProps) {
             <Eye className="size-4" />
             Xem
           </Button>
-          <Button
-            variant="outline"
-            className="flex-1 border-destructive text-destructive hover:bg-destructive hover:text-white"
-            onClick={onDelete}
-          >
-            <Trash2 className="size-4" />
-            Xóa
-          </Button>
+      
         </div>
       </CardContent>
     </Card>
@@ -282,7 +274,6 @@ export default function CarManagementPage() {
     fetchVehicles();
   }, [fetchCarsForInstructor]);
 
-  // Reload when page becomes visible (e.g., when navigating back from car-upload)
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
@@ -311,7 +302,6 @@ export default function CarManagementPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <section className="space-y-4">
         <PageHeader
           title="Quản Lý Xe Học Lái"
@@ -323,7 +313,6 @@ export default function CarManagementPage() {
           }}
         />
 
-        {/* Stats Cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-start justify-between gap-4">
@@ -331,7 +320,7 @@ export default function CarManagementPage() {
                 <CardDescription className="text-sm font-medium">
                   Tổng Xe
                 </CardDescription>
-                <CardTitle className="text-3xl font-semibold">
+                <CardTitle className="text-xl font-semibold">
                   {vehicles.length}
                 </CardTitle>
               </div>
@@ -346,7 +335,7 @@ export default function CarManagementPage() {
                 <CardDescription className="text-sm font-medium">
                   Đã Duyệt
                 </CardDescription>
-                <CardTitle className="text-3xl font-semibold">
+                <CardTitle className="text-xl font-semibold">
                   {approvedCount}
                 </CardTitle>
               </div>
@@ -361,7 +350,7 @@ export default function CarManagementPage() {
                 <CardDescription className="text-sm font-medium">
                   Chờ Duyệt
                 </CardDescription>
-                <CardTitle className="text-3xl font-semibold">
+                <CardTitle className="text-xl font-semibold">
                   {pendingCount}
                 </CardTitle>
               </div>
@@ -376,7 +365,7 @@ export default function CarManagementPage() {
                 <CardDescription className="text-sm font-medium">
                   Giá Trung Bình
                 </CardDescription>
-                <CardTitle className="text-3xl font-semibold">
+                <CardTitle className="text-xl font-semibold">
                   {averagePrice.toLocaleString("vi-VN")} VNĐ
                 </CardTitle>
               </div>
@@ -388,7 +377,6 @@ export default function CarManagementPage() {
         </div>
       </section>
 
-      {/* Vehicles Grid */}
       {fetchCarsLoading ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
@@ -433,7 +421,6 @@ export default function CarManagementPage() {
         </section>
       )}
 
-      {/* Modals */}
       <VehicleModal
         vehicle={selectedVehicle}
         open={showDetailModal}

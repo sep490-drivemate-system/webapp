@@ -1,10 +1,12 @@
 "use client";
 
-import { Search, Eye, CheckCircle, XCircle, MessageSquare, Loader2, Filter, MoreHorizontal, Calendar, User } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Search, Eye, CheckCircle, XCircle, Loader2, MoreHorizontal, Calendar, User, Clock, FileText, Trash2 } from "lucide-react";
 import Image from "next/image";
+import PageHeader from "@/components/commons/Header/header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -19,10 +21,10 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Spinner } from "@/components/ui/shadcn-io/spinner";
 import { PostStatus } from "@/types/forum/post.enum";
 import {
     Dialog,
@@ -37,6 +39,13 @@ import { Label } from "@/components/ui/label";
 import { UserRole } from "@/types/auth/user-role.enum";
 import { useRequireAuth } from "@/hooks/auth/useRequireAuth";
 import { usePostManagement } from "@/hooks/forum/usePost";
+import { useThunkAction } from "@/lib/redux/useThunkAction";
+import {
+    getBlogCategories,
+    createCategoriesForInspector,
+    deleteCategoryForInspector,
+} from "@/features/blog/blogThunk";
+import { BlogCategory } from "@/types/blog/blog.type";
 
 export default function PostManagementPage() {
     useRequireAuth([UserRole.Admin, UserRole.Inspector]);
@@ -66,97 +75,185 @@ export default function PostManagementPage() {
         stats,
     } = usePostManagement();
 
+    const {
+        runSafe: runGetCategories,
+        loading: getCategoriesLoading,
+    } = useThunkAction(getBlogCategories);
+    const {
+        runSafe: runCreateCategory,
+        loading: createCategoryLoading,
+    } = useThunkAction(createCategoriesForInspector);
+    const {
+        runSafe: runDeleteCategory,
+        loading: deleteCategoryLoading,
+    } = useThunkAction(deleteCategoryForInspector);
+
+    const [categories, setCategories] = useState<BlogCategory[]>([]);
+    const [newCategoryName, setNewCategoryName] = useState("");
+    const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            const res = await runGetCategories(undefined as void);
+            if (res.ok) {
+                const data = res.data?.value;
+                setCategories(Array.isArray(data) ? (data as BlogCategory[]) : []);
+            } else {
+                setCategories([]);
+            }
+        };
+
+        fetchCategories();
+    }, [runGetCategories]);
+
+    const handleCreateCategory = async () => {
+        const name = newCategoryName.trim();
+        if (!name) return;
+
+        const res = await runCreateCategory({ name });
+        if (res.ok && res.data?.value) {
+            const created = res.data.value as BlogCategory;
+            setCategories((prev) => [...prev, created]);
+            setNewCategoryName("");
+        }
+    };
+
+    const handleDeleteCategory = async (id: string) => {
+        setDeletingCategoryId(id);
+        const res = await runDeleteCategory({ id });
+        if (res.ok) {
+            setCategories((prev) => prev.filter((category) => category.id !== id));
+        }
+        setDeletingCategoryId(null);
+    };
+
     return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Quản lý bài viết</h1>
-            </div>
-
-
-            {/* Filters */}
-            <Card>
-                <CardContent className="pt-6">
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="flex-1 relative">
-                            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                            <Input
-                                placeholder="Tìm kiếm bài viết..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10"
-                            />
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Filter className="size-4 text-muted-foreground" />
-                            <Select
-                                value={statusFilter as string}
-                                onValueChange={(value) => setStatusFilter(value as PostStatus | "all")}
-                            >
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="Lọc theo trạng thái" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Tất cả</SelectItem>
-                                    <SelectItem value={String(PostStatus.Pending)}>Chờ duyệt</SelectItem>
-                                    <SelectItem value={String(PostStatus.Approved)}>Đã duyệt</SelectItem>
-                                    <SelectItem value={String(PostStatus.Rejected)}>Đã từ chối</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
+        <div className="space-y-8">
+            <PageHeader
+                title="Quản Lý Bài Viết"
+                description="Theo dõi, duyệt hoặc quản lý trạng thái các bài viết của giảng viên."
+                className="space-y-4"
+            />
+            <Card className="rounded-3xl border bg-background shadow-sm">
+                <CardContent className="p-6">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                        <StatCard
+                            label="Tổng số bài đăng"
+                            value={stats.total}
+                            icon={<FileText className="size-5" />}
+                            accent="bg-blue-50 text-blue-600"
+                        />
+                        <StatCard
+                            label="Chờ duyệt"
+                            value={stats.pending}
+                            icon={<Clock className="size-5" />}
+                            accent="bg-amber-50 text-amber-600"
+                        />
+                        <StatCard
+                            label="Đã duyệt"
+                            value={stats.approved}
+                            icon={<CheckCircle className="size-5" />}
+                            accent="bg-emerald-50 text-emerald-600"
+                        />
+                        <StatCard
+                            label="Từ chối"
+                            value={stats.rejected}
+                            icon={<XCircle className="size-5" />}
+                            accent="bg-rose-50 text-rose-600"
+                        />
                     </div>
                 </CardContent>
             </Card>
 
-            {/* Posts List */}
-            <Card>
-                <CardContent className="p-0">
-                    {isLoading ? (
-                        <div className="py-12 text-center">
-                            <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary mb-4" />
-                            <p className="text-muted-foreground">Đang tải danh sách bài viết...</p>
-                        </div>
-                    ) : posts.length === 0 ? (
-                        <div className="py-12 text-center">
-                            <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                            <p className="text-muted-foreground">
-                                {searchTerm
-                                    ? "Không tìm thấy bài viết nào."
-                                    : "Không có bài viết nào."}
-                            </p>
-                        </div>
-                    ) : (
-                        <Table>
-                            <TableHeader>
+            <section className="rounded-3xl border bg-card p-6 shadow-sm">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center">
+                    <div className="relative flex-1">
+                        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                            value={searchTerm}
+                            onChange={(event) => setSearchTerm(event.target.value)}
+                            placeholder="Tìm kiếm bài viết..."
+                            className="pl-10"
+                        />
+                    </div>
+                    <Select
+                        value={statusFilter as string}
+                        onValueChange={(value) => setStatusFilter(value as PostStatus | "all")}
+                    >
+                        <SelectTrigger className="w-full md:w-56">
+                            <SelectValue placeholder="Trạng thái" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                            <SelectItem value={String(PostStatus.Pending)}>Chờ duyệt</SelectItem>
+                            <SelectItem value={String(PostStatus.Approved)}>Đã duyệt</SelectItem>
+                            <SelectItem value={String(PostStatus.Rejected)}>Đã từ chối</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </section>
+
+            <section className="rounded-3xl border bg-card p-6 shadow-sm">
+                <div className="overflow-x-auto rounded-2xl border">
+                    <Table>
+                        <TableHeader className="bg-muted/60 text-xs uppercase text-muted-foreground">
+                            <TableRow>
+                                <TableHead className="text-center font-semibold">STT</TableHead>
+                                <TableHead>Tiêu đề</TableHead>
+                                <TableHead>Tác giả</TableHead>
+                                <TableHead>Ngày tạo</TableHead>
+                                <TableHead>Trạng thái</TableHead>
+                                <TableHead className="text-center">Thao tác</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {isLoading ? (
                                 <TableRow>
-                                    <TableHead className="w-[50px]">STT</TableHead>
-                                    <TableHead>Tiêu đề</TableHead>
-                                    <TableHead>Tác giả</TableHead>
-                                    <TableHead>Ngày tạo</TableHead>
-                                    <TableHead>Trạng thái</TableHead>
-                                    <TableHead className="text-center w-[100px]">Thao tác</TableHead>
+                                    <TableCell
+                                        colSpan={6}
+                                        className="py-8 text-center text-sm text-muted-foreground"
+                                    >
+                                        <div className="flex items-center justify-center gap-2">
+                                            <Spinner variant="circle" className="size-4" />
+                                            <span>Đang tải danh sách bài viết...</span>
+                                        </div>
+                                    </TableCell>
                                 </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {posts.map((post, index) => {
+                            ) : posts.length === 0 ? (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={6}
+                                        className="py-8 text-center text-sm text-muted-foreground"
+                                    >
+                                        {searchTerm
+                                            ? "Không tìm thấy bài viết phù hợp."
+                                            : "Không có bài viết nào."}
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                posts.map((post, index) => {
                                     const statusBadge = getStatusBadge(post.status);
                                     const strippedTitle = post.title.replace(/<[^>]*>/g, "");
-                                    const strippedContent = post.content.replace(/<[^>]*>/g, "");
-                                    const truncatedContent = strippedContent.length > 100
-                                        ? strippedContent.substring(0, 100) + "..."
-                                        : strippedContent;
 
                                     return (
-                                        <TableRow key={post.postId}>
-                                            <TableCell className="font-medium">{index + 1}</TableCell>
+                                        <TableRow
+                                            key={post.postId}
+                                            className="hover:bg-muted/30"
+                                        >
+                                            <TableCell className="text-center text-sm font-semibold text-muted-foreground">
+                                                {index + 1}
+                                            </TableCell>
                                             <TableCell>
-                                                <div className="max-w-[400px]">
-                                                    <div className="font-medium line-clamp-1">
+                                                <div className="space-y-1">
+                                                    <p className="line-clamp-2 font-medium">
                                                         {strippedTitle || "Không có tiêu đề"}
-                                                    </div>
+                                                    </p>
                                                 </div>
                                             </TableCell>
-                                            <TableCell>{post.authorName || "N/A"}</TableCell>
-                                            <TableCell>
+                                            <TableCell className="text-sm">
+                                                {post.authorName || "N/A"}
+                                            </TableCell>
+                                            <TableCell className="text-sm">
                                                 {new Date(post.createdAt).toLocaleDateString("vi-VN", {
                                                     year: "numeric",
                                                     month: "2-digit",
@@ -173,58 +270,161 @@ export default function PostManagementPage() {
                                                     {statusBadge.label}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell className="text-center">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="icon"
-                                                            aria-label="Thao tác"
-                                                        >
-                                                            <MoreHorizontal className="size-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                                                        <DropdownMenuSeparator />
-                                                        <DropdownMenuItem
-                                                            onClick={() => openViewDialog(post)}
-                                                        >
-                                                            <Eye className="mr-2 size-4" />
-                                                            Xem chi tiết
-                                                        </DropdownMenuItem>
-                                                        {post.status === PostStatus.Pending && (
-                                                            <>
-                                                                <DropdownMenuItem
-                                                                    onClick={() => handleApprove(post.postId)}
-                                                                    disabled={isUpdating}
-                                                                >
-                                                                    <CheckCircle className="mr-2 size-4" />
-                                                                    Duyệt bài viết
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem
-                                                                    onClick={() => openRejectDialog(post)}
-                                                                    disabled={isUpdating}
-                                                                    className="text-red-600"
-                                                                >
-                                                                    <XCircle className="mr-2 size-4" />
-                                                                    Từ chối bài viết
-                                                                </DropdownMenuItem>
-                                                            </>
-                                                        )}
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                                            <TableCell>
+                                                <div className="flex justify-center">
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="icon"
+                                                                aria-label="Thao tác"
+                                                            >
+                                                                <MoreHorizontal className="size-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuItem
+                                                                onSelect={() => openViewDialog(post)}
+                                                            >
+                                                                <Eye className="mr-2 size-4" />
+                                                                Xem chi tiết
+                                                            </DropdownMenuItem>
+
+                                                            {post.status === PostStatus.Pending && (
+                                                                <>
+                                                                    <DropdownMenuSeparator />
+                                                                    <DropdownMenuItem
+                                                                        onClick={() => handleApprove(post.postId)}
+                                                                        disabled={isUpdating}
+                                                                        className="text-emerald-600"
+                                                                    >
+                                                                        <CheckCircle className="mr-2 size-4" />
+                                                                        Duyệt bài viết
+                                                                    </DropdownMenuItem>
+                                                                    <DropdownMenuItem
+                                                                        onClick={() => openRejectDialog(post)}
+                                                                        disabled={isUpdating}
+                                                                        className="text-rose-600"
+                                                                    >
+                                                                        <XCircle className="mr-2 size-4" />
+                                                                        Từ chối bài viết
+                                                                    </DropdownMenuItem>
+                                                                </>
+                                                            )}
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </div>
                                             </TableCell>
                                         </TableRow>
                                     );
-                                })}
-                            </TableBody>
-                        </Table>
-                    )}
-                </CardContent>
-            </Card>
+                                })
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
+            </section>
 
-            {/* View Detail Dialog */}
+            <section className="rounded-3xl border bg-card p-6 shadow-sm">
+                <div className="space-y-3">
+                    <h2 className="text-lg font-semibold">Quản lý phân loại bài viết</h2>
+                    <p className="text-sm text-muted-foreground">
+                        Xem danh sách phân loại hiện có và thêm mới phân loại cho bài viết.
+                    </p>
+                </div>
+                <div className="mt-4 overflow-x-auto rounded-2xl border bg-muted/20">
+                    <Table>
+                        <TableHeader className="bg-muted/60 text-xs uppercase text-muted-foreground">
+                            <TableRow>
+                                <TableHead className="w-[60px] text-center font-semibold">
+                                    STT
+                                </TableHead>
+                                <TableHead className="font-semibold">Tên phân loại</TableHead>
+                                <TableHead className="w-[140px] text-center font-semibold">
+                                    Thao tác
+                                </TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {getCategoriesLoading ? (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={3}
+                                        className="py-6 text-center text-sm text-muted-foreground"
+                                    >
+                                        <div className="flex items-center justify-center gap-2">
+                                            <Spinner variant="circle" className="size-4" />
+                                            <span>Đang tải danh sách phân loại...</span>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ) : categories.length === 0 ? (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={3}
+                                        className="py-6 text-center text-sm text-muted-foreground"
+                                    >
+                                        Chưa có phân loại nào.
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                categories.map((category, index) => (
+                                    <TableRow key={category.id}>
+                                        <TableCell className="text-center text-sm text-muted-foreground">
+                                            {index + 1}
+                                        </TableCell>
+                                        <TableCell className="text-sm">{category.name}</TableCell>
+                                        <TableCell className="text-center">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="icon"
+                                                className="border-destructive/40 text-destructive hover:bg-destructive hover:text-white transition-colors"
+                                                onClick={() => handleDeleteCategory(category.id)}
+                                                disabled={
+                                                    deleteCategoryLoading ||
+                                                    deletingCategoryId === category.id
+                                                }
+                                                aria-label="Xóa phân loại"
+                                            >
+                                                <Trash2 className="size-4" />
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                            <TableRow>
+                                <TableCell />
+                                <TableCell>
+                                    <Input
+                                        id="new-category-name"
+                                        value={newCategoryName}
+                                        onChange={(e) => setNewCategoryName(e.target.value)}
+                                        placeholder="Nhập tên phân loại mới..."
+                                        className="h-9"
+                                    />
+                                </TableCell>
+                                <TableCell className="text-center">
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        onClick={handleCreateCategory}
+                                        disabled={!newCategoryName.trim() || createCategoryLoading}
+                                    >
+                                        {createCategoryLoading ? (
+                                            <Spinner
+                                                variant="circle"
+                                                className="mr-2 size-4 text-primary-foreground"
+                                            />
+                                        ) : null}
+                                        Thêm phân loại
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </div>
+            </section>
+
             <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
                 <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
@@ -232,7 +432,6 @@ export default function PostManagementPage() {
                     </DialogHeader>
                     {selectedPost && (
                         <div className="space-y-6 py-4">
-                            {/* Header Info */}
                             <div className="flex items-start justify-between border-b pb-4">
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2">
@@ -259,8 +458,6 @@ export default function PostManagementPage() {
                                     {getStatusBadge(selectedPost.status).label}
                                 </Badge>
                             </div>
-
-                            {/* Title */}
                             <div>
                                 <h3 className="text-sm font-medium text-muted-foreground mb-2">Tiêu đề</h3>
                                 <div
@@ -268,8 +465,6 @@ export default function PostManagementPage() {
                                     dangerouslySetInnerHTML={{ __html: selectedPost.title }}
                                 />
                             </div>
-
-                            {/* Content */}
                             <div>
                                 <h3 className="text-sm font-medium text-muted-foreground mb-2">Nội dung</h3>
                                 <div
@@ -277,8 +472,6 @@ export default function PostManagementPage() {
                                     dangerouslySetInnerHTML={{ __html: selectedPost.content }}
                                 />
                             </div>
-
-                            {/* Images */}
                             {selectedPost.images && selectedPost.images.length > 0 && (
                                 <div>
                                     <h3 className="text-sm font-medium text-muted-foreground mb-2">
@@ -303,8 +496,6 @@ export default function PostManagementPage() {
                                     </div>
                                 </div>
                             )}
-
-                            {/* Videos */}
                             {selectedPost.videos && selectedPost.videos.length > 0 && (
                                 <div>
                                     <h3 className="text-sm font-medium text-muted-foreground mb-2">
@@ -341,8 +532,6 @@ export default function PostManagementPage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-
-            {/* Reject Dialog */}
             <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
                 <DialogContent>
                     <DialogHeader>
@@ -389,6 +578,38 @@ export default function PostManagementPage() {
                 </DialogContent>
             </Dialog>
         </div>
+    );
+}
+
+function StatCard({
+    label,
+    value,
+    icon,
+    accent,
+}: {
+    label: string;
+    value: number;
+    icon?: React.ReactNode;
+    accent?: string;
+}) {
+    return (
+        <Card>
+            <CardHeader className="flex flex-row items-start justify-between gap-4">
+                <div className="space-y-1">
+                    <CardDescription className="text-sm font-medium">
+                        {label}
+                    </CardDescription>
+                    <CardTitle className="text-2xl font-semibold">{value}</CardTitle>
+                </div>
+                {icon && (
+                    <span
+                        className={`rounded-xl p-3 ${accent || "bg-blue-50 text-blue-600"}`}
+                    >
+                        {icon}
+                    </span>
+                )}
+            </CardHeader>
+        </Card>
     );
 }
 

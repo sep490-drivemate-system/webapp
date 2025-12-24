@@ -34,7 +34,6 @@ export default function Home() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <section className="space-y-3">
         <Card className="rounded-2xl border bg-white p-6 shadow-sm">
           <CardHeader>
@@ -59,7 +58,6 @@ export default function Home() {
         </Card>
       </section>
 
-      {/* Status Messages */}
       {uploadStatus !== "idle" && (
         <Card
           className={
@@ -81,8 +79,6 @@ export default function Home() {
           </CardContent>
         </Card>
       )}
-
-      {/* Manual Form */}
       <section>
         <Tabs defaultValue="manual" className="w-full">
           <TabsContent value="manual" className="space-y-6 mt-6">

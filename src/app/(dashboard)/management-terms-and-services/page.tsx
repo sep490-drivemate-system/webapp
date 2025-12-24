@@ -41,7 +41,6 @@ export default function AdminTermsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [termToDelete, setTermToDelete] = useState<string | null>(null);
 
-  // Fetch policies on mount and when refreshTrigger changes
   useEffect(() => {
     dispatch(getNewDriverPolicy())
       .unwrap()
@@ -56,29 +55,26 @@ export default function AdminTermsPage() {
       });
   }, [dispatch, refreshTrigger]);
 
-  // Combine and transform policies to Term format
   const terms = useMemo(() => {
     const allPolicies: Term[] = [];
 
-    // Transform new driver policies (type 1)
     newDriverPolicies.forEach((policy) => {
       allPolicies.push({
         id: policy.id,
         title: policy.title,
         description: policy.detail,
         type: "1",
-        createdAt: new Date().toISOString(), // API doesn't return createdAt, using current date
+        createdAt: new Date().toISOString(),
       });
     });
 
-    // Transform instructor policies (type 2)
     instructorPolicies.forEach((policy) => {
       allPolicies.push({
         id: policy.id,
         title: policy.title,
         description: policy.detail,
         type: "2",
-        createdAt: new Date().toISOString(), // API doesn't return createdAt, using current date
+        createdAt: new Date().toISOString(),
       });
     });
 
@@ -98,18 +94,15 @@ export default function AdminTermsPage() {
   const handleSubmit = async (termData: Omit<Term, "id" | "createdAt">) => {
     setLoading(true);
     try {
-      // Transform termData to Policy format (type string -> number, description -> description)
       const policyData: Omit<Policy, "id"> = {
         title: termData.title,
         description: termData.description,
-        type: parseInt(termData.type, 10), // Convert string to number
+        type: parseInt(termData.type, 10),
       };
 
       if (selectedTerm) {
-        // Update existing policy
         await dispatch(updatePolicy({ id: selectedTerm.id, data: policyData })).unwrap();
       } else {
-        // Create new policy
         await dispatch(createPolicy(policyData)).unwrap();
       }
 
@@ -134,7 +127,6 @@ export default function AdminTermsPage() {
 
     setLoading(true);
     try {
-      // Delete policy using batch API
       await dispatch(deletePolicy([termToDelete])).unwrap();
       setRefreshTrigger((prev) => prev + 1);
       setDeleteDialogOpen(false);

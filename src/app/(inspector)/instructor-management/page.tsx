@@ -66,7 +66,6 @@ import {
 } from "lucide-react";
 import React, { useMemo, useState } from "react";
 
-// Helper functions to convert between enum and string
 const statusToString = (status: InstructorStatus): string => {
   switch (status) {
     case InstructorStatus.Pending:
@@ -150,7 +149,6 @@ export default function ManagementInstructorPage() {
               statusFilter;
           return matchesSearch && matchesStatus;
         })
-        // Sort by submitted date (latest first) so the newest appears at STT 1
         .sort(
           (a, b) =>
             new Date(b.submitDate).getTime() - new Date(a.submitDate).getTime()
@@ -184,7 +182,6 @@ export default function ManagementInstructorPage() {
       }
     };
     fetchInstructorApplications();
-    // }, [searchTerm, statusFilter, itemsPerPage]);
   }, []);
 
   const goToFirstPage = () => setCurrentPage(1);
@@ -196,7 +193,6 @@ export default function ManagementInstructorPage() {
   const canGoPrevious = currentPage > 1;
   const canGoNext = currentPage < totalPages;
 
-  // Calculate stats
   const stats = useMemo(() => {
     const apps = Array.isArray(applications) ? applications : [];
     return {
@@ -221,16 +217,6 @@ export default function ManagementInstructorPage() {
     });
   };
 
-  const getRemainingValidityDays = (
-    submitDate: string,
-    dateUntilAutoRejection: string
-  ) => {
-    const submitted = new Date(submitDate);
-    const autoRejectionDate = new Date(dateUntilAutoRejection);
-    const diffMs = autoRejectionDate.getTime() - submitted.getTime();
-    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
 
   const getStatusBadge = (status: InstructorStatus) => {
     switch (status) {
@@ -385,7 +371,6 @@ export default function ManagementInstructorPage() {
                 <TableHead>Số điện thoại</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Ngày nộp</TableHead>
-                <TableHead>Số ngày hiệu lực</TableHead>
                 <TableHead>Trạng thái</TableHead>
                 <TableHead className="text-center">Thao tác</TableHead>
               </TableRow>
@@ -394,7 +379,7 @@ export default function ManagementInstructorPage() {
               {paginatedApplications.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={8}
+                    colSpan={7}
                     className="py-8 text-center text-sm text-muted-foreground"
                   >
                     Không tìm thấy ứng viên phù hợp.
@@ -402,10 +387,6 @@ export default function ManagementInstructorPage() {
                 </TableRow>
               ) : (
                 paginatedApplications.map((instructorApplication, index) => {
-                  const remainingDays = getRemainingValidityDays(
-                    instructorApplication.submitDate,
-                    instructorApplication.dateUntilAutoRejection
-                  );
                   return (
                     <TableRow
                       key={instructorApplication.applicationId}
@@ -432,15 +413,6 @@ export default function ManagementInstructorPage() {
                       </TableCell>
                       <TableCell className="text-sm">
                         {formatDate(instructorApplication.submitDate)}
-                      </TableCell>
-                      <TableCell className="text-sm font-medium">
-                        {remainingDays > 0 ? (
-                          <span className="text-emerald-600">
-                            {remainingDays} ngày
-                          </span>
-                        ) : (
-                          <span className="text-red-600">Hết hạn</span>
-                        )}
                       </TableCell>
                       <TableCell>
                         {getStatusBadge(
@@ -704,36 +676,6 @@ export default function ManagementInstructorPage() {
                     src={selectedInstructor.personalProfile ?? null}
                   />
                 </SectionShell>
-
-                {/* <SectionShell title="Thông Tin Liên Hệ Khẩn Cấp">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <InfoItem
-                      label="Tên người liên hệ"
-                      value={
-                        selectedInstructor.emergencyContact?.name ??
-                        "Chưa cập nhật"
-                      }
-                    />
-                    <InfoItem
-                      label="Số điện thoại người liên hệ"
-                      value={
-                        selectedInstructor.emergencyContact?.phone ??
-                        "Chưa cập nhật"
-                      }
-                    >
-                      {selectedInstructor.emergencyContact?.phone ? (
-                        <a
-                          href={`tel:${selectedInstructor.emergencyContact.phone}`}
-                          className="text-primary"
-                        >
-                          {selectedInstructor.emergencyContact.phone}
-                        </a>
-                      ) : (
-                        "Chưa cập nhật"
-                      )}
-                    </InfoItem>
-                  </div>
-                </SectionShell> */}
               </div>
             </div>
           </DialogContent>

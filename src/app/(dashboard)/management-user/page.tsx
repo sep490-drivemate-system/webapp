@@ -34,10 +34,7 @@ export default function ManagementUserPage() {
   const [users, setUsers] = useState<UserManagement[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isBanDialogOpen, setIsBanDialogOpen] = useState(false);
-  const [editingUser, setEditingUser] =
-    useState<UserManagement | null>(null);
   const [banningUser, setBanningUser] =
     useState<UserManagement | null>(null);
   const [banReason, setBanReason] = useState("");
@@ -224,10 +221,6 @@ export default function ManagementUserPage() {
 
       <UserDataTable
         data={filteredUsers}
-        onView={(u) => {
-          setEditingUser(u);
-          setIsEditDialogOpen(true);
-        }}
         onToggleBlock={handleToggleBlock}
       />
 

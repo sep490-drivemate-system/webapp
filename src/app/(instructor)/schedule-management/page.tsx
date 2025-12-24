@@ -245,8 +245,6 @@ function BookingCard({ booking }: { booking: BookingItem }) {
     <div
       className={`bg-white rounded-xl shadow-sm border-l-4 p-6 hover:shadow-md transition-shadow cursor-pointer ${colors.border}`}
     >
-      {/* Header */}
-
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-slate-900">
@@ -269,8 +267,6 @@ function BookingCard({ booking }: { booking: BookingItem }) {
           {getStatusText(booking.status)}
         </span>
       </div>
-
-      {/* Details */}
 
       <div className="space-y-3 mb-4">
         <div className="flex items-start gap-3">
@@ -463,8 +459,6 @@ function ScheduleCalendar({
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-      {/* Calendar Header */}
-
       <div className="flex items-center justify-between mb-6">
         <button
           onClick={handlePrevMonth}
@@ -489,15 +483,9 @@ function ScheduleCalendar({
         </button>
       </div>
 
-      {/* Day Headers */}
-
       <div className="grid grid-cols-7 gap-2 mb-2">{headerDays}</div>
 
-      {/* Calendar Days */}
-
       <div className="grid grid-cols-7 gap-2">{calendarDays}</div>
-
-      {/* Legend */}
 
       <div className="mt-6 pt-6 border-t border-slate-200 space-y-3">
         <div className="flex items-center gap-3">
@@ -538,8 +526,6 @@ function ScheduleBookingList({
 
   return (
     <div className="space-y-6">
-      {/* Selected Date Header */}
-
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <div className="flex items-center gap-3">
           <Calendar size={24} className="text-[#10b981]" />
@@ -553,8 +539,6 @@ function ScheduleBookingList({
           {bookings.length} buổi huấn luyện
         </p>
       </div>
-
-      {/* Bookings List */}
 
       <div className="space-y-4">
         {bookings.length > 0 ? (
@@ -643,7 +627,6 @@ export default function SchedulePage() {
   return (
     <main className="min-h-screen">
       <div className="container mx-autopy-8">
-        {/* Header with Update Button */}
         <PageHeader
           title="Lịch Huấn Luyện"
           description="Quản lý lịch trình huấn luyện của bạn"
@@ -655,8 +638,6 @@ export default function SchedulePage() {
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-8">
-          {/* Calendar Section */}
-
           <div className="lg:col-span-1">
             {fetchInstructorScheduleLoading ? (
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
@@ -677,18 +658,14 @@ export default function SchedulePage() {
             )}
           </div>
 
-          {/* Bookings List Section */}
-
           <div className="lg:col-span-2">
             {fetchInstructorScheduleLoading ? (
               <div className="space-y-6">
-                {/* Selected Date Header Skeleton */}
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
                   <Skeleton className="h-8 w-64 mb-2" />
                   <Skeleton className="h-4 w-48" />
                 </div>
 
-                {/* Booking Cards Skeleton */}
                 <div className="space-y-4">
                   {[1, 2, 3].map((i) => (
                     <div

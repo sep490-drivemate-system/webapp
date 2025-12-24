@@ -46,7 +46,6 @@ import PageHeader from "@/components/commons/Header/header";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -609,7 +608,6 @@ export default function ReviewerCarDocumentsPage() {
     useThunkAction(getCarDocumentsForInspector);
   const { run: moderateCar, loading: moderating } = useThunkAction(moderateCarForInspector);
 
-  // Fetch cars from API
   useEffect(() => {
     setError(null);
     fetchCars(
@@ -695,7 +693,6 @@ export default function ReviewerCarDocumentsPage() {
       },
       {
         onSuccess: () => {
-          // Refresh danh sách xe sau khi moderate thành công
           fetchCars(
             {
               page: currentPage,

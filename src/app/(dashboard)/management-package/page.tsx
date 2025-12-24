@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -31,35 +31,20 @@ import {
   Package as PackageIcon,
   Plus,
   Search,
-  Filter,
   Edit,
   Trash2,
   Eye,
-  Car,
   Clock,
-  DollarSign,
-  TrendingUp,
   CheckCircle,
-  XCircle,
+  AlertCircle,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  ChevronDown,
-  PlayCircle,
-  AlertCircle,
 } from "lucide-react";
-import packagesData from "@/data/mock-packages.json";
 import { PackageFormDialog } from "@/components/package/PackageFormDialog";
 import { PackageViewDialog } from "@/components/package/PackageViewDialog";
 import PageHeader from "@/components/commons/Header/header";
-import {
-  IconCancel,
-  IconDisabled,
-  IconDisabledOff,
-  IconReload,
-  IconStatusChange,
-} from "@tabler/icons-react";
 import { useThunkAction } from "@/lib/redux/useThunkAction";
 import {
   getRoadTypes,
@@ -96,13 +81,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-interface Session {
-  sessionId: string;
-  date: string;
-  duration: number;
-  status: "completed" | "pending" | "cancelled" | "rescheduled";
-}
-
 export interface PackageType {
   id: string;
   instructorId: string;
@@ -122,7 +100,7 @@ export interface PackageType {
   status: "active" | "completed" | "expired" | "cancelled";
   purchaseDate: string;
   expiryDate: string;
-  sessions: Session[];
+  sessions: any[];
 }
 
 export default function ManagementPackagePage() {
@@ -130,9 +108,6 @@ export default function ManagementPackagePage() {
   const [packageTotalCount, setPackageTotalCount] = useState(0);
   const [packageTotalCountAll, setPackageTotalCountAll] = useState(0);
   const [packageListLoading, setPackageListLoading] = useState(false);
-  const [packages, setPackages] = useState<PackageType[]>(
-    packagesData.packages as PackageType[]
-  );
   const [searchQuery, setSearchQuery] = useState("");
   const [vehicleFilter, setVehicleFilter] = useState("all");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -186,178 +161,6 @@ export default function ManagementPackagePage() {
   const [skillCurrentPage, setSkillCurrentPage] = useState(1);
   const [skillItemsPerPage, setSkillItemsPerPage] = useState(8);
 
-  // Time filter state (year/month/week) for statistics cards
-  const now = new Date();
-  const [viewMode, setViewMode] = useState<"year" | "month" | "week">("month");
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
-
-  const getCurrentWeekOfMonth = (year: number, month: number, day?: number) => {
-    const targetDate = day ? new Date(year, month - 1, day) : new Date();
-    const firstDayOfMonth = new Date(year, month - 1, 1);
-    const firstWeekday = firstDayOfMonth.getDay();
-    const currentDay = targetDate.getDate();
-
-    return Math.ceil((currentDay + firstWeekday) / 7);
-  };
-
-  const [selectedWeek, setSelectedWeek] = useState(
-    getCurrentWeekOfMonth(now.getFullYear(), now.getMonth() + 1, now.getDate())
-  );
-
-  const getAvailableYears = () => {
-    const currentYear = new Date().getFullYear();
-    const years: number[] = [];
-    for (let i = 0; i < 10; i++) {
-      years.push(currentYear - i);
-    }
-    return years;
-  };
-
-  const getAvailableMonths = (year: number) => {
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1;
-
-    if (year === currentYear) {
-      return Array.from({ length: currentMonth }, (_, i) => i + 1);
-    }
-    if (year < currentYear) {
-      return Array.from({ length: 12 }, (_, i) => i + 1);
-    }
-    return [];
-  };
-
-  const getAvailableWeeks = (year: number, month: number) => {
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1;
-
-    const lastDayOfMonth = new Date(year, month, 0).getDate();
-    const firstDayOfMonth = new Date(year, month - 1, 1);
-    const firstWeekday = firstDayOfMonth.getDay();
-
-    const totalWeeks = Math.ceil((lastDayOfMonth + firstWeekday) / 7);
-
-    if (year === currentYear && month === currentMonth) {
-      const currentWeek = getCurrentWeekOfMonth(
-        year,
-        month,
-        currentDate.getDate()
-      );
-      return Array.from({ length: currentWeek }, (_, i) => i + 1);
-    }
-    if (year < currentYear || (year === currentYear && month < currentMonth)) {
-      return Array.from({ length: totalWeeks }, (_, i) => i + 1);
-    }
-    return [];
-  };
-
-  const getTimeRangeDescription = () => {
-    switch (viewMode) {
-      case "week":
-        return `Tuần ${selectedWeek}, Tháng ${selectedMonth}/${selectedYear}`;
-      case "month":
-        return `Tháng ${selectedMonth}/${selectedYear}`;
-      case "year":
-        return `Năm ${selectedYear}`;
-      default:
-        return "Theo tháng";
-    }
-  };
-
-  // Packages filtered by time range for statistics
-  const packagesForStats = useMemo(() => {
-    return packages.filter((pkg) => {
-      const date = new Date(pkg.purchaseDate);
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1;
-      const week = getCurrentWeekOfMonth(year, month, date.getDate());
-
-      if (viewMode === "year") {
-        return year === selectedYear;
-      }
-      if (viewMode === "month") {
-        return year === selectedYear && month === selectedMonth;
-      }
-      return (
-        year === selectedYear &&
-        month === selectedMonth &&
-        week === selectedWeek
-      );
-    });
-  }, [packages, viewMode, selectedYear, selectedMonth, selectedWeek]);
-
-  // Session statistics (completed / cancelled / rescheduled) filtered by time range
-  const sessionStats = useMemo(() => {
-    let completed = 0;
-    let cancelled = 0;
-    let rescheduled = 0;
-
-    packages.forEach((pkg) => {
-      pkg.sessions.forEach((session) => {
-        const date = new Date(session.date);
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1;
-        const week = getCurrentWeekOfMonth(year, month, date.getDate());
-
-        let inRange = false;
-        if (viewMode === "year") {
-          inRange = year === selectedYear;
-        } else if (viewMode === "month") {
-          inRange = year === selectedYear && month === selectedMonth;
-        } else {
-          inRange =
-            year === selectedYear &&
-            month === selectedMonth &&
-            week === selectedWeek;
-        }
-
-        if (!inRange) return;
-
-        if (session.status === "completed") completed += 1;
-        if (session.status === "cancelled") cancelled += 1;
-        if (session.status === "rescheduled") rescheduled += 1;
-      });
-    });
-
-    return { completed, cancelled, rescheduled };
-  }, [packages, viewMode, selectedYear, selectedMonth, selectedWeek]);
-
-  // Statistics
-  const stats = useMemo(() => {
-    const total = packagesForStats.length;
-    const active = packagesForStats.filter((p) => p.status === "active").length;
-    const completedPackages = packagesForStats.filter(
-      (p) => p.status === "completed"
-    ).length;
-    const totalRevenue = packagesForStats.reduce(
-      (sum, p) => sum + p.totalPrice,
-      0
-    );
-    const totalHours = packagesForStats.reduce(
-      (sum, p) => sum + p.totalHours,
-      0
-    );
-    const usedHours = packagesForStats.reduce((sum, p) => sum + p.usedHours, 0);
-
-    return {
-      total,
-      active,
-      completed: completedPackages,
-      totalRevenue,
-      totalHours,
-      usedHours,
-      utilizationRate:
-        totalHours > 0 ? ((usedHours / totalHours) * 100).toFixed(1) : 0,
-      completedSessions: sessionStats.completed,
-      cancelledSessions: sessionStats.cancelled,
-      rescheduledSessions: sessionStats.rescheduled,
-    };
-  }, [packagesForStats, sessionStats]);
-
-  // Pagination + fetch service packages from API
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, vehicleFilter]);
@@ -368,7 +171,6 @@ export default function ManagementPackagePage() {
   );
   const startIndex = (currentPage - 1) * itemsPerPage;
 
-  // Get total number of service packages (independent of filters)
   useEffect(() => {
     fetchPackages(
       {
@@ -389,7 +191,6 @@ export default function ManagementPackagePage() {
   useEffect(() => {
     setPackageListLoading(true);
 
-    // Normalize searchKey to lowercase for case-insensitive search
     const normalizedSearchKey =
       searchQuery.trim() !== "" ? searchQuery.trim().toLocaleLowerCase() : undefined;
 
@@ -397,14 +198,12 @@ export default function ManagementPackagePage() {
       {
         pageNumber: currentPage,
         pageSize: itemsPerPage,
-        // Let backend handle search logic (including case-insensitive, accent-insensitive, etc.)
         searchKey: normalizedSearchKey,
       },
       {
         onSuccess: (response) => {
           let pageContent = response?.value?.pageContent ?? [];
 
-          // Re-filter by isRentalCar from API to match UI "With rental car" / "Without rental car"
           if (vehicleFilter === "with") {
             pageContent = pageContent.filter(
               (pkg: any) => pkg.isRentalCar === true
@@ -477,83 +276,17 @@ export default function ManagementPackagePage() {
   const goToNextSkillPage = () =>
     setSkillCurrentPage((prev) => Math.min(prev + 1, skillTotalPages));
 
-  // Handle create package
   const handleCreatePackage = (newPackage: PackageType) => {
-    setPackages([...packages, newPackage]);
     setIsCreateDialogOpen(false);
   };
 
-  // Handle edit package
   const handleEditPackage = (updatedPackage: PackageType) => {
-    const updatedPackages = packages.map((pkg) =>
-      pkg.id === updatedPackage.id ? updatedPackage : pkg
-    );
-    setPackages(updatedPackages);
     setIsEditDialogOpen(false);
     setSelectedPackage(null);
   };
 
-  // Handle delete package
-  const handleDeletePackage = (id: string) => {
-    if (confirm("Bạn có chắc chắn muốn xóa gói học này?")) {
-      setPackages(packages.filter((pkg) => pkg.id !== id));
-    }
-  };
-
-  // Format currency
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("vi-VN").format(amount);
-  };
-
-  // Format date
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("vi-VN");
-  };
-
-  // Get status badge
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      active: {
-        label: "Đang hoạt động",
-        variant: "default" as const,
-        icon: PlayCircle,
-        className:
-          "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200",
-      },
-      completed: {
-        label: "Hoàn thành",
-        variant: "secondary" as const,
-        icon: CheckCircle,
-        className: "bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200",
-      },
-      expired: {
-        label: "Hết hạn",
-        variant: "destructive" as const,
-        icon: AlertCircle,
-        className:
-          "bg-amber-50 text-amber-700 hover:bg-amber-100 border-amber-200",
-      },
-      cancelled: {
-        label: "Đã hủy",
-        variant: "outline" as const,
-        icon: XCircle,
-        className: "bg-red-50 text-red-700 hover:bg-red-100 border-red-200",
-      },
-    };
-
-    const config =
-      statusConfig[status as keyof typeof statusConfig] || statusConfig.active;
-    const Icon = config.icon;
-
-    return (
-      <Badge
-        variant={config.variant}
-        className={`flex items-center gap-1 border ${config.className}`}
-      >
-        <Icon className="h-3 w-3" />
-        {config.label}
-      </Badge>
-    );
   };
 
   useEffect(() => {
@@ -756,21 +489,15 @@ export default function ManagementPackagePage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <PageHeader
         title="Quản Lý Gói Dịch Vụ"
         description="Quản lý và theo dõi tất cả các gói dịch vụ trong hệ thống."
       />
 
-      {/* Statistics Cards + Time Filter */}
       <Card>
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>Thống kê gói dịch vụ & buổi huấn luyện</CardTitle>
-            <CardDescription>
-              Dữ liệu được lọc theo khoảng thời gian:{" "}
-              {getTimeRangeDescription()}
-            </CardDescription>
           </div>
         </CardHeader>
         <CardContent>
@@ -790,67 +517,10 @@ export default function ManagementPackagePage() {
                 </span>
               </CardHeader>
             </Card>
-            {/* <Card>
-              <CardHeader className="flex flex-row items-start justify-between gap-4">
-                <div className="space-y-1">
-                  <CardDescription className="text-sm font-medium">
-                    Tổng Buổi Huấn Luyện Đã Hoàn Thành
-                  </CardDescription>
-                  <CardTitle className="text-2xl font-semibold">
-                    {stats.completedSessions}
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Từ {stats.total} gói dịch vụ
-                  </p>
-                </div>
-                <span className="rounded-xl p-3 bg-emerald-50 text-emerald-600">
-                  <CheckCircle className="size-5" />
-                </span>
-              </CardHeader>
-            </Card> */}
-            {/* <Card>
-              <CardHeader className="flex flex-row items-start justify-between gap-4">
-                <div className="space-y-1">
-                  <CardDescription className="text-sm font-medium">
-                    Tổng Buổi Huấn Luyện Bị Hủy
-                  </CardDescription>
-                  <CardTitle className="text-2xl font-semibold">
-                    {stats.cancelledSessions}
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Từ {stats.total} gói dịch vụ
-                  </p>
-                </div>
-                <span className="rounded-xl p-3 bg-red-50 text-red-600">
-                  <IconCancel className="size-5" />
-                </span>
-              </CardHeader>
-            </Card> */}
-            {/* <Card>
-              <CardHeader className="flex flex-row items-start justify-between gap-4">
-                <div className="space-y-1">
-                  <CardDescription className="text-sm font-medium">
-                    Tổng Buổi Huấn Luyện Bị Đổi Lịch
-                  </CardDescription>
-                  <CardTitle className="text-2xl font-semibold">
-                    {stats.rescheduledSessions}
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Từ {stats.total} gói dịch vụ
-                  </p>
-                </div>
-                <span className="rounded-xl p-3 bg-amber-50 text-amber-600">
-                  <IconReload className="size-5" />
-                </span>
-              </CardHeader>
-            </Card>*/}
           </div>
         </CardContent>
-      </Card> 
+      </Card>
 
-    
-
-      {/* Filters + Packages Table in one Card */}
       <Card>
         <CardContent>
           <div className="space-y-4">
@@ -963,13 +633,12 @@ export default function ManagementPackagePage() {
                               <span className="text-sm font-medium">
                                 {pkg.instructorName}
                               </span>
-                              {/* Hidden ID per request */}
                             </div>
                           </div>
                         </TableCell>
                         <TableCell className="px-4 py-3">
                           <span className="text-sm">
-                            {(pkg as any).isRentalCar ?? !pkg.allowSelfCar
+                            {(pkg as any).isRentalCar ?? !pkg.isRentalCar
                               ? "Kèm thuê xe"
                               : "Không kèm thuê xe"}
                           </span>
@@ -1061,7 +730,6 @@ export default function ManagementPackagePage() {
         </CardContent>
       </Card>
 
-      {/* Road Types List */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-4">
           <div>
@@ -1116,7 +784,7 @@ export default function ManagementPackagePage() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    paginatedRoadTypes.map((roadType, index) => (
+                    paginatedRoadTypes.map((roadType: RoadType, index: number) => (
                       <TableRow key={roadType.id}>
                         <TableCell className="px-4 py-3 text-sm font-semibold text-muted-foreground">
                           {roadStartIndex + index + 1}
@@ -1233,7 +901,6 @@ export default function ManagementPackagePage() {
         </CardContent>
       </Card>
 
-      {/* Driving Skills List */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-4">
           <div>
@@ -1288,7 +955,7 @@ export default function ManagementPackagePage() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    paginatedDrivingSkills.map((skill, index) => (
+                    paginatedDrivingSkills.map((skill: DrivingSkill, index: number) => (
                       <TableRow key={skill.id}>
                         <TableCell className="px-4 py-3 text-sm font-semibold text-muted-foreground">
                           {skillStartIndex + index + 1}
@@ -1402,7 +1069,6 @@ export default function ManagementPackagePage() {
         </CardContent>
       </Card>
 
-      {/* Dialogs */}
       <Dialog open={isServiceViewOpen} onOpenChange={setIsServiceViewOpen}>
         <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
           {selectedServicePackage && (
@@ -1449,7 +1115,7 @@ export default function ManagementPackagePage() {
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge variant="secondary" className="rounded-full px-3 py-1">
                         {(selectedServicePackage as any).isRentalCar ??
-                        !selectedServicePackage.allowSelfCar
+                        !selectedServicePackage.isRentalCar
                           ? "Kèm thuê xe"
                           : "Không kèm thuê xe"}
                       </Badge>
@@ -1527,7 +1193,6 @@ export default function ManagementPackagePage() {
         package={selectedPackage}
       />
 
-      {/* Road Type Create / Edit Modal */}
       <Dialog open={isRoadTypeModalOpen} onOpenChange={setIsRoadTypeModalOpen}>
         <DialogContent>
           <DialogHeader>
@@ -1576,7 +1241,6 @@ export default function ManagementPackagePage() {
         </DialogContent>
       </Dialog>
 
-      {/* Road Type Delete Confirmation */}
       <AlertDialog
         open={isDeleteRoadTypeDialogOpen}
         onOpenChange={setIsDeleteRoadTypeDialogOpen}
@@ -1609,7 +1273,6 @@ export default function ManagementPackagePage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Driving Skill Create / Edit Modal */}
       <Dialog
         open={isDrivingSkillModalOpen}
         onOpenChange={setIsDrivingSkillModalOpen}
@@ -1663,7 +1326,6 @@ export default function ManagementPackagePage() {
         </DialogContent>
       </Dialog>
 
-      {/* Driving Skill Delete Confirmation */}
       <AlertDialog
         open={isDeleteDrivingSkillDialogOpen}
         onOpenChange={setIsDeleteDrivingSkillDialogOpen}

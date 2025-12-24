@@ -65,21 +65,21 @@ const data = {
       url: "/management-package",
       icon: IconPackage,
     },
-    {
-      title: "Quản lý tài liệu",
-      url: "/management-document",
-      icon: IconTextCaption,
-    },
+    // {
+    //   title: "Quản lý tài liệu",
+    //   url: "/management-document",
+    //   icon: IconTextCaption,
+    // },
     {
       title: "Quản lý điều khoản dịch vụ",
       url: "/management-terms-and-services",
       icon: IconKey,
     },
-    {
-      title: "Quản lý cài đặt hệ thống",
-      url: "/management-setting",
-      icon: IconSettings,
-    },
+    // {
+    //   title: "Quản lý cài đặt hệ thống",
+    //   url: "/management-setting",
+    //   icon: IconSettings,
+    // },
   ],
   navClouds: [
     {
@@ -145,11 +145,6 @@ const data = {
       url: "/management-post",
       icon: IconArticle,
     },
-    {
-      name: "Quản lý bài viết",
-      url: "/blogs-management",
-      icon: IconFile,
-    },
     
   ],
 
@@ -180,26 +175,26 @@ const data = {
       url: "/driving-session-management",
       icon: IconNavigation,
     },
-    {
-      name: "Quản lý bài viết",
-      url: "/blog-management",
-      icon: IconArticle,
-    },
-    {
-      name: "Lịch sử giao dịch",
-      url: "/transaction-management",
-      icon: IconHistory,
-    },
+    // {
+    //   name: "Quản lý bài viết",
+    //   url: "/blog-management",
+    //   icon: IconArticle,
+    // },
+    // {
+    //   name: "Lịch sử giao dịch",
+    //   url: "/transaction-management",
+    //   icon: IconHistory,
+    // },
     {
       name: "Giấy tờ tùy thân",
       url: "/identification-document-management",
       icon: IconFile,
     },
-    {
-      name: "Thông báo",
-      url: "/notification-management",
-      icon: IconBell,
-    },
+    // {
+    //   name: "Thông báo",
+    //   url: "/notification-management",
+    //   icon: IconBell,
+    // },
     {
       name: "Diễn đàn",
       url: "/forum",

@@ -55,7 +55,6 @@ interface DocumentRecord {
   files: DocumentFile[];
 }
 
-// Helper function to format date
 const formatDate = (dateString: string): string => {
   if (!dateString) return "—";
   try {
@@ -66,15 +65,11 @@ const formatDate = (dateString: string): string => {
   }
 };
 
-// Helper function to map ApplicantDocument to DocumentRecord[]
 const mapApplicantDocumentToRecords = (
   applicantDoc: ApplicantDocument | null
 ): DocumentRecord[] => {
   if (!applicantDoc) return [];
-
   const records: DocumentRecord[] = [];
-
-  // Helper function to format gender
   const formatGender = (gender: string | null | undefined): string => {
     if (!gender) return "—";
     if (gender === "Male") return "Nam";
@@ -82,7 +77,6 @@ const mapApplicantDocumentToRecords = (
     return gender;
   };
 
-  // Căn Cước Công Dân
   records.push({
     id: "citizenId",
     title: "Căn Cước Công Dân",
@@ -94,7 +88,6 @@ const mapApplicantDocumentToRecords = (
     files: [],
   });
 
-  // Lý Lịch Tư Pháp (có thể dùng personalProfile nếu có 2 ảnh, hoặc để trống)
   records.push({
     id: "legalHistory",
     title: "Lý Lịch Tư Pháp",
@@ -109,7 +102,6 @@ const mapApplicantDocumentToRecords = (
       : [],
   });
 
-  // Giấy Khám Sức Khỏe
   records.push({
     id: "healthCertificate",
     title: "Giấy Khám Sức Khỏe",
@@ -124,7 +116,6 @@ const mapApplicantDocumentToRecords = (
       : [],
   });
 
-  // Bằng Lái Xe
   const driverLicenseFiles: DocumentFile[] = [];
   if (applicantDoc.drivingLicenseFront) {
     driverLicenseFiles.push({
@@ -153,7 +144,6 @@ const mapApplicantDocumentToRecords = (
     files: driverLicenseFiles,
   });
 
-  // Chứng Chỉ Hành Nghề
   records.push({
     id: "trainingCertificate",
     title: "Chứng Chỉ Hành Nghề",
@@ -190,8 +180,6 @@ export default function IdentificationDocumentManagementPage() {
     useState<ApplicantDocument | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Dialog states
   const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false);
   const [isPhoneDialogOpen, setIsPhoneDialogOpen] = useState(false);
   const [isEmergencyNameDialogOpen, setIsEmergencyNameDialogOpen] =
@@ -200,8 +188,6 @@ export default function IdentificationDocumentManagementPage() {
     useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [isBioDialogOpen, setIsBioDialogOpen] = useState(false);
-
-  // Form values
   const [phoneValue, setPhoneValue] = useState("");
   const [emergencyNameValue, setEmergencyNameValue] = useState("");
   const [emergencyPhoneValue, setEmergencyPhoneValue] = useState("");
@@ -228,7 +214,6 @@ export default function IdentificationDocumentManagementPage() {
       setError(null);
 
       try {
-        // Fetch user data
         const userResponse = await dispatch(
           getUserById({ id: jwtUser.id })
         ).unwrap();
@@ -237,8 +222,6 @@ export default function IdentificationDocumentManagementPage() {
 
         const fetchedUser = userResponse.value ?? null;
         setUserInfo(fetchedUser);
-
-        // Fetch emergency contact
         try {
           const emergencyContactResponse = await dispatch(
             getUserEmergencyContact({ id: jwtUser.id })
@@ -249,10 +232,7 @@ export default function IdentificationDocumentManagementPage() {
           setEmergencyContact(contacts.length > 0 ? contacts[0] : null);
         } catch (emergencyErr) {
           console.error("Failed to fetch emergency contact", emergencyErr);
-          // Don't set error for emergency contact fetch failure
         }
-
-        // Fetch instructor data if instructor ID exists
         if (fetchedUser?.instructor?.instructorId) {
           try {
             const instructorResponse = await dispatch(
@@ -261,8 +241,6 @@ export default function IdentificationDocumentManagementPage() {
 
             if (cancelled) return;
             setInstructorInfo(instructorResponse.value ?? null);
-
-            // Fetch instructor application documents
             try {
               const applicantResponse = await dispatch(
                 getInstructorApplication({
@@ -277,11 +255,9 @@ export default function IdentificationDocumentManagementPage() {
                 "Failed to fetch instructor application",
                 applicantErr
               );
-              // Don't set error for applicant document fetch failure
             }
           } catch (instructorErr) {
             console.error("Failed to fetch instructor info", instructorErr);
-            // Don't set error for instructor fetch failure, just log it
           }
         }
       } catch (err) {
@@ -302,8 +278,6 @@ export default function IdentificationDocumentManagementPage() {
       cancelled = true;
     };
   }, [dispatch]);
-
-  // Function to refresh user data
   const refreshUserData = async () => {
     const jwtUser = getUserInfo();
     if (!jwtUser?.id) return;
@@ -313,8 +287,6 @@ export default function IdentificationDocumentManagementPage() {
         getUserById({ id: jwtUser.id })
       ).unwrap();
       setUserInfo(userResponse.value ?? null);
-
-      // Refresh emergency contact
       try {
         const emergencyContactResponse = await dispatch(
           getUserEmergencyContact({ id: jwtUser.id })
@@ -324,8 +296,6 @@ export default function IdentificationDocumentManagementPage() {
       } catch (emergencyErr) {
         console.error("Failed to fetch emergency contact", emergencyErr);
       }
-
-      // Refresh instructor data if instructor ID exists
       if (userResponse.value?.instructor?.instructorId) {
         try {
           const instructorResponse = await dispatch(
@@ -342,8 +312,6 @@ export default function IdentificationDocumentManagementPage() {
       console.error("Failed to refresh user data", err);
     }
   };
-
-  // Handler for avatar update
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -385,8 +353,6 @@ export default function IdentificationDocumentManagementPage() {
       setIsUpdating(false);
     }
   };
-
-  // Handler for phone update
   const handleUpdatePhone = async () => {
     if (!userInfo?.userId) {
       toast.error("Không tìm thấy thông tin người dùng");
@@ -398,8 +364,6 @@ export default function IdentificationDocumentManagementPage() {
       toast.error("Vui lòng nhập số điện thoại");
       return;
     }
-
-    // Validate: chỉ cho nhập 10 số
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(trimmedPhone)) {
       toast.error("Số điện thoại phải có đúng 10 chữ số");
@@ -426,7 +390,6 @@ export default function IdentificationDocumentManagementPage() {
     }
   };
 
-  // Handler for emergency contact name update
   const handleUpdateEmergencyName = async () => {
     if (!userInfo?.userId) {
       toast.error("Không tìm thấy thông tin người dùng");
@@ -457,8 +420,6 @@ export default function IdentificationDocumentManagementPage() {
       setIsUpdating(false);
     }
   };
-
-  // Handler for emergency contact phone update
   const handleUpdateEmergencyPhone = async () => {
     if (!userInfo?.userId) {
       toast.error("Không tìm thấy thông tin người dùng");
@@ -470,8 +431,6 @@ export default function IdentificationDocumentManagementPage() {
       toast.error("Vui lòng nhập số điện thoại người liên hệ");
       return;
     }
-
-    // Validate: chỉ cho nhập 10 số
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(trimmedPhone)) {
       toast.error("Số điện thoại phải có đúng 10 chữ số");
@@ -498,7 +457,6 @@ export default function IdentificationDocumentManagementPage() {
     }
   };
 
-  // Handler for password update
   const handleUpdatePassword = async () => {
     if (!userInfo?.userId) {
       toast.error("Không tìm thấy thông tin người dùng");
@@ -539,8 +497,6 @@ export default function IdentificationDocumentManagementPage() {
       setIsUpdating(false);
     }
   };
-
-  // Handler for bio update
   const handleUpdateBio = async () => {
     if (!userInfo?.instructor?.instructorId) {
       toast.error("Không tìm thấy thông tin giảng viên");
@@ -579,15 +535,11 @@ export default function IdentificationDocumentManagementPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <PageHeader
         title="Quản Lý Tài Liệu Cá Nhân"
         description="Xem và chỉnh sửa tài liệu đã tải lên "
       />
-
-      {/* User profile & emergency contact */}
       <section className="space-y-6">
-        {/* Thông tin cá nhân */}
         <Card className="border border-border/60 shadow-sm">
           <CardHeader className="pb-6">
             <CardTitle className="text-xl font-semibold">
@@ -605,9 +557,7 @@ export default function IdentificationDocumentManagementPage() {
               </div>
             ) : (
               <>
-                {/* Ảnh đại diện và thông tin cơ bản */}
                 <div className="flex flex-col lg:flex-row gap-8 pb-8 border-b border-border/60">
-                  {/* Ảnh đại diện */}
                   <div className="flex flex-col items-center lg:items-start gap-4 lg:min-w-[200px]">
                     <Avatar className="h-36 w-36 border-2 border-border shadow-lg">
                       <AvatarImage
@@ -693,8 +643,6 @@ export default function IdentificationDocumentManagementPage() {
                       </DialogContent>
                     </Dialog>
                   </div>
-
-                  {/* Thông tin cơ bản */}
                   <div className="flex-1 grid gap-4 sm:grid-cols-2">
                     <InfoItem label="Họ và tên" value={displayName} />
                     <InfoItem label="Email" value={displayEmail} />
@@ -726,8 +674,6 @@ export default function IdentificationDocumentManagementPage() {
                     />
                   </div>
                 </div>
-
-                {/* Mô tả */}
                 <div className="space-y-2 rounded-lg border border-border/60 p-5 bg-muted/30">
                   <div className="flex items-center justify-between">
                     <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
@@ -802,8 +748,6 @@ export default function IdentificationDocumentManagementPage() {
             )}
           </CardContent>
         </Card>
-
-        {/* Liên hệ khẩn cấp */}
         <Card className="border border-border/60 shadow-sm">
           <CardHeader className="pb-4">
             <CardTitle className="text-xl">Liên hệ khẩn cấp</CardTitle>
@@ -850,8 +794,6 @@ export default function IdentificationDocumentManagementPage() {
           </CardContent>
         </Card>
       </section>
-
-      {/* Document detail cards */}
       <section className="space-y-6">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
@@ -874,7 +816,6 @@ export default function IdentificationDocumentManagementPage() {
                 </CardHeader>
 
                 <CardContent className="space-y-6">
-                  {/* Files */}
                   {record.files.length > 0 && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {record.files.map((file) => (
@@ -900,8 +841,6 @@ export default function IdentificationDocumentManagementPage() {
                       ))}
                     </div>
                   )}
-
-                  {/* Fields */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {record.fields.map((field) => (
                       <div
@@ -917,8 +856,6 @@ export default function IdentificationDocumentManagementPage() {
                       </div>
                     ))}
                   </div>
-
-                  {/* Notes removed as per requirement */}
                 </CardContent>
               </Card>
             );

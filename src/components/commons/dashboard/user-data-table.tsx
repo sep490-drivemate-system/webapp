@@ -7,7 +7,7 @@ import {
   IconChevronsLeft,
   IconChevronsRight,
 } from "@tabler/icons-react";
-import { Ban, CheckCircle2, Eye, MoreHorizontal } from "lucide-react";
+import { Ban, CheckCircle2, MoreHorizontal } from "lucide-react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -23,8 +23,6 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import * as yup from "yup";
-
 import { Badge } from "@/components/ui/badge";
 import { UserRole } from "@/types/auth/user-role.enum";
 import { Button } from "@/components/ui/button";
@@ -48,22 +46,18 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UserManagement } from "@/types/user/user-profile.type";
 import { AccountStatus } from "@/types/user/status.enum";
 
-// Using IUserManagement interface from types
 export type User = UserManagement;
 
 interface UserDataTableProps {
   data: User[];
-  onView?: (user: User) => void;
   onToggleBlock?: (user: User) => void;
 }
 
-// STT column component
 function STTCell({ index }: { index: number }) {
   return (
     <div className="flex items-center justify-center font-medium">
@@ -72,7 +66,6 @@ function STTCell({ index }: { index: number }) {
   );
 }
 
-// Get status badge variant and className
 const getStatusVariant = (status: AccountStatus) => {
   switch (status) {
     case AccountStatus.Normal:
@@ -99,7 +92,6 @@ const getStatusClassName = (status: AccountStatus): string => {
   }
 };
 
-// Get role badge variant and className
 const getRoleVariant = (role: UserRole) => {
   switch (role) {
     case UserRole.Admin:
@@ -130,7 +122,6 @@ const getRoleClassName = (role: UserRole): string => {
   }
 };
 
-// Convert role to Vietnamese
 const getRoleLabel = (role: UserRole): string => {
   switch (role) {
     case UserRole.Admin:
@@ -146,7 +137,6 @@ const getRoleLabel = (role: UserRole): string => {
   }
 };
 
-// Convert status to Vietnamese
 const getStatusLabel = (status: AccountStatus): string => {
   switch (status) {
     case AccountStatus.Normal:
@@ -163,12 +153,10 @@ const getStatusLabel = (status: AccountStatus): string => {
 function UserTableRow({
   row,
   index,
-  onView,
   onToggleBlock,
 }: {
   row: Row<User>;
   index: number;
-  onView?: (user: User) => void;
   onToggleBlock?: (user: User) => void;
 }) {
   const isBlocked = row.original.accountStatus === AccountStatus.Banned;
@@ -194,11 +182,6 @@ function UserTableRow({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onSelect={() => onView?.(row.original)}>
-                      <Eye className="mr-2 size-4" />
-                      Xem chi tiết
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onSelect={() => onToggleBlock?.(row.original)}
                       className={isBlocked ? "text-emerald-600" : "text-red-600"}
@@ -233,7 +216,6 @@ function UserTableRow({
 
 export function UserDataTable({
   data: initialData,
-  onView,
   onToggleBlock,
 }: UserDataTableProps) {
   const [data, setData] = React.useState(() => initialData);
@@ -248,7 +230,6 @@ export function UserDataTable({
     pageSize: 10,
   });
 
-  // Update data when initialData changes
   React.useEffect(() => {
     setData(initialData);
   }, [initialData]);
@@ -258,7 +239,7 @@ export function UserDataTable({
       {
         id: "stt",
         header: () => <div className="text-center">STT</div>,
-        cell: () => null, // This will be handled in UserTableRow
+        cell: () => null,
         enableSorting: false,
         enableHiding: false,
       },
@@ -309,7 +290,7 @@ export function UserDataTable({
       {
         id: "actions",
         header: () => <div className="text-center">Thao tác</div>,
-        cell: () => null, // This will be handled in UserTableRow
+        cell: () => null,
         enableSorting: false,
         enableHiding: false,
       },
@@ -371,7 +352,6 @@ export function UserDataTable({
                       key={row.id}
                       row={row}
                       index={index}
-                      onView={onView}
                       onToggleBlock={onToggleBlock}
                     />
                   ))

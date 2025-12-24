@@ -82,11 +82,8 @@ export default function ServicePackageDetailPage() {
     {}
   );
 
-  // Load package data if editing (when packageId is provided)
   useEffect(() => {
     if (packageId && !isCreate) {
-      // TODO: Fetch package data from API using packageId
-      // For now, using DEFAULT_PACKAGE as placeholder
       setForm(DEFAULT_PACKAGE);
     }
   }, [packageId, isCreate]);
@@ -114,7 +111,6 @@ export default function ServicePackageDetailPage() {
   };
 
   const handleSave = () => {
-    // Validate required fields
     if (!form.title.trim()) {
       alert("Vui lòng nhập tên gói dịch vụ");
       return;
@@ -140,7 +136,6 @@ export default function ServicePackageDetailPage() {
       return;
     }
 
-    // Convert form data to API format
     const priceNumber = parseFloat(form.price.replace(/\./g, ""));
     const durationHours = convertDurationToHours(form.duration);
     const isRentalCar = form.carOption === "Người hướng dẫn và xe";
@@ -153,7 +148,7 @@ export default function ServicePackageDetailPage() {
       drivingSkills: form.skills,
       price: priceNumber,
       isRentalCar: isRentalCar,
-      packageCars: [], // Empty array for now, can be extended later
+      packageCars: [],
     };
 
     console.log(packageData);
@@ -163,7 +158,6 @@ export default function ServicePackageDetailPage() {
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
 
-        // If creating, navigate back after save
         if (isCreate) {
           setTimeout(() => {
             router.push("/service-package-management");
@@ -230,7 +224,6 @@ export default function ServicePackageDetailPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      {/* Header */}
       <PageHeader
         title={
           isCreate ? "Tạo chi tiết gói dịch vụ" : "Xem chi tiết gói dịch vụ"
@@ -250,9 +243,7 @@ export default function ServicePackageDetailPage() {
         }
       />
 
-      {/* Content */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Success Message */}
         {saved && (
           <div className="mb-6 flex items-center gap-3 bg-green-50 border border-green-200 rounded-lg p-4">
             <CheckCircle className="w-5 h-5 text-green-600" />
@@ -262,10 +253,8 @@ export default function ServicePackageDetailPage() {
           </div>
         )}
 
-        {/* Form Card */}
         <Card className="border border-gray-200 overflow-visible">
           <div className="p-6 space-y-6">
-            {/* Package Name */}
             <div className="space-y-2">
               <Label
                 htmlFor="title"
@@ -282,7 +271,6 @@ export default function ServicePackageDetailPage() {
               />
             </div>
 
-            {/* Description */}
             <div className="space-y-2">
               <Label
                 htmlFor="description"
@@ -300,7 +288,6 @@ export default function ServicePackageDetailPage() {
               />
             </div>
 
-            {/* Price */}
             <div className="space-y-2">
               <Label
                 htmlFor="price"
@@ -320,13 +307,12 @@ export default function ServicePackageDetailPage() {
               />
             </div>
 
-            {/* Duration */}
             <div className="space-y-2">
               <Label
                 htmlFor="duration"
                 className="text-base font-semibold text-gray-900"
               >
-                Thời lượng <span className="text-red-600">*</span>
+                Thời lượng (giờ) <span className="text-red-600">*</span>
               </Label>
               <Input
                 id="duration"
@@ -341,7 +327,6 @@ export default function ServicePackageDetailPage() {
               />
             </div>
 
-            {/* Skills Dropdown */}
             <div className="space-y-2">
               <Label className="text-base font-semibold text-gray-900">
                 Kỹ năng học được <span className="text-red-600">*</span>
@@ -419,7 +404,6 @@ export default function ServicePackageDetailPage() {
               </div>
             </div>
 
-            {/* Road Types Dropdown */}
             <div className="space-y-2 relative z-40">
               <Label className="text-base font-semibold text-gray-900">
                 Loại đường <span className="text-red-600">*</span>
@@ -499,7 +483,6 @@ export default function ServicePackageDetailPage() {
               </div>
             </div>
 
-            {/* Car Option */}
             <div className="space-y-2">
               <Label className="text-base font-semibold text-gray-900">
                 Tùy chọn xe <span className="text-red-600">*</span>
@@ -560,7 +543,6 @@ export default function ServicePackageDetailPage() {
             </div>
           </div>
 
-          {/* Actions */}
           <div className="border-t border-gray-200 bg-gray-50 px-6 py-4 flex gap-3">
             <Button
               onClick={handleReset}

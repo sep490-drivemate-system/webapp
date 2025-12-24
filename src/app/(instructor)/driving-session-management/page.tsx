@@ -8,18 +8,17 @@ import {
   CheckCircle,
   AlertCircle,
   X,
-  FileText,
   Navigation,
   List,
   PlayCircle,
   RefreshCw,
   Loader2,
+  Car,
 } from "lucide-react";
 
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -38,7 +37,6 @@ import { getAllSessions } from "@/features/booking/bookingThunk";
 import { IBookingSession, SessionStatus } from "@/types/booking/booking.type";
 import { useThunkAction } from "@/lib/redux/useThunkAction";
 
-// Map SessionStatus enum to UI status string
 const mapSessionStatusToString = (status: SessionStatus): string => {
   switch (status) {
     case SessionStatus.Planning:
@@ -58,7 +56,6 @@ const mapSessionStatusToString = (status: SessionStatus): string => {
   }
 };
 
-// Map UI status string to SessionStatus enum
 const mapStringToSessionStatus = (
   status: string
 ): SessionStatus | undefined => {
@@ -80,7 +77,6 @@ const mapStringToSessionStatus = (
   }
 };
 
-// Type for UI session format
 type UISession = {
   id: string;
   packageName: string;
@@ -96,7 +92,6 @@ type UISession = {
   displayEndLocationName: string;
 };
 
-// Convert IBookingSession to UI format
 const convertSessionToUIFormat = (session: IBookingSession): UISession => {
   return {
     id: session.id,
@@ -132,7 +127,6 @@ export default function DrivingSessionManagementPage() {
     | "cancelled"
   >("all");
 
-  // Fetch sessions when component mounts or filter changes
   useEffect(() => {
     const getAllSessions = async () => {
       const status = mapStringToSessionStatus(selectedTab);
@@ -142,7 +136,6 @@ export default function DrivingSessionManagementPage() {
     getAllSessions();
   }, [selectedTab]);
 
-  // Convert and filter sessions
   const filteredSessions = useMemo(() => {
     const convertedSessions = allSessions.map(convertSessionToUIFormat);
 
@@ -150,7 +143,6 @@ export default function DrivingSessionManagementPage() {
       return convertedSessions;
     }
 
-    // Filter by status (note: pending_confirmation doesn't exist in API, so it will return empty)
     return convertedSessions.filter(
       (session: UISession) => session.status === selectedTab
     );
@@ -225,7 +217,6 @@ export default function DrivingSessionManagementPage() {
 
   const formatDate = (dateString: string) => {
     try {
-      // Handle both date-only and datetime strings
       const datePart = dateString.split("T")[0];
       const [year, month, day] = datePart.split("-");
       if (year && month && day) {
@@ -262,14 +253,11 @@ export default function DrivingSessionManagementPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header Section */}
       <PageHeader
         title="Quản Lý Buổi Huấn Luyện"
         description="Quản lý lịch trình huấn luyện và theo dõi tiến trình của người lái mới"
         className="space-y-4"
       />
-
-      {/* Filter Section */}
       <section>
         <div className="flex justify-end items-center gap-4">
           <Label
@@ -359,7 +347,6 @@ export default function DrivingSessionManagementPage() {
         </div>
       </section>
 
-      {/* Content Section */}
       <section>
         {isLoading ? (
           <Card>
@@ -412,9 +399,6 @@ export default function DrivingSessionManagementPage() {
                               {session.packageName}
                             </CardTitle>
                           )}
-                          <CardDescription className="text-sm truncate">
-                            ID: {session.id}
-                          </CardDescription>
                         </div>
                       </div>
                       <Badge
@@ -456,7 +440,7 @@ export default function DrivingSessionManagementPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3 text-muted-foreground">
-                        <FileText className="h-4 w-4 flex-shrink-0" />
+                        <Car className="h-4 w-4 flex-shrink-0" />
                         <span className="text-sm">
                           Xe: {session.vehicleName || "Xe của khách hàng"}
                         </span>
