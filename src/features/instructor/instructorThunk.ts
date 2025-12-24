@@ -1,7 +1,7 @@
 import { ICar } from "@/types/car/car.type";
 import { createThunk } from "../genericCreateThunk";
 import { HttpMethod } from "@/types/constants/httpMethod";
-import { GetInstructorsParams, IInstructors, InstructorApplication, PaginatedInstructorsResponse } from "@/types/instructor/instructor-management.types";
+import { GetInstructorsParams, IInstructors, InstructorApplication, PaginatedInstructorsResponse, IInstructorStatistic } from "@/types/instructor/instructor-management.types";
 
 export const INSTRUCTOR_PATH = "instructors";
 
@@ -72,3 +72,31 @@ export const getIntructorApplicationByInstructorId = createThunk<
 >(HttpMethod.GET, "getIntructorApplicationByInstructorId", `${INSTRUCTOR_PATH}/:instructorId/applicants`, {
   buildUrl: (payload) => `${INSTRUCTOR_PATH}/${payload.instructorId}/applicants`
 });
+
+export interface GetInstructorStatisticParams {
+  from?: string; // ISO 8601 date string
+  to?: string; // ISO 8601 date string
+}
+
+export const getInstructorStatistic = createThunk<
+  IInstructorStatistic,
+  GetInstructorStatisticParams | void
+>(
+  HttpMethod.GET,
+  "getInstructorStatistic",
+  "booking/instructor-statistic",
+  {
+    buildUrl: (payload) => {
+      if (!payload || (!payload.from && !payload.to)) {
+        return "booking/instructor-statistic";
+      }
+      
+      const params = new URLSearchParams();
+      if (payload.from) params.append("from", payload.from);
+      if (payload.to) params.append("to", payload.to);
+      
+      const queryString = params.toString();
+      return `booking/instructor-statistic${queryString ? `?${queryString}` : ""}`;
+    },
+  }
+);

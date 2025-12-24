@@ -224,3 +224,27 @@ export interface ITopPersonalCar {
 
 
 
+
+export interface IInstructorStatistic {
+  totalPackageCount: number;
+  totalCarCount: number;
+  totalUpcomingSessionCount: number;
+  recentPurchases: IRecentPackagePurchases[];
+  totalSessionByStatusCount: Record<string, number>;
+  totalSessionByDay: Record<string, Record<string, number>>; // Based on "from and to"
+  topPersonalPackages: ITopPersonalPackage[];
+  topPersonalCars: ITopPersonalCar[];
+}
+
+export interface IInstructorStatisticFilter {
+  year?: number;
+  month?: number;
+  week?: number;
+  type?: StatisticTimeType;
+}
+
+export enum StatisticTimeType {
+  Weekly = 0,
+  Monthly = 1,
+  Yearly = 2,
+}
