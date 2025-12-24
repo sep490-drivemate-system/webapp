@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import ImageUploadField from "../image-upload-field";
+import ImageUploadField from "../commons/image-upload-field";
 
 export default function CitizenIdSection() {
   const [formData, setFormData] = useState({
@@ -28,11 +28,24 @@ export default function CitizenIdSection() {
     }));
   };
 
-  const handleImageUpload = (field: string, base64: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: base64,
-    }));
+  const handleImageUpload = async (field: string, file: File | null) => {
+    if (!file) {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: "",
+      }));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result as string;
+      setFormData((prev) => ({
+        ...prev,
+        [field]: base64,
+      }));
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -46,16 +59,12 @@ export default function CitizenIdSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <ImageUploadField
             label="Ảnh Mặt Trước"
-            onUpload={(base64: string) =>
-              handleImageUpload("frontImage", base64)
-            }
+            onUpload={(file) => handleImageUpload("frontImage", file)}
             preview={formData.frontImage}
           />
           <ImageUploadField
             label="Ảnh Mặt Sau"
-            onUpload={(base64: string) =>
-              handleImageUpload("backImage", base64)
-            }
+            onUpload={(file) => handleImageUpload("backImage", file)}
             preview={formData.backImage}
           />
         </div>

@@ -87,7 +87,6 @@ const carSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // Register Car
     builder
       .addCase(registerCar.pending, (state) => {
         state.isLoading = true;
@@ -104,7 +103,6 @@ const carSlice = createSlice({
         state.errorMessage = action.payload || "Không thể đăng ký xe";
       });
 
-    // Get My Cars
     builder
       .addCase(getCarsForInstructor.pending, (state) => {
         state.isLoading = true;
@@ -121,7 +119,6 @@ const carSlice = createSlice({
         state.errorMessage = action.payload || "Không thể tải danh sách xe";
       });
 
-    // Get Car By Id
     builder
       .addCase(getCarById.pending, (state) => {
         state.isLoading = true;
@@ -138,7 +135,6 @@ const carSlice = createSlice({
         state.errorMessage = action.payload || "Không thể tải thông tin xe";
       });
 
-    // Delete Car
     builder
       .addCase(deleteCar.pending, (state) => {
         state.isLoading = true;
@@ -147,7 +143,6 @@ const carSlice = createSlice({
       .addCase(deleteCar.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        // Remove car from list
         const carId = action.meta.arg.id;
         state.cars = state.cars.filter((car) => car.id !== carId);
         if (state.currentCar?.id === carId) {

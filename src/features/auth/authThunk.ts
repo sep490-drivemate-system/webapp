@@ -72,7 +72,6 @@ export const test = createThunk<any, TestDto>(
   {
     config: (payload) => {
       const form = new FormData();
-      // Use dot notation for nested objects to match ASP.NET Core model binding
       form.append("testccdmat.cccdmt", payload.testccdmat.cccdmt.toString());
       form.append("testccdmat.formFilecccd", payload.testccdmat.formFilecccd);
       form.append("testccdmas.cccdms", payload.testccdmas.cccdms.toString());
@@ -86,7 +85,6 @@ export const test = createThunk<any, TestDto>(
   }
 );
 
-// Thunk đăng ký instructor với FormData
 export const registerInstructor = createThunk<
   string, // instructorId
   InstructorRegistrationRequest
@@ -94,7 +92,6 @@ export const registerInstructor = createThunk<
   buildBody: (payload) => {
     const form = new FormData();
 
-    // Text fields
     form.append("Fullname", payload.Fullname);
     form.append("RawPassword", payload.RawPassword);
     form.append("Email", payload.Email);
@@ -104,7 +101,6 @@ export const registerInstructor = createThunk<
     form.append("DrivingLicenseTier", payload.DrivingLicenseTier);
     form.append("TeachingTier", payload.TeachingTier);
 
-    // File fields
     if (payload.Avatar) {
       form.append("Avatar", payload.Avatar);
     }

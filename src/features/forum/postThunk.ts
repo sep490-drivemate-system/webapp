@@ -49,26 +49,6 @@ export const createPost = createThunk<boolean, IPostCreation>(
                 });
             }
 
-            // Debug: Log FormData contents
-            console.log("[FormData] Title:", payload.title);
-            console.log("[FormData] Content:", payload.content);
-            console.log("[FormData] CategoryIds:", payload.categoryIds);
-            console.log("[FormData] TagIds:", payload.tagIds);
-            console.log("[FormData] Images count:", payload.images?.length || 0);
-            console.log("[FormData] Videos count:", payload.videos?.length || 0);
-
-            // Log FormData entries (for debugging)
-            if (typeof window !== "undefined") {
-                console.log("[FormData] Entries:");
-                for (const [key, value] of formData.entries()) {
-                    if (value instanceof File) {
-                        console.log(`  ${key}: File(${value.name}, ${value.size} bytes, ${value.type})`);
-                    } else {
-                        console.log(`  ${key}:`, value);
-                    }
-                }
-            }
-
             return formData;
         },
     }

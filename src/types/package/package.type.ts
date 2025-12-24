@@ -85,7 +85,6 @@ export interface Package {
   bookingCount: number;
 }
 
-// Paginated response từ backend
 export interface PaginatedPackagesResponse {
   currentPage: number;
   pageSize: number;
@@ -93,7 +92,6 @@ export interface PaginatedPackagesResponse {
   pageContent: Package[];
 }
 
-// Request params cho API get packages
 export interface GetPackagesParams {
   searchKey?: string;
   allowSelfCar?: boolean;

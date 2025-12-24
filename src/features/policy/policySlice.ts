@@ -32,7 +32,6 @@ const policySlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        // Get New Driver Policy
         builder
             .addCase(getNewDriverPolicy.pending, (state) => {
                 state.isLoading = true;
@@ -43,8 +42,6 @@ const policySlice = createSlice({
                 state.isSuccess = true;
                 const response = action.payload as any;
                 
-                // Handle GenericResponse format
-                // API returns: { value: IPolicy[], isSuccess: boolean, message: string, errorCode: null }
                 const policies: IPolicy[] = response?.value;
                 
                 if (Array.isArray(policies)) {
@@ -59,7 +56,6 @@ const policySlice = createSlice({
                 state.errorMessage = action.payload || 'Không thể tải điều khoản người lái mới';
             });
 
-        // Get Instructor Policy
         builder
             .addCase(getInstructorPolicy.pending, (state) => {
                 state.isLoading = true;
@@ -70,8 +66,6 @@ const policySlice = createSlice({
                 state.isSuccess = true;
                 const response = action.payload as any;
                 
-                // Handle GenericResponse format
-                // API returns: { value: IPolicy[], isSuccess: boolean, message: string, errorCode: null }
                 const policies: IPolicy[] = response?.value;
                 
                 if (Array.isArray(policies)) {
@@ -86,7 +80,6 @@ const policySlice = createSlice({
                 state.errorMessage = action.payload || 'Không thể tải điều khoản người hướng dẫn';
             });
 
-        // Create Policy
         builder
             .addCase(createPolicy.pending, (state) => {
                 state.isLoading = true;
@@ -99,7 +92,6 @@ const policySlice = createSlice({
                 const policy: Policy = response?.value;
                 
                 if (policy) {
-                    // Map Policy (with description) to IPolicy (with detail)
                     const ipolicy: IPolicy = {
                         id: policy.id,
                         title: policy.title,
@@ -107,7 +99,6 @@ const policySlice = createSlice({
                         type: policy.type,
                     };
                     
-                    // Add to appropriate list based on type
                     if (ipolicy.type === 1) {
                         state.newDriverPolicies.push(ipolicy);
                     } else if (ipolicy.type === 2) {
@@ -121,7 +112,6 @@ const policySlice = createSlice({
                 state.errorMessage = action.payload || 'Không thể tạo điều khoản';
             });
 
-        // Update Policy
         builder
             .addCase(updatePolicy.pending, (state) => {
                 state.isLoading = true;
@@ -134,7 +124,6 @@ const policySlice = createSlice({
                 const updatedPolicy: Policy = response?.value;
                 
                 if (updatedPolicy) {
-                    // Map Policy (with description) to IPolicy (with detail)
                     const ipolicy: IPolicy = {
                         id: updatedPolicy.id,
                         title: updatedPolicy.title,
@@ -142,7 +131,6 @@ const policySlice = createSlice({
                         type: updatedPolicy.type,
                     };
                     
-                    // Update in appropriate list based on type
                     if (ipolicy.type === 1) {
                         const index = state.newDriverPolicies.findIndex(p => p.id === ipolicy.id);
                         if (index !== -1) {
@@ -162,7 +150,6 @@ const policySlice = createSlice({
                 state.errorMessage = action.payload || 'Không thể cập nhật điều khoản';
             });
 
-        // Delete Policy
         builder
             .addCase(deletePolicy.pending, (state) => {
                 state.isLoading = true;
@@ -171,11 +158,9 @@ const policySlice = createSlice({
             .addCase(deletePolicy.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                // Get the IDs that were deleted from the original action payload
                 const deletedIds = action.meta.arg;
                 
                 if (Array.isArray(deletedIds)) {
-                    // Remove deleted policies from both lists
                     state.newDriverPolicies = state.newDriverPolicies.filter(
                         (policy) => !deletedIds.includes(policy.id)
                     );

@@ -11,16 +11,12 @@ export interface UploadResponse {
     id?: string;
 }
 
-// Upload file kèm JSON metadata (multipart/form-data)
-// Endpoint ví dụ: POST /files/upload
 export const uploadFileWithMeta = createThunk<UploadResponse, FormData>(
     HttpMethod.POST,
     "uploadFileWithMeta",
     "files/upload"
-    // Không cần set headers, interceptor sẽ tự xử lý multipart
 );
 
-// Ví dụ gửi JSON thuần (application/json)
 export interface CreateProfilePayload {
     name: string;
     email: string;

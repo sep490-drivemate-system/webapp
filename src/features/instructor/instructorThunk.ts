@@ -102,12 +102,10 @@ export const getStatisticsInstructor = createThunk<
 
     const params = new URLSearchParams();
 
-    // Always add type if provided
     if (payload.type !== undefined && payload.type !== null) {
       params.append("type", payload.type.toString());
     }
 
-    // Add year if provided
     if (
       payload.year !== undefined &&
       payload.year !== null &&
@@ -116,7 +114,6 @@ export const getStatisticsInstructor = createThunk<
       params.append("year", payload.year.toString());
     }
 
-    // Add month if provided (for month and week viewMode)
     if (
       payload.month !== undefined &&
       payload.month !== null &&
@@ -125,7 +122,6 @@ export const getStatisticsInstructor = createThunk<
       params.append("month", payload.month.toString());
     }
 
-    // Add week if provided (only for week viewMode)
     if (
       payload.week !== undefined &&
       payload.week !== null &&

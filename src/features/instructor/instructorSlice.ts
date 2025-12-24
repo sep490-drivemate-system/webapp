@@ -18,29 +18,23 @@ interface PaginationState {
 }
 
 interface InstructorState extends BaseState {
-  // Data
   allInstructors: IInstructors[];
   filteredInstructors: IInstructors[];
   displayedInstructors: IInstructors[];
   
-  // Statistics
   statistics: IInstructorStatistic | null;
   revenueStatistics: IStatisticsInstructor | null;
   
-  // Search & Filter
   searchQuery: string;
   filters: FilterState;
   tempFilters: FilterState;
   
-  // Sorting
   sortBy: SortType;
   sortAscending: boolean;
   
-  // UI State
   showFilterModal: boolean;
   isRefreshing: boolean;
   
-  // Pagination
   pagination: PaginationState;
 }
 
@@ -53,36 +47,29 @@ const initialFilterState: FilterState = {
 };
 
 const initialState: InstructorState = {
-  // Data
   allInstructors: [],
   filteredInstructors: [],
   displayedInstructors: [],
   
-  // Statistics
   statistics: null,
   revenueStatistics: null,
   
-  // Search & Filter
   searchQuery: '',
   filters: initialFilterState,
   tempFilters: initialFilterState,
   
-  // Sorting
   sortBy: SortType.Rating,
   sortAscending: false,
   
-  // UI State
   showFilterModal: false,
   isRefreshing: false,
   
-  // Pagination
   pagination: {
     currentPage: 1,
     itemsPerPage: 8,
     totalItems: 0,
   },
   
-  // Base State
   isLoading: false,
   errorMessage: null,
   isSuccess: false,
@@ -92,7 +79,6 @@ const instructorSlice = createSlice({
   name: 'instructor',
   initialState,
   reducers: {
-    // Data Actions
     setAllInstructors: (state, action: PayloadAction<IInstructors[]>) => {
       state.allInstructors = action.payload;
     },
@@ -103,7 +89,6 @@ const instructorSlice = createSlice({
       state.displayedInstructors = action.payload;
     },
     
-    // Search & Filter Actions
     setSearchQuery: (state, action: PayloadAction<string>) => {
       state.searchQuery = action.payload;
     },
@@ -121,7 +106,6 @@ const instructorSlice = createSlice({
       state.filters = state.tempFilters;
     },
     
-    // Sorting Actions
     setSortBy: (state, action: PayloadAction<SortType>) => {
       state.sortBy = action.payload;
     },
@@ -132,7 +116,6 @@ const instructorSlice = createSlice({
       state.sortAscending = !state.sortAscending;
     },
     
-    // UI State Actions
     setShowFilterModal: (state, action: PayloadAction<boolean>) => {
       state.showFilterModal = action.payload;
     },
@@ -140,7 +123,6 @@ const instructorSlice = createSlice({
       state.isRefreshing = action.payload;
     },
     
-    // Pagination Actions
     setPagination: (state, action: PayloadAction<Partial<PaginationState>>) => {
       state.pagination = { ...state.pagination, ...action.payload };
     },
@@ -152,7 +134,6 @@ const instructorSlice = createSlice({
       };
     },
     
-    // Base State Actions
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
@@ -169,7 +150,6 @@ const instructorSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Handle getStatisticsInstructor
       .addCase(getStatisticsInstructor.pending, (state) => {
         state.isLoading = true;
         state.errorMessage = null;
@@ -186,7 +166,6 @@ const instructorSlice = createSlice({
         state.isSuccess = false;
         state.errorMessage = action.payload || 'Failed to fetch statistics';
       })
-      // Handle getStatisticOverviewPriceInstructor
       .addCase(getStatisticOverviewPriceInstructor.pending, (state) => {
         state.isLoading = true;
         state.errorMessage = null;
@@ -207,32 +186,26 @@ const instructorSlice = createSlice({
 });
 
 export const {
-  // Data Actions
   setAllInstructors,
   setFilteredInstructors,
   setDisplayedInstructors,
   
-  // Search & Filter Actions
   setSearchQuery,
   setFilters,
   setTempFilters,
   resetFilters,
   applyTempFilters,
   
-  // Sorting Actions
   setSortBy,
   setSortAscending,
   toggleSortOrder,
   
-  // UI State Actions
   setShowFilterModal,
   setIsRefreshing,
   
-  // Pagination Actions
   setPagination,
   resetPagination,
   
-  // Base State Actions
   setLoading,
   setError,
   setSuccess,

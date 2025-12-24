@@ -1,19 +1,17 @@
-// Model for user's purchased packages and driving sessions
-
 export interface IDrivingSession {
     id: string;
     packageId: string;
     instructorId: string;
     instructorName: string;
-    displayName?: string | null; // Tên hiển thị của địa điểm
-    date: string; // Format: "YYYY-MM-DD"
-    startTime: string; // Format: "HH:MM"
-    endTime: string; // Format: "HH:MM"
-    duration: number; // in hours
+    displayName?: string | null;
+    date: string;
+    startTime: string;
+    endTime: string;
+    duration: number;
     location: string;
     vehicleId?: string;
-    startingLatitude?: number; // Latitude của điểm đón
-    startingLongtitude?: number; // Longitude của điểm đón
+    startingLatitude?: number;
+    startingLongtitude?: number;
     vehicleName?: string;
     status: "planing" | "upcoming" | "in_progress" | "completed" | "reschedule" | "cancelled";
     createdAt: string;
@@ -39,14 +37,13 @@ export interface IUserPackage {
 
 export interface IInstructorBusyTime {
     instructorId: string;
-    date: string; // Format: "YYYY-MM-DD"
+    date: string;
     busySlots: {
-        startTime: string; // Format: "HH:MM"
-        endTime: string; // Format: "HH:MM"
+        startTime: string;
+        endTime: string;
     }[];
 }
 
-// API Response Types
 export enum BookingStatus {
     All = 0,
     Purchased = 1,
@@ -65,11 +62,11 @@ export interface IUserPackageAPI {
     carPrice:number;
     bookingStatus: BookingStatus;
     avatarInstructor: string;
-    buyDate: string; // ISO format
-    duration: number; // in hours
-    durationInUse: number; // hours used
-    precentInUse: number; // percentage 0-100
-    remainingTime: number; // hours remaining
+    buyDate: string;
+    duration: number;
+    durationInUse: number;
+    precentInUse: number;
+    remainingTime: number;
 }
 
 export interface IGetUserPackagesParams {

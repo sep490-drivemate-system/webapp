@@ -1,6 +1,5 @@
 import { UserRole } from "../auth/user-role.enum";
 
-// Post Status Enum
 export enum PostStatus {
   PENDING_REVIEW = "PENDING_REVIEW",
   PUBLISHED = "PUBLISHED",
@@ -8,7 +7,6 @@ export enum PostStatus {
   DRAFT = "DRAFT",
 }
 
-// Moderation Status Enum
 export enum ModerationStatus {
   WAITING = "WAITING",
   APPROVED = "APPROVED",
@@ -16,13 +14,11 @@ export enum ModerationStatus {
   SUGGEST_EDIT = "SUGGEST_EDIT",
 }
 
-// Reaction Type Enum
 export enum ReactionType {
   LIKE = "LIKE",
   DISLIKE = "DISLIKE",
 }
 
-// User Interface
 export interface User {
   id: string;
   name: string;
@@ -31,7 +27,6 @@ export interface User {
   role: UserRole;
 }
 
-// Post Interface
 export interface Post {
   id: string;
   title: string;
@@ -54,7 +49,6 @@ export interface Post {
   featured?: boolean;
 }
 
-// Post Moderation Interface
 export interface PostModeration {
   id: string;
   postId: string;
@@ -67,14 +61,13 @@ export interface PostModeration {
   createdAt: string;
 }
 
-// Comment Interface
 export interface Comment {
   id: string;
   postId: string;
   userId: string;
   user: User;
   content: string;
-  parentId?: string; // For nested replies
+  parentId?: string;
   replies?: Comment[];
   createdAt: string;
   updatedAt: string;
@@ -82,7 +75,6 @@ export interface Comment {
   dislikes: number;
 }
 
-// Reaction Interface
 export interface Reaction {
   id: string;
   postId?: string;
@@ -93,12 +85,10 @@ export interface Reaction {
   createdAt: string;
 }
 
-// Post with Moderation
 export interface PostWithModeration extends Post {
   moderation?: PostModeration;
 }
 
-// Post with Comments and Reactions
 export interface PostDetail extends Post {
   comments: Comment[];
   reactions: Reaction[];

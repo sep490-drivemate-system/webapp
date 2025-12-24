@@ -101,7 +101,6 @@ const documentSlice = createSlice({
       .addCase(getUserEmergencyContact.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        // Get first item if array has 2 or more items, otherwise get the first item or null
         const contacts = action.payload.value ?? [];
         state.emergencyContact = contacts.length >= 2 ? contacts[0] : (contacts.length === 1 ? contacts[0] : null);
         state.errorMessage = null;

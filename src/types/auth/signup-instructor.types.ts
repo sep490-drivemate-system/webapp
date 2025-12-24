@@ -1,4 +1,3 @@
-// Type cho dữ liệu đăng ký người hướng dẫn (FormData)
 export interface InstructorRegistrationData {
     email: string
     documents: {
@@ -13,7 +12,6 @@ export interface InstructorRegistrationData {
     }
 }
 
-// Interface cho backend .NET - Request
 export interface InstructorSignupRequest {
     email: string
     b2LicenseFront: File
@@ -26,7 +24,6 @@ export interface InstructorSignupRequest {
     vehicleInsurance: File
 }
 
-// Interface cho backend .NET - Response
 export interface InstructorSignupResponse {
     success: boolean
     message: string
@@ -41,7 +38,6 @@ export interface InstructorSignupResponse {
     }[]
 }
 
-// Type cho từng loại giấy tờ
 export interface DocumentType {
     id: string
     name: string
@@ -53,7 +49,6 @@ export interface DocumentType {
     required: boolean
 }
 
-// Type cho response từ API
 export interface InstructorRegistrationResponse {
     success: boolean
     message: string

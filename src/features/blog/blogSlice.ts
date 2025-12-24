@@ -42,7 +42,6 @@ const blogSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        // Get List Blogs
         builder
             .addCase(getListBlogs.pending, (state) => {
                 state.isLoading = true;
@@ -53,9 +52,6 @@ const blogSlice = createSlice({
                 state.isSuccess = true;
                 const response = action.payload as any;
                 
-                // Handle both GenericResponse format and direct response
-                // API returns: { value: PaginatedGeneric<Blog>, isSuccess: boolean, message: string, errorCode: null }
-                // GenericResponse expects: { value: T, success: boolean, message: string, errorCode: null }
                 const paginatedData: PaginatedGeneric<Blog> = response?.value;
                 
                 if (paginatedData && Array.isArray(paginatedData.pageContent)) {
@@ -76,7 +72,6 @@ const blogSlice = createSlice({
                 state.errorMessage = action.payload || 'Không thể tải danh sách bài viết';
             });
         
-        // Get List Blogs For Instructor
         builder
             .addCase(getListBlogsForInstructor.pending, (state) => {
                 state.isLoading = true;
@@ -87,8 +82,6 @@ const blogSlice = createSlice({
                 state.isSuccess = true;
                 const response = action.payload as any;
                 
-                // Handle both GenericResponse format and direct response
-                // API returns: { value: PaginatedGeneric<Blog>, isSuccess: boolean, message: string, errorCode: null }
                 const paginatedData: PaginatedGeneric<Blog> = response?.value;
                 
                 if (paginatedData && Array.isArray(paginatedData.pageContent)) {
@@ -109,7 +102,6 @@ const blogSlice = createSlice({
                 state.errorMessage = action.payload || 'Không thể tải danh sách bài viết';
             });
         
-        // Get Blog Detail
         builder
             .addCase(getBlogDetailForAllRoles.pending, (state) => {
                 state.isLoading = true;
@@ -120,8 +112,6 @@ const blogSlice = createSlice({
                 state.isSuccess = true;
                 const response = action.payload as any;
                 
-                // Handle GenericResponse format
-                // API returns: { value: BlogDetail, isSuccess: boolean, message: string, errorCode: null }
                 const blogDetail: BlogDetail = response?.value;
                 
                 if (blogDetail) {
@@ -137,7 +127,6 @@ const blogSlice = createSlice({
                 state.blogDetail = null;
             });
 
-        // Get Blog Detail For Instructor
         builder
             .addCase(gettBlogDetailForInstructor.pending, (state) => {
                 state.isLoading = true;
@@ -148,7 +137,6 @@ const blogSlice = createSlice({
                 state.isSuccess = true;
                 const response = action.payload as any;
 
-                // API returns: { value: BlogForInstructorDetail, isSuccess: boolean, message: string, errorCode: null }
                 const blogDetail: BlogForInstructorDetail = response?.value;
 
                 if (blogDetail) {
@@ -164,7 +152,6 @@ const blogSlice = createSlice({
                 state.blogDetail = null;
             });
 
-        // Delete Blog For Instructor
         builder
             .addCase(deleteBlogForInstructor.pending, (state) => {
                 state.isLoading = true;

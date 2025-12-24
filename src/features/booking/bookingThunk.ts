@@ -52,7 +52,6 @@ export enum PolicyType {
   Booking = 1,
 }
 
-// Create Session Request Interface
 export interface ICreateSessionRequest {
   bookingId: string;
   startTime: string; // ISO datetime format
@@ -68,7 +67,6 @@ export interface ICreateSessionRequest {
   endingLongtitude?: number;
 }
 
-// Session Log Request Interface
 export interface ISessionLogRequest {
   streetName: string;
   latitude: number;
@@ -79,12 +77,10 @@ export interface ISessionLogRequest {
   polylineSesionLog?: string | null;
 }
 
-// Cancel Session Request Interface
 export interface ICancelSessionRequest {
   note: string;
 }
 
-// Feedback Request Interface
 export interface IFeedbackRequest {
   instructorRating: number;
   instructorFeedback: string;
@@ -95,7 +91,6 @@ export interface IFeedbackRequest {
   instructorId: string;
 }
 
-// Reschedule Session Request Interface
 export interface IRescheduleSessionRequest {
   note: string;
   newStartTime: string;
@@ -128,7 +123,6 @@ export const getMyPackages = createThunk<
   }
 );
 
-// Get booking sessions with optional status filter
 export const getBookingSessions = createThunk<
   IBookingSession[],
   IGetBookingSessionsParams
@@ -140,7 +134,6 @@ export const getBookingSessions = createThunk<
     buildUrl: (payload) => {
       const params = new URLSearchParams();
 
-      // Add status filter if provided
       if (payload?.status !== undefined) {
         params.append('status', payload.status.toString());
       }
@@ -171,11 +164,6 @@ export const getAllSessions = createThunk<
   }
 );
 
-
-
-// Get novice driver addresses
-
-// Get policies by type
 export const getPolicies = createThunk<
   IPolicy[],
   { policyType: PolicyType }
@@ -188,7 +176,6 @@ export const getPolicies = createThunk<
   }
 );
 
-// Create a new booking session
 export const createSession = createThunk<
   boolean,
   ICreateSessionRequest
@@ -212,7 +199,6 @@ export const getSessionRoutes = createThunk<
   }
 );
 
-// Get session detail by sessionId
 export const getSessionDetail = createThunk<
   ISessionDetailResponse,
   { sessionId: string }
@@ -234,7 +220,6 @@ export const addSessionLog = createAsyncThunk<
   async ({ sessionId, logData }, { rejectWithValue }) => {
     try {
       const url = `/${SESSION_PATH}/${sessionId}/session-log`;
-
 
       const response = await axiosInstance.post<GenericResponse<boolean>>(
         url,
@@ -288,7 +273,6 @@ export const cancelSession = createAsyncThunk<
   }
 );
 
-// Reschedule a session
 export const rescheduleSession = createAsyncThunk<
   GenericResponse<boolean>,
   { sessionId: string; rescheduleData: IRescheduleSessionRequest },
@@ -315,7 +299,6 @@ export const rescheduleSession = createAsyncThunk<
   }
 );
 
-// Submit feedback for a booking
 export const submitFeedback = createAsyncThunk<
   GenericResponse<boolean>,
   IFeedbackRequest,

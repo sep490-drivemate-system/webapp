@@ -4,22 +4,34 @@ import { useState } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import ImageUploadField from "../image-upload-field";
+import ImageUploadField from "../commons/image-upload-field";
 
 export default function HealthCertificateSection() {
   const [formData, setFormData] = useState({
     image: "" as string,
   });
 
-  const handleImageUpload = (base64: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      image: base64,
-    }));
+  const handleImageUpload = (file: File | null) => {
+    if (!file) {
+      setFormData((prev) => ({
+        ...prev,
+        image: "",
+      }));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result as string;
+      setFormData((prev) => ({
+        ...prev,
+        image: base64,
+      }));
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -31,7 +43,7 @@ export default function HealthCertificateSection() {
       <CardContent className="pt-6 space-y-6">
         <ImageUploadField
           label="Ảnh Giấy Khám Sức Khỏe"
-          onUpload={(base64: string) => handleImageUpload(base64)}
+          onUpload={handleImageUpload}
           preview={formData.image}
         />
       </CardContent>

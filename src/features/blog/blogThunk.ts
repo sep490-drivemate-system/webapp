@@ -53,7 +53,6 @@ export const getListBlogsForAllRoles = createThunk<
   }
 );
 
-// Alias for backward compatibility
 export const getListBlogs = getListBlogsForAllRoles;
 
 export const getBlogDetailForAllRoles = createThunk<

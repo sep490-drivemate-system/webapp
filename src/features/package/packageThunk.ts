@@ -56,8 +56,6 @@ export const getInstructorPackages = createThunk<
   }
 );
 
-
-
 export const createInstructorPackage = createThunk<
   boolean,
   CreatePackageForm

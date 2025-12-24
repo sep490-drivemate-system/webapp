@@ -26,19 +26,16 @@ export interface AuthState extends BaseState {
 const isClient = typeof window !== "undefined";
 const tokenExpired = isClient ? isAccessTokenExpired() : true;
 if (isClient && tokenExpired) {
-  // Clear stale tokens early to avoid inconsistent UI state
   try {
     clearTokens();
   } catch { }
 }
 
 const initialState: AuthState = {
-  // BaseState properties
   isLoading: false,
   errorMessage: null,
   isSuccess: false,
 
-  // Authentication state
   signInData: {
     password: "",
     emailOrPhone: "",
@@ -46,7 +43,6 @@ const initialState: AuthState = {
   isAuthenticated: isClient ? !!getUserRole() && !tokenExpired : false,
   role: isClient && !tokenExpired ? getUserRole() as unknown as UserRole : UserRole.NoviceDriver,
 
-  // Signup flow state
   inputCode: "",
   verificationCode: "",
   signupData: {
@@ -147,7 +143,6 @@ const authSlice = createSlice({
       })
       .addCase(signUp.rejected, (state) => {
         state.isLoading = false;
-        // state.errorMessage = action.error?.message || "Đăng ký thất bại";
       })
       .addCase(sendEmailCode.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -156,11 +151,9 @@ const authSlice = createSlice({
       })
       .addCase(sendEmailCode.rejected, (state) => {
         state.isLoading = false;
-        // state.errorMessage = action.error?.message || "Đăng nhập thất bại";
       })
       .addCase(sendEmailCode.pending, (state) => {
         state.isLoading = true;
-        // state.errorMessage = action.error?.message || "Đăng nhập thất bại";
       });
   },
 });

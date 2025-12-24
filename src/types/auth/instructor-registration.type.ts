@@ -1,4 +1,3 @@
-// Type cho đăng ký instructor với FormData
 export interface InstructorRegistrationRequest {
   Fullname: string;
   RawPassword: string;
@@ -16,7 +15,6 @@ export interface InstructorRegistrationRequest {
   PersonalProfile: File;
 }
 
-// Response type cho đăng ký instructor
 export interface InstructorRegistrationResponse {
   success: boolean;
   message: string;

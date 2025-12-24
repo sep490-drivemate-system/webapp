@@ -25,7 +25,7 @@ export interface ProfessionalCertificateDocument
 
 export interface InstructorDocuments {
   b2License?: DriverLicenseDocument;
-  drivingLicense?: DriverLicenseDocument; // Alternative name for b2License
+  drivingLicense?: DriverLicenseDocument;
   cccd?: CitizenIdDocument;
   professionalCertificate?: ProfessionalCertificateDocument;
   healthCertificate?: BaseInstructorDocument;
@@ -122,7 +122,6 @@ export interface IInstructors {
   packageCount: number;
 }
 
-// Paginated response từ backend
 export interface PaginatedInstructorsResponse {
   currentPage: number;
   pageSize: number;
@@ -130,7 +129,6 @@ export interface PaginatedInstructorsResponse {
   pageContent: IInstructors[];
 }
 
-// Request params cho API
 export interface GetInstructorsParams {
   searchKey?: string;
   pageNumber?: number;
@@ -147,12 +145,11 @@ export interface IInstructor {
   bio: string;
   totalBookings: number;
   gender: gender;
-  packages?: IInstructorPackages[]; // Optional packages array
-  price?: number; // Optional price for some instructors
-  vehicels?: ICar[]; // Optional vehicles (typo in data, keeping for compatibility)
+  packages?: IInstructorPackages[];
+  price?: number;
+  vehicels?: ICar[];
 }
 
-// Type for InstructorItem component (with price for display)
 export type Instructor = IInstructor & {
   price: number;
 };
@@ -192,7 +189,7 @@ export interface IInstructorStatistic {
   totalUpcomingSessionCount: number;
   recentPurchases: IRecentPackagePurchases[];
   totalSessionByStatusCount: Record<string, number>;
-  totalSessionByDay: Record<string, Record<string, number>>; // Based on "from and to"
+  totalSessionByDay: Record<string, Record<string, number>>;
   topPersonalPackages: ITopPersonalPackage[];
   topPersonalCars: ITopPersonalCar[];
 }
@@ -202,21 +199,20 @@ export interface IRecentPackagePurchases {
   phoneNumber: string;
   avatarUrl: string;
   packageName: string;
-  boughtTime: string; // ISO 8601 date string
-  // Navigational ids
-  noviceDriverUserId: string; // UUID as string
-  packageId: string; // UUID as string
+  boughtTime: string;
+  noviceDriverUserId: string;
+  packageId: string;
 }
 
 export interface ITopPersonalPackage {
-  id: string; // UUID as string
+  id: string;
   name: string;
   bookCount: number;
   percentage: number;
 }
 
 export interface ITopPersonalCar {
-  id: string; // UUID as string
+  id: string;
   name: string;
   bookCount: number;
   percentage: number;
@@ -228,7 +224,7 @@ export interface IInstructorStatistic {
   totalUpcomingSessionCount: number;
   recentPurchases: IRecentPackagePurchases[];
   totalSessionByStatusCount: Record<string, number>;
-  totalSessionByDay: Record<string, Record<string, number>>; // Based on "from and to"
+  totalSessionByDay: Record<string, Record<string, number>>;
   topPersonalPackages: ITopPersonalPackage[];
   topPersonalCars: ITopPersonalCar[];
 }

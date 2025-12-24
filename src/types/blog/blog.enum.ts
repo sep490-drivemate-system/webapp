@@ -6,7 +6,6 @@ export enum BlogStatus {
     Banned = 5,
 }
 
-// Vietnamese labels for displaying blog status
 export const BLOG_STATUS_LABELS: Record<BlogStatus, string> = {
     [BlogStatus.Pending]: "Chờ duyệt",
     [BlogStatus.Active]: "Đang hoạt động",

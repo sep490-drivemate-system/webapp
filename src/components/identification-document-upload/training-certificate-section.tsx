@@ -4,7 +4,6 @@ import { useState } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -15,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import ImageUploadField from "../image-upload-field";
+import ImageUploadField from "../commons/image-upload-field";
 
 export default function TrainingCertificateSection() {
   const [formData, setFormData] = useState({
@@ -30,11 +29,24 @@ export default function TrainingCertificateSection() {
     }));
   };
 
-  const handleImageUpload = (base64: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      image: base64,
-    }));
+  const handleImageUpload = (file: File | null) => {
+    if (!file) {
+      setFormData((prev) => ({
+        ...prev,
+        image: "",
+      }));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result as string;
+      setFormData((prev) => ({
+        ...prev,
+        image: base64,
+      }));
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -48,7 +60,7 @@ export default function TrainingCertificateSection() {
       <CardContent className="pt-6 space-y-6">
         <ImageUploadField
           label="Ảnh Chứng Chỉ Hành Nghề"
-          onUpload={(base64: string) => handleImageUpload(base64)}
+          onUpload={handleImageUpload}
           preview={formData.image}
         />
 

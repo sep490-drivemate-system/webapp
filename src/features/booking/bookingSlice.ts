@@ -66,7 +66,6 @@ const initialState: BookingState = {
     errorMessage: null,
     isSuccess: false,
 
-    // Data
     myPackages: [],
     bookingSessions: [],
     allSessions: [],
@@ -77,7 +76,6 @@ const initialState: BookingState = {
     policies: [],
     userInfo: null,
 
-    // Operation states
     isCreatingSession: false,
     isSavingRoutes: false,
     isAddingLog: false,
@@ -88,7 +86,6 @@ const initialState: BookingState = {
     isCancellingBooking: false,
 };
 
-// Transform API response status string to SessionStatus enum
 const mapStatusStringToEnum = (status: string | number): SessionStatus => {
     if (typeof status === 'number') {
         return status as SessionStatus;
@@ -112,7 +109,6 @@ const mapStatusStringToEnum = (status: string | number): SessionStatus => {
     }
 };
 
-// Transform API response to IBookingSession format
 const transformSessionResponse = (apiSession: any): IBookingSession => {
     return {
         id: apiSession.id,
@@ -137,7 +133,6 @@ const bookingSlice = createSlice({
     name: 'booking',
     initialState,
     reducers: {
-        // Clear actions
         clearSessionDetail: (state) => {
             state.sessionDetail = null;
         },
@@ -151,13 +146,11 @@ const bookingSlice = createSlice({
             state.isSuccess = false;
         },
 
-        // Set user info
         setUserInfo: (state, action: PayloadAction<IUserInfo | null>) => {
             state.userInfo = action.payload;
         },
     },
     extraReducers: (builder) => {
-        // Get My Packages
         builder
             .addCase(getMyPackages.pending, (state) => {
                 state.isLoading = true;
@@ -166,7 +159,6 @@ const bookingSlice = createSlice({
             .addCase(getMyPackages.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                // Handle GenericResponse or direct array
                 const response = action.payload as any;
                 state.myPackages = Array.isArray(response) ? response : (response?.value || []);
             })
@@ -176,7 +168,6 @@ const bookingSlice = createSlice({
                 state.errorMessage = action.error.message || 'Không thể tải danh sách gói';
             });
 
-        // Get Booking Sessions
         builder
             .addCase(getBookingSessions.pending, (state) => {
                 state.isLoading = true;
@@ -185,7 +176,6 @@ const bookingSlice = createSlice({
             .addCase(getBookingSessions.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                // Handle GenericResponse or direct array
                 const response = action.payload as any;
                 state.bookingSessions = Array.isArray(response) ? response : (response?.value || []);
             })
@@ -195,7 +185,6 @@ const bookingSlice = createSlice({
                 state.errorMessage = action.error.message || 'Không thể tải danh sách buổi học';
             });
 
-        // Get All Sessions
         builder
             .addCase(getAllSessions.pending, (state) => {
                 state.isLoading = true;
@@ -204,10 +193,8 @@ const bookingSlice = createSlice({
             .addCase(getAllSessions.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                // Handle GenericResponse or direct array
                 const response = action.payload as any;
                 const sessions = Array.isArray(response) ? response : (response?.value || []);
-                // Transform API response to match IBookingSession interface
                 state.allSessions = sessions.map(transformSessionResponse);
             })
             .addCase(getAllSessions.rejected, (state, action) => {
@@ -216,7 +203,6 @@ const bookingSlice = createSlice({
                 state.errorMessage = action.error.message || 'Không thể tải danh sách buổi học';
             });
 
-        // Get Session Routes
         builder
             .addCase(getSessionRoutes.pending, (state) => {
                 state.isLoading = true;
@@ -225,7 +211,6 @@ const bookingSlice = createSlice({
             .addCase(getSessionRoutes.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                // Handle GenericResponse or direct array
                 const response = action.payload as any;
                 state.sessionRoutes = Array.isArray(response) ? response : (response?.value || []);
             })
@@ -235,7 +220,6 @@ const bookingSlice = createSlice({
                 state.errorMessage = action.error.message || 'Không thể tải lộ trình';
             });
 
-        // Get Session Detail
         builder
             .addCase(getSessionDetail.pending, (state) => {
                 state.isLoading = true;
@@ -244,7 +228,6 @@ const bookingSlice = createSlice({
             .addCase(getSessionDetail.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                // Handle GenericResponse or direct object
                 const response = action.payload as any;
                 state.sessionDetail = response?.value || response;
             })
@@ -254,7 +237,6 @@ const bookingSlice = createSlice({
                 state.errorMessage = action.error.message || 'Không thể tải chi tiết buổi học';
             });
 
-        // Get Instructor Schedule
         builder
             .addCase(getInstructorSchedule.pending, (state) => {
                 state.isLoading = true;
@@ -263,7 +245,6 @@ const bookingSlice = createSlice({
             .addCase(getInstructorSchedule.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                // Handle GenericResponse or direct array
                 const response = action.payload as any;
                 state.instructorSchedule = Array.isArray(response) ? response : (response?.value || []);
             })
@@ -273,7 +254,6 @@ const bookingSlice = createSlice({
                 state.errorMessage = action.error.message || 'Không thể tải lịch trình';
             });
 
-        // Get Instructor Booked Sessions
         builder
             .addCase(getInstructorBookedSessions.pending, (state) => {
                 state.isLoading = true;
@@ -282,7 +262,6 @@ const bookingSlice = createSlice({
             .addCase(getInstructorBookedSessions.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                // Handle GenericResponse or direct array
                 const response = action.payload as any;
                 state.instructorBookedSessions = Array.isArray(response) ? response : (response?.value || []);
             })
@@ -292,7 +271,6 @@ const bookingSlice = createSlice({
                 state.errorMessage = action.error.message || 'Không thể tải danh sách buổi học đã đặt';
             });
 
-        // Get Policies
         builder
             .addCase(getPolicies.pending, (state) => {
                 state.isLoading = true;
@@ -301,7 +279,6 @@ const bookingSlice = createSlice({
             .addCase(getPolicies.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                // Handle GenericResponse or direct array
                 const response = action.payload as any;
                 state.policies = Array.isArray(response) ? response : (response?.value || []);
             })
@@ -311,7 +288,6 @@ const bookingSlice = createSlice({
                 state.errorMessage = action.error.message || 'Không thể tải chính sách';
             });
 
-        // Create Session
         builder
             .addCase(createSession.pending, (state) => {
                 state.isCreatingSession = true;
@@ -327,8 +303,6 @@ const bookingSlice = createSlice({
                 state.errorMessage = action.error.message || 'Không thể tạo buổi học';
             });
 
-
-        // Add Session Log
         builder
             .addCase(addSessionLog.pending, (state) => {
                 state.isAddingLog = true;
@@ -344,12 +318,6 @@ const bookingSlice = createSlice({
                 state.errorMessage = action.payload || 'Không thể thêm log';
             });
 
-
-
-        // Reschedule Session
-
-
-        // Update Session Status
         builder
             .addCase(updateSessionStatus.pending, (state) => {
                 state.isUpdatingStatus = true;
@@ -365,7 +333,6 @@ const bookingSlice = createSlice({
                 state.errorMessage = action.payload || 'Không thể cập nhật trạng thái buổi tập lái';
             });
 
-        // Submit Feedback
         builder
             .addCase(submitFeedback.pending, (state) => {
                 state.isSubmittingFeedback = true;
@@ -381,7 +348,6 @@ const bookingSlice = createSlice({
                 state.errorMessage = action.payload || 'Không thể gửi phản hồi';
             });
 
-        // Cancel package booking
         builder
             .addCase(cancelPackageBooking.pending, (state) => {
                 state.isCancellingBooking = true;

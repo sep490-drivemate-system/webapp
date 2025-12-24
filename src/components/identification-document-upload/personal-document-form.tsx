@@ -27,7 +27,7 @@ export default function PersonalDocumentForm({
       setIsSubmitting(true);
       // Validate form data here
       onSuccess("Tài liệu đã được tải lên thành công!");
-    } catch (error) {
+    } catch {
       onError("Lỗi khi tải lên tài liệu. Vui lòng thử lại.");
     } finally {
       setIsSubmitting(false);

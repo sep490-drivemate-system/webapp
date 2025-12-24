@@ -57,16 +57,6 @@ export interface RoadType {
   icon: string;
 }
 
-// Old interface - replaced by API Response type below
-// export interface IBookingSession {
-//   id: string;
-//   date: string;
-//   time: string;
-//   status: string;
-//   completed?: boolean;
-// }
-
-// For rental screen specific booking structure
 export interface IBookingItem {
   id: string;
   instructorName: string;
@@ -78,7 +68,6 @@ export interface IBookingItem {
   routeStatus?: RouteStatus;
 }
 
-// For car detail screen booking
 export interface ICarBooking {
   id: string;
   instructorName: string;
@@ -111,7 +100,7 @@ export interface Booking {
   id: string;
   date: string;
   time: string;
-  duration: number; // in minutes
+  duration: number;
   instructorName: string;
   instructorAvatar: string;
   instructorRating: number;
@@ -163,7 +152,7 @@ export interface LearningRoute {
   steps: RouteStep[];
   totalDuration: number;
   difficulty: "beginner" | "intermediate" | "advanced";
-  progress: number; // 0-100
+  progress: number;
 }
 
 export interface RouteStep {
@@ -194,8 +183,8 @@ export interface RouteSegment {
   id: string;
   startPoint: MapPoint;
   endPoint: MapPoint;
-  distance: number; // in meters
-  duration: number; // in minutes
+  distance: number;
+  duration: number;
   roadType: string;
   difficulty: "easy" | "medium" | "hard";
   coordinates: Array<{ latitude: number; longitude: number }>;
@@ -219,15 +208,14 @@ export interface IBookingSession {
 }
 
 export interface IGetBookingSessionsParams {
-  bookingId?: string; // Optional for getting all sessions
-  status?: number; // Optional status filter
+  bookingId?: string;
+  status?: number;
 }
 
 export interface IGetAllSessionsParams {
-  status?: SessionStatus; // Optional status filter
+  status?: SessionStatus;
 }
 
-// Session Detail Response
 export interface ISessionDetailResponse {
   displayStartLocationName: string;
   startingLatitude: number;

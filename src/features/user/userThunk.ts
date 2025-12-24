@@ -35,11 +35,6 @@ export const getLicenseValidity = createThunk<
     `/${NOVICE_DRIVER_PATH}/license-validity`
 );
 
-
-
-/**
- * Helper function to convert UpdateInstructorPayload to FormData
- */
 function createUpdateInstructorFormData(payload: UpdateInstructorPayload): FormData {
     const formData = new FormData();
     
@@ -167,28 +162,23 @@ function createEditUserFormData(payload: EditUserPayload): FormData {
     if (payload.EmergencyContactPhone !== undefined) {
         formData.append("EmergencyContactPhone", payload.EmergencyContactPhone);
     }
-    if (payload.ProfileAvatar !== undefined && payload.ProfileAvatar !== null) {
-        // Handle File objects from web inputs
+        if (payload.ProfileAvatar !== undefined && payload.ProfileAvatar !== null) {
         if (typeof File !== "undefined" && payload.ProfileAvatar instanceof File) {
             formData.append("ProfileAvatar", payload.ProfileAvatar);
         }
-        // In React Native, if ProfileAvatar is a local file URI, format it correctly for FormData
         else if (typeof payload.ProfileAvatar === "string" && (payload.ProfileAvatar.startsWith("file://") || payload.ProfileAvatar.startsWith("content://"))) {
-            // Extract file extension from URI to determine type
             const uri = payload.ProfileAvatar;
             const extension = uri.split('.').pop()?.toLowerCase() || 'jpg';
             const mimeType = extension === 'png' ? 'image/png' : 
                            extension === 'jpeg' || extension === 'jpg' ? 'image/jpeg' : 
                            'image/jpeg';
             
-            // Format for React Native FormData
             formData.append("ProfileAvatar", {
                 uri: uri,
                 type: mimeType,
                 name: `avatar.${extension}`,
             } as any);
         } else {
-            // This might be a URL or base64 string - append as string
             formData.append("ProfileAvatar", payload.ProfileAvatar);
         }
     }

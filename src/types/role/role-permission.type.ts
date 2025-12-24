@@ -1,6 +1,5 @@
 import { UserRole } from "../auth/user-role.enum";
 
-// Permission categories
 export enum PermissionCategory {
     USER_MANAGEMENT = "Quản lý người dùng",
     INSTRUCTOR_MANAGEMENT = "Quản lý giảng viên",
@@ -11,7 +10,6 @@ export enum PermissionCategory {
     SYSTEM_SETTINGS = "Cài đặt hệ thống",
 }
 
-// Permission actions
 export enum PermissionAction {
     VIEW = "Xem",
     CREATE = "Tạo",
@@ -21,7 +19,6 @@ export enum PermissionAction {
     EXPORT = "Xuất dữ liệu",
 }
 
-// Permission interface
 export interface IPermission {
     id: string;
     name: string;
@@ -30,19 +27,17 @@ export interface IPermission {
     description: string;
 }
 
-// Role with permissions
 export interface IRoleWithPermissions {
     role: UserRole;
     roleName: string;
     description: string;
-    permissions: string[]; // Array of permission IDs
+    permissions: string[];
     userCount: number;
-    isSystemRole: boolean; // Cannot be deleted
+    isSystemRole: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
 
-// Role statistics
 export interface IRoleStats {
     totalRoles: number;
     totalPermissions: number;

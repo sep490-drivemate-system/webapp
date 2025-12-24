@@ -29,7 +29,6 @@ const transactionSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        // Get User Transactions
         builder
             .addCase(getUserTransactions.pending, (state) => {
                 state.isLoading = true;
@@ -38,8 +37,6 @@ const transactionSlice = createSlice({
             .addCase(getUserTransactions.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                // Handle GenericResponse with pagination structure
-                // Response structure: { value: { pageContent: [...], currentPage, pageSize, totalCount }, isSuccess, message, errorCode }
                 const response = action.payload as any;
                 
                 let transactions: any[] = [];
@@ -52,13 +49,11 @@ const transactionSlice = createSlice({
                     transactions = response.value;
                 }
                 
-                // Keep dates as strings (ISO format) for Redux serialization
-                // The ViewModel will handle Date conversion when needed
                 state.transactions = transactions.map((transaction: any) => ({
                     ...transaction,
                     date: transaction.date instanceof Date 
                         ? transaction.date.toISOString()
-                        : transaction.date, // Keep as string if already a string
+                        : transaction.date,
                 }));
             })
             .addCase(getUserTransactions.rejected, (state, action) => {
