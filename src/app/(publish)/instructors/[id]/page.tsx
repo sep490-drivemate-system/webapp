@@ -44,87 +44,14 @@ import { Loader2 } from "lucide-react";
 import { ICar, ICarDetail } from "@/types/car/car.type";
 import { useThunkAction } from "@/lib/redux/useThunkAction";
 import { getCarById, getCarsForInstructor } from "@/features/car/carThunk";
+import { getInstructorReviews } from "@/features/reviews/reviewThunk";
+import { InstructorRevew } from "@/types/reviews/reviews.type";
 
-type InstructorDetail = IInstructors & {
-  phone?: string;
-  email?: string;
-  pricePerHour?: number;
-  pricePerDay?: number;
-  pricePerMonth?: number;
-  specialties?: string[];
-  area?: string;
-  reviewCount?: number;
-  carCount?: number;
+const formatDate = (date: Date | string) => {
+  const d = typeof date === "string" ? new Date(date) : date;
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("vi-VN");
 };
-
-interface Review {
-  id: string;
-  userName: string;
-  userAvatar: string;
-  rating: number;
-  comment: string;
-  date: string;
-  verified: boolean;
-}
-
-// Mock reviews data for instructors
-const mockInstructorReviews: Review[] = [
-  {
-    id: "1",
-    userName: "Nguyễn Thị E",
-    userAvatar:
-      "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
-    rating: 5,
-    comment:
-      "Thầy dạy rất tận tâm và kiên nhẫn. Giúp em tự tin hơn khi lái xe. Phương pháp giảng dạy dễ hiểu và thực tế.",
-    date: "2024-01-20",
-    verified: true,
-  },
-  {
-    id: "2",
-    userName: "Trần Văn F",
-    userAvatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
-    rating: 5,
-    comment:
-      "Excellent instructor! Very professional and patient. Highly recommended for beginners.",
-    date: "2024-01-18",
-    verified: true,
-  },
-  {
-    id: "3",
-    userName: "Lê Thị G",
-    userAvatar:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
-    rating: 4,
-    comment:
-      "Thầy dạy tốt, có kinh nghiệm. Tuy nhiên lịch học hơi bận nên khó sắp xếp.",
-    date: "2024-01-15",
-    verified: false,
-  },
-  {
-    id: "4",
-    userName: "Phạm Văn H",
-    userAvatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
-    rating: 5,
-    comment:
-      "Rất hài lòng với cách dạy của thầy. Sau khóa học, em đã tự tin lái xe một mình.",
-    date: "2024-01-12",
-    verified: true,
-  },
-  {
-    id: "5",
-    userName: "Hoàng Thị I",
-    userAvatar:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
-    rating: 5,
-    comment:
-      "Thầy rất chuyên nghiệp, giảng dạy chi tiết từng bước. Recommend cho mọi người!",
-    date: "2024-01-10",
-    verified: true,
-  },
-];
 
 export default function InstructorDetailPage() {
   const params = useParams();
@@ -135,7 +62,7 @@ export default function InstructorDetailPage() {
   );
   const [bookingType, setBookingType] = useState("hourly");
   const [duration, setDuration] = useState("2");
-  const [instructor, setInstructor] = useState<InstructorDetail | null>(null);
+  const [instructor, setInstructor] = useState<IInstructors | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [packages, setPackages] = useState<IInstructorPackages[]>([]);
@@ -151,6 +78,11 @@ export default function InstructorDetailPage() {
     useThunkAction(getCarsForInstructor);
   const { run: fetchCarDetail, loading: carDetailLoading } =
     useThunkAction(getCarById);
+  const { run: fetchInstructorReviews, loading: reviewsLoading } =
+    useThunkAction(getInstructorReviews);
+
+  const [reviews, setReviews] = useState<InstructorRevew[]>([]);
+  const [reviewsError, setReviewsError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchInstructor = async () => {
@@ -219,6 +151,26 @@ export default function InstructorDetailPage() {
     );
   }, [fetchCarsForInstructor, instructorId]);
 
+  useEffect(() => {
+    if (!instructorId) return;
+    setReviewsError(null);
+    fetchInstructorReviews(
+      { id: instructorId },
+      {
+        onSuccess: (res) => {
+          const apiReviews = res?.value ?? [];
+          setReviews(apiReviews);
+        },
+        onError: () => {
+          setReviews([]);
+          setReviewsError(
+            "Không thể tải đánh giá cho người hướng dẫn. Vui lòng thử lại."
+          );
+        },
+      }
+    );
+  }, [fetchInstructorReviews, instructorId]);
+
   const experienceYears = useMemo(() => {
     const parsed = Number(instructor?.experienceYear ?? 0);
     return Number.isNaN(parsed) ? 0 : parsed;
@@ -232,20 +184,8 @@ export default function InstructorDetailPage() {
   };
 
   const calculateTotalPrice = () => {
-    const durationNum = parseInt(duration);
-    const pricePerHour = instructor?.pricePerHour ?? 0;
-    const pricePerDay = instructor?.pricePerDay ?? 0;
-    const pricePerMonth = instructor?.pricePerMonth ?? 0;
-    switch (bookingType) {
-      case "hourly":
-        return pricePerHour * durationNum;
-      case "daily":
-        return pricePerDay * durationNum;
-      case "monthly":
-        return pricePerMonth * durationNum;
-      default:
-        return 0;
-    }
+    // TODO: Implement pricing calculation when pricing fields are available
+    return 0;
   };
 
   const getInitials = (name: string) => {
@@ -312,9 +252,7 @@ export default function InstructorDetailPage() {
   };
 
   const getCarCount = () => {
-    if (cars?.length) return cars.length;
-    if (typeof instructor?.carCount === "number") return instructor.carCount;
-    return 0;
+    return cars?.length ?? 0;
   };
 
   const getPackageCount = () => {
@@ -374,8 +312,8 @@ export default function InstructorDetailPage() {
         error={carDetailError}
         onRetry={handleRetryCarDetail}
       />
-      <div className="container mx-auto px-4 pt-30 pb-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="w-full max-w-none px-3 sm:px-4 lg:px-6 xl:px-10 pt-30 pb-12">
+        <div className="px-16">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Instructor Profile */}
@@ -408,7 +346,7 @@ export default function InstructorDetailPage() {
                               {instructor.averageRating?.toFixed(1) ?? "0.0"}
                             </span>
                             <span className="text-slate-500">
-                              ({instructor.reviewCount ?? 0} đánh giá)
+                              ({reviews.length} đánh giá)
                             </span>
                           </div>
                           <div className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1">
@@ -580,13 +518,6 @@ export default function InstructorDetailPage() {
                         <div className="text-xs text-slate-500">
                           Hướng dẫn viên: {instructor.fullName}
                         </div>
-                        <Button
-                          onClick={() => handleBuyPackage(pkg)}
-                          variant="green"
-                          className="shrink-0"
-                        >
-                          Mua gói
-                        </Button>
                       </div>
                     </div>
                   ))}
@@ -696,231 +627,72 @@ export default function InstructorDetailPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                  Đánh giá từ học viên ({mockInstructorReviews.length})
+                  Đánh giá từ học viên về người hướng dẫn ({reviews.length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {mockInstructorReviews.map((review) => (
-                    <div
-                      key={review.id}
-                      className="border-b pb-4 last:border-b-0"
-                    >
-                      <div className="flex items-start gap-3">
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage
-                            src={review.userAvatar}
-                            alt={review.userName}
-                          />
-                          <AvatarFallback>
-                            {getInitials(review.userName)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-medium">
-                              {review.userName}
-                            </span>
-                            {review.verified && (
-                              <Badge variant="secondary" className="text-xs">
-                                <Shield className="h-3 w-3 mr-1" />
-                                Đã xác thực
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="flex">
-                              {renderStars(review.rating)}
+                {reviewsLoading && (
+                  <div className="flex items-center gap-2 text-sm text-slate-500">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Đang tải đánh giá...
+                  </div>
+                )}
+
+                {reviewsError && !reviewsLoading && (
+                  <div className="rounded-lg border border-red-100 bg-red-50 p-3 text-sm text-red-700">
+                    {reviewsError}
+                  </div>
+                )}
+
+                {!reviewsLoading && !reviewsError && reviews.length === 0 && (
+                  <div className="rounded-lg border border-slate-100 bg-slate-50 p-3 text-sm text-slate-600">
+                    Người hướng dẫn chưa có đánh giá nào.
+                  </div>
+                )}
+
+                {!reviewsLoading && !reviewsError && reviews.length > 0 && (
+                  <div className="space-y-4">
+                    {reviews.map((review, index) => (
+                      <div
+                        key={index}
+                        className="border-b pb-4 last:border-b-0"
+                      >
+                        <div className="flex items-start gap-3">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage
+                              src={review.avatar}
+                              alt={review.name}
+                            />
+                            <AvatarFallback>
+                              {getInitials(review.name)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-medium">
+                                {review.name}
+                              </span>
                             </div>
-                            <span className="text-sm text-gray-500">
-                              {review.date}
-                            </span>
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="flex">
+                                {renderStars(review.rating)}
+                              </div>
+                              <span className="text-sm text-gray-500">
+                                {formatDate(review.created)}
+                              </span>
+                            </div>
+                            <p className="text-gray-600">{review.description}</p>
                           </div>
-                          <p className="text-gray-600">{review.comment}</p>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
-
-          {/* Booking Sidebar */}
-          <div className="lg:col-span-1">
-            <Card className="sticky top-4">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CalendarIcon className="h-5 w-5" />
-                  Đặt lịch học
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Booking Type */}
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Loại thuê
-                  </label>
-                  <Tabs value={bookingType} onValueChange={setBookingType}>
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="hourly" className="text-xs">
-                        Theo giờ
-                      </TabsTrigger>
-                      <TabsTrigger value="daily" className="text-xs">
-                        Theo ngày
-                      </TabsTrigger>
-                      <TabsTrigger value="monthly" className="text-xs">
-                        Theo tháng
-                      </TabsTrigger>
-                    </TabsList>
-                  </Tabs>
-                </div>
-
-                {/* Duration */}
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Thời gian (
-                    {bookingType === "hourly"
-                      ? "giờ"
-                      : bookingType === "daily"
-                      ? "ngày"
-                      : "tháng"}
-                    )
-                  </label>
-                  <Select value={duration} onValueChange={setDuration}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {bookingType === "hourly" && (
-                        <>
-                          <SelectItem value="1">1 giờ</SelectItem>
-                          <SelectItem value="2">2 giờ</SelectItem>
-                          <SelectItem value="3">3 giờ</SelectItem>
-                          <SelectItem value="4">4 giờ</SelectItem>
-                          <SelectItem value="6">6 giờ</SelectItem>
-                          <SelectItem value="8">8 giờ</SelectItem>
-                        </>
-                      )}
-                      {bookingType === "daily" && (
-                        <>
-                          <SelectItem value="1">1 ngày</SelectItem>
-                          <SelectItem value="2">2 ngày</SelectItem>
-                          <SelectItem value="3">3 ngày</SelectItem>
-                          <SelectItem value="7">1 tuần</SelectItem>
-                          <SelectItem value="14">2 tuần</SelectItem>
-                        </>
-                      )}
-                      {bookingType === "monthly" && (
-                        <>
-                          <SelectItem value="1">1 tháng</SelectItem>
-                          <SelectItem value="2">2 tháng</SelectItem>
-                          <SelectItem value="3">3 tháng</SelectItem>
-                          <SelectItem value="6">6 tháng</SelectItem>
-                          <SelectItem value="12">1 năm</SelectItem>
-                        </>
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Date Picker */}
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Ngày bắt đầu
-                  </label>
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    disabled={(date) => date < new Date()}
-                    className="rounded-md border"
-                  />
-                </div>
-
-                <Separator />
-
-                {/* Price Summary */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Đơn giá:</span>
-                    <span>
-                      {bookingType === "hourly" &&
-                        formatPrice(instructor.pricePerHour ?? 0)}
-                      {bookingType === "daily" &&
-                        formatPrice(instructor.pricePerDay ?? 0)}
-                      {bookingType === "monthly" &&
-                        formatPrice(instructor.pricePerMonth ?? 0)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Thời gian:</span>
-                    <span>
-                      {duration}{" "}
-                      {bookingType === "hourly"
-                        ? "giờ"
-                        : bookingType === "daily"
-                        ? "ngày"
-                        : "tháng"}
-                    </span>
-                  </div>
-                  <Separator />
-                  <div className="flex justify-between font-semibold text-lg">
-                    <span>Tổng cộng:</span>
-                    <span className="text-blue-600">
-                      {formatPrice(calculateTotalPrice())}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Book Button */}
-                <Button className="w-full" size="lg">
-                  <CalendarIcon className="h-4 w-4 mr-2" />
-                  Đặt lịch ngay
-                </Button>
-
-                {/* Quick Contact */}
-                <div className="pt-4 border-t">
-                  <h4 className="font-medium mb-2">Liên hệ trực tiếp</h4>
-                  <div className="space-y-2">
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start"
-                      size="sm"
-                    >
-                      <Phone className="h-4 w-4 mr-2" />
-                      Gọi điện
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start"
-                      size="sm"
-                    >
-                      <Mail className="h-4 w-4 mr-2" />
-                      Gửi email
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Support Info */}
-                <div className="pt-4 border-t">
-                  <h4 className="font-medium mb-2">Hỗ trợ khách hàng</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-gray-500" />
-                      <span>1900 1234</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Mail className="h-4 w-4 text-gray-500" />
-                      <span>support@drivemate.vn</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
       </div>
-    </div>
+        </div>
+    </div> 
   );
 }

@@ -1,4 +1,4 @@
-import { Car, LicenseTier } from "../car/car.type";
+import { ICar, LicenseTier } from "../car/car.type";
 import { gender } from "../constants/enum";
 import { Gender } from "../user/gender.enum";
 
@@ -109,17 +109,6 @@ export interface IInstructorCar {
   vehicleType: string | null;
 }
 
-export interface InstructorPackage {
-  id: string;
-  name: string;
-  duration: number; // in hours
-  roadTypes: string[]; // ['Khu dân cư', 'Đô thị', 'Cao tốc', etc.]
-  skills: string[]; // ['Điều khiển cơ bản', 'Đỗ xe', 'Chuyển làn', etc.]
-  hasVehicle: boolean;
-  basePrice: number; // Giá cơ bản của gói
-  vehiclePrice?: number; // Giá xe thêm (nếu có xe)
-  vehicle?: Car;
-}
 
 export interface IInstructors {
   id: string;
@@ -158,7 +147,7 @@ export interface IInstructor {
   bio: string;
   totalBookings: number;
   gender: gender;
-  packages?: InstructorPackage[]; // Optional packages array
+  packages?: IInstructorPackages[]; // Optional packages array
   price?: number; // Optional price for some instructors
   vehicels?: any[]; // Optional vehicles (typo in data, keeping for compatibility)
 }
@@ -232,3 +221,6 @@ export interface ITopPersonalCar {
   bookCount: number;
   percentage: number;
 }
+
+
+

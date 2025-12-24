@@ -63,9 +63,9 @@ export function PackageServiceCard({
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <Car className="h-4 w-4 text-gray-500 flex-shrink-0" />
             <span>
-              {pkg.allowSelfCar
-                ? "Có thể thuê xe tập"
-                : "Không thể thuê xe tập (tự túc xe)"}
+              {pkg.isRentalCar
+                ? "Có kèm thuê xe"
+                : "Không kèm thuê xe"}
             </span>
           </div>
         </div>

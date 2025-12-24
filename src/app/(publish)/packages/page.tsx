@@ -11,87 +11,100 @@ import {
   type FilterSection,
 } from "@/components/commons/package-filter-sidebar";
 import { useAppDispatch } from "@/lib/redux/useAppDispatch";
-import { getListPackages } from "@/features/package/packageThunk";
-import type { Package as DrivingPackage } from "@/types/package/package.type";
+import {
+  getDrivingSkills,
+  getListPackages,
+  getRoadTypes,
+} from "@/features/package/packageThunk";
+import type {
+  DrivingSkill,
+  Package as DrivingPackage,
+  PaginatedPackagesResponse,
+  RoadType,
+} from "@/types/package/package.type";
 import { PackageServiceCard } from "@/components/package/package-service-card";
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 6;
 
 interface PackageFilters {
   roadType: string;
-  allowSelfCar: string;
-  priceRange: string;
-  duration: string;
+  drivingSkill: string;
+  isRentalCar: string;
 }
-
-const ROAD_TYPES = [
-  "Đường nội thành/Đô thị",
-  "Đường trường/Cao tốc",
-  "Đường đồi núi/Địa hình phức tạp",
-  "Đường khu vực dân cư/Đường hẹp",
-  "Đường đang thi công/Mặt đường xấu",
-  "Đường đô thị (Trong thành phố))",
-];
-
-const PACKAGE_FILTER_SECTIONS: FilterSection<PackageFilters>[] = [
-  {
-    key: "roadType",
-    label: "Loại đường",
-    placeholder: "Chọn loại đường",
-    options: [
-      { value: "all", label: "Tất cả" },
-      ...ROAD_TYPES.map((type) => ({ value: type, label: type })),
-    ],
-  },
-  {
-    key: "allowSelfCar",
-    label: "Hình thức xe",
-    placeholder: "Chọn tùy chọn",
-    options: [
-      { value: "all", label: "Tất cả" },
-      { value: "yes", label: "Tự mang xe" },
-      { value: "no", label: "Dùng xe của giáo viên" },
-    ],
-  },
-  {
-    key: "priceRange",
-    label: "Khoảng giá",
-    placeholder: "Chọn khoảng giá",
-    options: [
-      { value: "all", label: "Tất cả" },
-      { value: "low", label: "< 300.000đ" },
-      { value: "medium", label: "300.000 - 800.000đ" },
-      { value: "high", label: "> 800.000đ" },
-    ],
-  },
-  {
-    key: "duration",
-    label: "Thời lượng",
-    placeholder: "Chọn thời lượng",
-    options: [
-      { value: "all", label: "Tất cả" },
-      { value: "short", label: "≤ 20 giờ" },
-      { value: "medium", label: "21-40 giờ" },
-      { value: "long", label: "> 40 giờ" },
-    ],
-  },
-];
 
 export default function PackagesPage() {
   const dispatch = useAppDispatch();
   const [filters, setFilters] = useState<PackageFilters>({
     roadType: "all",
-    allowSelfCar: "all",
-    priceRange: "all",
-    duration: "all",
+    drivingSkill: "all",
+    isRentalCar: "all",
   });
 
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [packages, setPackages] = useState<DrivingPackage[]>([]);
   const [totalCount, setTotalCount] = useState(0);
+  const [roadTypes, setRoadTypes] = useState<RoadType[]>([]);
+  const [drivingSkills, setDrivingSkills] = useState<DrivingSkill[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const filterSections: FilterSection<PackageFilters>[] = useMemo(
+    () => [
+      {
+        key: "roadType",
+        label: "Loại đường",
+        placeholder: "Chọn loại đường",
+        options: [
+          { value: "all", label: "Tất cả" },
+          ...roadTypes.map((type) => ({ value: type.id, label: type.name })),
+        ],
+      },
+      {
+        key: "drivingSkill",
+        label: "Kỹ năng",
+        placeholder: "Chọn kỹ năng",
+        options: [
+          { value: "all", label: "Tất cả" },
+          ...drivingSkills.map((skill) => ({
+            value: skill.id,
+            label: skill.display_name,
+          })),
+        ],
+      },
+      {
+        key: "isRentalCar",
+        label: "Lựa chọn xe",
+        placeholder: "Chọn tùy chọn",
+        options: [
+          { value: "all", label: "Tất cả" },
+          { value: "true", label: "Có kèm thuê xe" },
+          { value: "false", label: "Không kèm thuê xe" },
+        ],
+      },
+    ],
+    [drivingSkills, roadTypes]
+  );
+
+  useEffect(() => {
+    const fetchFilterMetadata = async () => {
+      try {
+        const [roadTypeResponse, drivingSkillResponse] = await Promise.all([
+          dispatch(getRoadTypes()).unwrap(),
+          dispatch(getDrivingSkills()).unwrap(),
+        ]);
+
+        const normalize = <T,>(res: any): T => (res?.value ?? res) as T;
+
+        setRoadTypes(normalize<RoadType[]>(roadTypeResponse) ?? []);
+        setDrivingSkills(normalize<DrivingSkill[]>(drivingSkillResponse) ?? []);
+      } catch (err) {
+        console.error("Không thể tải dữ liệu bộ lọc", err);
+      }
+    };
+
+    fetchFilterMetadata();
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchPackages = async () => {
@@ -103,20 +116,33 @@ export default function PackagesPage() {
             pageNumber: currentPage,
             pageSize: ITEMS_PER_PAGE,
             searchKey: searchQuery || undefined,
-            allowSelfCar:
-              filters.allowSelfCar === "yes"
+            roadTypes: filters.roadType !== "all" ? [filters.roadType] : undefined,
+            drivingSkills:
+              filters.drivingSkill !== "all" ? [filters.drivingSkill] : undefined,
+            isRentalCar:
+              filters.isRentalCar === "true"
                 ? true
-                : filters.allowSelfCar === "no"
+                : filters.isRentalCar === "false"
                 ? false
                 : undefined,
-            roadTypes:
-              filters.roadType !== "all" ? [filters.roadType] : undefined,
           })
         ).unwrap();
 
-        const data = response.value;
-        setPackages(data?.pageContent ?? []);
-        setTotalCount(data?.totalCount ?? 0);
+        const data = (response?.value ?? response) as
+          | DrivingPackage[]
+          | PaginatedPackagesResponse
+          | undefined;
+
+        if (data && "pageContent" in data) {
+          setPackages(data.pageContent ?? []);
+          setTotalCount(data.totalCount ?? 0);
+        } else if (Array.isArray(data)) {
+          setPackages(data);
+          setTotalCount(data.length);
+        } else {
+          setPackages([]);
+          setTotalCount(0);
+        }
       } catch (err) {
         const message =
           typeof err === "string" ? err : "Không thể tải danh sách gói dịch vụ";
@@ -130,34 +156,16 @@ export default function PackagesPage() {
   }, [
     currentPage,
     searchQuery,
-    filters.allowSelfCar,
     filters.roadType,
+    filters.drivingSkill,
+    filters.isRentalCar,
     dispatch,
   ]);
 
-  const filteredPackages = useMemo(() => {
-    return packages
-      .filter((pkg) => {
-        const matchesPrice =
-          filters.priceRange === "all" ||
-          (filters.priceRange === "low" && pkg.price < 300000) ||
-          (filters.priceRange === "medium" &&
-            pkg.price >= 300000 &&
-            pkg.price <= 800000) ||
-          (filters.priceRange === "high" && pkg.price > 800000);
-
-        const matchesDuration =
-          filters.duration === "all" ||
-          (filters.duration === "short" && pkg.duration <= 20) ||
-          (filters.duration === "medium" &&
-            pkg.duration > 20 &&
-            pkg.duration <= 40) ||
-          (filters.duration === "long" && pkg.duration > 40);
-
-        return matchesPrice && matchesDuration;
-      })
-      .sort((a, b) => b.bookingCount - a.bookingCount);
-  }, [packages, filters.duration, filters.priceRange]);
+  const sortedPackages = useMemo(
+    () => [...packages].sort((a, b) => b.bookingCount - a.bookingCount),
+    [packages]
+  );
 
   const totalPages =
     totalCount > 0 ? Math.ceil(totalCount / ITEMS_PER_PAGE) : 0;
@@ -165,9 +173,8 @@ export default function PackagesPage() {
   const resetFilters = () => {
     setFilters({
       roadType: "all",
-      allowSelfCar: "all",
-      priceRange: "all",
-      duration: "all",
+      drivingSkill: "all",
+      isRentalCar: "all",
     });
     setSearchQuery("");
     setCurrentPage(1);
@@ -206,7 +213,7 @@ export default function PackagesPage() {
           <div className="lg:col-span-1">
             <PackageFilterSidebar
               filters={filters}
-              sections={PACKAGE_FILTER_SECTIONS}
+              sections={filterSections}
               onFilterChange={handlePackageFilterChange}
               onReset={resetFilters}
             />
@@ -226,7 +233,7 @@ export default function PackagesPage() {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
-              {filteredPackages.map((pkg) => (
+              {sortedPackages.map((pkg) => (
                 <PackageServiceCard key={pkg.id} pkg={pkg} />
               ))}
             </div>
@@ -240,7 +247,7 @@ export default function PackagesPage() {
             )}
 
             {/* No Results */}
-            {!loading && filteredPackages.length === 0 && (
+            {!loading && sortedPackages.length === 0 && (
               <div className="text-center py-12">
                 <div className="text-gray-500 mb-4">
                   <PackageIcon className="h-16 w-16 mx-auto mb-4 opacity-50" />

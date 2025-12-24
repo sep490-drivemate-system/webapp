@@ -26,7 +26,6 @@ import {
 import * as yup from "yup";
 
 import { Badge } from "@/components/ui/badge";
-import { IUserManagement } from "@/types/user/manage-user.type";
 import { UserRole } from "@/types/auth/user-role.enum";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -52,9 +51,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { UserManagement } from "@/types/user/user-profile.type";
+import { AccountStatus } from "@/types/user/status.enum";
 
 // Using IUserManagement interface from types
-export type User = IUserManagement;
+export type User = UserManagement;
 
 interface UserDataTableProps {
   data: User[];
@@ -72,26 +73,26 @@ function STTCell({ index }: { index: number }) {
 }
 
 // Get status badge variant and className
-const getStatusVariant = (status: User["status"]) => {
+const getStatusVariant = (status: AccountStatus) => {
   switch (status) {
-    case "Active":
+    case AccountStatus.Normal:
       return "default";
-    case "Inactive":
+    case AccountStatus.Registered:
       return "secondary";
-    case "Suspended":
+    case AccountStatus.Banned:
       return "destructive";
     default:
       return "secondary";
   }
 };
 
-const getStatusClassName = (status: User["status"]): string => {
+const getStatusClassName = (status: AccountStatus): string => {
   switch (status) {
-    case "Active":
+    case AccountStatus.Normal:
       return "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200";
-    case "Inactive":
+    case AccountStatus.Registered:
       return "bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200";
-    case "Suspended":
+    case AccountStatus.Banned:
       return "bg-red-50 text-red-700 hover:bg-red-100 border-red-200";
     default:
       return "";
@@ -146,14 +147,14 @@ const getRoleLabel = (role: UserRole): string => {
 };
 
 // Convert status to Vietnamese
-const getStatusLabel = (status: User["status"]): string => {
+const getStatusLabel = (status: AccountStatus): string => {
   switch (status) {
-    case "Active":
-      return "Hoạt động";
-    case "Inactive":
-      return "Ngừng hoạt động";
-    case "Suspended":
-      return "Bị đình chỉ";
+    case AccountStatus.Normal:
+      return "Tài khoản thường";
+    case AccountStatus.Registered:
+      return "Tài khoản đăng ký";
+    case AccountStatus.Banned:
+      return "Tài khoản bị chặn";
     default:
       return status;
   }
@@ -170,7 +171,7 @@ function UserTableRow({
   onView?: (user: User) => void;
   onToggleBlock?: (user: User) => void;
 }) {
-  const isBlocked = row.original.status === "Suspended";
+  const isBlocked = row.original.accountStatus === AccountStatus.Banned;
 
   return (
     <TableRow data-state={row.getIsSelected() && "selected"}>
@@ -265,7 +266,7 @@ export function UserDataTable({
         accessorKey: "userName",
         header: "Họ tên",
         cell: ({ row }) => (
-          <div className="font-medium">{row.original.userName}</div>
+          <div className="font-medium">{row.original.fullName}</div>
         ),
         enableHiding: false,
       },
@@ -298,10 +299,10 @@ export function UserDataTable({
         header: "Trạng thái",
         cell: ({ row }) => (
           <Badge
-            variant={getStatusVariant(row.original.status)}
-            className={getStatusClassName(row.original.status)}
+            variant={getStatusVariant(row.original.accountStatus)}
+            className={getStatusClassName(row.original.accountStatus)}
           >
-            {getStatusLabel(row.original.status)}
+            {getStatusLabel(row.original.accountStatus)}
           </Badge>
         ),
       },
@@ -325,7 +326,7 @@ export function UserDataTable({
       columnFilters,
       pagination,
     },
-    getRowId: (row) => row.id,
+    getRowId: (row) => row.userId,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,

@@ -22,6 +22,8 @@ export const getListPackages = createThunk<
     if (payload?.searchKey) params.append("SearchKey", payload.searchKey);
     if (payload?.allowSelfCar !== undefined)
       params.append("AllowSelfCar", payload.allowSelfCar.toString());
+    if (payload?.isRentalCar !== undefined)
+      params.append("IsRentalCar", payload.isRentalCar.toString());
     if (payload?.roadTypes && payload.roadTypes.length > 0) {
       payload.roadTypes.forEach((roadType) => {
         params.append("RoadTypes", roadType);

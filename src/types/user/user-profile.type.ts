@@ -1,6 +1,7 @@
 import { UserRole } from "../auth/user-role.enum";
 import { LicenseTier } from "../car/car.type";
 import { Gender } from "./gender.enum";
+import { AccountStatus } from "./status.enum";
 
 export interface IUserProfile {
   id: string;
@@ -122,8 +123,22 @@ export interface UpdateInstructorPayload {
   experienceYear?: number;
 }
 
+export interface UserManagement {
+  userId: string;
+  avatarUrl: string;
+  phone: string;
+  email: string;
+  fullName: string;
+  licenseTier: LicenseTier;
+  birthDate: string;
+  role: UserRole;
+  instructor: InstructorDetailDTO | null;
+  noviceDriver: NoviceDriverDetailDTO | null;
+  accountStatus: AccountStatus,
+}
+
+
 export interface createUserForAdmin {
-  username: string,
   password: string,
   email: string,
   fullname: string,
@@ -131,4 +146,8 @@ export interface createUserForAdmin {
   gender: Gender,
   dateOfBirth: string,
   role: UserRole,
+}
+
+export interface BanUnbanUserForAdmin{
+  reason: string,
 }

@@ -76,7 +76,7 @@ export interface Package {
   instructorId: string;
   instructorName: string;
   instructorAvatar: string;
-  allowSelfCar: boolean;
+  isRentalCar: boolean;
   duration: number;
   roadTypes: string[];
   skills: string[];
@@ -97,6 +97,7 @@ export interface PaginatedPackagesResponse {
 export interface GetPackagesParams {
   searchKey?: string;
   allowSelfCar?: boolean;
+  isRentalCar?: boolean;
   roadTypes?: string[];
   drivingSkills?: string[];
   pageNumber?: number;

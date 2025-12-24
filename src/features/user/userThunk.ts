@@ -1,4 +1,4 @@
-import { EditUserPayload, IUserInfo, InstructorDetailDTO, UpdateInstructorPayload, createUserForAdmin } from "@/types/user/user-profile.type";
+import { EditUserPayload, IUserInfo, InstructorDetailDTO, UpdateInstructorPayload, UserManagement, createUserForAdmin, BanUnbanUserForAdmin } from "@/types/user/user-profile.type";
 import { createThunk } from "../genericCreateThunk";
 import { HttpMethod } from "@/types/constants/httpMethod";
 import { createAsyncThunk } from "@reduxjs/toolkit";
@@ -196,12 +196,23 @@ function createEditUserFormData(payload: EditUserPayload): FormData {
     return formData;
 }
 export const getAllUser = createThunk<
-    IUserInfo[],
-    void
+    UserManagement[],
+    { searchKey?: string } | void
 >(
     HttpMethod.GET,
     "getAllUser",
-    `/${USER_PATH}`
+    `/${USER_PATH}`,
+    {
+        config: (payload) => {
+            const params: Record<string, string> = {};
+            if (payload && typeof payload === 'object' && payload !== null && 'searchKey' in payload && payload.searchKey) {
+                params.searchKey = payload.searchKey;
+            }
+            return {
+                params: Object.keys(params).length > 0 ? params : undefined
+            };
+        }
+    }
 );
 export const createUserForAdminThunk = createAsyncThunk<
     GenericResponse<IUserInfo>,
@@ -223,6 +234,92 @@ export const createUserForAdminThunk = createAsyncThunk<
             };
 
             console.log(`[Thunk Error] POST ${url}:`, error);
+
+            let message = "";
+            if (error.response?.data?.message) {
+                message = error.response.data.message;
+            } else if (error.message) {
+                message = error.message;
+            } else {
+                message = "Đã xảy ra lỗi. Vui lòng thử lại.";
+            }
+
+            return rejectWithValue(message);
+        }
+    }
+);
+
+export const banUserForAdmin = createAsyncThunk<
+    GenericResponse<BanUnbanUserForAdmin>,
+    { id: string; reason: string },
+    { rejectValue: string }
+>(
+    "banUserForAdmin",
+    async (payload, { rejectWithValue }) => {
+        if (!payload.id || payload.id.trim() === "") {
+            return rejectWithValue("User ID is required");
+        }
+        if (!payload.reason || payload.reason.trim() === "") {
+            return rejectWithValue("Reason is required");
+        }
+
+        const url = `/${USER_PATH}/${payload.id}/ban`;
+
+        try {
+            const response = await axiosInstance.put<GenericResponse<BanUnbanUserForAdmin>>(
+                url,
+                { reason: payload.reason }
+            );
+            console.log(`[Thunk] Response:`, response.data);
+            return response.data;
+        } catch (err) {
+            const error = err as unknown as {
+                response?: { data?: { message?: string } };
+                message?: string;
+            };
+
+            console.log(`[Thunk Error] PUT ${url}:`, error);
+
+            let message = "";
+            if (error.response?.data?.message) {
+                message = error.response.data.message;
+            } else if (error.message) {
+                message = error.message;
+            } else {
+                message = "Đã xảy ra lỗi. Vui lòng thử lại.";
+            }
+
+            return rejectWithValue(message);
+        }
+    }
+);
+
+export const unbanUserForAdmin = createAsyncThunk<
+    GenericResponse<BanUnbanUserForAdmin>,
+    { id: string},
+    { rejectValue: string }
+>(
+    "unbanUserForAdmin",
+    async (payload, { rejectWithValue }) => {
+        if (!payload.id || payload.id.trim() === "") {
+            return rejectWithValue("User ID is required");
+        }
+
+        const url = `/${USER_PATH}/${payload.id}/unban`;
+
+        try {
+            const response = await axiosInstance.put<GenericResponse<BanUnbanUserForAdmin>>(
+                url,
+            );
+            console.log(`[Thunk] Response:`, response.data);
+            return response.data;
+        } catch (err) {
+            const error = err as unknown as {
+                response?: { data?: { message?: string } };
+                message?: string;
+            };
+
+            console.log(`[Thunk Error] PUT ${url}:`, error);
 
             let message = "";
             if (error.response?.data?.message) {

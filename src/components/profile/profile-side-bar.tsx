@@ -29,11 +29,10 @@ interface ProfileSideBarProps {
 const menuItems: Array<{ id: MenuItemId; label: string; icon: any }> = [
   { id: "info", label: "Thông tin cá nhân", icon: User },
   { id: "history", label: "Lịch sử giao dịch", icon: Clock },
-  { id: "packages", label: "Lịch sử mua gói", icon: Package },
+  // { id: "packages", label: "Lịch sử mua gói", icon: Package },
   { id: "wallet", label: "Ví & Nạp tiền", icon: Wallet },
-  { id: "notifications", label: "Thông báo", icon: Bell },
-  { id: "settings", label: "Cài đặt", icon: Settings },
-  { id: "logout", label: "Đăng xuất", icon: LogOut },
+  // { id: "notifications", label: "Thông báo", icon: Bell },
+  // { id: "settings", label: "Cài đặt", icon: Settings },
 ];
 
 export default function ProfileSideBar({

@@ -30,7 +30,7 @@ const initialState: PackageState = {
     roadTypes: [],
     drivingSkills: [],
     price: 0,
-    allowNoviceCar: false,
+    isRentalCar: false,
     packageCars: [],
   },
 };

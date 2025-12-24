@@ -129,14 +129,6 @@ function UserDropdown() {
                 <UserRound className="h-4 w-4 text-gray-500" />
                 <span className="flex-1 text-left">Hồ sơ cá nhân</span>
               </Link>
-              {/* <Link
-                href="/bookings"
-                className="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors"
-                onClick={() => setOpen(false)}
-              >
-                <CalendarClock className="h-4 w-4 text-gray-500" />
-                <span className="flex-1 text-left">Lịch sử đặt</span>
-              </Link> */}
               <button
                 type="button"
                 className="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors w-full text-left"
@@ -187,6 +179,9 @@ function MobileMenu({
   open: boolean;
   onClose: () => void;
 }) {
+  const auth = useAppSelector((state) => state.auth);
+  const { handleSignOut } = useAuth();
+
   if (!open) return null;
   return (
     <div className="lg:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md">
@@ -206,20 +201,44 @@ function MobileMenu({
           </Link>
         ))}
         <div className="w-full max-w-sm flex flex-col gap-2 mt-4">
-          <Link
-            href="/signin"
-            className="block px-6 py-3 rounded-md text-lg font-medium text-white hover:bg-accent hover:text-accent-foreground text-center transition-colors"
-            onClick={onClose}
-          >
-            Sign in
-          </Link>
-          <Link
-            href="/signup"
-            className="block px-6 py-3 rounded-md text-lg font-medium text-white hover:bg-accent hover:text-accent-foreground text-center transition-colors"
-            onClick={onClose}
-          >
-            Sign up
-          </Link>
+          {auth.isAuthenticated ? (
+            <>
+              <Link
+                href="/profile"
+                className="flex items-center justify-center gap-3 px-6 py-3 rounded-md text-lg font-medium text-white hover:bg-accent hover:text-accent-foreground transition-colors"
+                onClick={onClose}
+              >
+                <span>Hồ sơ cá nhân</span>
+              </Link>
+              <button
+                type="button"
+                className="flex items-center justify-center gap-3 px-6 py-3 rounded-md text-lg font-medium text-white hover:bg-accent hover:text-accent-foreground transition-colors w-full"
+                onClick={() => {
+                  onClose();
+                  handleSignOut();
+                }}
+              >
+                <span>Đăng xuất</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/signin"
+                className="block px-6 py-3 rounded-md text-lg font-medium text-white hover:bg-accent hover:text-accent-foreground text-center transition-colors"
+                onClick={onClose}
+              >
+                Đăng nhập
+              </Link>
+              <Link
+                href="/signup"
+                className="block px-6 py-3 rounded-md text-lg font-medium text-white hover:bg-accent hover:text-accent-foreground text-center transition-colors"
+                onClick={onClose}
+              >
+                Đăng ký
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </div>

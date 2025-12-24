@@ -10,13 +10,15 @@ import {
   type FilterSection,
 } from "@/components/commons/package-filter-sidebar";
 import { useThunkAction } from "@/lib/redux/useThunkAction";
-import { getCarById, getCars } from "@/features/car/carThunk";
-import { ICar, ICarDetail } from "@/types/car/car.type";
+import { getCarById, getCars, getManufacturers } from "@/features/car/carThunk";
+import { IBrandCar, ICar, ICarDetail } from "@/types/car/car.type";
 import { CarDetailDialog } from "@/components/car/car-detail-dialog";
 import { CarCard } from "@/components/car/car-card";
 import { CarStatus } from "@/types/constants/enum";
 
 const PAGE_SIZE = 6; // 3 items per row on web, 2 rows = 6 items per page
+const SEAT_OPTIONS = [4, 5, 7, 9, 16, 29, 35, 45];
+const FUEL_OPTIONS = ["Xăng", "Dầu", "Điện", "Hybrid"];
 
 interface CarFilters {
   seats: string;
@@ -37,10 +39,18 @@ export default function CarsPage() {
   const { run: fetchCars, loading } = useThunkAction(getCars);
   const { run: fetchCarDetail, loading: detailLoading } =
     useThunkAction(getCarById);
+  const { run: fetchManufacturers } = useThunkAction(getManufacturers);
+  const [brands, setBrands] = useState<IBrandCar[]>([]);
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedCarId, setSelectedCarId] = useState<string | null>(null);
   const [carDetail, setCarDetail] = useState<ICarDetail | null>(null);
   const [detailError, setDetailError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchManufacturers(undefined, {
+      onSuccess: (res) => setBrands(res?.value ?? []),
+    });
+  }, [fetchManufacturers]);
 
   useEffect(() => {
     const seatsParam =
@@ -73,17 +83,12 @@ export default function CarsPage() {
     );
   }, [fetchCars, filters, currentPage]);
 
-  const uniqueSeats = useMemo(
-    () => [...new Set(cars.map((car) => car.seatCounts))].sort((a, b) => a - b),
-    [cars]
-  );
-  const uniqueBrands = useMemo(
-    () => [...new Set(cars.map((car) => car.brand))].sort(),
-    [cars]
-  );
-  const uniqueFuels = useMemo(
-    () => [...new Set(cars.map((car) => car.fuel))].sort(),
-    [cars]
+  const brandOptions = useMemo(
+    () =>
+      [...brands]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((brand) => ({ value: brand.name, label: brand.name })),
+    [brands]
   );
 
   const totalPages = totalCount > 0 ? Math.ceil(totalCount / PAGE_SIZE) : 0;
@@ -136,7 +141,7 @@ export default function CarsPage() {
       placeholder: "Chọn số chỗ",
       options: [
         { value: "all", label: "Tất cả" },
-        ...uniqueSeats.map((seats) => ({
+        ...SEAT_OPTIONS.map((seats) => ({
           value: seats.toString(),
           label: `${seats} chỗ`,
         })),
@@ -148,7 +153,7 @@ export default function CarsPage() {
       placeholder: "Chọn hãng xe",
       options: [
         { value: "all", label: "Tất cả" },
-        ...uniqueBrands.map((brand) => ({ value: brand, label: brand })),
+        ...brandOptions,
       ],
     },
     {
@@ -157,7 +162,7 @@ export default function CarsPage() {
       placeholder: "Chọn nhiên liệu",
       options: [
         { value: "all", label: "Tất cả" },
-        ...uniqueFuels.map((fuel) => ({ value: fuel, label: fuel })),
+        ...FUEL_OPTIONS.map((fuel) => ({ value: fuel, label: fuel })),
       ],
     },
   ];
