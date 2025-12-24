@@ -18,7 +18,6 @@ export const useCategories = () => {
                     setCategories(result.value);
                 }
             } catch (error) {
-                console.error("Error loading categories:", error);
                 toast.error("Không thể tải danh mục. Vui lòng thử lại.");
             } finally {
                 setIsLoading(false);

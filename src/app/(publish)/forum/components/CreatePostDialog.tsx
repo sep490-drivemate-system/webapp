@@ -110,39 +110,6 @@ export function CreatePostDialog({ onCreated }: CreatePostDialogProps) {
                 />
               </div>
             </div>
-            {/* 
-            <div className="space-y-2">
-              <Label>Thẻ (Tags) *</Label>
-              <div className="border rounded-lg p-3 max-h-48 overflow-y-auto">
-                {tags.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">Không có thẻ nào</p>
-                ) : (
-                  <div className="space-y-2">
-                    {tags.map((tag) => (
-                      <div key={tag.id} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`tag-${tag.id}`}
-                          checked={selectedTagIds.includes(tag.id)}
-                          onCheckedChange={() => toggleTag(tag.id)}
-                        />
-                        <label
-                          htmlFor={`tag-${tag.id}`}
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                        >
-                          {tag.name}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              {selectedTagIds.length > 0 && (
-                <p className="text-xs text-muted-foreground">
-                  Đã chọn {selectedTagIds.length} thẻ
-                </p>
-              )}
-            </div> */}
-
             <div className="space-y-2">
               <Label>Ảnh {imageFiles.length > 0 && <span className="text-muted-foreground">({imageFiles.length})</span>}</Label>
               <div className="border-2 border-dashed rounded-lg p-4 transition-colors hover:border-primary/50">

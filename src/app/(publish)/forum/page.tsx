@@ -98,11 +98,11 @@ export default function ForumPage() {
   }, [filteredPosts, searchQuery, selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-gray-50 mt-10">
+    <div className="min-h-screen bg-gray-50 mt-16">
       <div className="container mx-auto px-4 py-6 max-w-6xl">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="hidden lg:block space-y-4">
-            <Card className="overflow-hidden">
+            <Card className="overflow-hidden mt-10">
               <CardContent className="p-0">
                 <div className="p-4 bg-gradient-to-r from-primary/10 to-primary/5 border-b">
                   <h3 className="font-bold text-lg flex items-center gap-2">
@@ -113,11 +113,10 @@ export default function ForumPage() {
                 <div className="p-4 space-y-3">
                   <button
                     onClick={() => setSelectedCategory(null)}
-                    className={`w-full text-left p-3 rounded-lg transition-all ${
-                      selectedCategory === null
-                        ? "bg-primary text-primary-foreground shadow-md"
-                        : ""
-                    }`}
+                    className={`w-full text-left p-3 rounded-lg transition-all ${selectedCategory === null
+                      ? "bg-primary text-primary-foreground shadow-md"
+                      : ""
+                      }`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-medium">Tất cả</span>
@@ -141,17 +140,15 @@ export default function ForumPage() {
                           onClick={() =>
                             setSelectedCategory(isSelected ? null : cat.name)
                           }
-                          className={`w-full text-left p-3 rounded-lg transition-all group ${
-                            isSelected
-                              ? `bg-gradient-to-r ${cat.color} text-white shadow-lg`
-                              : " border border-transparent "
-                          }`}
+                          className={`w-full text-left p-3 rounded-lg transition-all group ${isSelected
+                            ? `bg-gradient-to-r ${cat.color} text-white shadow-lg`
+                            : " border border-transparent "
+                            }`}
                         >
                           <div className="flex items-center justify-between">
                             <span
-                              className={`font-semibold text-sm ${
-                                isSelected ? "text-white" : "text-gray-900"
-                              }`}
+                              className={`font-semibold text-sm ${isSelected ? "text-white" : "text-gray-900"
+                                }`}
                             >
                               {cat.name}
                             </span>
@@ -166,12 +163,12 @@ export default function ForumPage() {
           </div>
 
           <div className="lg:col-span-3 space-y-4">
-            <Card>
+            <Card className="mt-10">
               <CardContent className="p-5">
                 <div className="flex items-center gap-4">
                   <div className="flex-1 relative">
                     <Input
-                      placeholder="Tìm kiếm bài viết, câu hỏi, hoặc chủ đề..."
+                      placeholder="Tìm kiếm bài viết..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -213,8 +210,8 @@ export default function ForumPage() {
                 // Sort images and videos by order and combine them
                 const sortedImages = post.images
                   ? [...post.images].sort(
-                      (a, b) => (a.order || 0) - (b.order || 0)
-                    )
+                    (a, b) => (a.order || 0) - (b.order || 0)
+                  )
                   : [];
                 const sortedVideos = post.videos
                   ? [...post.videos].sort((a, b) => a.order - b.order)
@@ -401,11 +398,10 @@ export default function ForumPage() {
                               {mediaItems.slice(0, 4).map((item, index) => (
                                 <div
                                   key={index}
-                                  className={`relative rounded-xl overflow-hidden bg-black shadow-md ${
-                                    index === 0 && mediaItems.length > 4
-                                      ? "col-span-2 aspect-video"
-                                      : "aspect-square"
-                                  }`}
+                                  className={`relative rounded-xl overflow-hidden bg-black shadow-md ${index === 0 && mediaItems.length > 4
+                                    ? "col-span-2 aspect-video"
+                                    : "aspect-square"
+                                    }`}
                                 >
                                   {item.type === "image" ? (
                                     <Image
@@ -583,7 +579,7 @@ export default function ForumPage() {
                                               placeholder="Viết phản hồi..."
                                               value={
                                                 replyInputs[
-                                                  `${post.postId}-${comment.commentId}`
+                                                `${post.postId}-${comment.commentId}`
                                                 ] || ""
                                               }
                                               onChange={(e) =>
@@ -597,7 +593,7 @@ export default function ForumPage() {
                                               className="resize-none text-sm"
                                               disabled={
                                                 isCommenting[
-                                                  `${post.postId}-${comment.commentId}`
+                                                `${post.postId}-${comment.commentId}`
                                                 ]
                                               }
                                             />
@@ -612,7 +608,7 @@ export default function ForumPage() {
                                               }
                                               disabled={
                                                 isCommenting[
-                                                  `${post.postId}-${comment.commentId}`
+                                                `${post.postId}-${comment.commentId}`
                                                 ] ||
                                                 !replyInputs[
                                                   `${post.postId}-${comment.commentId}`
