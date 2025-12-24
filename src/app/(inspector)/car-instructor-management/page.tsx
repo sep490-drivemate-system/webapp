@@ -18,7 +18,20 @@ import {
   Search,
   X,
   XCircle,
+  Loader2,
 } from "lucide-react";
+import { useThunkAction } from "@/lib/redux/useThunkAction";
+import {
+  getCarDocumentsForInspector,
+  getCars,
+  moderateCarForInspector,
+} from "@/features/car/carThunk";
+import {
+  CarDocuments,
+  ICar,
+  PaginatedCarsResponse,
+} from "@/types/car/car.type";
+import { CarStatus } from "@/types/constants/enum";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -127,351 +140,158 @@ const formatDate = (dateString: string) => {
   return `${day}-${month}-${year}`;
 };
 
-const mockDocuments: VehicleDocument[] = [
-  {
-    id: 1,
-    instructorId: 101,
-    instructorName: "Nguyễn Văn A",
-    phoneNumber: "0912345678",
-    email: "nguyena@example.com",
-    vehicleBrand: "Toyota",
-    vehicleModel: "Vios",
-    licensePlate: "51A-123.45",
-    submittedDate: "2025-01-18",
-    status: "pending",
-    documents: {
-      inspection: {
-        frontImage: "/inspection-front.jpg",
-        backImage: "/inspection-back.jpg",
-        issueDate: "2023-05-15",
-        expirationDate: "2025-05-15",
-      },
-      insurance: {
-        frontImage: "/insurance-front.jpg",
-        backImage: "/insurance-back.jpg",
-        issueDate: "2023-06-01",
-        expirationDate: "2025-06-01",
-      },
-      registration: {
-        frontImage: "/registration-front.jpg",
-        backImage: "/registration-back.jpg",
-        ownerName: "Nguyễn Văn A",
-        licensePlate: "51A-123.45",
-        vehicleBrand: "Toyota",
-        vehicleModel: "Vios",
-        seats: 5,
-        issueDate: "2022-03-20",
-        fuelType: "Xăng",
-        hourlyRentalPrice: 150000,
-      },
-      verification: {
-        frontView: "/car-front-view.png",
-        backView: "/car-back-view.jpg",
-        sideView: "/car-side-view.png",
-        interiorView: "/modern-car-interior.png",
-      },
-    },
-  },
-  {
-    id: 2,
-    instructorId: 102,
-    instructorName: "Trần Thị B",
-    phoneNumber: "0987654321",
-    email: "tranb@example.com",
-    vehicleBrand: "Honda",
-    vehicleModel: "Accord",
-    licensePlate: "51B-456.78",
-    submittedDate: "2025-01-16",
-    status: "pending",
-    documents: {
-      inspection: {
-        frontImage: "/inspection-front.jpg",
-        backImage: "/inspection-back.jpg",
-        issueDate: "2023-07-10",
-        expirationDate: "2025-07-10",
-      },
-      insurance: {
-        frontImage: "/insurance-front.jpg",
-        backImage: "/insurance-back.jpg",
-        issueDate: "2023-08-05",
-        expirationDate: "2025-08-05",
-      },
-      registration: {
-        frontImage: "/registration-front.jpg",
-        backImage: "/registration-back.jpg",
-        ownerName: "Trần Thị B",
-        licensePlate: "51B-456.78",
-        vehicleBrand: "Honda",
-        vehicleModel: "Accord",
-        seats: 5,
-        issueDate: "2021-09-12",
-        fuelType: "Xăng",
-        hourlyRentalPrice: 180000,
-      },
-      verification: {
-        frontView: "/car-front-view.png",
-        backView: "/car-back-view.jpg",
-        sideView: "/car-side-view.png",
-        interiorView: "/modern-car-interior.png",
-      },
-    },
-  },
-  {
-    id: 3,
-    instructorId: 103,
-    instructorName: "Lê Minh C",
-    phoneNumber: "0911111111",
-    email: "leminc@example.com",
-    vehicleBrand: "BMW",
-    vehicleModel: "3 Series",
-    licensePlate: "51C-789.01",
-    submittedDate: "2025-01-14",
-    status: "approved",
-    documents: {
-      inspection: {
-        frontImage: "/inspection-front.jpg",
-        backImage: "/inspection-back.jpg",
-        issueDate: "2023-04-22",
-        expirationDate: "2025-04-22",
-      },
-      insurance: {
-        frontImage: "/insurance-front.jpg",
-        backImage: "/insurance-back.jpg",
-        issueDate: "2023-05-10",
-        expirationDate: "2025-05-10",
-      },
-      registration: {
-        frontImage: "/registration-front.jpg",
-        backImage: "/registration-back.jpg",
-        ownerName: "Lê Minh C",
-        licensePlate: "51C-789.01",
-        vehicleBrand: "BMW",
-        vehicleModel: "3 Series",
-        seats: 5,
-        issueDate: "2020-11-08",
-        fuelType: "Xăng",
-        hourlyRentalPrice: 250000,
-      },
-      verification: {
-        frontView: "/car-front-view.png",
-        backView: "/car-back-view.jpg",
-        sideView: "/car-side-view.png",
-        interiorView: "/modern-car-interior.png",
-      },
-    },
-  },
-  {
-    id: 4,
-    instructorId: 104,
-    instructorName: "Phạm Đức D",
-    phoneNumber: "0922222222",
-    email: "phamd@example.com",
-    vehicleBrand: "Kia",
-    vehicleModel: "Cerato",
-    licensePlate: "51D-234.56",
-    submittedDate: "2025-01-20",
-    status: "pending",
-    documents: {
-      inspection: {
-        frontImage: "/inspection-front.jpg",
-        backImage: null,
-        issueDate: "2023-09-18",
-        expirationDate: "2025-09-18",
-      },
-      insurance: {
-        frontImage: "/insurance-front.jpg",
-        backImage: "/insurance-back.jpg",
-        issueDate: "2023-10-03",
-        expirationDate: "2025-10-03",
-      },
-      registration: {
-        frontImage: null,
-        backImage: null,
-        ownerName: null,
-        licensePlate: null,
-        vehicleBrand: null,
-        vehicleModel: null,
-        seats: null,
-        issueDate: null,
-        fuelType: null,
-        hourlyRentalPrice: null,
-      },
-      verification: {
-        frontView: "/car-front-view.png",
-        backView: "/car-back-view.jpg",
-        sideView: null,
-        interiorView: "/modern-car-interior.png",
-      },
-    },
-  },
-  {
-    id: 5,
-    instructorId: 105,
-    instructorName: "Đặng Hoàng E",
-    phoneNumber: "0933333333",
-    email: "danghoanged@example.com",
-    vehicleBrand: "Mazda",
-    vehicleModel: "3",
-    licensePlate: "51E-567.89",
-    submittedDate: "2025-01-12",
-    status: "rejected",
-    rejectionReason: "Giấy đăng ký xe hết hạn",
-    documents: {
-      inspection: {
-        frontImage: "/inspection-front.jpg",
-        backImage: "/inspection-back.jpg",
-        issueDate: "2023-02-14",
-        expirationDate: "2024-02-14",
-      },
-      insurance: {
-        frontImage: "/insurance-front.jpg",
-        backImage: "/insurance-back.jpg",
-        issueDate: "2023-03-01",
-        expirationDate: "2024-03-01",
-      },
-      registration: {
-        frontImage: "/registration-front.jpg",
-        backImage: "/registration-back.jpg",
-        ownerName: "Đặng Hoàng E",
-        licensePlate: "51E-567.89",
-        vehicleBrand: "Mazda",
-        vehicleModel: "3",
-        seats: 5,
-        issueDate: "2020-01-22",
-        fuelType: "Xăng",
-        hourlyRentalPrice: 160000,
-      },
-      verification: {
-        frontView: "/car-front-view.png",
-        backView: "/car-back-view.jpg",
-        sideView: "/car-side-view.png",
-        interiorView: "/modern-car-interior.png",
-      },
-    },
-  },
-  {
-    id: 6,
-    instructorId: 106,
-    instructorName: "Hoàng Thế F",
-    phoneNumber: "0944444444",
-    email: "hoangf@example.com",
-    vehicleBrand: "Hyundai",
-    vehicleModel: "Elantra",
-    licensePlate: "51F-890.12",
-    submittedDate: "2025-01-10",
-    status: "approved",
-    documents: {
-      inspection: {
-        frontImage: "/inspection-front.jpg",
-        backImage: "/inspection-back.jpg",
-        issueDate: "2023-11-09",
-        expirationDate: "2025-11-09",
-      },
-      insurance: {
-        frontImage: "/insurance-front.jpg",
-        backImage: "/insurance-back.jpg",
-        issueDate: "2023-12-15",
-        expirationDate: "2025-12-15",
-      },
-      registration: {
-        frontImage: "/registration-front.jpg",
-        backImage: "/registration-back.jpg",
-        ownerName: "Hoàng Thế F",
-        licensePlate: "51F-890.12",
-        vehicleBrand: "Hyundai",
-        vehicleModel: "Elantra",
-        seats: 5,
-        issueDate: "2019-07-30",
-        fuelType: "Xăng",
-        hourlyRentalPrice: 140000,
-      },
-      verification: {
-        frontView: "/car-front-view.png",
-        backView: "/car-back-view.jpg",
-        sideView: "/car-side-view.png",
-        interiorView: "/modern-car-interior.png",
-      },
-    },
-  },
-];
-
-interface DocumentViewerModalProps {
-  document: VehicleDocument | null;
+// Helper function để normalize và xử lý trạng thái xe từ API
+const getCarStatusInfo = (status: CarStatus | string) => {
+  const statusStr = status?.toString().toLowerCase() || "";
+  
+  // Kiểm tra các trường hợp có thể xảy ra từ API
+  if (
+    statusStr === CarStatus.Approved.toLowerCase() ||
+    statusStr === "approved" ||
+    statusStr === "approve"
+  ) {
+    return {
+      label: "Đã duyệt",
+      className: "bg-green-50 text-green-700 border border-green-200",
+      statusType: "approved" as const,
+    };
+  }
+  if (
+    statusStr === CarStatus.Pending.toLowerCase() ||
+    statusStr === "pending"
+  ) {
+    return {
+      label: "Chờ duyệt",
+      className: "bg-yellow-50 text-yellow-700 border border-yellow-200",
+      statusType: "pending" as const,
+    };
+  }
+  if (
+    statusStr === CarStatus.Rejected.toLowerCase() ||
+    statusStr === "rejected" ||
+    statusStr === "reject"
+  ) {
+    return {
+      label: "Từ chối",
+      className: "bg-red-50 text-red-700 border border-red-200",
+      statusType: "rejected" as const,
+    };
+  }
+  // Fallback: hiển thị giá trị gốc nếu không khớp
+  return {
+    label: status?.toString() || "Không xác định",
+    className: "bg-gray-50 text-gray-700 border border-gray-200",
+    statusType: "unknown" as const,
+  };
+};
+interface CarDetailModalProps {
+  car: ICar | null;
+  carDocuments: CarDocuments[] | null;
+  loadingDocuments: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-function DocumentViewerModal({
-  document,
+function CarDetailModal({
+  car,
+  carDocuments,
+  loadingDocuments,
   open,
   onOpenChange,
-}: DocumentViewerModalProps) {
-  if (!document) return null;
+}: CarDetailModalProps) {
+  if (!car) return null;
+
+  const statusInfo = getCarStatusInfo(car.status);
+  const registrationDoc = carDocuments?.find((doc) =>
+    doc.documentType?.toLowerCase().includes("registration")
+  );
+  const insuranceDoc = carDocuments?.find((doc) =>
+    doc.documentType?.toLowerCase().includes("insurance")
+  );
+  const hasDocuments = Boolean(registrationDoc || insuranceDoc);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[95vh] max-w-5xl overflow-y-auto">
+      <DialogContent className="max-h-[95vh] max-w-3xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            Chi tiết tài liệu - {document.vehicleBrand} {document.vehicleModel}{" "}
-            - {document.licensePlate}
+            Chi tiết xe - {car.brand} {car.modelName} - {car.license_plate}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-8 pb-6">
-          <div className="grid gap-4 rounded-lg border bg-muted/30 p-5 sm:grid-cols-2">
-            <InfoItem label="Người hướng dẫn" value={document.instructorName} />
-            <InfoItem
-              label="Ngày nộp"
-              value={formatDate(document.submittedDate)}
-            />
-            <InfoItem label="Số điện thoại" value={document.phoneNumber}>
-              <a href={`tel:${document.phoneNumber}`} className="text-primary">
-                {document.phoneNumber}
-              </a>
-            </InfoItem>
-            <InfoItem label="Email" value={document.email}>
-              <a
-                href={`mailto:${document.email}`}
-                className="text-primary break-all"
-              >
-                {document.email}
-              </a>
-            </InfoItem>
-            <InfoItem label="Trạng thái" value={document.status}>
-              <Badge
-                className={`px-3 py-1 text-xs ${
-                  document.status === "pending"
-                    ? "bg-amber-50 text-amber-700"
-                    : document.status === "approved"
-                    ? "bg-emerald-50 text-emerald-700"
-                    : "bg-red-50 text-red-700"
-                }`}
-              >
-                {document.status === "pending"
-                  ? "Chờ duyệt"
-                  : document.status === "approved"
-                  ? "Đã duyệt"
-                  : "Từ chối"}
-              </Badge>
-            </InfoItem>
-          </div>
-
-          <InspectionDocumentSection document={document} />
-          <InsuranceDocumentSection document={document} />
-          <RegistrationDocumentSection document={document} />
-          <VerificationImagesSection document={document} />
-
-          {document.status === "rejected" && document.rejectionReason && (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
-              <h4 className="text-sm font-semibold text-destructive">
-                Lý do từ chối
-              </h4>
-              <p className="text-sm text-destructive">
-                {document.rejectionReason}
-              </p>
+        <div className="space-y-6 pb-6">
+          {car.thumbnailUrl && (
+            <div className="rounded-lg overflow-hidden border">
+              <img
+                src={car.thumbnailUrl}
+                alt={`${car.brand} ${car.modelName}`}
+                className="w-full h-64 object-cover"
+              />
             </div>
           )}
+
+          <div className="grid gap-4 rounded-lg border bg-muted/30 p-5 sm:grid-cols-2">
+            <InfoItem label="Hãng xe" value={car.brand} />
+            <InfoItem label="Model" value={car.modelName} />
+            <InfoItem label="Số chỗ ngồi" value={`${car.seatCounts} chỗ`} />
+            <InfoItem
+              label="Giá thuê/giờ"
+              value={`${car.price.toLocaleString("vi-VN")} VND`}
+            />
+            <InfoItem label="Nhiên liệu" value={car.fuel} />
+            <InfoItem label="Loại xe" value={car.vehicleType} />
+            <InfoItem label="Hạng bằng lái" value={car.licenseTier} />
+          </div>
+
+          <div className="space-y-4 rounded-lg border bg-muted/30 p-5">
+            <div className="flex items-center justify-between">
+              <h4 className="text-base font-semibold text-foreground">
+                Tài liệu xe
+              </h4>
+              {loadingDocuments && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Đang tải...
+                </div>
+              )}
+            </div>
+
+            {hasDocuments ? (
+              <div className="space-y-6">
+                {registrationDoc && (
+                  <div className="space-y-3">
+                    <Label className="text-xs font-semibold uppercase text-muted-foreground">
+                      Giấy đăng ký xe
+                    </Label>
+                    <ImagePair
+                      firstLabel="ẢNH MẶT TRƯỚC"
+                      firstSrc={registrationDoc.frontImageUrl ?? null}
+                      secondLabel="ẢNH MẶT SAU"
+                      secondSrc={registrationDoc.backImageUrl ?? null}
+                    />
+                  </div>
+                )}
+
+                {insuranceDoc && (
+                  <div className="space-y-3">
+                    <Label className="text-xs font-semibold uppercase text-muted-foreground">
+                      Bảo hiểm xe
+                    </Label>
+                    <ImagePair
+                      firstLabel="ẢNH MẶT TRƯỚC"
+                      firstSrc={insuranceDoc.frontImageUrl ?? null}
+                      secondLabel="ẢNH MẶT SAU"
+                      secondSrc={insuranceDoc.backImageUrl ?? null}
+                    />
+                  </div>
+                )}
+              </div>
+            ) : !loadingDocuments ? (
+              <p className="text-sm text-muted-foreground">
+                Chưa có tài liệu cho xe này.
+              </p>
+            ) : null}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
@@ -588,10 +408,6 @@ function RegistrationDocumentSection({
             label="Họ và tên"
             value={registration.ownerName ?? "Chưa cập nhật"}
           />
-          <InfoItem
-            label="Biển số xe"
-            value={registration.licensePlate ?? "Chưa cập nhật"}
-          />
         </div>
       </div>
 
@@ -692,34 +508,22 @@ function ImageTile({ label, src }: { label: string; src: string | null }) {
   );
 }
 
-interface DocumentRowProps {
-  document: VehicleDocument;
+interface CarRowProps {
+  car: ICar;
   orderNumber: number;
   onView: () => void;
   onApprove: () => void;
   onReject: () => void;
 }
 
-function DocumentRow({
-  document,
+function CarRow({
+  car,
   orderNumber,
   onView,
   onApprove,
   onReject,
-}: DocumentRowProps) {
-  const statusStyles =
-    document.status === "pending"
-      ? "bg-amber-50 text-amber-700"
-      : document.status === "approved"
-      ? "bg-emerald-50 text-emerald-700"
-      : "bg-red-50 text-red-700";
-
-  const statusLabel =
-    document.status === "pending"
-      ? "Chờ duyệt"
-      : document.status === "approved"
-      ? "Đã duyệt"
-      : "Từ chối";
+}: CarRowProps) {
+  const statusInfo = getCarStatusInfo(car.status);
 
   return (
     <tr className="border-b last:border-b-0 hover:bg-muted/50">
@@ -727,30 +531,20 @@ function DocumentRow({
         {orderNumber}
       </td>
       <td className="px-4 py-3 text-sm font-medium">
-        {document.instructorName}
+        {car.brand}
       </td>
       <td className="px-4 py-3 text-sm">
-        <a
-          href={`tel:${document.phoneNumber}`}
-          className="flex items-center gap-1 text-primary"
-        >
-          {document.phoneNumber}
-        </a>
+        {car.modelName}
       </td>
       <td className="px-4 py-3 text-sm">
-        <a
-          href={`mailto:${document.email}`}
-          className="break-all text-primary underline"
-        >
-          {document.email}
-        </a>
+        {car.seatCounts} chỗ
       </td>
       <td className="px-4 py-3 text-sm">
-        {formatDate(document.submittedDate)}
+        {car.price.toLocaleString("vi-VN")} VND
       </td>
       <td className="px-4 py-3">
-        <Badge className={`${statusStyles} px-3 py-1 text-xs`}>
-          {statusLabel}
+        <Badge className={`${statusInfo.className} px-3 py-1 text-xs font-medium`}>
+          {statusInfo.label}
         </Badge>
       </td>
       <td className="px-4 py-3 text-center">
@@ -766,7 +560,7 @@ function DocumentRow({
                 <Eye className="mr-2 size-4" />
                 Xem chi tiết
               </DropdownMenuItem>
-              {document.status === "pending" && (
+              {getCarStatusInfo(car.status).statusType === "pending" && (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -774,11 +568,11 @@ function DocumentRow({
                     className="text-emerald-600"
                   >
                     <CheckCircle className="mr-2 size-4" />
-                    Duyệt tài liệu
+                    Duyệt xe
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={onReject} className="text-red-600">
                     <XCircle className="mr-2 size-4" />
-                    Từ chối tài liệu
+                    Từ chối xe
                   </DropdownMenuItem>
                 </>
               )}
@@ -792,44 +586,60 @@ function DocumentRow({
 
 export default function ReviewerCarDocumentsPage() {
   const router = useRouter();
-  const [documents, setDocuments] = useState<VehicleDocument[]>(mockDocuments);
+  const [cars, setCars] = useState<ICar[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [statusFilter, setStatusFilter] = useState<
-    "all" | "pending" | "approved" | "rejected"
+    "all" | CarStatus.Approved | CarStatus.Pending | CarStatus.Rejected
   >("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedDocument, setSelectedDocument] =
-    useState<VehicleDocument | null>(null);
+  const [selectedCar, setSelectedCar] = useState<ICar | null>(null);
+  const [carDocuments, setCarDocuments] = useState<CarDocuments[] | null>(null);
   const [showDocumentModal, setShowDocumentModal] = useState(false);
-  const [actioningDocumentId, setActioningDocumentId] = useState<number | null>(
-    null
-  );
+  const [actioningCarId, setActioningCarId] = useState<string | null>(null);
   const [actionType, setActionType] = useState<"approve" | "reject" | null>(
     null
   );
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [error, setError] = useState<string | null>(null);
+  const [moderateError, setModerateError] = useState<string | null>(null);
+  
+  const { run: fetchCars, loading } = useThunkAction(getCars);
+  const { run: fetchCarDocuments, loading: loadingDocuments } =
+    useThunkAction(getCarDocumentsForInspector);
+  const { run: moderateCar, loading: moderating } = useThunkAction(moderateCarForInspector);
 
-  const sortedDocuments = useMemo(
-    () =>
-      [...documents].sort(
-        (a, b) =>
-          new Date(b.submittedDate).getTime() -
-          new Date(a.submittedDate).getTime()
-      ),
-    [documents]
-  );
+  // Fetch cars from API
+  useEffect(() => {
+    setError(null);
+    fetchCars(
+      {
+        page: currentPage,
+        size: itemsPerPage,
+        brand: searchTerm.trim() || undefined,
+        status: statusFilter === "all" ? undefined : statusFilter,
+      },
+      {
+        onSuccess: (res) => {
+          const response = res?.value as PaginatedCarsResponse | undefined;
+          if (response) {
+            setCars(response.pageContent ?? []);
+            setTotalCount(response.totalCount ?? 0);
+          } else {
+            setCars([]);
+            setTotalCount(0);
+          }
+        },
+        onError: () => {
+          setCars([]);
+          setTotalCount(0);
+          setError("Không thể tải danh sách xe. Vui lòng thử lại.");
+        },
+      }
+    );
+  }, [fetchCars, currentPage, itemsPerPage, searchTerm, statusFilter]);
 
-  const filteredDocuments = useMemo(() => {
-    return sortedDocuments.filter((doc) => {
-      const matchesStatus =
-        statusFilter === "all" || doc.status === statusFilter;
-      const matchesSearch =
-        doc.instructorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.licensePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.phoneNumber.includes(searchTerm);
-      return matchesStatus && matchesSearch;
-    });
-  }, [sortedDocuments, statusFilter, searchTerm]);
+  const filteredCars = useMemo(() => cars, [cars]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -837,12 +647,7 @@ export default function ReviewerCarDocumentsPage() {
 
   const totalPages = Math.max(
     1,
-    Math.ceil(filteredDocuments.length / itemsPerPage)
-  );
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedDocuments = filteredDocuments.slice(
-    startIndex,
-    startIndex + itemsPerPage
+    Math.ceil(totalCount / itemsPerPage)
   );
 
   const canGoPrevious = currentPage > 1;
@@ -855,45 +660,91 @@ export default function ReviewerCarDocumentsPage() {
   const goToNextPage = () =>
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
-  const stats = useMemo(
-    () => ({
-      total: documents.length,
-      pending: documents.filter((d) => d.status === "pending").length,
-      approved: documents.filter((d) => d.status === "approved").length,
-      rejected: documents.filter((d) => d.status === "rejected").length,
-    }),
-    [documents]
-  );
+  const stats = useMemo(() => {
+    return {
+      total: totalCount,
+      pending: cars.filter((c) => getCarStatusInfo(c.status).statusType === "pending")
+        .length,
+      approved: cars.filter((c) => getCarStatusInfo(c.status).statusType === "approved")
+        .length,
+      rejected: cars.filter((c) => getCarStatusInfo(c.status).statusType === "rejected")
+        .length,
+    };
+  }, [cars, totalCount]);
 
-  const handleApprove = (id: number) => {
-    setActioningDocumentId(id);
+  const handleApprove = (id: string) => {
+    setActioningCarId(id);
     setActionType("approve");
   };
 
-  const handleReject = (id: number) => {
-    setActioningDocumentId(id);
+  const handleReject = (id: string) => {
+    setActioningCarId(id);
     setActionType("reject");
   };
 
   const confirmAction = () => {
-    if (actioningDocumentId === null || !actionType) return;
-    setDocuments((prev) =>
-      prev.map((doc) =>
-        doc.id === actioningDocumentId
-          ? {
-              ...doc,
-              status: actionType === "approve" ? "approved" : "rejected",
+    if (actioningCarId === null || !actionType) return;
+    
+    setModerateError(null);
+    const action = actionType === "approve" ? "approve" : "decline";
+    
+    moderateCar(
+      {
+        id: actioningCarId,
+        action: action,
+      },
+      {
+        onSuccess: () => {
+          // Refresh danh sách xe sau khi moderate thành công
+          fetchCars(
+            {
+              page: currentPage,
+              size: itemsPerPage,
+            },
+            {
+              onSuccess: (res) => {
+                const response = res?.value as PaginatedCarsResponse | undefined;
+                if (response) {
+                  setCars(response.pageContent ?? []);
+                  setTotalCount(response.totalCount ?? 0);
+                }
+              },
+              onError: () => {
+                setError("Không thể tải lại danh sách xe.");
+              },
             }
-          : doc
-      )
+          );
+          setActioningCarId(null);
+          setActionType(null);
+        },
+        onError: (err) => {
+          setModerateError(
+            actionType === "approve"
+              ? "Không thể duyệt xe. Vui lòng thử lại."
+              : "Không thể từ chối xe. Vui lòng thử lại."
+          );
+          console.error("Moderate car error:", err);
+        },
+      }
     );
-    setActioningDocumentId(null);
-    setActionType(null);
   };
 
-  const handleView = (document: VehicleDocument) => {
-    setSelectedDocument(document);
+  const handleView = (car: ICar) => {
+    setSelectedCar(car);
     setShowDocumentModal(true);
+    setCarDocuments(null);
+    fetchCarDocuments(
+      { id: car.id },
+      {
+        onSuccess: (res) => {
+          const docs = (res?.value as CarDocuments[] | undefined) ?? [];
+          setCarDocuments(docs);
+        },
+        onError: () => {
+          setCarDocuments([]);
+        },
+      }
+    );
   };
 
   return (
@@ -905,32 +756,38 @@ export default function ReviewerCarDocumentsPage() {
       />
       <Card className="rounded-3xl border bg-background shadow-sm">
         <CardContent className="p-6">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <StatCard
-              label="Tổng xe"
-              value={stats.total}
-              icon={<FileText className="size-5" />}
-              accent="bg-blue-50 text-blue-600"
-            />
-            <StatCard
-              label="Chờ duyệt"
-              value={stats.pending}
-              icon={<Clock className="size-5" />}
-              accent="bg-amber-50 text-amber-600"
-            />
-            <StatCard
-              label="Đã duyệt"
-              value={stats.approved}
-              icon={<CheckCircle className="size-5" />}
-              accent="bg-emerald-50 text-emerald-600"
-            />
-            <StatCard
-              label="Từ chối"
-              value={stats.rejected}
-              icon={<XCircle className="size-5" />}
-              accent="bg-rose-50 text-rose-600"
-            />
-          </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <StatCard
+                label="Tổng xe"
+                value={stats.total}
+                icon={<FileText className="size-5" />}
+                accent="bg-blue-50 text-blue-600"
+              />
+              <StatCard
+                label="Chờ duyệt"
+                value={stats.pending}
+                icon={<Clock className="size-5" />}
+                accent="bg-amber-50 text-amber-600"
+              />
+              <StatCard
+                label="Đã duyệt"
+                value={stats.approved}
+                icon={<CheckCircle className="size-5" />}
+                accent="bg-emerald-50 text-emerald-600"
+              />
+              <StatCard
+                label="Từ chối"
+                value={stats.rejected}
+                icon={<XCircle className="size-5" />}
+                accent="bg-rose-50 text-rose-600"
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -941,7 +798,7 @@ export default function ReviewerCarDocumentsPage() {
             <Input
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
-              placeholder="Tìm theo tên, số điện thoại hoặc biển số..."
+              placeholder="Tìm theo hãng xe..."
               className="pl-10"
             />
           </div>
@@ -949,7 +806,11 @@ export default function ReviewerCarDocumentsPage() {
             value={statusFilter}
             onValueChange={(value) =>
               setStatusFilter(
-                value as "all" | "pending" | "approved" | "rejected"
+                value as
+                  | "all"
+                  | CarStatus.Pending
+                  | CarStatus.Approved
+                  | CarStatus.Rejected
               )
             }
           >
@@ -957,10 +818,10 @@ export default function ReviewerCarDocumentsPage() {
               <SelectValue placeholder="Trạng thái" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tất cả trạng thái</SelectItem>
-              <SelectItem value="pending">Chờ duyệt</SelectItem>
-              <SelectItem value="approved">Đã duyệt</SelectItem>
-              <SelectItem value="rejected">Từ chối</SelectItem>
+              <SelectItem value="all">Tất cả</SelectItem>
+              <SelectItem value={CarStatus.Pending}>Chờ duyệt</SelectItem>
+              <SelectItem value={CarStatus.Approved}>Đã duyệt</SelectItem>
+              <SelectItem value={CarStatus.Rejected}>Từ chối</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -973,14 +834,16 @@ export default function ReviewerCarDocumentsPage() {
               <TableRow>
                 <TableHead className="px-4 py-3 font-semibold">STT</TableHead>
                 <TableHead className="px-4 py-3 font-semibold">
-                  Người hướng dẫn
+                  Hãng xe
                 </TableHead>
                 <TableHead className="px-4 py-3 font-semibold">
-                  Điện thoại
+                  Model
                 </TableHead>
-                <TableHead className="px-4 py-3 font-semibold">Email</TableHead>
                 <TableHead className="px-4 py-3 font-semibold">
-                  Ngày nộp
+                  Số chỗ ngồi
+                </TableHead>
+                <TableHead className="px-4 py-3 font-semibold">
+                  Giá/giờ
                 </TableHead>
                 <TableHead className="px-4 py-3 font-semibold">
                   Trạng thái
@@ -991,24 +854,45 @@ export default function ReviewerCarDocumentsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredDocuments.length === 0 ? (
+              {loading ? (
                 <TableRow>
                   <TableCell
                     colSpan={7}
                     className="px-4 py-8 text-center text-sm text-muted-foreground"
                   >
-                    Không tìm thấy tài liệu phù hợp.
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Đang tải dữ liệu...
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : error ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={7}
+                    className="px-4 py-8 text-center text-sm text-destructive"
+                  >
+                    {error}
+                  </TableCell>
+                </TableRow>
+              ) : filteredCars.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={7}
+                    className="px-4 py-8 text-center text-sm text-muted-foreground"
+                  >
+                    Không tìm thấy xe phù hợp.
                   </TableCell>
                 </TableRow>
               ) : (
-                paginatedDocuments.map((document, index) => (
-                  <DocumentRow
-                    key={document.id}
-                    document={document}
-                    orderNumber={startIndex + index + 1}
-                    onView={() => handleView(document)}
-                    onApprove={() => handleApprove(document.id)}
-                    onReject={() => handleReject(document.id)}
+                filteredCars.map((car, index) => (
+                  <CarRow
+                    key={car.id}
+                    car={car}
+                    orderNumber={(currentPage - 1) * itemsPerPage + index + 1}
+                    onView={() => handleView(car)}
+                    onApprove={() => handleApprove(car.id)}
+                    onReject={() => handleReject(car.id)}
                   />
                 ))
               )}
@@ -1017,8 +901,7 @@ export default function ReviewerCarDocumentsPage() {
         </div>
         <div className="mt-6 flex flex-col gap-4 rounded-2xl bg-muted/20 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-xs text-muted-foreground sm:text-sm">
-            Hiển thị {paginatedDocuments.length}/{filteredDocuments.length} tài
-            liệu.
+            Hiển thị {filteredCars.length}/{totalCount} xe.
           </div>
           <div className="flex flex-col items-center gap-4 sm:flex-row">
             <div className="flex items-center gap-2">
@@ -1082,15 +965,28 @@ export default function ReviewerCarDocumentsPage() {
         </div>
       </section>
 
-      <DocumentViewerModal
-        document={selectedDocument}
+      <CarDetailModal
+        car={selectedCar}
+        carDocuments={carDocuments}
+        loadingDocuments={loadingDocuments}
         open={showDocumentModal}
-        onOpenChange={setShowDocumentModal}
+        onOpenChange={(open) => {
+          setShowDocumentModal(open);
+          if (!open) {
+            setCarDocuments(null);
+          }
+        }}
       />
 
       <AlertDialog
-        open={actioningDocumentId !== null}
-        onOpenChange={(open) => !open && setActioningDocumentId(null)}
+        open={actioningCarId !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setActioningCarId(null);
+            setActionType(null);
+            setModerateError(null);
+          }
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -1099,12 +995,17 @@ export default function ReviewerCarDocumentsPage() {
             </AlertDialogTitle>
             <AlertDialogDescription>
               {actionType === "approve"
-                ? "Bạn có chắc chắn muốn duyệt tài liệu này?"
-                : "Bạn có chắc chắn muốn từ chối tài liệu này?"}
+                ? "Bạn có chắc chắn muốn duyệt xe này?"
+                : "Bạn có chắc chắn muốn từ chối xe này?"}
             </AlertDialogDescription>
           </AlertDialogHeader>
+          {moderateError && (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+              {moderateError}
+            </div>
+          )}
           <AlertDialogFooter>
-            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogCancel disabled={moderating}>Hủy</AlertDialogCancel>
             <AlertDialogAction
               className={
                 actionType === "approve"
@@ -1112,8 +1013,18 @@ export default function ReviewerCarDocumentsPage() {
                   : "bg-red-600 text-white hover:bg-red-700"
               }
               onClick={confirmAction}
+              disabled={moderating}
             >
-              {actionType === "approve" ? "Duyệt" : "Từ chối"}
+              {moderating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Đang xử lý...
+                </>
+              ) : actionType === "approve" ? (
+                "Duyệt"
+              ) : (
+                "Từ chối"
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1153,3 +1064,4 @@ function StatCard({
     </Card>
   );
 }
+

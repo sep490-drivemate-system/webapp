@@ -1,25 +1,5 @@
 import { CarStatus } from "@/types/constants/enum";
 
-export interface Car {
-  id: number | string;
-  name: string;
-  brand: string;
-  imageUrl: string;
-  images?: string[];
-  price: number;
-  pricing?: {
-    halfDay: { price: number; duration: number };
-    fullDay: { price: number; duration: number };
-  };
-  location: string;
-  rating: number;
-  seats: number;
-  type: string;
-  fuel: string;
-  totalRentalCount?: number;
-  instructor?: { experience: string };
-}
-
 export enum LicenseTier {
   B = "B",
   C1 = "C1",
@@ -125,4 +105,11 @@ export interface GetCarsParams {
   seats?: number;
   brand?: string;
   fuel?: string;
+  status?: string;
+}
+
+export interface CarDocuments {
+  frontImageUrl: string,
+  backImageUrl: string,
+  documentType: string,
 }

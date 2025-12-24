@@ -16,8 +16,8 @@ export enum BookingStatus {
   }
   
   export enum CarStatus {
-    Approved = "Approve",
+    Approved = "Approved",
     Pending = "Pending",
-    Rejected = "Reject",
+    Rejected = "Rejected",
   }
   

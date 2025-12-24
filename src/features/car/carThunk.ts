@@ -1,6 +1,7 @@
 import { createThunk } from "../genericCreateThunk";
 import { HttpMethod } from "@/types/constants/httpMethod";
 import {
+  CarDocuments,
   IBrandCar,
   ICar,
   ICarDetail,
@@ -80,6 +81,9 @@ export const getCars = createThunk<PaginatedCarsResponse, GetCarsParams>(
       if (payload.fuel) {
         params.append("fuel", payload.fuel);
       }
+      if (payload.status) {
+        params.append("status", payload.status);
+      }
       
       const queryString = params.toString();
       const fullUrl = queryString ? `${baseUrl}?${queryString}` : baseUrl;
@@ -90,6 +94,7 @@ export const getCars = createThunk<PaginatedCarsResponse, GetCarsParams>(
     },
   }
 );
+
 export const getRecommendedCars = createThunk<ICar[], { max_count?: number } | void>(
   HttpMethod.GET,
   "getRecommendedCars",
@@ -102,5 +107,35 @@ export const getRecommendedCars = createThunk<ICar[], { max_count?: number } | v
       const query = params.toString();
       return query ? `${baseUrl}?${query}` : baseUrl;
     },
+  }
+);
+
+export const moderateCarForInspector = createThunk<
+  void,
+  { id: string; action: "approve" | "decline" }
+>(
+  HttpMethod.POST,
+  "moderateCarForInspector",
+  `/${CAR_PATH}/:id/moderate`,
+  {
+    buildUrl: (payload) => {
+      const baseUrl = `/${CAR_PATH}/${payload.id}/moderate`;
+      const params = new URLSearchParams();
+      params.append("action", payload.action);
+      const queryString = params.toString();
+      return `${baseUrl}?${queryString}`;
+    },
+  }
+);
+
+export const getCarDocumentsForInspector = createThunk<
+  CarDocuments[],
+  { id: string }
+>(
+  HttpMethod.GET,
+  "getCarDocumentsForInspector",
+  `/${CAR_PATH}/:id/document`,
+  {
+    buildUrl: (payload) => `/${CAR_PATH}/${payload.id}/document`,
   }
 );

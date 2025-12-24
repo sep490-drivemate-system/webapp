@@ -14,6 +14,7 @@ import { getCarById, getCars } from "@/features/car/carThunk";
 import { ICar, ICarDetail } from "@/types/car/car.type";
 import { CarDetailDialog } from "@/components/car/car-detail-dialog";
 import { CarCard } from "@/components/car/car-card";
+import { CarStatus } from "@/types/constants/enum";
 
 const PAGE_SIZE = 6; // 3 items per row on web, 2 rows = 6 items per page
 
@@ -56,6 +57,7 @@ export default function CarsPage() {
         seats: Number.isNaN(seatsParam as number) ? undefined : seatsParam,
         brand: brandParam,
         fuel: fuelParam,
+        status: CarStatus.Approved,
       },
       {
         onSuccess: (res) => {
