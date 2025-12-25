@@ -26,25 +26,31 @@ interface RegistrationData {
   year?: number;
   licenseTier?: string;
   description?: string;
+  frontImage?: File | string | null;
+  backImage?: File | string | null;
+  [key: string]: string | number | File | null | undefined;
 }
 
 interface InspectionData {
-  frontImage?: File | string;
-  backImage?: File | string;
+  frontImage?: File | string | null;
+  backImage?: File | string | null;
+  [key: string]: File | string | null | undefined;
 }
 
 interface InsuranceData {
-  frontImage?: File | string;
-  backImage?: File | string;
+  frontImage?: File | string | null;
+  backImage?: File | string | null;
   expiryDate?: string;
+  [key: string]: File | string | null | undefined;
 }
 
 interface VerificationData {
-  frontImage?: File | string;
-  backImage?: File | string;
-  leftSideImage?: File | string;
-  rightSideImage?: File | string;
-  interiorImage?: File | string;
+  frontImage?: File | string | null;
+  backImage?: File | string | null;
+  leftSideImage?: File | string | null;
+  rightSideImage?: File | string | null;
+  interiorImage?: File | string | null;
+  [key: string]: File | string | null | undefined;
 }
 
 interface FormData {
