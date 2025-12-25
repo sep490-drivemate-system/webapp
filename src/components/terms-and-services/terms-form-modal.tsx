@@ -31,17 +31,6 @@ interface TermsFormModalProps {
   loading?: boolean;
 }
 
-const getTypeLabel = (type: string): string => {
-  switch (type) {
-    case "1":
-      return "Người lái mới";
-    case "2":
-      return "Người hướng dẫn";
-    default:
-      return `Loại ${type}`;
-  }
-};
-
 export function TermsFormModal({
   open,
   onOpenChange,

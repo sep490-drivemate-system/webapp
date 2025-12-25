@@ -70,11 +70,11 @@ const carSlice = createSlice({
       state,
       action: PayloadAction<{
         field: keyof ICarRegistrationRequest;
-        value: any;
+        value: ICarRegistrationRequest[keyof ICarRegistrationRequest];
       }>
     ) => {
-      (state.carRegistrationForm as any)[action.payload.field] =
-        action.payload.value;
+      state.carRegistrationForm[action.payload.field] =
+        action.payload.value as never;
     },
     clearCarRegistrationForm: (state) => {
       state.carRegistrationForm = initialState.carRegistrationForm;

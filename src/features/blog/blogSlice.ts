@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { BaseState } from '@/types/generic/baseState';
 import { Blog, BlogDetail, BlogForInstructorDetail } from '@/types/blog/blog.type';
 import { PaginatedGeneric } from '@/types/generic/genericResponse';
@@ -50,7 +50,7 @@ const blogSlice = createSlice({
             .addCase(getListBlogs.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                const response = action.payload as any;
+                const response = action.payload as { value?: PaginatedGeneric<Blog> };
                 
                 const paginatedData: PaginatedGeneric<Blog> = response?.value;
                 
@@ -80,7 +80,7 @@ const blogSlice = createSlice({
             .addCase(getListBlogsForInstructor.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                const response = action.payload as any;
+                const response = action.payload as { value?: PaginatedGeneric<Blog> };
                 
                 const paginatedData: PaginatedGeneric<Blog> = response?.value;
                 
@@ -110,7 +110,7 @@ const blogSlice = createSlice({
             .addCase(getBlogDetailForAllRoles.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                const response = action.payload as any;
+                const response = action.payload as { value?: BlogDetail };
                 
                 const blogDetail: BlogDetail = response?.value;
                 
@@ -135,7 +135,7 @@ const blogSlice = createSlice({
             .addCase(gettBlogDetailForInstructor.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                const response = action.payload as any;
+                const response = action.payload as { value?: BlogForInstructorDetail };
 
                 const blogDetail: BlogForInstructorDetail = response?.value;
 

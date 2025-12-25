@@ -51,7 +51,6 @@ export function BlogCard({
   image,
   publishedAt,
   author,
-  readTime,
   variant = "instructor",
   detailLink,
   previewLength = 110,

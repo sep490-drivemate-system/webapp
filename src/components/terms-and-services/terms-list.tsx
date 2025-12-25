@@ -49,7 +49,7 @@ const getTypeLabel = (type: string): string => {
 
 const DEFAULT_PAGE_SIZE = 10;
 
-export function TermsList({ onEdit, onDelete, refreshTrigger, terms, loading }: TermsListProps) {
+export function TermsList({ onEdit, onDelete, terms, loading }: TermsListProps) {
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   const { page, totalPages, currentItems, setPage, next, prev } = usePagination(

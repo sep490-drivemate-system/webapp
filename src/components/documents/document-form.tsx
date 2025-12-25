@@ -13,24 +13,23 @@ import type { DocumentType, DocumentField } from "@/lib/types";
 interface DocumentFormProps {
   documentType: DocumentType;
   userId: string;
-  initialData?: Record<string, any>;
-  onSave: (data: Record<string, any>) => void;
+  initialData?: Record<string, unknown>;
+  onSave: (data: Record<string, unknown>) => void;
   onCancel: () => void;
 }
 
 export function DocumentForm({
   documentType,
-  userId,
   initialData,
   onSave,
   onCancel,
 }: DocumentFormProps) {
-  const [formData, setFormData] = useState<Record<string, any>>(
+  const [formData, setFormData] = useState<Record<string, unknown>>(
     initialData || {}
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleChange = (fieldName: string, value: any) => {
+  const handleChange = (fieldName: string, value: unknown) => {
     setFormData((prev) => ({
       ...prev,
       [fieldName]: value,

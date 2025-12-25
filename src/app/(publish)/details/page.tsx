@@ -295,6 +295,7 @@ export default function DetailsPage() {
                           {(car.images || [car.image]).map((image, index) => (
                             <CarouselItem key={index}>
                               <div className="relative">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                   src={image}
                                   alt={`${car.name} - Hình ${index + 1}`}

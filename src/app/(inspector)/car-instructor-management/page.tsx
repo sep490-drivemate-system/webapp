@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   CheckCircle,
   ChevronLeft,
@@ -11,14 +10,10 @@ import {
   Clock,
   Eye,
   FileText,
-  Mail,
   MoreHorizontal,
-  Phone,
-  Plus,
   Search,
-  X,
-  XCircle,
   Loader2,
+  XCircle,
 } from "lucide-react";
 import { useThunkAction } from "@/lib/redux/useThunkAction";
 import {
@@ -84,65 +79,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-interface VehicleDocument {
-  id: number;
-  instructorId: number;
-  instructorName: string;
-  phoneNumber: string;
-  email: string;
-  vehicleBrand: string;
-  vehicleModel: string;
-  licensePlate: string;
-  submittedDate: string;
-  status: "pending" | "approved" | "rejected";
-  documents: {
-    inspection: {
-      frontImage: string | null;
-      backImage: string | null;
-      issueDate: string | null;
-      expirationDate: string | null;
-    };
-    insurance: {
-      frontImage: string | null;
-      backImage: string | null;
-      issueDate: string | null;
-      expirationDate: string | null;
-    };
-    registration: {
-      frontImage: string | null;
-      backImage: string | null;
-      ownerName: string | null;
-      licensePlate: string | null;
-      vehicleBrand: string | null;
-      vehicleModel: string | null;
-      seats: number | null;
-      issueDate: string | null;
-      fuelType: string | null;
-      hourlyRentalPrice: number | null;
-    };
-    verification: {
-      frontView: string | null;
-      backView: string | null;
-      sideView: string | null;
-      interiorView: string | null;
-    };
-  };
-  rejectionReason?: string;
-}
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return dateString;
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  return `${day}-${month}-${year}`;
-};
-
 // Helper function để normalize và xử lý trạng thái xe từ API
 const getCarStatusInfo = (status: CarStatus | string) => {
   const statusStr = status?.toString().toLowerCase() || "";
-  
+
   // Kiểm tra các trường hợp có thể xảy ra từ API
   if (
     statusStr === CarStatus.Approved.toLowerCase() ||
@@ -200,7 +140,6 @@ function CarDetailModal({
 }: CarDetailModalProps) {
   if (!car) return null;
 
-  const statusInfo = getCarStatusInfo(car.status);
   const registrationDoc = carDocuments?.find((doc) =>
     doc.documentType?.toLowerCase().includes("registration")
   );
@@ -221,6 +160,7 @@ function CarDetailModal({
         <div className="space-y-6 pb-6">
           {car.thumbnailUrl && (
             <div className="rounded-lg overflow-hidden border">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={car.thumbnailUrl}
                 alt={`${car.brand} ${car.modelName}`}
@@ -316,157 +256,6 @@ function InfoItem({
   );
 }
 
-function SectionShell({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="rounded-xl border bg-card p-6 shadow-sm">
-      <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-      <div className="mt-4 space-y-4">{children}</div>
-    </section>
-  );
-}
-
-function InspectionDocumentSection({
-  document,
-}: {
-  document: VehicleDocument;
-}) {
-  const { inspection } = document.documents;
-  return (
-    <SectionShell title="Giấy Đăng Kiểm Xe">
-      <ImagePair
-        firstLabel="ẢNH MẶT TRƯỚC"
-        firstSrc={inspection.frontImage}
-        secondLabel="ẢNH MẶT SAU"
-        secondSrc={inspection.backImage}
-      />
-      <div className="grid gap-4 sm:grid-cols-2">
-        <InfoItem
-          label="Ngày cấp"
-          value={inspection.issueDate ?? "Chưa cập nhật"}
-        />
-        <InfoItem
-          label="Ngày hết hạn"
-          value={inspection.expirationDate ?? "Chưa cập nhật"}
-        />
-      </div>
-    </SectionShell>
-  );
-}
-
-function InsuranceDocumentSection({ document }: { document: VehicleDocument }) {
-  const { insurance } = document.documents;
-  return (
-    <SectionShell title="Bảo Hiểm Xe">
-      <ImagePair
-        firstLabel="ẢNH MẶT TRƯỚC"
-        firstSrc={insurance.frontImage}
-        secondLabel="ẢNH MẶT SAU"
-        secondSrc={insurance.backImage}
-      />
-      <div className="grid gap-4 sm:grid-cols-2">
-        <InfoItem
-          label="Ngày cấp"
-          value={insurance.issueDate ?? "Chưa cập nhật"}
-        />
-        <InfoItem
-          label="Ngày hết hạn"
-          value={insurance.expirationDate ?? "Chưa cập nhật"}
-        />
-      </div>
-    </SectionShell>
-  );
-}
-
-function RegistrationDocumentSection({
-  document,
-}: {
-  document: VehicleDocument;
-}) {
-  const { registration } = document.documents;
-  return (
-    <SectionShell title="Giấy Đăng Ký Xe">
-      <ImagePair
-        firstLabel="ẢNH MẶT TRƯỚC"
-        firstSrc={registration.frontImage}
-        secondLabel="ẢNH MẶT SAU"
-        secondSrc={registration.backImage}
-      />
-
-      <div className="rounded-lg border bg-muted/20 p-4">
-        <Label className="text-xs font-semibold uppercase text-muted-foreground">
-          Thông tin chủ sở hữu
-        </Label>
-        <div className="mt-2 grid gap-4 sm:grid-cols-2">
-          <InfoItem
-            label="Họ và tên"
-            value={registration.ownerName ?? "Chưa cập nhật"}
-          />
-        </div>
-      </div>
-
-      <div className="rounded-lg border bg-muted/20 p-4">
-        <Label className="text-xs font-semibold uppercase text-muted-foreground">
-          Thông tin xe
-        </Label>
-        <div className="mt-2 grid gap-4 sm:grid-cols-2">
-          <InfoItem
-            label="Tên hãng xe"
-            value={registration.vehicleBrand ?? "Chưa cập nhật"}
-          />
-          <InfoItem
-            label="Tên mẫu xe"
-            value={registration.vehicleModel ?? "Chưa cập nhật"}
-          />
-          <InfoItem
-            label="Số chỗ ngồi"
-            value={registration.seats?.toString() ?? "Chưa cập nhật"}
-          />
-          <InfoItem
-            label="Ngày cấp"
-            value={registration.issueDate ?? "Chưa cập nhật"}
-          />
-          <InfoItem
-            label="Loại nhiên liệu"
-            value={registration.fuelType ?? "Chưa cập nhật"}
-          />
-          <InfoItem
-            label="Giá thuê theo giờ"
-            value={
-              registration.hourlyRentalPrice
-                ? `${registration.hourlyRentalPrice.toLocaleString()} VND`
-                : "Chưa cập nhật"
-            }
-          />
-        </div>
-      </div>
-    </SectionShell>
-  );
-}
-
-function VerificationImagesSection({
-  document,
-}: {
-  document: VehicleDocument;
-}) {
-  const { verification } = document.documents;
-  return (
-    <SectionShell title="Ảnh Xác Minh Xe">
-      <div className="grid gap-4 md:grid-cols-2">
-        <ImageTile label="ẢNH PHÍA TRƯỚC" src={verification.frontView} />
-        <ImageTile label="ẢNH PHÍA SAU" src={verification.backView} />
-        <ImageTile label="ẢNH BÊN HÔNG" src={verification.sideView} />
-        <ImageTile label="ẢNH NỘI THẤT" src={verification.interiorView} />
-      </div>
-    </SectionShell>
-  );
-}
-
 function ImagePair({
   firstLabel,
   firstSrc,
@@ -493,6 +282,7 @@ function ImageTile({ label, src }: { label: string; src: string | null }) {
         {label}
       </Label>
       {src ? (
+        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={src}
           alt={label}
@@ -529,20 +319,16 @@ function CarRow({
       <td className="px-4 py-3 text-sm font-semibold text-muted-foreground">
         {orderNumber}
       </td>
-      <td className="px-4 py-3 text-sm font-medium">
-        {car.brand}
-      </td>
-      <td className="px-4 py-3 text-sm">
-        {car.modelName}
-      </td>
-      <td className="px-4 py-3 text-sm">
-        {car.seatCounts} chỗ
-      </td>
+      <td className="px-4 py-3 text-sm font-medium">{car.brand}</td>
+      <td className="px-4 py-3 text-sm">{car.modelName}</td>
+      <td className="px-4 py-3 text-sm">{car.seatCounts} chỗ</td>
       <td className="px-4 py-3 text-sm">
         {car.price.toLocaleString("vi-VN")} VND
       </td>
       <td className="px-4 py-3">
-        <Badge className={`${statusInfo.className} px-3 py-1 text-xs font-medium`}>
+        <Badge
+          className={`${statusInfo.className} px-3 py-1 text-xs font-medium`}
+        >
           {statusInfo.label}
         </Badge>
       </td>
@@ -584,7 +370,6 @@ function CarRow({
 }
 
 export default function ReviewerCarDocumentsPage() {
-  const router = useRouter();
   const [cars, setCars] = useState<ICar[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [statusFilter, setStatusFilter] = useState<
@@ -602,11 +387,14 @@ export default function ReviewerCarDocumentsPage() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [error, setError] = useState<string | null>(null);
   const [moderateError, setModerateError] = useState<string | null>(null);
-  
+
   const { run: fetchCars, loading } = useThunkAction(getCars);
-  const { run: fetchCarDocuments, loading: loadingDocuments } =
-    useThunkAction(getCarDocumentsForInspector);
-  const { run: moderateCar, loading: moderating } = useThunkAction(moderateCarForInspector);
+  const { run: fetchCarDocuments, loading: loadingDocuments } = useThunkAction(
+    getCarDocumentsForInspector
+  );
+  const { run: moderateCar, loading: moderating } = useThunkAction(
+    moderateCarForInspector
+  );
 
   useEffect(() => {
     setError(null);
@@ -643,10 +431,7 @@ export default function ReviewerCarDocumentsPage() {
     setCurrentPage(1);
   }, [statusFilter, searchTerm]);
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(totalCount / itemsPerPage)
-  );
+  const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
 
   const canGoPrevious = currentPage > 1;
   const canGoNext = currentPage < totalPages;
@@ -661,12 +446,15 @@ export default function ReviewerCarDocumentsPage() {
   const stats = useMemo(() => {
     return {
       total: totalCount,
-      pending: cars.filter((c) => getCarStatusInfo(c.status).statusType === "pending")
-        .length,
-      approved: cars.filter((c) => getCarStatusInfo(c.status).statusType === "approved")
-        .length,
-      rejected: cars.filter((c) => getCarStatusInfo(c.status).statusType === "rejected")
-        .length,
+      pending: cars.filter(
+        (c) => getCarStatusInfo(c.status).statusType === "pending"
+      ).length,
+      approved: cars.filter(
+        (c) => getCarStatusInfo(c.status).statusType === "approved"
+      ).length,
+      rejected: cars.filter(
+        (c) => getCarStatusInfo(c.status).statusType === "rejected"
+      ).length,
     };
   }, [cars, totalCount]);
 
@@ -682,10 +470,10 @@ export default function ReviewerCarDocumentsPage() {
 
   const confirmAction = () => {
     if (actioningCarId === null || !actionType) return;
-    
+
     setModerateError(null);
     const action = actionType === "approve" ? "approve" : "decline";
-    
+
     moderateCar(
       {
         id: actioningCarId,
@@ -700,7 +488,9 @@ export default function ReviewerCarDocumentsPage() {
             },
             {
               onSuccess: (res) => {
-                const response = res?.value as PaginatedCarsResponse | undefined;
+                const response = res?.value as
+                  | PaginatedCarsResponse
+                  | undefined;
                 if (response) {
                   setCars(response.pageContent ?? []);
                   setTotalCount(response.totalCount ?? 0);
@@ -833,9 +623,7 @@ export default function ReviewerCarDocumentsPage() {
                 <TableHead className="px-4 py-3 font-semibold">
                   Hãng xe
                 </TableHead>
-                <TableHead className="px-4 py-3 font-semibold">
-                  Model
-                </TableHead>
+                <TableHead className="px-4 py-3 font-semibold">Model</TableHead>
                 <TableHead className="px-4 py-3 font-semibold">
                   Số chỗ ngồi
                 </TableHead>
@@ -1061,4 +849,3 @@ function StatCard({
     </Card>
   );
 }
-

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 const links = {
   "Liên hệ": [
     "Hotline: 1900-xxxx",

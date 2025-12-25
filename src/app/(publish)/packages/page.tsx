@@ -94,7 +94,7 @@ export default function PackagesPage() {
           dispatch(getDrivingSkills()).unwrap(),
         ]);
 
-        const normalize = <T,>(res: any): T => (res?.value ?? res) as T;
+        const normalize = <T,>(res: unknown): T => (res as { value?: T })?.value ?? (res as T);
 
         setRoadTypes(normalize<RoadType[]>(roadTypeResponse) ?? []);
         setDrivingSkills(normalize<DrivingSkill[]>(drivingSkillResponse) ?? []);

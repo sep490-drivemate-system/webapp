@@ -1,16 +1,22 @@
-import { createThunk } from "../genericCreateThunk";
-import { HttpMethod } from "@/types/constants/httpMethod";
-import { BookingStatus, IGetUserPackages } from "@/types/booking/booking.type";
-import { IBookingSession, IGetBookingSessionsParams, IGetAllSessionsParams, ISessionDetailResponse, SessionStatus } from "@/types/booking/booking.type";
-import { ISessionRoutes } from "@/types/booking/booking.type";
 import axiosInstance from "@/lib/axios/axiosInstance";
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { BookingStatus, IBookingSession, IGetAllSessionsParams, IGetBookingSessionsParams, IGetUserPackages, ISessionDetailResponse, ISessionRoutes, SessionStatus } from "@/types/booking/booking.type";
+import { HttpMethod } from "@/types/constants/httpMethod";
 import { GenericResponse, PaginatedGeneric } from "@/types/generic/genericResponse";
 import { IBuyPackageRequest, IBuyPackageResponse, IMyPackges } from "@/types/package/package.type";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createThunk } from "../genericCreateThunk";
 
 const BOOKING_PATH = "booking";
 const SESSION_PATH = "session";
 const POLICY_PATH = "policy";
+
+interface InstructorInfo {
+  [key: string]: unknown;
+}
+
+interface NoviceDriverInfo {
+  [key: string]: unknown;
+}
 
 export interface IUserInfo {
   userId: string;
@@ -20,8 +26,8 @@ export interface IUserInfo {
   fullName: string;
   birthDate: string;
   role: number;
-  instructor: any | null;
-  noviceDriver: any | null;
+  instructor: InstructorInfo | null;
+  noviceDriver: NoviceDriverInfo | null;
 }
 export interface IInstructorSchedule {
   startTime: string;
@@ -229,7 +235,10 @@ export const addSessionLog = createAsyncThunk<
       console.log("✅ Session log added successfully:", response.data);
       return response.data;
     } catch (err) {
-      const error = err as any;
+      const error = err as unknown as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
       console.error("❌ API Error:", error.response?.data || error.message);
       const message = error.response?.data?.message || "Không thể thêm log";
       return rejectWithValue(message);
@@ -265,7 +274,10 @@ export const cancelSession = createAsyncThunk<
       );
       return response.data;
     } catch (err) {
-      const error = err as any;
+      const error = err as unknown as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
       console.error("❌ API Error:", error.response?.data || error.message);
       const message = error.response?.data?.message || "Không thể hủy buổi tập";
       return rejectWithValue(message);
@@ -291,7 +303,10 @@ export const rescheduleSession = createAsyncThunk<
       console.log("✅ Session rescheduled successfully:", response.data);
       return response.data;
     } catch (err) {
-      const error = err as any;
+      const error = err as unknown as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
       console.error("❌ API Error:", error.response?.data || error.message);
       const message = error.response?.data?.message || "Không thể đổi lịch buổi tập";
       return rejectWithValue(message);
@@ -320,7 +335,10 @@ export const submitFeedback = createAsyncThunk<
       console.log("✅ Feedback submitted successfully:", response.data);
       return response.data;
     } catch (err) {
-      const error = err as any;
+      const error = err as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
       console.error("❌ API Error:", error.response?.data || error.message);
       const message = error.response?.data?.message || "Không thể gửi phản hồi";
       return rejectWithValue(message);

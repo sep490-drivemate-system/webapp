@@ -8,7 +8,7 @@ import {
   useState,
   useRef,
 } from "react";
-import { Trash2, Plus, Upload } from "lucide-react";
+import { Trash2, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -78,6 +78,7 @@ function SquareImageUpload({
       {label && <Label className="text-foreground">{label}</Label>}
       {preview ? (
         <div className="aspect-square w-full max-w-xs rounded-lg border-2 border-border bg-secondary">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={preview || "/placeholder.svg"}
             alt={label || "Preview"}

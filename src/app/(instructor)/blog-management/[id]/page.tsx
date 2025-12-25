@@ -46,12 +46,7 @@ export default function BlogDetailPage() {
   }, [postId, fetchBlogDetail]);
 
   const post = blogDetail;
-  const contentHtml =
-    post?.content ||
-    (Array.isArray((post as any)?.contents)
-      ? (post as any)?.contents.join("")
-      : undefined) ||
-    "<p>Chưa có nội dung.</p>";
+  const contentHtml = post?.content || "<p>Chưa có nội dung.</p>";
 
   const headerActions = (
     <Link href="/blog-management">

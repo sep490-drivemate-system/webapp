@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
   ChevronRight,
@@ -10,16 +8,12 @@ import {
   Plus,
   Search,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { BlogCard } from "@/components/blogs/blog-card";
 import PageHeader from "@/components/commons/Header/header";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -28,12 +22,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BlogCard } from "@/components/blogs/blog-card";
-import { Badge } from "@/components/ui/badge";
-import { useAppDispatch, useAppSelector } from "@/lib/redux/useAppDispatch";
 import { getListBlogsForInstructor } from "@/features/blog/blogThunk";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/useAppDispatch";
+import { BLOG_STATUS_LABELS, BlogStatus } from "@/types/blog/blog.enum";
 import { BlogForInstructor } from "@/types/blog/blog.type";
-import { BlogStatus, BLOG_STATUS_LABELS } from "@/types/blog/blog.enum";
 
 export default function BlogsInstructorManagementPage() {
   const router = useRouter();
@@ -241,27 +233,5 @@ export default function BlogsInstructorManagementPage() {
         </div>
       </section>
     </div>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  accent,
-}: {
-  label: string;
-  value: number;
-  accent?: string;
-}) {
-  return (
-    <Card className="border-none bg-white shadow-inner">
-      <CardHeader className="space-y-1 pb-2">
-        <CardDescription className="text-xs uppercase tracking-wide">
-          {label}
-        </CardDescription>
-        <CardTitle className={`text-2xl ${accent ?? ""}`}>{value}</CardTitle>
-      </CardHeader>
-      <CardContent />
-    </Card>
   );
 }

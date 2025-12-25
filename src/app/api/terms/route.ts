@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     terms.push(newTerm);
     return NextResponse.json(newTerm, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Lỗi khi tạo điều khoản" },
       { status: 500 }
@@ -125,7 +125,7 @@ export async function PUT(request: NextRequest) {
     };
 
     return NextResponse.json(terms[index]);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Lỗi khi cập nhật điều khoản" },
       { status: 500 }
@@ -156,7 +156,7 @@ export async function DELETE(request: NextRequest) {
 
     terms = terms.filter((t) => t.id !== id);
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Lỗi khi xóa điều khoản" },
       { status: 500 }

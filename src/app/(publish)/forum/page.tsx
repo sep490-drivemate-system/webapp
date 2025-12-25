@@ -95,7 +95,7 @@ export default function ForumPage() {
         new Date(b.lastModifiedAt || b.createdAt).getTime() -
         new Date(a.lastModifiedAt || a.createdAt).getTime()
     );
-  }, [filteredPosts, searchQuery, selectedCategory]);
+  }, [filteredPosts, searchQuery]);
 
   return (
     <div className="min-h-screen bg-gray-50 mt-16">

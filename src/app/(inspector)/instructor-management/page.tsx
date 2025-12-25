@@ -182,7 +182,7 @@ export default function ManagementInstructorPage() {
       }
     };
     fetchInstructorApplications();
-  }, []);
+  }, [runGetAllInstructorApplications]);
 
   const goToFirstPage = () => setCurrentPage(1);
   const goToLastPage = () => setCurrentPage(totalPages);
@@ -794,6 +794,7 @@ function ImageTile({ label, src }: { label: string; src: string | null }) {
         {label}
       </Label>
       {src ? (
+        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={src}
           alt={label}

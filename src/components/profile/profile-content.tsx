@@ -1,52 +1,45 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  CreditCard,
-  Clock,
-  Car,
-  Award,
-  Bell,
-  Lock,
-  Eye,
-  EyeOff,
-  Camera,
-  Check,
-  Wallet,
-  Package,
-  ArrowUpRight,
-  ArrowDownLeft,
-  Plus,
-  RefreshCw,
-  BarChart3,
-  X,
-  Edit,
-  AlertCircle,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { updateNoviceDriverLicense } from "@/features/document/documentThunk";
+import { editUser } from "@/features/user/userThunk";
+import { useAppDispatch } from "@/lib/redux/useAppDispatch";
 import {
-  IPackagePurchase,
-  IUserWallet,
-  IUserSettings,
-  IUserInfo,
   EditUserPayload,
+  IPackagePurchase,
+  IUserInfo,
+  IUserSettings,
+  IUserWallet,
 } from "@/types/user/user-profile.type";
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  Award,
+  BarChart3,
+  Bell,
+  Calendar,
+  Car,
+  Clock,
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  Package,
+  Phone,
+  Plus,
+  RefreshCw,
+  User,
+  Wallet
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import ProfileContentPersonal from "./profile-content-personal";
 import ProfileContentTransaction from "./profile-content-transaction";
-import { useAppDispatch } from "@/lib/redux/useAppDispatch";
-import { editUser } from "@/features/user/userThunk";
-import { updateNoviceDriverLicense } from "@/features/document/documentThunk";
 
 type TabType =
   | "info"

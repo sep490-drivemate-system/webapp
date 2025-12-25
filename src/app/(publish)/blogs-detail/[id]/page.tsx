@@ -10,6 +10,8 @@ import { useAppDispatch, useAppSelector } from "@/lib/redux/useAppDispatch";
 import { getBlogDetailForAllRoles } from "@/features/blog/blogThunk";
 import { getUserById } from "@/features/user/userThunk";
 import type { IUserInfo } from "@/types/user/user-profile.type";
+import type { GenericResponse } from "@/types/generic/genericResponse";
+import type { BlogDetail, BlogForInstructorDetail } from "@/types/blog/blog.type";
 
 export default function BlogDetailPage() {
   const params = useParams();
@@ -39,7 +41,8 @@ export default function BlogDetailPage() {
     dispatch(getUserById({ id: blogDetail.instructorId }))
       .unwrap()
       .then((response) => {
-        const user = (response as any)?.value as IUserInfo | undefined;
+        const userResponse = response as GenericResponse<IUserInfo>;
+        const user = userResponse?.value;
         if (!user) return;
 
         setAuthor({
@@ -55,18 +58,28 @@ export default function BlogDetailPage() {
   const blog = useMemo(() => {
     if (!blogDetail) return null;
 
-    // Nội dung thực tế nằm trong BlogDetail.content.content (ContentItem)
+
+    // Handle both BlogDetail and BlogForInstructorDetail types, and nested content structure
+    type BlogDetailWithNestedContent = BlogDetail | BlogForInstructorDetail | {
+      content?: string | { content?: string };
+      createdAt?: string;
+      publishedAt?: string;
+    };
+    
+    const detail = blogDetail as BlogDetailWithNestedContent;
     const rawContent =
-      (blogDetail as any).content?.content ??
-      (typeof (blogDetail as any).content === "string"
-        ? (blogDetail as any).content
-        : "") ??
-      "";
+      (typeof detail.content === "object" && detail.content !== null && "content" in detail.content
+        ? detail.content.content
+        : typeof detail.content === "string"
+        ? detail.content
+        : "") ?? "";
 
     const publishedAt =
-      (blogDetail as any).createdAt ??
-      (blogDetail as any).publishedAt ??
-      undefined;
+      "createdAt" in detail && detail.createdAt
+        ? detail.createdAt
+        : "publishedAt" in detail && detail.publishedAt
+        ? detail.publishedAt
+        : undefined;
 
     return {
       id: blogDetail.id,

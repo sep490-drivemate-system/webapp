@@ -62,10 +62,9 @@ const getVehicleStatusLabel = (status: CarStatus) => {
 interface VehicleCardProps {
   vehicle: ICar;
   onDetail: () => void;
-  onDelete: () => void;
 }
 
-function VehicleCard({ vehicle, onDetail, onDelete }: VehicleCardProps) {
+function VehicleCard({ vehicle, onDetail }: VehicleCardProps) {
   const [imageError, setImageError] = useState(false);
 
   return (
@@ -88,6 +87,7 @@ function VehicleCard({ vehicle, onDetail, onDelete }: VehicleCardProps) {
           </Badge>
         </div>
         {vehicle.thumbnailUrl && !imageError ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={vehicle.thumbnailUrl}
             alt={`${vehicle.brand} ${vehicle.modelName}`}
@@ -224,10 +224,6 @@ export default function CarManagementPage() {
   const [deleteVehicleId, setDeleteVehicleId] = useState<string | null>(null);
   const { run: fetchCarsForInstructor, loading: fetchCarsLoading } =
     useThunkAction(getCarsForInstructor);
-
-  const handleDelete = (id: string) => {
-    setDeleteVehicleId(id);
-  };
 
   const confirmDelete = () => {
     if (deleteVehicleId) {
@@ -414,7 +410,6 @@ export default function CarManagementPage() {
                   setSelectedVehicle(vehicle);
                   setShowDetailModal(true);
                 }}
-                onDelete={() => handleDelete(vehicle.id)}
               />
             ))}
           </div>

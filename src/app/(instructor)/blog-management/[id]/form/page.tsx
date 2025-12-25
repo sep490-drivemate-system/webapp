@@ -16,7 +16,8 @@ import {
   getBlogCategories,
   updateBlogForInstructor,
 } from "@/features/blog/blogThunk";
-import { BlogCategory } from "@/types/blog/blog.type";
+import { BlogCategory, BlogForInstructorDetail } from "@/types/blog/blog.type";
+import { GenericResponse } from "@/types/generic/genericResponse";
 import { toast } from "sonner";
 
 export default function BlogFormPage() {
@@ -40,14 +41,9 @@ export default function BlogFormPage() {
   useEffect(() => {
     fetchCategories(undefined, {
       onSuccess: (response) => {
-        const result = response as any;
-        const data = result?.value ?? result;
-        const successFlag =
-          typeof result?.success === "boolean"
-            ? result.success
-            : typeof result?.isSuccess === "boolean"
-              ? result.isSuccess
-              : true;
+        const result = response as GenericResponse<BlogCategory[]>;
+        const data = result?.value ?? [];
+        const successFlag = result?.success ?? true;
 
         if (successFlag && Array.isArray(data)) {
           setCategories(data);
@@ -70,8 +66,8 @@ export default function BlogFormPage() {
       { id: postId as string },
       {
         onSuccess: (response) => {
-          const result = response as any;
-          const data = result?.value ?? result;
+          const result = response as GenericResponse<BlogForInstructorDetail>;
+          const data = result?.value;
 
           if (!data) {
             setNotFound(true);
@@ -82,10 +78,7 @@ export default function BlogFormPage() {
             return;
           }
 
-          const contentHtml =
-            (data as any)?.content && typeof (data as any).content === "string"
-              ? (data as any).content
-              : "";
+          const contentHtml = typeof data.content === "string" ? data.content : "";
 
           const adaptedPost: MockBlogPost = {
             id: data.id,
@@ -146,29 +139,23 @@ export default function BlogFormPage() {
       };
 
       const response = isEditMode
-        ? ((await updateBlog(
-            {
-              id: postId as string,
-              ...payload,
-            },
-          )) as any)
-        : ((await createBlog(payload)) as any);
+        ? (await updateBlog({
+            id: postId as string,
+            ...payload,
+          }))
+        : (await createBlog(payload));
 
-      const successFlag =
-        typeof response?.success === "boolean"
-          ? response.success
-          : typeof response?.isSuccess === "boolean"
-            ? response.isSuccess
-            : true;
+      const result = response as GenericResponse<BlogForInstructorDetail>;
+      const successFlag = result?.success ?? true;
 
       if (!successFlag) {
         throw new Error(
-          response?.message || "Không thể tạo bài viết. Vui lòng thử lại."
+          result?.message || "Không thể tạo bài viết. Vui lòng thử lại."
         );
       }
 
       toast.success(
-        response?.message ||
+        result?.message ||
           (isEditMode
             ? "Cập nhật bài viết thành công."
             : "Tạo bài viết thành công.")
@@ -176,7 +163,9 @@ export default function BlogFormPage() {
       router.push(isEditMode ? backHref : "/blog-management");
     } catch (error) {
       const message =
-        (error as any)?.message || "Không thể tạo bài viết. Vui lòng thử lại.";
+        error instanceof Error
+          ? error.message
+          : "Không thể tạo bài viết. Vui lòng thử lại.";
       toast.error(message);
     }
   };

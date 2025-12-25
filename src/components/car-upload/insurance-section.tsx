@@ -5,9 +5,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import ImageUploadField from "../commons/image-upload-field";
 
+interface InsuranceData {
+  frontImage?: File | string | null;
+  backImage?: File | string | null;
+  expiryDate?: string;
+  [key: string]: File | string | null | undefined;
+}
+
 interface InsuranceSectionProps {
-  data: any;
-  onUpdate: (data: any) => void;
+  data: InsuranceData;
+  onUpdate: (data: InsuranceData) => void;
 }
 
 export default function InsuranceSection({

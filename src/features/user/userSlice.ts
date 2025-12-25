@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { BaseState } from "@/types/generic/baseState";
 
-export interface UserState extends BaseState {
-}
+export type UserState = BaseState;
 
 const initialState: UserState = {
     isLoading: false,

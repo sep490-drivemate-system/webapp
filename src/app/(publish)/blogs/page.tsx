@@ -116,12 +116,8 @@ export default function BlogsPage() {
     const normalizedSearch = searchQuery.trim().toLowerCase();
     if (normalizedSearch) {
       result = result.filter((blog) => {
-        const rawContent =
-          (blog as any).content ??
-          ((blog as any).contents?.join(" ") as string | undefined) ??
-          blog.categoryName ??
-          "";
-        const haystack = `${blog.title} ${stripHtmlTags(rawContent)}`.toLowerCase();
+        // Blog type doesn't have content field, so we only search by title and category
+        const haystack = `${blog.title} ${blog.categoryName || ""}`.toLowerCase();
         return haystack.includes(normalizedSearch);
       });
     }
@@ -148,11 +144,8 @@ export default function BlogsPage() {
     () =>
       paginatedBlogs.map((blog: Blog) => {
         const authorInfo = authors[blog.instructorId];
-        const rawContent =
-          (blog as any).content ??
-          ((blog as any).contents?.join(" ") as string | undefined) ??
-          blog.categoryName ??
-          "";
+        // Blog type doesn't have content field, use categoryName as fallback
+        const rawContent = blog.categoryName || "";
 
         return {
           id: blog.id,

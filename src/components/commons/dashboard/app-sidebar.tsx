@@ -19,7 +19,6 @@ import { useAppSelector } from "@/lib/redux/useAppDispatch";
 import { UserRole } from "@/types/auth/user-role.enum";
 import {
   IconArticle,
-  IconBell,
   IconCalendar,
   IconCamera,
   IconCar,
@@ -28,17 +27,12 @@ import {
   IconFile,
   IconFileAi,
   IconFileDescription,
-  IconHistory,
   IconKey,
   IconMessageCircle,
   IconNavigation,
-  IconNews,
   IconPackage,
-  IconSettings,
-  IconTextCaption,
   IconUserCog,
   IconUsersGroup,
-  IconWorld,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import * as React from "react";

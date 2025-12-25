@@ -171,6 +171,7 @@ export function InstructorStep5Documents({ onNext, onBack, loading = false }: In
                                     <div className="relative">
                                         {doc.frontImage ? (
                                             <div className="relative">
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                                 <img
                                                     src={doc.frontImage}
                                                     alt={`${doc.name} mặt trước`}
@@ -207,6 +208,7 @@ export function InstructorStep5Documents({ onNext, onBack, loading = false }: In
                                         <div className="relative">
                                             {doc.backImage ? (
                                                 <div className="relative">
+                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                                     <img
                                                         src={doc.backImage}
                                                         alt={`${doc.name} mặt sau`}

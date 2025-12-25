@@ -42,7 +42,6 @@ import type {
 import type { TestDto } from "@/types/test";
 import type {
   InstructorRegistrationRequest,
-  InstructorRegistrationResponse,
 } from "@/types/auth/instructor-registration.type";
 
 export const signUpInstructor = createThunk<
@@ -61,11 +60,11 @@ export const signUpInstructor = createThunk<
     form.append("vehiclePapers", payload.vehiclePapers);
     form.append("vehicleInsurance", payload.vehicleInsurance);
 
-    return { data: form } as any;
+    return { data: form };
   },
 });
 
-export const test = createThunk<any, TestDto>(
+export const test = createThunk<unknown, TestDto>(
   HttpMethod.POST,
   `test`,
   `api/auth/test-form`,
@@ -80,7 +79,7 @@ export const test = createThunk<any, TestDto>(
         payload.testccdmas.formFilecccdms
       );
 
-      return { data: form } as any;
+      return { data: form };
     },
   }
 );

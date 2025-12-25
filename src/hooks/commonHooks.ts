@@ -1,9 +1,6 @@
 "use client";
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormSchema, validateField, validateForm } from "@/schemas/schema";
-import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/lib/redux/store";
-import { useAppSelector } from "@/lib/redux/useAppDispatch";
 
 // useLocalStorage
 type SetValue<T> = Dispatch<SetStateAction<T>>;
@@ -83,6 +80,7 @@ export function useAsync<T>(fn: () => Promise<T>, deps: unknown[] = []) {
         } catch (err) {
             if (mountedRef.current) setState({ data: null, loading: false, error: err });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, deps);
 
     useEffect(() => {
@@ -109,6 +107,7 @@ export function useValidation() {
                 return false;
             }
             setErrors((prev) => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const { [field]: _, ...rest } = prev;
                 return rest;
             });
@@ -128,6 +127,7 @@ export function useValidation() {
     const clearError = useCallback((field?: keyof FormSchema) => {
         setErrors((prev) => {
             if (!field) return {};
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [field]: _, ...rest } = prev;
             return rest;
         });

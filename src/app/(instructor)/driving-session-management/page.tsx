@@ -32,7 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { useAppDispatch, useAppSelector } from "@/lib/redux/useAppDispatch";
+import { useAppSelector } from "@/lib/redux/useAppDispatch";
 import { getAllSessions } from "@/features/booking/bookingThunk";
 import { IBookingSession, SessionStatus } from "@/types/booking/booking.type";
 import { useThunkAction } from "@/lib/redux/useThunkAction";
@@ -110,7 +110,6 @@ const convertSessionToUIFormat = (session: IBookingSession): UISession => {
 };
 
 export default function DrivingSessionManagementPage() {
-  const dispatch = useAppDispatch();
   const { allSessions, isLoading, errorMessage } = useAppSelector(
     (state) => state.booking
   );
@@ -134,7 +133,7 @@ export default function DrivingSessionManagementPage() {
       console.log("getAllSessions", result.data?.value ?? []);
     };
     getAllSessions();
-  }, [selectedTab]);
+  }, [selectedTab, runGetAllSessions]);
 
   const filteredSessions = useMemo(() => {
     const convertedSessions = allSessions.map(convertSessionToUIFormat);
@@ -224,6 +223,7 @@ export default function DrivingSessionManagementPage() {
       }
       return dateString;
     } catch (error) {
+      console.error("formatDate error", error);
       return dateString;
     }
   };

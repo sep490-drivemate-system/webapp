@@ -177,7 +177,7 @@ function createEditUserFormData(payload: EditUserPayload): FormData {
                 uri: uri,
                 type: mimeType,
                 name: `avatar.${extension}`,
-            } as any);
+            } as unknown as File);
         } else {
             formData.append("ProfileAvatar", payload.ProfileAvatar);
         }

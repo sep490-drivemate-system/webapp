@@ -14,11 +14,44 @@ import { getUserInfo } from "@/lib/jwt/jwt.utils";
 import { ICarRegistrationRequest } from "@/types/car/car.type";
 import { getManufacturers } from "@/features/car/carThunk";
 
+interface RegistrationData {
+  licensePlate?: string;
+  brand?: string;
+  brandId?: string;
+  color?: string;
+  seats?: number;
+  fuelType?: string;
+  model?: string;
+  carType?: string;
+  year?: number;
+  licenseTier?: string;
+  description?: string;
+}
+
+interface InspectionData {
+  frontImage?: File | string;
+  backImage?: File | string;
+}
+
+interface InsuranceData {
+  frontImage?: File | string;
+  backImage?: File | string;
+  expiryDate?: string;
+}
+
+interface VerificationData {
+  frontImage?: File | string;
+  backImage?: File | string;
+  leftSideImage?: File | string;
+  rightSideImage?: File | string;
+  interiorImage?: File | string;
+}
+
 interface FormData {
-  registration: any;
-  inspection: any;
-  insurance: any;
-  verification: any;
+  registration: RegistrationData;
+  inspection: InspectionData;
+  insurance: InsuranceData;
+  verification: VerificationData;
   rentalPrice: string;
 }
 
@@ -56,7 +89,10 @@ export default function DocumentForm({
     fetchManufacturers();
   }, [dispatch]);
 
-  const handleSectionUpdate = (section: string, data: any) => {
+  const handleSectionUpdate = (
+    section: string,
+    data: RegistrationData | InspectionData | InsuranceData | VerificationData
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [section]: data,
@@ -164,19 +200,26 @@ export default function DocumentForm({
       };
       const fuelType = fuelTypeMap[formData.registration.fuelType] || formData.registration.fuelType;
 
+      // Helper function to extract File from File | string | undefined
+      const getFile = (value: File | string | undefined): File | null => {
+        if (!value) return null;
+        if (value instanceof File) return value;
+        return null; // Ignore string values (legacy base64)
+      };
+
       // Prepare registration request data
       const registrationData: ICarRegistrationRequest = {
         InstructorId: userInfo.id,
         Description: formData.registration.description || "",
         HourlyPrice: parseFloat(formData.rentalPrice),
-        ThumbnailImage: formData.verification.frontImage || null,
-        CarFrontImage: formData.verification.frontImage || null,
-        CarBackImage: formData.verification.backImage || null,
-        CarLeftImage: formData.verification.leftSideImage || null,
-        CarRightImage: formData.verification.rightSideImage || null,
-        InteriorImage: formData.verification.interiorImage || null,
-        RegistrationFront: formData.inspection.frontImage || null,
-        RegistrationBack: formData.inspection.backImage || null,
+        ThumbnailImage: getFile(formData.verification.frontImage),
+        CarFrontImage: getFile(formData.verification.frontImage),
+        CarBackImage: getFile(formData.verification.backImage),
+        CarLeftImage: getFile(formData.verification.leftSideImage),
+        CarRightImage: getFile(formData.verification.rightSideImage),
+        InteriorImage: getFile(formData.verification.interiorImage),
+        RegistrationFront: getFile(formData.inspection.frontImage),
+        RegistrationBack: getFile(formData.inspection.backImage),
         LicenseTier: formData.registration.licenseTier,
         LicensePlate: formData.registration.licensePlate,
         BrandId: brandId,
@@ -186,8 +229,8 @@ export default function DocumentForm({
         Color: formData.registration.color,
         Seats: formData.registration.seats,
         FuelType: fuelType,
-        InsuranceFront: formData.insurance.frontImage || null,
-        InsuranceBack: formData.insurance.backImage || null,
+        InsuranceFront: getFile(formData.insurance.frontImage),
+        InsuranceBack: getFile(formData.insurance.backImage),
         InsuranceEndTime: formData.insurance.expiryDate || undefined,
       };
 

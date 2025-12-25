@@ -1,9 +1,9 @@
 "use client";
 
-import { MapView, MapViewExample } from "@/components/ui/map-view";
+import { MapView } from "@/components/ui/map-view";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MapPin, Car, Users, Calendar } from "lucide-react";
+import { Car, Users, Calendar } from "lucide-react";
 
 // Mock data for different types of locations
 const carLocations = [
@@ -78,8 +78,18 @@ const bookingLocations = [
   }
 ];
 
+interface Location {
+  id: string;
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  type: "car" | "instructor" | "booking";
+  status: "active" | "inactive";
+}
+
 export default function MapDemoPage() {
-  const handleLocationSelect = (location: any) => {
+  const handleLocationSelect = (location: Location) => {
     console.log("Selected location:", location);
     // Here you can implement your logic for handling location selection
     // For example: navigate to detail page, show modal, etc.

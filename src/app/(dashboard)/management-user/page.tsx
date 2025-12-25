@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -27,6 +27,7 @@ import { Gender } from "@/types/user/gender.enum";
 import { UserManagement } from "@/types/user/user-profile.type";
 import { AccountStatus } from "@/types/user/status.enum";
 import { useDebouncedValue } from "@/hooks/commonHooks";
+import { PaginatedGeneric } from "@/types/generic/genericResponse";
 
 export default function ManagementUserPage() {
   const dispatch = useAppDispatch();
@@ -55,16 +56,24 @@ export default function ManagementUserPage() {
 
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
 
-  const fetchUsers = async (searchKey?: string) => {
+  const fetchUsers = useCallback(async (searchKey?: string) => {
     try {
       const payload = searchKey && searchKey.trim() 
         ? { searchKey: searchKey.trim() } 
         : undefined;
-      const res: any = await dispatch(getAllUser(payload)).unwrap();
-      const apiUsers =
-        res?.value?.pageContent || res?.value || res || [];
+      const res = await dispatch(getAllUser(payload)).unwrap();
+      let apiUsers: UserManagement[] = [];
+      
+      if (res?.value) {
+        if (Array.isArray(res.value)) {
+          apiUsers = res.value;
+        } else {
+          const paginated = res.value as unknown as PaginatedGeneric<UserManagement>;
+          apiUsers = paginated?.pageContent || [];
+        }
+      }
 
-      const mappedUsers: UserManagement[] = apiUsers.map((u: any) => ({
+      const mappedUsers: UserManagement[] = apiUsers.map((u: UserManagement) => ({
         userId: u.userId,
         fullName: u.fullName || "",
         email: u.email || "",
@@ -77,18 +86,15 @@ export default function ManagementUserPage() {
         noviceDriver: u.noviceDriver || null,
         accountStatus: u.accountStatus ?? AccountStatus.Normal,
       }));
-
-      console.log(mappedUsers)
-
       setUsers(mappedUsers);
     } catch (error) {
       console.error("Fetch users failed:", error);
     }
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     fetchUsers(debouncedSearchTerm);
-  }, [debouncedSearchTerm]);
+  }, [debouncedSearchTerm, fetchUsers]);
 
   const filteredUsers = users.filter((user) => {
     if (user.role === UserRole.Admin) {
@@ -143,9 +149,9 @@ export default function ManagementUserPage() {
 
       setIsCreateDialogOpen(false);
       resetForm();
-    } catch (err: any) {
+    } catch (err) {
       setErrors({
-        email: err?.message || "Tạo người dùng thất bại",
+        email: err instanceof Error ? err.message : "Tạo người dùng thất bại",
       });
     }
   };
@@ -196,7 +202,7 @@ export default function ManagementUserPage() {
       setIsBanDialogOpen(false);
       setBanningUser(null);
       setBanReason("");
-    } catch (err: any) {
+    } catch (err) {
       console.error("Ban/Unban user failed:", err);
     }
   };

@@ -1,20 +1,27 @@
 "use client";
 
-import { useMemo } from "react";
-import {
-  Search,
-  Loader2,
-  Filter,
-  User,
-  Wallet,
-  MoreHorizontal,
-  Eye,
-  Banknote,
-} from "lucide-react";
-import Image from "next/image";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PaginationControls } from "@/components/commons/pagination-controls";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -30,33 +37,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PaymentStatus } from "@/types/payment/payment.type";
-import { UserRole } from "@/types/auth/user-role.enum";
 import { useRequireAuth } from "@/hooks/auth/useRequireAuth";
 import { usePayment } from "@/hooks/payment/usePayment";
-import { PaginationControls } from "@/components/commons/pagination-controls";
-import { WithdrawStatus, BankType } from "@/types/withdrawal/withdrawal.type";
+import { UserRole } from "@/types/auth/user-role.enum";
+import { PaymentStatus } from "@/types/payment/payment.type";
 import { Transactions } from "@/types/transaction/transaction.filter.type";
 import { TransactionStatus } from "@/types/transaction/transaction.type";
+import { BankType, WithdrawStatus } from "@/types/withdrawal/withdrawal.type";
+import {
+  Banknote,
+  Eye,
+  Filter,
+  Loader2,
+  MoreHorizontal,
+  Search,
+  User,
+  Wallet,
+} from "lucide-react";
 
 export default function PaymentManagementPage() {
   useRequireAuth([UserRole.Admin]);
@@ -93,6 +91,10 @@ export default function PaymentManagementPage() {
   } = usePayment();
 
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("vi-VN").format(amount);
+  };
+
   const getTypeLabel = (type?: string) => {
     switch (type) {
       case "deposit":
@@ -107,11 +109,6 @@ export default function PaymentManagementPage() {
         return "Giao dịch";
     }
   };
-
-
-  function formatCurrency(arg0: number): import("react").ReactNode {
-    throw new Error("Function not implemented.");
-  }
 
   return (
     <div className="space-y-6">
@@ -208,10 +205,6 @@ export default function PaymentManagementPage() {
               <TableBody>
                 {transactions.map((transaction: Transactions, index: number) => {
                   const statusBadge = getStatusBadge(transaction.status as unknown as PaymentStatus);
-
-                  function formatCurrency(transactionValue: number): import("react").ReactNode {
-                    throw new Error("Function not implemented.");
-                  }
 
                   return (
                     <TableRow key={transaction.id}>

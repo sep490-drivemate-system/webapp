@@ -80,6 +80,7 @@ export default function PracticeTestPage() {
             });
         }, 1000);
         return () => clearInterval(timer);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isTestStarted]);
 
     const handleStartTest = (licenseType: LicenseType) => {

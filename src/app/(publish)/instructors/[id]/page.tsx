@@ -9,7 +9,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CarDetailDialog } from "@/components/car/car-detail-dialog";
 import {
   Star,
-  Calendar as CalendarIcon,
   Award,
   CheckCircle,
   User,
@@ -74,7 +73,7 @@ export default function InstructorDetailPage() {
         } else {
           setError("Không tìm thấy người hướng dẫn");
         }
-      } catch (err) {
+      } catch {
         setError("Không thể tải thông tin người hướng dẫn. Vui lòng thử lại.");
       } finally {
         setLoading(false);
@@ -99,7 +98,7 @@ export default function InstructorDetailPage() {
         } else {
           setPackages([]);
         }
-      } catch (err) {
+      } catch {
         setPackagesError("Không thể tải gói dịch vụ. Vui lòng thử lại.");
       } finally {
         setPackagesLoading(false);
@@ -160,20 +159,12 @@ export default function InstructorDetailPage() {
     }).format(price);
   };
 
-  const calculateTotalPrice = () => {
-    return 0;
-  };
-
   const getInitials = (name: string) => {
     return name
       .split(" ")
       .map((n) => n[0])
       .join("")
       .toUpperCase();
-  };
-
-  const handleBuyPackage = (pkg: IInstructorPackages) => {
-    console.log("Buy package", pkg.id);
   };
 
   const loadCarDetail = (carId: string) => {
@@ -218,12 +209,6 @@ export default function InstructorDetailPage() {
         }`}
       />
     ));
-  };
-
-  const getExperienceLevel = (years: number) => {
-    if (years <= 5) return "Mới vào nghề";
-    if (years <= 10) return "Có kinh nghiệm";
-    return "Chuyên gia";
   };
 
   const getCarCount = () => {
@@ -532,6 +517,7 @@ export default function InstructorDetailPage() {
                       className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
                     >
                       <div className="relative h-48 w-full">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={car.thumbnailUrl}
                           alt={car.modelName}

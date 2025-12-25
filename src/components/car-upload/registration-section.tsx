@@ -13,10 +13,27 @@ import {
 
 import { IBrandCar } from "@/types/car/car.type";
 
+interface RegistrationData {
+  licensePlate?: string;
+  brandId?: string;
+  brand?: string;
+  color?: string;
+  seats?: number;
+  fuelType?: string;
+  model?: string;
+  carType?: string;
+  year?: number;
+  licenseTier?: string;
+  description?: string;
+  frontImage?: File | string | null;
+  backImage?: File | string | null;
+  [key: string]: string | number | File | null | undefined;
+}
+
 interface RegistrationSectionProps {
-  data: any;
+  data: RegistrationData;
   rentalPrice: string;
-  onUpdate: (data: any) => void;
+  onUpdate: (data: RegistrationData) => void;
   onPriceUpdate: (price: string) => void;
   manufacturers?: IBrandCar[];
 }

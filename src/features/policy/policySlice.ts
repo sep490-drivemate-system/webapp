@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { BaseState } from '@/types/generic/baseState';
 import { IPolicy, Policy } from '@/types/policy';
 import { getNewDriverPolicy, getInstructorPolicy, createPolicy, updatePolicy, deletePolicy } from './policyThunk';
@@ -40,7 +40,7 @@ const policySlice = createSlice({
             .addCase(getNewDriverPolicy.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                const response = action.payload as any;
+                const response = action.payload as { value?: IPolicy[] } | unknown;
                 
                 const policies: IPolicy[] = response?.value;
                 
@@ -64,7 +64,7 @@ const policySlice = createSlice({
             .addCase(getInstructorPolicy.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                const response = action.payload as any;
+                const response = action.payload as { value?: IPolicy[] } | unknown;
                 
                 const policies: IPolicy[] = response?.value;
                 
@@ -88,7 +88,7 @@ const policySlice = createSlice({
             .addCase(createPolicy.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                const response = action.payload as any;
+                const response = action.payload as { value?: Policy } | unknown;
                 const policy: Policy = response?.value;
                 
                 if (policy) {
@@ -120,7 +120,7 @@ const policySlice = createSlice({
             .addCase(updatePolicy.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                const response = action.payload as any;
+                const response = action.payload as { value?: Policy } | unknown;
                 const updatedPolicy: Policy = response?.value;
                 
                 if (updatedPolicy) {

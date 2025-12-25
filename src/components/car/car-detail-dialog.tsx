@@ -182,6 +182,7 @@ export function CarDetailDialog({
             <div className="grid grid-cols-1 gap-6">
               <div className="relative aspect-video overflow-hidden rounded-xl bg-slate-100 ring-1 ring-slate-200 shadow-sm">
                 {car.thumbnailUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={car.thumbnailUrl}
                     alt={car.modelName}
@@ -284,6 +285,7 @@ export function CarDetailDialog({
                         className="relative aspect-video overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200 shadow-sm"
                       >
                         {img ? (
+                          // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={img}
                             alt={`Ảnh xe ${index + 1}`}

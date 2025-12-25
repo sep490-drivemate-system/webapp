@@ -13,7 +13,7 @@ interface DocumentRecord {
   typeName: string;
   userId: string;
   status: "pending" | "verified" | "rejected";
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   updatedAt: string;
 }
 

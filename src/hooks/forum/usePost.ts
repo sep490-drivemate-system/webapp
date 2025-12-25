@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { createPost, getPosts, updatePost, rejectPost } from "@/features/forum/postThunk";
 import { getCategories } from "@/features/taxonomy/category/categoryThunk";
 import { getTags } from "@/features/taxonomy/tag/tagThunk";
@@ -32,13 +32,7 @@ export const useCreatePost = (onSuccess?: () => void) => {
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [tags, setTags] = useState<ITag[]>([]);
 
-  useEffect(() => {
-    if (open) {
-      loadCategoriesAndTags();
-    }
-  }, [open]);
-
-  const loadCategoriesAndTags = async () => {
+  const loadCategoriesAndTags = useCallback(async () => {
     const [categoriesResult, tagsResult] = await Promise.all([
       runGetCategories(undefined, {
         onError: () => {
@@ -59,7 +53,13 @@ export const useCreatePost = (onSuccess?: () => void) => {
     if (tagsResult.ok && tagsResult.data?.value) {
       setTags(tagsResult.data.value);
     }
-  };
+  }, [runGetCategories, runGetTags]);
+
+  useEffect(() => {
+    if (open) {
+      loadCategoriesAndTags();
+    }
+  }, [open, loadCategoriesAndTags]);
 
   // Cleanup preview URLs
   useEffect(() => {
@@ -218,9 +218,10 @@ export const useCreatePost = (onSuccess?: () => void) => {
           toast.error(data?.message || "Không thể tạo bài viết. Vui lòng thử lại.");
         }
       },
-      onError: (error: any) => {
+      onError: (error: unknown) => {
+        const errorMessage = error instanceof Error ? error.message : "Không thể tạo bài viết. Vui lòng thử lại.";
         console.error("Error creating post:", error);
-        toast.error(error?.message || "Không thể tạo bài viết. Vui lòng thử lại.");
+        toast.error(errorMessage);
       },
     });
 
@@ -286,11 +287,7 @@ export const usePostManagement = () => {
   const { runSafe: runUpdatePost, loading: isUpdatingPost } = useThunkAction(updatePost);
   const { runSafe: runRejectPost, loading: isRejectingPost } = useThunkAction(rejectPost);
 
-  useEffect(() => {
-    loadPosts();
-  }, [statusFilter]);
-
-  const loadPosts = async () => {
+  const loadPosts = useCallback(async () => {
     setIsLoading(true);
     try {
       const filter: IPostFilter = {
@@ -316,7 +313,11 @@ export const usePostManagement = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [runGetPosts, statusFilter]);
+
+  useEffect(() => {
+    loadPosts();
+  }, [statusFilter, loadPosts]);
 
   const filteredPosts = useMemo(() => {
     if (!searchTerm) return posts;
@@ -345,8 +346,9 @@ export const usePostManagement = () => {
             toast.success("Bài viết đã được duyệt thành công!");
             loadPosts();
           },
-          onError: (error: any) => {
-            toast.error(error?.message || "Không thể duyệt bài viết. Vui lòng thử lại.");
+          onError: (error: unknown) => {
+            const errorMessage = error instanceof Error ? error.message : "Không thể duyệt bài viết. Vui lòng thử lại.";
+            toast.error(errorMessage);
           },
         }
       );
@@ -355,9 +357,10 @@ export const usePostManagement = () => {
         // Error already handled in onError callback
         return;
       }
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Không thể duyệt bài viết. Vui lòng thử lại.";
       console.error("Error approving post:", error);
-      toast.error(error?.message || "Không thể duyệt bài viết. Vui lòng thử lại.");
+      toast.error(errorMessage);
     } finally {
       setIsUpdating(false);
     }
@@ -387,8 +390,9 @@ export const usePostManagement = () => {
             setSelectedPost(null);
             loadPosts();
           },
-          onError: (error: any) => {
-            toast.error(error?.message || "Không thể từ chối bài viết. Vui lòng thử lại.");
+          onError: (error: unknown) => {
+            const errorMessage = error instanceof Error ? error.message : "Không thể từ chối bài viết. Vui lòng thử lại.";
+            toast.error(errorMessage);
           },
         }
       );
@@ -397,9 +401,10 @@ export const usePostManagement = () => {
         // Error already handled in onError callback
         return;
       }
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Không thể từ chối bài viết. Vui lòng thử lại.";
       console.error("Error rejecting post:", error);
-      toast.error(error?.message || "Không thể từ chối bài viết. Vui lòng thử lại.");
+      toast.error(errorMessage);
     } finally {
       setIsUpdating(false);
     }

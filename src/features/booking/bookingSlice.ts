@@ -109,7 +109,26 @@ const mapStatusStringToEnum = (status: string | number): SessionStatus => {
     }
 };
 
-const transformSessionResponse = (apiSession: any): IBookingSession => {
+interface ApiSessionResponse {
+    id: string;
+    packageName: string;
+    displayStartLocationName: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    duration: number;
+    startingLatitude: number;
+    startingLongtitude: number;
+    displayEndLocationName: string;
+    endingLatitude: number;
+    endingLongtitude: number;
+    carName?: string;
+    vehicleName?: string;
+    status: string | number;
+    createdAt: string;
+}
+
+const transformSessionResponse = (apiSession: ApiSessionResponse): IBookingSession => {
     return {
         id: apiSession.id,
         packageName: apiSession.packageName,
@@ -159,7 +178,7 @@ const bookingSlice = createSlice({
             .addCase(getMyPackages.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                const response = action.payload as any;
+                const response = action.payload as IMyPackgesResponse[] | { value?: IMyPackgesResponse[] } | unknown;
                 state.myPackages = Array.isArray(response) ? response : (response?.value || []);
             })
             .addCase(getMyPackages.rejected, (state, action) => {
@@ -176,7 +195,7 @@ const bookingSlice = createSlice({
             .addCase(getBookingSessions.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                const response = action.payload as any;
+                const response = action.payload as IBookingSession[] | { value?: IBookingSession[] } | unknown;
                 state.bookingSessions = Array.isArray(response) ? response : (response?.value || []);
             })
             .addCase(getBookingSessions.rejected, (state, action) => {
@@ -193,8 +212,12 @@ const bookingSlice = createSlice({
             .addCase(getAllSessions.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                const response = action.payload as any;
-                const sessions = Array.isArray(response) ? response : (response?.value || []);
+                const response = action.payload as ApiSessionResponse[] | { value?: ApiSessionResponse[] } | unknown;
+                const sessions = Array.isArray(response) 
+                    ? response 
+                    : (typeof response === 'object' && response !== null && 'value' in response && Array.isArray((response as { value?: ApiSessionResponse[] }).value))
+                        ? (response as { value: ApiSessionResponse[] }).value
+                        : [];
                 state.allSessions = sessions.map(transformSessionResponse);
             })
             .addCase(getAllSessions.rejected, (state, action) => {
@@ -211,7 +234,7 @@ const bookingSlice = createSlice({
             .addCase(getSessionRoutes.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                const response = action.payload as any;
+                const response = action.payload as ISessionRoutes[] | { value?: ISessionRoutes[] } | unknown;
                 state.sessionRoutes = Array.isArray(response) ? response : (response?.value || []);
             })
             .addCase(getSessionRoutes.rejected, (state, action) => {
@@ -228,7 +251,7 @@ const bookingSlice = createSlice({
             .addCase(getSessionDetail.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                const response = action.payload as any;
+                const response = action.payload as ISessionDetailResponse | { value?: ISessionDetailResponse } | unknown;
                 state.sessionDetail = response?.value || response;
             })
             .addCase(getSessionDetail.rejected, (state, action) => {
@@ -245,7 +268,7 @@ const bookingSlice = createSlice({
             .addCase(getInstructorSchedule.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                const response = action.payload as any;
+                const response = action.payload as IInstructorSchedule[] | { value?: IInstructorSchedule[] } | unknown;
                 state.instructorSchedule = Array.isArray(response) ? response : (response?.value || []);
             })
             .addCase(getInstructorSchedule.rejected, (state, action) => {
@@ -262,7 +285,7 @@ const bookingSlice = createSlice({
             .addCase(getInstructorBookedSessions.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                const response = action.payload as any;
+                const response = action.payload as IInstructorBookedSession[] | { value?: IInstructorBookedSession[] } | unknown;
                 state.instructorBookedSessions = Array.isArray(response) ? response : (response?.value || []);
             })
             .addCase(getInstructorBookedSessions.rejected, (state, action) => {
@@ -279,7 +302,7 @@ const bookingSlice = createSlice({
             .addCase(getPolicies.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                const response = action.payload as any;
+                const response = action.payload as IPolicy[] | { value?: IPolicy[] } | unknown;
                 state.policies = Array.isArray(response) ? response : (response?.value || []);
             })
             .addCase(getPolicies.rejected, (state, action) => {

@@ -347,8 +347,8 @@ export default function IdentificationDocumentManagementPage() {
         fileInputRef.current.value = "";
       }
       await refreshUserData();
-    } catch (err: any) {
-      toast.error(err || "Cập nhật ảnh đại diện thất bại");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Cập nhật ảnh đại diện thất bại");
     } finally {
       setIsUpdating(false);
     }
@@ -383,8 +383,8 @@ export default function IdentificationDocumentManagementPage() {
       setIsPhoneDialogOpen(false);
       setPhoneValue("");
       await refreshUserData();
-    } catch (err: any) {
-      toast.error(err || "Cập nhật số điện thoại thất bại");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Cập nhật số điện thoại thất bại");
     } finally {
       setIsUpdating(false);
     }
@@ -414,8 +414,8 @@ export default function IdentificationDocumentManagementPage() {
       setIsEmergencyNameDialogOpen(false);
       setEmergencyNameValue("");
       await refreshUserData();
-    } catch (err: any) {
-      toast.error(err || "Cập nhật tên người liên hệ thất bại");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Cập nhật tên người liên hệ thất bại");
     } finally {
       setIsUpdating(false);
     }
@@ -450,8 +450,8 @@ export default function IdentificationDocumentManagementPage() {
       setIsEmergencyPhoneDialogOpen(false);
       setEmergencyPhoneValue("");
       await refreshUserData();
-    } catch (err: any) {
-      toast.error(err || "Cập nhật số điện thoại người liên hệ thất bại");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Cập nhật số điện thoại người liên hệ thất bại");
     } finally {
       setIsUpdating(false);
     }
@@ -491,8 +491,8 @@ export default function IdentificationDocumentManagementPage() {
       setIsPasswordDialogOpen(false);
       setPasswordValue("");
       setConfirmPasswordValue("");
-    } catch (err: any) {
-      toast.error(err || "Cập nhật mật khẩu thất bại");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Cập nhật mật khẩu thất bại");
     } finally {
       setIsUpdating(false);
     }
@@ -516,8 +516,8 @@ export default function IdentificationDocumentManagementPage() {
       setIsBioDialogOpen(false);
       setBioValue("");
       await refreshUserData();
-    } catch (err: any) {
-      toast.error(err || "Cập nhật mô tả thất bại");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Cập nhật mô tả thất bại");
     } finally {
       setIsUpdating(false);
     }
@@ -827,6 +827,7 @@ export default function IdentificationDocumentManagementPage() {
                             {file.label}
                           </figcaption>
                           {file.imageUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={file.imageUrl}
                               alt={file.label}

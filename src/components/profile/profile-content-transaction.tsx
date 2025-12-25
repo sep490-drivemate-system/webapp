@@ -143,8 +143,8 @@ export default function ProfileContentTransaction({
       (transactions ?? []).map((transaction) => ({
         ...transaction,
         id:
-          (transaction as any).id ??
-          (transaction as any)._id ??
+          ('id' in transaction && typeof transaction.id === 'string' ? transaction.id : null) ??
+          ('_id' in transaction && typeof transaction._id === 'string' ? transaction._id : null) ??
           transaction.title,
       })),
     [transactions]

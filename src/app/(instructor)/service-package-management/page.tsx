@@ -1,23 +1,14 @@
 "use client";
 
 import PageHeader from "@/components/commons/Header/header";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getInstructorPackages } from "@/features/package/packageThunk";
 import { getUserInfo } from "@/lib/jwt/jwt.utils";
 import { useThunkAction } from "@/lib/redux/useThunkAction";
 import { IInstructorPackages } from "@/types/instructor/instructor-management.types";
-import {
-  Clock,
-  Loader2,
-  Plus,
-  Route,
-  Trash2,
-  Workflow,
-  Wrench,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Clock, Loader2, Plus, Route, Workflow, Wrench } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -28,13 +19,10 @@ const formatCurrency = (value: number) => {
 
 interface PackageCardProps {
   pkg: IInstructorPackages;
-  onDelete: (id: string) => void;
   formatCurrency: (value: number) => string;
 }
 
-function PackageCard({ pkg, onDelete, formatCurrency }: PackageCardProps) {
-  const router = useRouter();
-
+function PackageCard({ pkg, formatCurrency }: PackageCardProps) {
   return (
     <Card className="overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300 flex flex-col">
       <div className="border-l-4 border-emerald-600 bg-gradient-to-r from-emerald-50 to-white p-6">
@@ -109,16 +97,12 @@ function PackageCard({ pkg, onDelete, formatCurrency }: PackageCardProps) {
 }
 
 export default function ServicePackageManagementPage() {
-  const router = useRouter();
   const [packages, setPackages] = useState<IInstructorPackages[]>([]);
+  const router = useRouter();
   const {
     run: fetchInstructorPackages,
     loading: fetchInstructorPackagesLoading,
   } = useThunkAction(getInstructorPackages);
-
-  const handleDelete = (id: string) => {
-    setPackages(packages.filter((pkg) => pkg.id !== id));
-  };
 
   useEffect(() => {
     const userId = getUserInfo()?.id;
@@ -194,7 +178,6 @@ export default function ServicePackageManagementPage() {
                   <PackageCard
                     key={pkg.id}
                     pkg={pkg}
-                    onDelete={() => handleDelete(pkg.id)}
                     formatCurrency={formatCurrency}
                   />
                 ))}

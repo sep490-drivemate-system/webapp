@@ -9,6 +9,7 @@ import { ReactionType } from "@/types/forum/post.enum";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { getUserInfo } from "@/lib/jwt/jwt.utils";
+import { Car, GraduationCap, FileText, Wrench, ShoppingCart, MessageSquare, type LucideIcon } from "lucide-react";
 
 interface UseForumOptions {
     initialSearchQuery?: string;
@@ -23,7 +24,7 @@ interface CategoryWithStats {
     hasVideo: boolean;
     latestVideo: string | null;
     latestPost: PostsDTO | null;
-    icon: any;
+    icon: React.ComponentType<{ className?: string }>;
     color: string;
 }
 
@@ -77,12 +78,6 @@ export const useForum = (options: UseForumOptions = {}) => {
         loadCategories();
     }, [dispatch]);
 
-    useEffect(() => {
-        if (autoLoad) {
-            loadPosts();
-        }
-    }, [autoLoad]);
-
     const loadPosts = useCallback(async (filter?: Partial<IPostFilter>) => {
         setIsLoadingPosts(true);
         try {
@@ -101,6 +96,12 @@ export const useForum = (options: UseForumOptions = {}) => {
         }
     }, [dispatch]);
 
+    useEffect(() => {
+        if (autoLoad) {
+            loadPosts();
+        }
+    }, [autoLoad, loadPosts]);
+
     const filteredPosts = useMemo(() => {
         let filtered = posts;
 
@@ -114,7 +115,7 @@ export const useForum = (options: UseForumOptions = {}) => {
         }
 
         if (selectedCategory) {
-            filtered = filtered.filter((post) => {
+            filtered = filtered.filter(() => {
                 return true;
             });
         }
@@ -132,7 +133,7 @@ export const useForum = (options: UseForumOptions = {}) => {
             : [];
 
         return catsToUse.map((cat) => {
-            const postsInCategory = posts.filter((p) => {
+            const postsInCategory = posts.filter(() => {
                 return true;
             });
             const postsWithVideo = postsInCategory.filter((p) => p.videos && p.videos.length > 0);
@@ -237,9 +238,10 @@ export const useForum = (options: UseForumOptions = {}) => {
             } else {
                 toast.error("Không thể thực hiện thao tác. Vui lòng thử lại.");
             }
-        } catch (error: any) {
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Không thể thực hiện thao tác. Vui lòng thử lại.";
             console.error("Error reacting to post:", error);
-            toast.error(error?.message || "Không thể thực hiện thao tác. Vui lòng thử lại.");
+            toast.error(errorMessage);
         } finally {
             setIsReacting((prev) => ({ ...prev, [postId]: false }));
         }
@@ -300,9 +302,10 @@ export const useForum = (options: UseForumOptions = {}) => {
             } else {
                 toast.error("Không thể thêm bình luận. Vui lòng thử lại.");
             }
-        } catch (error: any) {
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Không thể thêm bình luận. Vui lòng thử lại.";
             console.error("Error commenting on post:", error);
-            toast.error(error?.message || "Không thể thêm bình luận. Vui lòng thử lại.");
+            toast.error(errorMessage);
         } finally {
             setIsCommenting((prev) => ({ ...prev, [postId]: false }));
         }
@@ -364,9 +367,10 @@ export const useForum = (options: UseForumOptions = {}) => {
             } else {
                 toast.error("Không thể thêm phản hồi. Vui lòng thử lại.");
             }
-        } catch (error: any) {
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Không thể thêm phản hồi. Vui lòng thử lại.";
             console.error("Error replying to comment:", error);
-            toast.error(error?.message || "Không thể thêm phản hồi. Vui lòng thử lại.");
+            toast.error(errorMessage);
         } finally {
             setIsCommenting((prev) => ({ ...prev, [key]: false }));
         }
@@ -433,15 +437,15 @@ export const useForum = (options: UseForumOptions = {}) => {
 };
 
 // Helper functions
-function getCategoryIcon(category: string) {
-    const icons: Record<string, any> = {
-        "Kỹ năng lái xe": "Car",
-        "Thi bằng lái": "GraduationCap",
-        "Luật giao thông": "FileText",
-        "Bảo dưỡng xe": "Wrench",
-        "Tư vấn xe": "ShoppingCart",
+function getCategoryIcon(category: string): LucideIcon {
+    const icons: Record<string, LucideIcon> = {
+        "Kỹ năng lái xe": Car,
+        "Thi bằng lái": GraduationCap,
+        "Luật giao thông": FileText,
+        "Bảo dưỡng xe": Wrench,
+        "Tư vấn xe": ShoppingCart,
     };
-    return icons[category] || "MessageSquare";
+    return icons[category] || MessageSquare;
 }
 
 function getCategoryColor(category: string) {

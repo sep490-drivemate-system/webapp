@@ -6,11 +6,9 @@ import {
     getAccessToken,
     clearTokens,
     handleTokenStorage,
-    getUserInfo
 } from "@/lib/jwt/jwt.utils";
 import { UserRole } from "@/types/auth/user-role.enum";
 import { useThunkAction } from "@/lib/redux/useThunkAction";
-import { ISignInRequest, ISignInResponse } from "@/types/auth/signin.type";
 import { setSignInEmailOrPhone, setSignInPassword, resetSignInData, signOut } from "@/features/auth/authSlice";
 
 export const useSignIn = () => {
@@ -41,7 +39,7 @@ export const useSignIn = () => {
     };
 
     // Token management utilities
-    const saveTokens = (accessToken: string, refreshToken: string) => {
+    const saveTokens = (accessToken: string) => {
         handleTokenStorage(accessToken);
     };
 

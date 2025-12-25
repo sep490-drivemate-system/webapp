@@ -25,7 +25,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BlogCategory } from "@/types/blog/blog.type";
-import { log } from "console";
 
 export type BlogFormValues = {
   title: string;
@@ -91,6 +90,7 @@ function SquareImageUpload({
       {label && <Label className="text-foreground">{label}</Label>}
       {preview ? (
         <div className="aspect-square w-full max-w-xs rounded-lg border-2 border-border bg-secondary">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={preview || "/placeholder.svg"}
             alt={label || "Preview"}
@@ -168,9 +168,6 @@ export function BlogForm({
         ((initialPost as unknown as { categoryId?: string | null })?.categoryId ??
           null),
     });
-    console.log(values.title);
-    console.log(values.content);
-    console.log(values.thumbnail);
   }, [initialPost, initialCategoryId]);
 
   const isContentEmpty = useMemo(

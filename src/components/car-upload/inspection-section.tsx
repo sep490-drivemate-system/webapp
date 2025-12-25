@@ -3,9 +3,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ImageUploadField from "../commons/image-upload-field";
 
+interface InspectionData {
+  frontImage?: File | string | null;
+  backImage?: File | string | null;
+  [key: string]: File | string | null | undefined;
+}
+
 interface InspectionSectionProps {
-  data: any;
-  onUpdate: (data: any) => void;
+  data: InspectionData;
+  onUpdate: (data: InspectionData) => void;
 }
 
 export default function InspectionSection({

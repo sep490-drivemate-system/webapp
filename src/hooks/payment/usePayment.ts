@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { toast } from "sonner";
 import { getTransactions } from "@/features/transaction/transactionThunk";
 import { Withdrawals } from "@/features/wallet/walletThunk";
@@ -10,50 +10,51 @@ import {
 import { TransactionFilter, Transactions } from "@/types/transaction/transaction.filter.type";
 import { TransactionStatus } from "@/types/transaction/transaction.type";
 import { IWithdrawal, WithdrawStatus, BankType } from "@/types/withdrawal/withdrawal.type";
+import { PaginatedGeneric } from "@/types/generic/genericResponse";
 
-// Map TransactionStatus to PaymentStatus
-const mapTransactionStatusToPaymentStatus = (status: TransactionStatus): PaymentStatus => {
-    switch (status) {
-        case TransactionStatus.Pending:
-            return PaymentStatus.Pending;
-        case TransactionStatus.Processing:
-            return PaymentStatus.Processing;
-        case TransactionStatus.Completed:
-            return PaymentStatus.Completed;
-        case TransactionStatus.Fail:
-            return PaymentStatus.Failed;
-        case TransactionStatus.Cancelled:
-            return PaymentStatus.Cancelled;
-        case TransactionStatus.Refunded:
-            return PaymentStatus.Refunded;
-        case TransactionStatus.Deposit:
-            return PaymentStatus.Deposit;
-        default:
-            return PaymentStatus.Pending;
-    }
-};
+// Note: mapTransactionStatusToPaymentStatus is reserved for future use
+// const mapTransactionStatusToPaymentStatus = (status: TransactionStatus): PaymentStatus => {
+//     switch (status) {
+//         case TransactionStatus.Pending:
+//             return PaymentStatus.Pending;
+//         case TransactionStatus.Processing:
+//             return PaymentStatus.Processing;
+//         case TransactionStatus.Completed:
+//             return PaymentStatus.Completed;
+//         case TransactionStatus.Fail:
+//             return PaymentStatus.Failed;
+//         case TransactionStatus.Cancelled:
+//             return PaymentStatus.Cancelled;
+//         case TransactionStatus.Refunded:
+//             return PaymentStatus.Refunded;
+//         case TransactionStatus.Deposit:
+//             return PaymentStatus.Deposit;
+//         default:
+//             return PaymentStatus.Pending;
+//     }
+// };
 
-
-const getStatusText = (status: TransactionStatus): string => {
-    switch (status) {
-        case TransactionStatus.Pending:
-            return "Chờ xử lý";
-        case TransactionStatus.Processing:
-            return "Đang xử lý";
-        case TransactionStatus.Completed:
-            return "Hoàn thành";
-        case TransactionStatus.Fail:
-            return "Thất bại";
-        case TransactionStatus.Cancelled:
-            return "Đã hủy";
-        case TransactionStatus.Refunded:
-            return "Đã hoàn tiền";
-        case TransactionStatus.Deposit:
-            return "Nạp tiền";
-        default:
-            return "Không xác định";
-    }
-};
+// Note: getStatusText is reserved for future use
+// const getStatusText = (status: TransactionStatus): string => {
+//     switch (status) {
+//         case TransactionStatus.Pending:
+//             return "Chờ xử lý";
+//         case TransactionStatus.Processing:
+//             return "Đang xử lý";
+//         case TransactionStatus.Completed:
+//             return "Hoàn thành";
+//         case TransactionStatus.Fail:
+//             return "Thất bại";
+//         case TransactionStatus.Cancelled:
+//             return "Đã hủy";
+//         case TransactionStatus.Refunded:
+//             return "Đã hoàn tiền";
+//         case TransactionStatus.Deposit:
+//             return "Nạp tiền";
+//         default:
+//             return "Không xác định";
+//     }
+// };
 
 
 export const usePayment = () => {
@@ -77,7 +78,7 @@ export const usePayment = () => {
     const { runSafe: runGetTransactions } = useThunkAction(getTransactions);
     const { runSafe: runWithdrawals, loading: isProcessingWithdrawal } = useThunkAction(Withdrawals);
 
-    const loadTransactions = async (page: number = 1, status?: TransactionStatus) => {
+    const loadTransactions = useCallback(async (page: number = 1, status?: TransactionStatus) => {
         setIsLoading(true);
         try {
             const filter: TransactionFilter = {
@@ -86,11 +87,11 @@ export const usePayment = () => {
                 status: status,
             };
 
-            const result = await runGetTransactions(filter, {
+            await runGetTransactions(filter, {
                 onSuccess: (data) => {
                     console.log("API Response:", data);
                     // Data is wrapped in GenericResponse, so we need to access data.value
-                    const paginatedData = data?.value;
+                    const paginatedData = data?.value as PaginatedGeneric<Transactions> | undefined;
 
                     if (paginatedData) {
                         // Always set totalCount and currentPage if data exists
@@ -108,20 +109,20 @@ export const usePayment = () => {
                         setTotalCount(0);
                     }
                 },
-                onError: (error: any) => {
+                onError: (error: unknown) => {
+                    const errorMessage = error instanceof Error ? error.message : "Không thể tải danh sách giao dịch.";
                     console.error("Error loading transactions:", error);
-                    toast.error(error?.message || "Không thể tải danh sách giao dịch.");
+                    toast.error(errorMessage);
                     setTransactions([]);
                 },
             });
-        } catch (error: any) {
-            console.error("Error loading transactions:", error);
+        } catch {
             toast.error("Không thể tải danh sách giao dịch.");
             setTransactions([]);
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [runGetTransactions, pageSize]);
 
     useEffect(() => {
         const statusToFilter = statusFilter === "all"
@@ -129,7 +130,7 @@ export const usePayment = () => {
             : mapPaymentStatusToTransactionStatus(statusFilter);
         setCurrentPage(1);
         loadTransactions(1, statusToFilter);
-    }, [statusFilter]);
+    }, [statusFilter, loadTransactions]);
 
     const mapPaymentStatusToTransactionStatus = (status: PaymentStatus): TransactionStatus => {
         switch (status) {
@@ -307,12 +308,12 @@ export const usePayment = () => {
                         : mapPaymentStatusToTransactionStatus(statusFilter);
                     loadTransactions(currentPage, statusToFilter);
                 },
-                onError: (error: any) => {
-                    toast.error(error?.message || "Không thể xử lý yêu cầu rút tiền.");
+                onError: (error: unknown) => {
+                    const errorMessage = error instanceof Error ? error.message : "Không thể xử lý yêu cầu rút tiền.";
+                    toast.error(errorMessage);
                 },
             });
-        } catch (error: any) {
-            console.error("Error processing withdrawal:", error);
+        } catch {
             toast.error("Không thể xử lý yêu cầu rút tiền.");
         } finally {
             setIsLoading(false);

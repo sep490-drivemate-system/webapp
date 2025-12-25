@@ -32,11 +32,9 @@ export default function UploadDemoPage() {
         formData.append("meta", JSON.stringify({ tags: ["demo", "image"] }));
         const res = await runUpload(formData);
         if (res.ok) {
-            alert(`Upload thành công: ${(res.data as any).data?.url || (res.data as any).url || "(xem console)"}`);
-            // eslint-disable-next-line no-console
+            alert(`Upload thành công: ${res.data.value?.url || "(xem console)"}`);
             console.log("Upload response:", res.data);
         } else {
-            // eslint-disable-next-line no-console
             console.error(res.error);
             alert("Upload thất bại");
         }
@@ -45,11 +43,9 @@ export default function UploadDemoPage() {
     const handleCreateProfile = async () => {
         const res = await runCreateProfile({ name, email });
         if (res.ok) {
-            alert(`Tạo profile thành công: ${(res.data as any).data?.id || (res.data as any).id || "(xem console)"}`);
-            // eslint-disable-next-line no-console
+            alert(`Tạo profile thành công: ${res.data.value?.id || "(xem console)"}`);
             console.log("Create profile response:", res.data);
         } else {
-            // eslint-disable-next-line no-console
             console.error(res.error);
             alert("Tạo profile thất bại");
         }
@@ -80,10 +76,8 @@ export default function UploadDemoPage() {
         const res = await runTest(testData);
         if (res.ok) {
             alert("Test thành công! (xem console)");
-            // eslint-disable-next-line no-console
             console.log("Test response:", res.data);
         } else {
-            // eslint-disable-next-line no-console
             console.error(res.error);
             alert("Test thất bại");
         }

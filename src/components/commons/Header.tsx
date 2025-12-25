@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  CalendarClock,
   CircleUser,
   LogIn,
   LogOut,

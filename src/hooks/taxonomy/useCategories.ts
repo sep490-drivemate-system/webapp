@@ -17,7 +17,7 @@ export const useCategories = () => {
                 if (result?.value) {
                     setCategories(result.value);
                 }
-            } catch (error) {
+            } catch {
                 toast.error("Không thể tải danh mục. Vui lòng thử lại.");
             } finally {
                 setIsLoading(false);

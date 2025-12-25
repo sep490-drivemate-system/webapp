@@ -7,22 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
     MessageSquare,
-    HelpCircle,
     Search,
     FileText,
 } from "lucide-react";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-    DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { UserRole } from "@/types/auth/user-role.enum";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { CreatePostDialog } from "@/app/(community)/forum/components/CreatePostDialog";
-import { getUserRole } from "@/lib/jwt/jwt.utils";
-import { UserRole as AuthUserRole } from "@/types/auth/user-role.enum";
 
 interface HeaderCommunityProps {
     searchQuery?: string;
@@ -57,10 +45,9 @@ export default function HeaderCommunity({
 }: HeaderCommunityProps) {
     const pathname = usePathname();
     const isForum = pathname?.includes("/forum");
-    const isQA = pathname?.includes("/qa");
     const isPracticeTest = pathname?.includes("/practice-test");
 
-    const { isAuthenticated, role: authRole } = useAuth();
+    const { isAuthenticated } = useAuth();
 
     return (
         <div className="sticky top-0 z-50 bg-white border-b shadow-md">

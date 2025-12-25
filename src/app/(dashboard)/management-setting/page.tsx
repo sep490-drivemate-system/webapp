@@ -1,8 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 
+import PageHeader from "@/components/commons/Header/header";
+import { SetSchedule } from "@/components/documents/set-schdedule";
+import SettingCategoryList from "@/components/settings/setting-category-list";
+import SettingEditDialog from "@/components/settings/setting-edit-dialog";
+import SettingForm from "@/components/settings/setting-form";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,27 +17,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import PageHeader from "@/components/commons/Header/header";
-import SettingCategoryList from "@/components/settings/setting-category-list";
-import SettingForm from "@/components/settings/setting-form";
-import SettingEditDialog from "@/components/settings/setting-edit-dialog";
 import { Input } from "@/components/ui/input";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Percent } from "lucide-react";
-import { SetSchedule } from "@/components/documents/set-schdedule";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  getSettingCategoryFromName,
   settingsData,
   type Setting,
   type SettingCategory,
-  type SettingInput,
-  getSettingRoleLabelFromName,
-  getSettingCategoryFromName,
-  getSettingDisplayName,
+  type SettingInput
 } from "@/lib/settings";
+import { AlertCircle, Percent } from "lucide-react";
 
-export default function ManagementSettingPage() {
+export default function ManagementSettingPage() { 
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState(
     searchParams.get("tab") || "policy"
@@ -49,16 +47,6 @@ export default function ManagementSettingPage() {
   const [commissionSaving, setCommissionSaving] = useState(false);
   const [commissionSaved, setCommissionSaved] = useState(false);
 
-  const handleAddSetting = () => {
-    setEditingSetting(null);
-    setShowForm(true);
-  };
-
-  const handleEditSetting = (id: string) => {
-    setEditingSetting(id);
-    setShowForm(true);
-  };
-
   const handleSaveSetting = (settingData: SettingInput) => {
     if (editingSetting) {
       setSettings(
@@ -70,10 +58,6 @@ export default function ManagementSettingPage() {
       setSettings([...settings, { id: Date.now().toString(), ...settingData }]);
     }
     setShowForm(false);
-  };
-
-  const handleDeleteSetting = (id: string) => {
-    setSettings(settings.filter((s) => s.id !== id));
   };
 
   const handleEditSettingQuick = (setting: Setting) => {
@@ -110,20 +94,11 @@ export default function ManagementSettingPage() {
       await new Promise((resolve) => setTimeout(resolve, 500));
       setCommissionSaved(true);
       setTimeout(() => setCommissionSaved(false), 2500);
-    } catch (err) {
+    } catch {
       setCommissionError("Không thể lưu tỉ lệ hoa hồng. Vui lòng thử lại.");
     } finally {
       setCommissionSaving(false);
     }
-  };
-
-  const getCategoryLabel = (category: SettingCategory) => {
-    const labels: Record<SettingCategory, string> = {
-      "cancel-service-package": "Hủy gói dịch vụ",
-      "cancel-driving-session": "Hủy buổi huấn luyện",
-      "reschedule-driving-session": "Đổi lịch buổi huấn luyện",
-    };
-    return labels[category];
   };
 
   return (

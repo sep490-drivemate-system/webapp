@@ -2,10 +2,21 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import PageHeader from "@/components/commons/Header/header";
+import { PaginationControls } from "@/components/commons/pagination-controls";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import {
   Select,
   SelectContent,
@@ -14,25 +25,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import PageHeader from "@/components/commons/Header/header";
-import { Filter, Search } from "lucide-react";
-import { PaginationControls } from "@/components/commons/pagination-controls";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationEllipsis,
-} from "@/components/ui/pagination";
+import { getUserTransactions } from "@/features/transaction/transactionThunk";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/useAppDispatch";
 import {
   FilterState,
   Transaction,
   TransactionStatus,
 } from "@/types/transaction/transaction.type";
-import { useAppDispatch, useAppSelector } from "@/lib/redux/useAppDispatch";
-import { getUserTransactions } from "@/features/transaction/transactionThunk";
+import { Filter, Search } from "lucide-react";
 
 const defaultFilters: FilterState = {
   timeRange: "all",
@@ -163,8 +163,8 @@ export default function TransactionsPage() {
       (transactions ?? []).map((transaction) => ({
         ...transaction,
         id:
-          (transaction as any).id ??
-          (transaction as any)._id ??
+          (transaction as unknown as { id?: string }).id ??
+          (transaction as unknown as { _id?: string })._id ??
           transaction.title,
       })),
     [transactions]

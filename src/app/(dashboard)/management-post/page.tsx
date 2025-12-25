@@ -537,7 +537,7 @@ export default function PostManagementPage() {
                     <DialogHeader>
                         <DialogTitle>Từ chối bài viết</DialogTitle>
                         <DialogDescription>
-                            Vui lòng nhập lý do từ chối bài viết "{selectedPost?.title}"
+                            Vui lòng nhập lý do từ chối bài viết &quot;{selectedPost?.title}&quot;
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">

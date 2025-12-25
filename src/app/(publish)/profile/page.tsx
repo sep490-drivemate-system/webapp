@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { User, Mail, Camera, Check, X } from "lucide-react";
+import { User, Camera, Check, X } from "lucide-react";
 import ProfileSideBar from "@/components/profile/profile-side-bar";
 import ProfileContent from "@/components/profile/profile-content";
 import mockData from "@/data/mock-user-profile.json";

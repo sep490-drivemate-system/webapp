@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { BaseState } from "@/types/generic/baseState";
 import { Transaction } from "@/types/transaction/transaction.type";
 import { getUserTransactions } from "./transactionThunk";
@@ -37,19 +37,34 @@ const transactionSlice = createSlice({
             .addCase(getUserTransactions.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                const response = action.payload as any;
+                const response = action.payload as 
+                    | Transaction[] 
+                    | { value?: { pageContent?: Transaction[] } | Transaction[] }
+                    | unknown;
                 
-                let transactions: any[] = [];
+                let transactions: Transaction[] = [];
                 
                 if (Array.isArray(response)) {
                     transactions = response;
-                } else if (response?.value?.pageContent && Array.isArray(response.value.pageContent)) {
-                    transactions = response.value.pageContent;
-                } else if (Array.isArray(response?.value)) {
-                    transactions = response.value;
+                } else if (
+                    typeof response === 'object' && 
+                    response !== null && 
+                    'value' in response
+                ) {
+                    const value = (response as { value?: { pageContent?: Transaction[] } | Transaction[] }).value;
+                    if (Array.isArray(value)) {
+                        transactions = value;
+                    } else if (
+                        typeof value === 'object' && 
+                        value !== null && 
+                        'pageContent' in value &&
+                        Array.isArray((value as { pageContent?: Transaction[] }).pageContent)
+                    ) {
+                        transactions = (value as { pageContent: Transaction[] }).pageContent;
+                    }
                 }
                 
-                state.transactions = transactions.map((transaction: any) => ({
+                state.transactions = transactions.map((transaction) => ({
                     ...transaction,
                     date: transaction.date instanceof Date 
                         ? transaction.date.toISOString()

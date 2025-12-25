@@ -1,4 +1,4 @@
-import { User, UserRole } from "./post.type";
+import { User } from "./post.type";
 
 export interface Question {
   id: string;

@@ -100,7 +100,7 @@ export interface PackageType {
   status: "active" | "completed" | "expired" | "cancelled";
   purchaseDate: string;
   expiryDate: string;
-  sessions: any[];
+  sessions: unknown[];
 }
 
 export default function ManagementPackagePage() {
@@ -206,11 +206,11 @@ export default function ManagementPackagePage() {
 
           if (vehicleFilter === "with") {
             pageContent = pageContent.filter(
-              (pkg: any) => pkg.isRentalCar === true
+              (pkg) => pkg.isRentalCar === true
             );
           } else if (vehicleFilter === "without") {
             pageContent = pageContent.filter(
-              (pkg: any) => pkg.isRentalCar === false
+              (pkg) => pkg.isRentalCar === false
             );
           }
 
@@ -276,11 +276,13 @@ export default function ManagementPackagePage() {
   const goToNextSkillPage = () =>
     setSkillCurrentPage((prev) => Math.min(prev + 1, skillTotalPages));
 
-  const handleCreatePackage = (newPackage: PackageType) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleCreatePackage = (_newPackage: PackageType) => {
     setIsCreateDialogOpen(false);
   };
 
-  const handleEditPackage = (updatedPackage: PackageType) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleEditPackage = (_updatedPackage: PackageType) => {
     setIsEditDialogOpen(false);
     setSelectedPackage(null);
   };
@@ -638,7 +640,7 @@ export default function ManagementPackagePage() {
                         </TableCell>
                         <TableCell className="px-4 py-3">
                           <span className="text-sm">
-                            {(pkg as any).isRentalCar ?? !pkg.isRentalCar
+                            {pkg.isRentalCar
                               ? "Kèm thuê xe"
                               : "Không kèm thuê xe"}
                           </span>
@@ -1114,8 +1116,7 @@ export default function ManagementPackagePage() {
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge variant="secondary" className="rounded-full px-3 py-1">
-                        {(selectedServicePackage as any).isRentalCar ??
-                        !selectedServicePackage.isRentalCar
+                        {selectedServicePackage.isRentalCar
                           ? "Kèm thuê xe"
                           : "Không kèm thuê xe"}
                       </Badge>

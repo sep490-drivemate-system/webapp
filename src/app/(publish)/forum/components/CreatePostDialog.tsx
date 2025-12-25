@@ -1,16 +1,15 @@
 "use client";
 
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ShadcnEditor } from "@/components/shadcn-editor/shadcn-editor";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Upload, X, Loader2, Image as ImageIcon, Video, FileImage, Link } from "lucide-react";
-import { ShadcnEditor } from "@/components/shadcn-editor/shadcn-editor";
-import { useCreatePost } from "@/hooks/forum/usePost";
 import { useAuth } from "@/hooks/auth/useAuth";
+import { useCreatePost } from "@/hooks/forum/usePost";
 import { UserRole } from "@/types/auth/user-role.enum";
+import { FileImage, Loader2, Plus, Video, X } from "lucide-react";
 
 type CreatePostDialogProps = {
   onCreated?: () => void;
@@ -28,18 +27,15 @@ export function CreatePostDialog({ onCreated }: CreatePostDialogProps) {
     setContent,
     selectedCategoryId,
     setSelectedCategoryId,
-    selectedTagIds,
     imageFiles,
     videoFiles,
     imagePreviews,
     videoPreviews,
     categories,
-    tags,
     handleImageChange,
     handleVideoChange,
     removeImage,
     removeVideo,
-    toggleTag,
     handleSubmit,
     handleClose,
   } = useCreatePost(onCreated);
@@ -141,6 +137,7 @@ export function CreatePostDialog({ onCreated }: CreatePostDialogProps) {
                       key={index}
                       className="relative group aspect-square rounded-lg overflow-hidden border-2 border-border bg-muted"
                     >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={preview}
                         alt={`Preview ${index + 1}`}

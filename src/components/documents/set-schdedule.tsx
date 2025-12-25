@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Calendar, Save, AlertCircle } from "lucide-react";
+import { Calendar, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function SetSchedule() {
@@ -39,7 +39,7 @@ export function SetSchedule() {
 
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (err) {
+    } catch {
       setError("Có lỗi xảy ra khi lưu cấu hình. Vui lòng thử lại.");
     } finally {
       setIsSaving(false);

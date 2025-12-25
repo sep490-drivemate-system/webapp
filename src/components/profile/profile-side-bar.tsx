@@ -2,6 +2,7 @@ import {
   User,
   Clock,
   ChevronRight,
+  LucideIcon,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSignIn } from "@/hooks/auth/useSignIn";
@@ -21,7 +22,7 @@ interface ProfileSideBarProps {
   onTabChange: (tab: TabType) => void;
 }
 
-const menuItems: Array<{ id: MenuItemId; label: string; icon: any }> = [
+const menuItems: Array<{ id: MenuItemId; label: string; icon: LucideIcon }> = [
   { id: "info", label: "Thông tin cá nhân", icon: User },
   { id: "history", label: "Lịch sử giao dịch", icon: Clock },
   // // { id: "packages", label: "Lịch sử mua gói", icon: Package },

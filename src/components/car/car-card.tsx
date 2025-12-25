@@ -40,6 +40,7 @@ export function CarCard({
       className={`overflow-hidden hover:shadow-lg transition-shadow p-0 gap-0 ${className}`}
     >
       <div className="relative">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={car.thumbnailUrl}
           alt={`${car.brand} ${car.modelName}`}

@@ -40,7 +40,7 @@ type PersonalSectionProps = {
   saveField: (fieldName: string) => void;
   cancelFieldEditing: (fieldName: string) => void;
   formValues: PersonalFormValues & Record<string, unknown>;
-  setFormValues: React.Dispatch<React.SetStateAction<any>>;
+  setFormValues: React.Dispatch<React.SetStateAction<PersonalFormValues & Record<string, unknown>>>;
   showPassword: Record<string, boolean>;
   setShowPassword: React.Dispatch<
     React.SetStateAction<Record<string, boolean>>
@@ -572,6 +572,7 @@ const ProfileContentPersonal = ({
                 </div>
                 {formValues.licensePhoto && (
                   <div className="relative w-full max-w-md mx-auto">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={formValues.licensePhoto}
                       alt="License preview"
@@ -583,11 +584,14 @@ const ProfileContentPersonal = ({
             ) : (
               <div className="border rounded-lg p-4 bg-gray-50">
                 {formValues.licensePhoto ? (
-                  <img
-                    src={formValues.licensePhoto}
-                    alt="License"
-                    className="w-full max-w-md mx-auto h-auto rounded-lg"
-                  />
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={formValues.licensePhoto}
+                      alt="License"
+                      className="w-full max-w-md mx-auto h-auto rounded-lg"
+                    />
+                  </>
                 ) : (
                   <div className="text-center py-8 text-gray-500">
                     <CreditCard className="w-12 h-12 mx-auto mb-2 text-gray-400" />

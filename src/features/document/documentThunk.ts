@@ -92,7 +92,7 @@ function createLicenseNoviceFormData(image: string | File | null): FormData {
         uri: uri,
         type: mimeType,
         name: `license.${extension}`,
-      } as any);
+      } as unknown as File);
     } else {
       formData.append("image", image);
     }

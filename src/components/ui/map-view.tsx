@@ -55,13 +55,16 @@ const mockLocations: MapLocation[] = [
   }
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LeafletMap = any;
+
 export function MapView({ 
   locations = mockLocations, 
   onLocationSelect,
   height = "400px" 
 }: MapViewProps) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<any>(null);
+  const [map, setMap] = useState<LeafletMap>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLocation, setSelectedLocation] = useState<MapLocation | null>(null);
   const [isLoading, setIsLoading] = useState(false);

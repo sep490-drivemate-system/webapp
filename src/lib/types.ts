@@ -17,8 +17,8 @@ export interface DocumentRecord {
   typeId: string;
   typeName: string;
   userId: string;
-  data: Record<string, any>;
-  files: Record<string, any>;
+  data: Record<string, unknown>;
+  files: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
   status: "pending" | "verified" | "rejected";

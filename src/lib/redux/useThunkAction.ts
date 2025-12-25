@@ -9,7 +9,9 @@ type Handlers<TData> = {
     onFinally?: () => void;
 };
 
-export function useThunkAction<TArg, TData, TConfig extends {} = any>(
+type ThunkConfig = Record<string, unknown>;
+
+export function useThunkAction<TArg, TData, TConfig extends ThunkConfig = ThunkConfig>(
     thunk: AsyncThunk<TData, TArg, TConfig>
 ) {
     const dispatch = useAppDispatch();
@@ -21,7 +23,8 @@ export function useThunkAction<TArg, TData, TConfig extends {} = any>(
             setLoading(true);
             setError(null);
             try {
-                const actionPromise = (dispatch as any)((thunk as any)(arg));
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const actionPromise = dispatch(thunk(arg) as any);
                 const result = (await actionPromise.unwrap()) as TData;
                 handlers?.onSuccess?.(result);
                 return result;

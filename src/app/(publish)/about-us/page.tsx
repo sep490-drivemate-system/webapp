@@ -99,6 +99,7 @@ export default function AboutUsPage() {
           <div className="grid md:grid-cols-2 gap-8 items-stretch mb-12">
             <div className="relative h-64 md:h-full rounded-2xl overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20 border border-border/50">
               <div className="absolute inset-0 flex items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/hero_image.png"
                   alt="Huấn luyện viên hướng dẫn người lái mới"

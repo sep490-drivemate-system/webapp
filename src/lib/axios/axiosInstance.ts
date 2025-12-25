@@ -1,7 +1,6 @@
 import axios, { AxiosError } from "axios";
 import {
   getAccessToken,
-  handleTokenStorage,
   clearTokens,
 } from "@/lib/jwt/jwt.utils";
 
@@ -15,8 +14,9 @@ const axiosInstance = axios.create({
 });
 
 // ----- Refresh token flow -----
-let isRefreshing = false as boolean;
-let refreshPromise: Promise<string> | null = null;
+// Note: These variables are reserved for future token refresh implementation
+// const isRefreshing = false;
+// const refreshPromise: Promise<string> | null = null;
 
 
 
@@ -57,13 +57,15 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const status = error.response?.status;
-    const originalConfig: any = error.config || {};
+    const originalConfig = error.config as { _retry?: boolean } | undefined;
 
     if (status === 401 && typeof window !== "undefined") {
-      if (!originalConfig._retry) {
-        originalConfig._retry = true;
+      if (!originalConfig?._retry) {
+        if (originalConfig) {
+          originalConfig._retry = true;
+        }
         try {
-          const newAccess = await getAccessToken();
+          await getAccessToken();
         } catch {
         }
       }

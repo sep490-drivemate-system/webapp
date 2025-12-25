@@ -18,7 +18,6 @@ import {
 import {
   Clock,
   Calendar,
-  MapPin,
   Car,
   CheckCircle,
   XCircle,
@@ -49,12 +48,11 @@ interface Package {
   status: string;
   purchaseDate: string;
   expiryDate: string;
-  sessions: any[];
+  sessions: unknown[];
 }
 
 export default function MyPackagesPage() {
-  const [packages, setPackages] = useState<Package[]>(packagesData.packages as any);
-  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
+  const [packages, setPackages] = useState<Package[]>(packagesData.packages as Package[]);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelingPackage, setCancelingPackage] = useState<Package | null>(null);
 
@@ -74,22 +72,12 @@ export default function MyPackagesPage() {
     });
   };
 
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   const getStatusInfo = (status: string) => {
+    type IconComponent = React.ComponentType<{ className?: string }>;
     const statusMap: Record<string, { 
       label: string; 
       variant: "default" | "secondary" | "outline" | "destructive";
-      icon: any;
+      icon: IconComponent;
     }> = {
       active: { 
         label: "Đang hoạt động", 

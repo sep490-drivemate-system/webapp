@@ -54,6 +54,7 @@ export default function ImageUploadField({
       <Label className={labelClassName || "text-foreground"}>{label}</Label>
       {preview ? (
         <div className="relative rounded-lg overflow-hidden border-2 border-border bg-secondary p-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={preview || "/placeholder.svg"}
             alt={label}

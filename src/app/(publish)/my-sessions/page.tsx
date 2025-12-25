@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -67,7 +67,7 @@ interface Session {
 }
 
 export default function MySessionsPage() {
-  const [sessions, setSessions] = useState<Session[]>(sessionsData.sessions as any);
+  const [sessions, setSessions] = useState<Session[]>(sessionsData.sessions as Session[]);
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
@@ -99,11 +99,12 @@ export default function MySessionsPage() {
   };
 
   const getStatusInfo = (status: string) => {
+    type IconComponent = React.ComponentType<{ className?: string }>;
     const statusMap: Record<string, {
       label: string;
       variant: "default" | "secondary" | "outline" | "destructive";
       color: string;
-      icon: any;
+      icon: IconComponent;
     }> = {
       pending: {
         label: "Chờ xác nhận",

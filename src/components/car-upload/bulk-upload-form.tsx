@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Upload, Download, FileJson } from "lucide-react";
+import { Download, FileJson } from "lucide-react";
 
 interface BulkUploadFormProps {
   onSuccess: (msg: string) => void;

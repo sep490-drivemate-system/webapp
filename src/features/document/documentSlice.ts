@@ -115,7 +115,7 @@ const documentSlice = createSlice({
         state.errorMessage = null;
         state.isSuccess = false;
       })
-      .addCase(updateUserEmergencyContact.fulfilled, (state, action) => {
+      .addCase(updateUserEmergencyContact.fulfilled, (state) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.errorMessage = null;
@@ -130,7 +130,7 @@ const documentSlice = createSlice({
         state.errorMessage = null;
         state.isSuccess = false;
       })
-      .addCase(updateNoviceDriverLicense.fulfilled, (state, action) => {
+      .addCase(updateNoviceDriverLicense.fulfilled, (state) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.errorMessage = null;

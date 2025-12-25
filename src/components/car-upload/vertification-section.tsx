@@ -3,9 +3,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ImageUploadField from "../commons/image-upload-field";
 
+interface VerificationData {
+  frontImage?: File | string | null;
+  backImage?: File | string | null;
+  leftSideImage?: File | string | null;
+  rightSideImage?: File | string | null;
+  interiorImage?: File | string | null;
+  [key: string]: File | string | null | undefined;
+}
+
 interface VerificationSectionProps {
-  data: any;
-  onUpdate: (data: any) => void;
+  data: VerificationData;
+  onUpdate: (data: VerificationData) => void;
 }
 
 export default function VerificationSection({

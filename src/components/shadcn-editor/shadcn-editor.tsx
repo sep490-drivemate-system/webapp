@@ -27,7 +27,6 @@ import {
   $getRoot,
   EditorState,
   LexicalEditor,
-  ElementNode,
 } from "lexical";
 
 import { TooltipProvider } from "@/components/ui/tooltip";

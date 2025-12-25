@@ -11,7 +11,7 @@ export interface IRentalPackage {
 
 export interface IInstructorOption {
   id: number;
-  imageUrl: any;
+  imageUrl: string;
   title: string;
   description: string;
 }
